@@ -43,4 +43,18 @@ class Controller
         header("Location:".ROOT."/".trim($page,"/"));
         exit();
     }
+
+    public function isLoggedIn()
+{
+    return isset($_SESSION['id_utilisateur']);
+}
+
+public function requireLogin()
+{
+    if (!$this->isLoggedIn()) {
+        header('Location: ' . BASE_URL . '/Loguins');
+        exit();
+    }
+}
+
 }

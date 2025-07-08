@@ -1,411 +1,168 @@
+<?php $this->view('partials/header')?>
 
-<!DOCTYPE html>
-<html lang="zxx" class="js">
+<body>
 
-<?php  $this->view('common/header')?>
 
-<body class="nk-body bg-lighter npc-default has-sidebar ">
-    <div class="nk-app-root">
-        <!-- main @s -->
-        <div class="nk-main ">
-            <!-- sidebar @s -->
-            <?php  $this->view('common/sidebare')?>
-            <!-- sidebar @e -->
-            <!-- wrap @s -->
-            <div class="nk-wrap ">
-                <!-- main header @s -->
-                <?php $this->view ('common/navbare') ?>
-                <!-- main header @e -->
-                <!-- content @s -->
-                <div class="nk-content ">
-                    <div class="container-fluid">
-                        <div class="nk-content-inner">
-                            <div class="nk-content-body">
-                                <div class="nk-block-head nk-block-head-sm">
-                                    <div class="nk-block-between">
-                                        <div class="nk-block-head-content">
-                                            <h3 class="nk-block-title page-title">Dashboard</h3>
-                                        </div><!-- .nk-block-head-content -->
-                                        <div class="nk-block-head-content">
-                                            <div class="toggle-wrap nk-block-tools-toggle">
-                                                <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1" data-target="pageMenu"><em class="icon ni ni-more-v"></em></a>
-                                                <div class="toggle-expand-content" data-content="pageMenu">
-                                                    
-                                                </div>
-                                            </div>
-                                        </div><!-- .nk-block-head-content -->
-                                    </div><!-- .nk-block-between -->
-                                </div><!-- .nk-block-head -->
-                                <div class="nk-block">
-                                    <div class="row g-gs ">
-                                        <div class="col-xxl-3 col-sm-6 col-xs-6 col-md-3 col-lg-3" >
-                                            <a href="text.php" class="">
-                                                <div class="card text-white" style="background-color: #009688">
-                                                    <a href="">
-                                                        <div class="nk-ecwg nk-ecwg6">
-                                                            <div class="card-inner">
-                                                                <div class="card-title-group">
-                                                                    <div class="card-title">
-                                                                        <h6 class="title" align="center">Liste d'attente</h6>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="data" align="center">
-                                                                    <div class="data-group">
-                                                                        <div class="amount text-white" align="center">1,945</div>
-                                                                        <div class="nk-ecwg6-ck">
-                                                                            <em class=" ni ni-users h-20 " style="font-size: 25px"></em>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class=" info" align="right"><span style="font-size: 25px" class="p-2 change up text-danger"><em class="icon ni ni-chevron-right-circle" ></em></span></div>
-                                                                </div>
-                                                            </div><!-- .card-inner -->
-                                                        </div><!-- .nk-ecwg -->
-                                                    </a>
+  <!--start wrapper-->
+  <div class="wrapper">
+    <!--start top header-->
+      <?php $this->view('partials/navbar')?>
+       <!--end top header-->
 
-                                                </div>
-                                            </a>
-                                           <!-- .card -->
-                                        </div><!-- .col -->
-                                        <div class="col-xxl-3 col-sm-6 col-xs-6 col-md-3 col-lg-3" >
-                                            <a href="text.php" class="">
-                                                <div class="card text-white" style="background-color: #009688">
-                                                    <a href="">
-                                                        <div class="nk-ecwg nk-ecwg6">
-                                                            <div class="card-inner">
-                                                                <div class="card-title-group">
-                                                                    <div class="card-title">
-                                                                        <h6 class="title" align="center">Liste d'attente</h6>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="data" align="center">
-                                                                    <div class="data-group">
-                                                                        <div class="amount text-white" align="center">1,945</div>
-                                                                        <div class="nk-ecwg6-ck">
-                                                                            <em class=" ni ni-users h-20 " style="font-size: 25px"></em>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class=" info" align="right"><span style="font-size: 25px" class="p-2 change up text-danger"><em class="icon ni ni-chevron-right-circle" ></em></span></div>
-                                                                </div>
-                                                            </div><!-- .card-inner -->
-                                                        </div><!-- .nk-ecwg -->
-                                                    </a>
+        <!--start sidebar -->
+      <?php $this->view('partials/sidebar')?>
+       <!--end sidebar -->
 
-                                                </div>
-                                            </a>
-                                           <!-- .card -->
-                                        </div><!-- .col --><div class="col-xxl-3 col-sm-6 col-xs-6 col-md-3 col-lg-3" >
-                                            <a href="text.php" class="">
-                                                <div class="card text-white" style="background-color: #009688">
-                                                    <a href="">
-                                                        <div class="nk-ecwg nk-ecwg6">
-                                                            <div class="card-inner">
-                                                                <div class="card-title-group">
-                                                                    <div class="card-title">
-                                                                        <h6 class="title" align="center">Liste d'attente</h6>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="data" align="center">
-                                                                    <div class="data-group">
-                                                                        <div class="amount text-white" align="center">1,945</div>
-                                                                        <div class="nk-ecwg6-ck">
-                                                                            <em class=" ni ni-users h-20 " style="font-size: 25px"></em>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class=" info" align="right"><span style="font-size: 25px" class="p-2 change up text-danger"><em class="icon ni ni-chevron-right-circle" ></em></span></div>
-                                                                </div>
-                                                            </div><!-- .card-inner -->
-                                                        </div><!-- .nk-ecwg -->
-                                                    </a>
-
-                                                </div>
-                                            </a>
-                                           <!-- .card -->
-                                        </div><!-- .col -->
-                                        <div class="col-xxl-3 col-sm-6 col-xs-6 col-md-3 col-lg-3" >
-                                            <a href="text.php" class="">
-                                                <div class="card text-white" style="background-color: #009688">
-                                                    <a href="">
-                                                        <div class="nk-ecwg nk-ecwg6">
-                                                            <div class="card-inner">
-                                                                <div class="card-title-group">
-                                                                    <div class="card-title">
-                                                                        <h6 class="title" align="center">Consu</h6>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="data" align="center">
-                                                                    <div class="data-group">
-                                                                        <div class="amount text-white" align="center">1,945</div>
-                                                                        <div class="nk-ecwg6-ck">
-                                                                            <em class=" ni ni-users h-20 " style="font-size: 25px"></em>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class=" info" align="right"><span style="font-size: 25px" class="p-2 change up text-danger"><em class="icon ni ni-chevron-right-circle" ></em></span></div>
-                                                                </div>
-                                                            </div><!-- .card-inner -->
-                                                        </div><!-- .nk-ecwg -->
-                                                    </a>
-
-                                                </div>
-                                            </a>
-                                           <!-- .card -->
-                                        </div><!-- .col -->
-
-                                    </div><!-- .row -->
-                                    <div class="row g-gs pt-5">
-                                        <div class="col-xxl-3 col-sm-6 col-xs-6 col-md-3 col-lg-3" >
-                                            <a href="text.php" class="">
-                                                <div class="card text-white" style="background-color: #009688">
-                                                    <a href="">
-                                                        <div class="nk-ecwg nk-ecwg6">
-                                                            <div class="card-inner">
-                                                                <div class="card-title-group">
-                                                                    <div class="card-title">
-                                                                        <h6 class="title" align="center">Liste d'attente</h6>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="data" align="center">
-                                                                    <div class="data-group">
-                                                                        <div class="amount text-white" align="center">1,945</div>
-                                                                        <div class="nk-ecwg6-ck">
-                                                                            <em class=" ni ni-users h-20 " style="font-size: 25px"></em>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class=" info" align="right"><span style="font-size: 25px" class="p-2 change up text-danger"><em class="icon ni ni-chevron-right-circle" ></em></span></div>
-                                                                </div>
-                                                            </div><!-- .card-inner -->
-                                                        </div><!-- .nk-ecwg -->
-                                                    </a>
-
-                                                </div>
-                                            </a>
-                                           <!-- .card -->
-                                        </div><!-- .col -->
-                                        <div class="col-xxl-3 col-sm-6 col-xs-6 col-md-3 col-lg-3" >
-                                            <a href="text.php" class="">
-                                                <div class="card text-white" style="background-color: #009688">
-                                                    <a href="">
-                                                        <div class="nk-ecwg nk-ecwg6">
-                                                            <div class="card-inner">
-                                                                <div class="card-title-group">
-                                                                    <div class="card-title">
-                                                                        <h6 class="title" align="center">Liste d'attente</h6>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="data" align="center">
-                                                                    <div class="data-group">
-                                                                        <div class="amount text-white" align="center">1,945</div>
-                                                                        <div class="nk-ecwg6-ck">
-                                                                            <em class=" ni ni-users h-20 " style="font-size: 25px"></em>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class=" info" align="right"><span style="font-size: 25px" class="p-2 change up text-danger"><em class="icon ni ni-chevron-right-circle" ></em></span></div>
-                                                                </div>
-                                                            </div><!-- .card-inner -->
-                                                        </div><!-- .nk-ecwg -->
-                                                    </a>
-
-                                                </div>
-                                            </a>
-                                           <!-- .card -->
-                                        </div><!-- .col --><div class="col-xxl-3 col-sm-6 col-xs-6 col-md-3 col-lg-3" >
-                                            <a href="text.php" class="">
-                                                <div class="card text-white" style="background-color: #009688">
-                                                    <a href="">
-                                                        <div class="nk-ecwg nk-ecwg6">
-                                                            <div class="card-inner">
-                                                                <div class="card-title-group">
-                                                                    <div class="card-title">
-                                                                        <h6 class="title" align="center">Liste d'attente</h6>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="data" align="center">
-                                                                    <div class="data-group">
-                                                                        <div class="amount text-white" align="center">1,945</div>
-                                                                        <div class="nk-ecwg6-ck">
-                                                                            <em class=" ni ni-users h-20 " style="font-size: 25px"></em>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class=" info" align="right"><span style="font-size: 25px" class="p-2 change up text-danger"><em class="icon ni ni-chevron-right-circle" ></em></span></div>
-                                                                </div>
-                                                            </div><!-- .card-inner -->
-                                                        </div><!-- .nk-ecwg -->
-                                                    </a>
-
-                                                </div>
-                                            </a>
-                                           <!-- .card -->
-                                        </div><!-- .col -->
-                                        <div class="col-xxl-3 col-sm-6 col-xs-6 col-md-3 col-lg-3" >
-                                            <a href="text.php" class="">
-                                                <div class="card text-white" style="background-color: #009688">
-                                                    <a href="">
-                                                        <div class="nk-ecwg nk-ecwg6">
-                                                            <div class="card-inner">
-                                                                <div class="card-title-group">
-                                                                    <div class="card-title">
-                                                                        <h6 class="title" align="center">Consu</h6>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="data" align="center">
-                                                                    <div class="data-group">
-                                                                        <div class="amount text-white" align="center">1,945</div>
-                                                                        <div class="nk-ecwg6-ck">
-                                                                            <em class=" ni ni-users h-20 " style="font-size: 25px"></em>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class=" info" align="right"><span style="font-size: 25px" class="p-2 change up text-danger"><em class="icon ni ni-chevron-right-circle" ></em></span></div>
-                                                                </div>
-                                                            </div><!-- .card-inner -->
-                                                        </div><!-- .nk-ecwg -->
-                                                    </a>
-
-                                                </div>
-                                            </a>
-                                           <!-- .card -->
-                                        </div><!-- .col -->
-
-                                    </div><!-- .row -->
-                                </div><!-- .nk-block -->
+       <!--start content-->
+          <main class="page-content">
+              
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-4">
+              <div class="col">
+                <div class="card radius-10">
+                  <div class="card-body">
+                      <div class="d-flex align-items-center">
+                          <div>
+                              <p class="mb-0 text-secondary">Total Orders</p>
+                              <h4 class="my-1">4805</h4>
+                              <p class="mb-0 font-13 text-success"><i class="bi bi-caret-up-fill"></i> 5% from last week</p>
+                          </div>
+                          <div class="widget-icon-large bg-gradient-purple text-white ms-auto"><i class="bi bi-basket2-fill"></i>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+               </div>
+               <div class="col">
+                  <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text-secondary">Total Revenue</p>
+                                <h4 class="my-1">$24K</h4>
+                                <p class="mb-0 font-13 text-success"><i class="bi bi-caret-up-fill"></i> 4.6 from last week</p>
+                            </div>
+                            <div class="widget-icon-large bg-gradient-success text-white ms-auto"><i class="bi bi-currency-exchange"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- content @e -->
-                <!-- footer @s -->
-                <?php $this->view('common/foot') ?>
-                <!-- footer @e -->
-            </div>
-
-            <!-- wrap @e -->
-        </div>
-        <!-- main @e -->
-    </div>
-    <!-- app-root @e -->
-    <!-- select region modal -->
-    <div class="modal fade" tabindex="-1" role="dialog" id="region">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross-sm"></em></a>
-                <div class="modal-body modal-body-md">
-                    <h5 class="title mb-4">Select Your Country</h5>
-                    <div class="nk-country-region">
-                        <ul class="country-list text-center gy-2">
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/arg.png" alt="" class="country-flag">
-                                    <span class="country-name">Argentina</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/aus.png" alt="" class="country-flag">
-                                    <span class="country-name">Australia</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/bangladesh.png" alt="" class="country-flag">
-                                    <span class="country-name">Bangladesh</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/canada.png" alt="" class="country-flag">
-                                    <span class="country-name">Canada <small>(English)</small></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/china.png" alt="" class="country-flag">
-                                    <span class="country-name">Centrafricaine</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/china.png" alt="" class="country-flag">
-                                    <span class="country-name">China</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/french.png" alt="" class="country-flag">
-                                    <span class="country-name">France</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/germany.png" alt="" class="country-flag">
-                                    <span class="country-name">Germany</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/iran.png" alt="" class="country-flag">
-                                    <span class="country-name">Iran</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/italy.png" alt="" class="country-flag">
-                                    <span class="country-name">Italy</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/mexico.png" alt="" class="country-flag">
-                                    <span class="country-name">México</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/philipine.png" alt="" class="country-flag">
-                                    <span class="country-name">Philippines</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/portugal.png" alt="" class="country-flag">
-                                    <span class="country-name">Portugal</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/s-africa.png" alt="" class="country-flag">
-                                    <span class="country-name">South Africa</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/spanish.png" alt="" class="country-flag">
-                                    <span class="country-name">Spain</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/switzerland.png" alt="" class="country-flag">
-                                    <span class="country-name">Switzerland</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/uk.png" alt="" class="country-flag">
-                                    <span class="country-name">United Kingdom</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="country-item">
-                                    <img src="./images/flags/english.png" alt="" class="country-flag">
-                                    <span class="country-name">United State</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+               </div>
+               <div class="col">
+                <div class="card radius-10">
+                  <div class="card-body">
+                      <div class="d-flex align-items-center">
+                          <div>
+                              <p class="mb-0 text-secondary">Total Customers</p>
+                              <h4 class="my-1">5.8K</h4>
+                              <p class="mb-0 font-13 text-danger"><i class="bi bi-caret-down-fill"></i> 2.7 from last week</p>
+                          </div>
+                          <div class="widget-icon-large bg-gradient-danger text-white ms-auto"><i class="bi bi-people-fill"></i>
+                          </div>
+                      </div>
+                  </div>
+               </div>
+               </div>
+               <div class="col">
+                <div class="card radius-10">
+                  <div class="card-body">
+                      <div class="d-flex align-items-center">
+                          <div>
+                              <p class="mb-0 text-secondary">Bounce Rate</p>
+                              <h4 class="my-1">38.15%</h4>
+                              <p class="mb-0 font-13 text-success"><i class="bi bi-caret-up-fill"></i> 12.2% from last week</p>
+                          </div>
+                          <div class="widget-icon-large bg-gradient-info text-white ms-auto"><i class="bi bi-bar-chart-line-fill"></i>
+                          </div>
+                      </div>
+                  </div>
                 </div>
-            </div><!-- .modal-content -->
-        </div><!-- .modla-dialog -->
-    </div><!-- .modal -->
-    <!-- JavaScript -->
-    <?php $this->view('common/footer') ?>
+               </div>
+            </div><!--end row-->
+
+
+            
+            
+          </main>
+       <!--end page main-->
+
+       <!--start overlay-->
+        <div class="overlay nav-toggle-icon"></div>
+       <!--end overlay-->
+
+       <!--Start Back To Top Button-->
+		     <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+       <!--End Back To Top Button-->
+
+       <!--start switcher-->
+       <div class="switcher-body">
+        <button class="btn btn-primary btn-switcher shadow-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"><i class="bi bi-paint-bucket me-0"></i></button>
+        <div class="offcanvas offcanvas-end shadow border-start-0 p-2" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling">
+          <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Theme Customizer</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+          </div>
+          <div class="offcanvas-body">
+            <h6 class="mb-0">Theme Variation</h6>
+            <hr>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="LightTheme" value="option1">
+              <label class="form-check-label" for="LightTheme">Light</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="DarkTheme" value="option2">
+              <label class="form-check-label" for="DarkTheme">Dark</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="SemiDarkTheme" value="option3">
+              <label class="form-check-label" for="SemiDarkTheme">Semi Dark</label>
+            </div>
+            <hr>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="MinimalTheme" value="option3" checked>
+              <label class="form-check-label" for="MinimalTheme">Minimal Theme</label>
+            </div>
+            <hr/>
+            <h6 class="mb-0">Header Colors</h6>
+            <hr/>
+            <div class="header-colors-indigators">
+              <div class="row row-cols-auto g-3">
+                <div class="col">
+                  <div class="indigator headercolor1" id="headercolor1"></div>
+                </div>
+                <div class="col">
+                  <div class="indigator headercolor2" id="headercolor2"></div>
+                </div>
+                <div class="col">
+                  <div class="indigator headercolor3" id="headercolor3"></div>
+                </div>
+                <div class="col">
+                  <div class="indigator headercolor4" id="headercolor4"></div>
+                </div>
+                <div class="col">
+                  <div class="indigator headercolor5" id="headercolor5"></div>
+                </div>
+                <div class="col">
+                  <div class="indigator headercolor6" id="headercolor6"></div>
+                </div>
+                <div class="col">
+                  <div class="indigator headercolor7" id="headercolor7"></div>
+                </div>
+                <div class="col">
+                  <div class="indigator headercolor8" id="headercolor8"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+       </div>
+       <!--end switcher-->
+
+  </div>
+  <!--end wrapper-->
+
+
+<?php $this->view('partials/foot')?>
+
 </body>
 
 </html>

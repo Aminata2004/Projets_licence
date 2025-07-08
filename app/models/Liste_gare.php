@@ -1,0 +1,94 @@
+<?php
+class Liste_gare extends Model
+{
+    public function saveGares()
+    { // Initialiser un tableau d'erreurs
+        $errors = [];
+        $id_compagnie = $_SESSION['id_compagnie'];
+
+        // Récupération sécurisée des données du formulaire
+        extract($_POST);
+
+
+        $db = $this->connect();
+
+        // Vérifier si la combinaison localité + numéroGare existe
+        $check = $db->prepare("SELECT idAgence FROM agence WHERE localite = :localite AND numeroGare = :numeroGare");
+        $check->execute([
+            ':localite' => $localite,
+            ':numeroGare' => $numeroGare
+        ]);
+        $existe = $check->fetch();
+
+        if ($existe) {
+            $errors[] = "Cette gare existe déjà dans cette localité.";
+        }
+        // Vérifier si le téléphone existe déjà
+        $telExiste = $this->existe('agence', 'tel', $tel);
+        if ($telExiste) {
+            $errors[] = "Ce numéro de téléphone est déjà utilisé.";
+        }
+
+        // Vérifier si le code marchand existe déjà
+        $codeExiste = $this->existe('agence', 'code', $code);
+        if ($codeExiste) {
+            $errors[] = "Ce code marchand est déjà utilisé.";
+        }
+
+        // Vérifier si le code commence par un chiffre négatif
+        if (preg_match('/^-/', $code)) {
+            $errors[] = "Le code marchand ne peut pas commencer par un signe négatif.";
+        }
+
+
+        if (count($errors) === 0) {
+            $insertion = $this->insertion_update_simples(
+                "INSERT INTO agence(code, localite, numeroGare, tel, localite, id_compagnie) 
+         VALUES(:code, :localite, :numeroGare, :tel, :localite, :id_compagnie)",
+                [
+                    ":code" => $code,
+                    ":localite" => $localite,
+                    ":numeroGare" => $numeroGare,
+                    ":tel" => $tel,
+                    ":localite" => $localite,
+                    ":id_compagnie" => $id_compagnie
+                ]
+            );
+
+            if ($insertion == true) {
+                $this->set_flash('Gare ajoutée avec succès', 'info');
+            } else {
+                $this->set_flash('Gare non ajoutée');
+            }
+        } else {
+            foreach ($errors as $error) {
+                $this->set_flash($error, "danger");
+            }
+        }
+    }
+
+    public function editAgence($data)  {
+         $req = "UPDATE agence 
+           SET numeroGare =:numeroGare, 
+               localite=:localite,
+               code=:code,
+                tel=:tel
+                WHERE idAgence=:idAgence";
+
+            $params = [
+                ":numeroGare" => $data['numeroGare'],
+                ":localite" => $data['localite'],
+                ':code' => $data['code'],
+                 ':tel' => $data['tel'],
+                ':idAgence' => $data['idAgence'],
+            ];
+
+            $modification = $this->insertion_update_simples($req, $params);
+
+            if ($modification == true) {
+                $this->set_flash("modification faite avec ", "primary");
+                // $this->redirect("compagnies");
+            }
+        
+    }
+}

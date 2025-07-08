@@ -1,1073 +1,688 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="4e24da5e-c366-4412-877d-087fc295cd42" name="Default" comment="" />
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
-    <option name="TRACKING_ENABLED" value="true" />
+    <list default="true" id="c5622afe-456d-4330-bab3-7138aadcaa23" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/controllers/Homes.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/BROUILLON.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/MVC.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace (2).xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CABINETWASSA.code-workspace" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/POE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/POE12" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/BROUILLONS.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/cabinet.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/consult" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/AjouterAnalyses.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/AjouterRendezvous.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Analyses.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Commandes.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Consultations.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Deconnexion.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Examens.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Familles.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Fournisseurs.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Home.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Lits.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Logins.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Maladies.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Medicaments.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Ordonnances.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/PDF.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Patients.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Payement_ord.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Posologies.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Receptions.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Reglements.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Rendez_vous.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Salles.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Securite_socials.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Structures.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Symptomes.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Tickets.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Unites.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/Utilisateurs.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/selectData_ajax.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/app.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/autoload.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/autoload.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/config.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/config.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/function.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/drouille2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/AjouterAnalyse.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Analyse.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Commande.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Consultation.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Examen.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Famille.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Fournisseur.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Lit.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Login.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Maladie.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Medicament.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Ordonnance.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Patient.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Payement_ordo.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Pdf.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Posologie.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Reception.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Reglement.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Rendezvous.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Salle.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Securite_social.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Structure.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Symptome.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Ticket.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Unite.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Utilisateur.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/test_consultation.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/tick" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/Allpdf.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/AnalyseReponse.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/PDFanalyse.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/PDFticket.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_analyse.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_commande.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_consultation.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_consultation_rdv.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_examen.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_famille.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_fournisseur.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_lit.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_maladie.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_medicament.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_ordonnance.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_posologie.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_reception.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_reglement.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_rendezvous.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_salle.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_securite.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_structure.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_symptome.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_ticket.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_unite.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ajouter_utilisateur.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/analyse.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/analyseTicket.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/analyse_realise.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/commande.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/common/_flash.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/common/cardParametre.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/common/consultation_info_patient.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/common/consultation_liste.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/common/foot.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/common/footer.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/common/header.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/common/navbare.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/common/navbare.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/common/notification.inc.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/common/sidebare.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/consultation.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/consultation_effectue.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/consultation_effectue_rdv.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/data.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/CONTRIBUTING.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/LICENSE.LGPL" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/SECURITY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/VERSION" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/autoload.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/Cpdf.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Courier-Bold.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Courier-BoldOblique.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Courier-Oblique.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Courier.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Courier.afm.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSans-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSans-Bold.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSans-BoldOblique.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSans-BoldOblique.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSans-Oblique.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSans-Oblique.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSans.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSans.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSansMono-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSansMono-Bold.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSansMono-BoldOblique.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSansMono-BoldOblique.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSansMono-Oblique.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSansMono-Oblique.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSansMono.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSansMono.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSerif-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSerif-Bold.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSerif-BoldItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSerif-BoldItalic.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSerif-Italic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSerif-Italic.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSerif.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/DejaVuSerif.ufm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Helvetica-Bold.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Helvetica-Bold.afm.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Helvetica-BoldOblique.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Helvetica-Oblique.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Helvetica.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Helvetica.afm.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Symbol.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Times-Bold.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Times-Bold.afm.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Times-BoldItalic.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Times-Italic.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Times-Italic.afm.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Times-Roman.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/Times-Roman.afm.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/ZapfDingbats.afm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/dompdf_font_family_cache.dist.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/fonts/mustRead.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/html5lib/Data.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/html5lib/InputStream.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/html5lib/Parser.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/html5lib/Tokenizer.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/html5lib/TreeBuilder.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/html5lib/named-character-references.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/CHANGELOG.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/CSSList/AtRuleBlockList.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/CSSList/CSSBlockList.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/CSSList/CSSList.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/CSSList/Document.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/CSSList/KeyFrame.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Comment/Comment.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Comment/Commentable.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/OutputFormat.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/OutputFormatter.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Parser.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Parsing/OutputException.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Parsing/ParserState.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Parsing/SourceException.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Parsing/UnexpectedEOFException.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Parsing/UnexpectedTokenException.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Property/AtRule.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Property/CSSNamespace.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Property/Charset.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Property/Import.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Property/KeyframeSelector.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Property/Selector.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Renderable.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Rule/Rule.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/RuleSet/AtRuleSet.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/RuleSet/DeclarationBlock.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/RuleSet/RuleSet.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Settings.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/CSSFunction.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/CSSString.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/CalcFunction.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/CalcRuleValueList.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/Color.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/LineName.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/PrimitiveValue.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/RuleValueList.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/Size.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/URL.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/Value.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-css-parser/src/Value/ValueList.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/.github/workflows/phpunit.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/.htaccess" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/bower.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/index.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/adobe-standard-encoding.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/cp1250.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/cp1251.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/cp1252.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/cp1253.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/cp1254.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/cp1255.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/cp1257.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/cp1258.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/cp874.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/iso-8859-1.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/iso-8859-11.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/iso-8859-15.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/iso-8859-16.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/iso-8859-2.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/iso-8859-4.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/iso-8859-5.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/iso-8859-7.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/iso-8859-9.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/koi8-r.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/maps/koi8-u.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/AdobeFontMetrics.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Autoloader.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/BinaryStream.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/EOT/File.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/EOT/Header.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/EncodingMap.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Exception/FontNotFoundException.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Font.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Glyph/Outline.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Glyph/OutlineComponent.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Glyph/OutlineComposite.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Glyph/OutlineSimple.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Header.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/OpenType/File.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/OpenType/TableDirectoryEntry.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/DirectoryEntry.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/cmap.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/glyf.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/head.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/hhea.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/hmtx.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/kern.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/loca.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/maxp.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/name.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/nameRecord.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/os2.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/Table/Type/post.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/TrueType/Collection.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/TrueType/File.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/TrueType/Header.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/TrueType/TableDirectoryEntry.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/WOFF/File.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/WOFF/Header.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-font-lib/src/FontLib/WOFF/TableDirectoryEntry.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/DefaultStyle.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Document.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Gradient/Stop.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Style.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Surface/CPdf.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Surface/SurfaceCpdf.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Surface/SurfaceInterface.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Surface/SurfacePDFLib.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/AbstractTag.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Anchor.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Circle.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/ClipPath.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Ellipse.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Group.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Image.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Line.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/LinearGradient.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Path.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Polygon.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Polyline.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/RadialGradient.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Rect.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Shape.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Stop.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/StyleTag.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/Text.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/Svg/Tag/UseTag.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/php-svg-lib/src/autoload.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/res/broken_image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/res/broken_image.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/lib/res/html.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/phpcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Adapter/CPDF.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Adapter/GD.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Adapter/PDFLib.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Autoloader.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Canvas.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/CanvasFactory.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Cellmap.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Css/AttributeTranslator.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Css/Color.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Css/Style.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Css/Stylesheet.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Dompdf.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Exception.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Exception/ImageException.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FontMetrics.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Frame.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Frame/Factory.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Frame/FrameList.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Frame/FrameListIterator.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Frame/FrameTree.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Frame/FrameTreeIterator.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Frame/FrameTreeList.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/AbstractFrameDecorator.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/Block.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/Image.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/Inline.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/ListBullet.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/ListBulletImage.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/NullFrameDecorator.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/Page.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/Table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/TableCell.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/TableRow.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/TableRowGroup.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameDecorator/Text.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/AbstractFrameReflower.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/Block.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/Image.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/Inline.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/ListBullet.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/NullFrameReflower.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/Page.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/Table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/TableCell.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/TableRow.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/TableRowGroup.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/FrameReflower/Text.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Helpers.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Image/Cache.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/JavascriptEmbedder.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/LineBox.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Options.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/PhpEvaluator.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Positioner/Absolute.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Positioner/AbstractPositioner.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Positioner/Block.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Positioner/Fixed.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Positioner/Inline.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Positioner/ListBullet.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Positioner/NullPositioner.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Positioner/TableCell.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Positioner/TableRow.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Renderer.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Renderer/AbstractRenderer.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Renderer/Block.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Renderer/Image.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Renderer/Inline.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Renderer/ListBullet.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Renderer/TableCell.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Renderer/TableRowGroup.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dompdf/src/Renderer/Text.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/dossier_patient.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/edit_commande.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/edit_consultation.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/edit_consultation_rdv.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/edit_ordonnance.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/edit_ticket.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/examen.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/famille.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/fournisseur.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/home.view.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/home.view.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/User1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/User2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/bakary.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/cabWassa.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/coming-soon-cover.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/consult.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/images.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/login_bg.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/login_bg1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/login_bg2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/logo-white.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/logoCaW.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/logoCaW1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/logowassa.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/logowassa1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/logowassa2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/logowassa7.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/medecin.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/medecincons.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/nurce.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/ordo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/patient.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/patients.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/pt.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/pt1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/pt2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/pt3.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/pt4.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/pt5.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/qrcode.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/transparent/black-0.1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/transparent/black-0.2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/transparent/black-0.3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/transparent/black-0.4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/transparent/black-0.5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/transparent/black-0.7.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/transparent/black-0.8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/transparent/black-0.9.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/transparent/white-0.1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/transparent/white-0.3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/transparent/white-0.9.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa3.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa4.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa4_2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa5.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa6.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa7.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa8.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa9.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/images/wassa9.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/liste_rendez_vous.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/lit.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/login.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/maladie.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/medicament.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ordonnance.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ordonnance_effectue.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/parametre.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/patient_dossier.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/payement_ord.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/payement_ord_vendu.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/pdf/analyseDemande.inc.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/pdf/analyseReponse.inc.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/pdf/commande.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/pdf/consultation.inc.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/pdf/consultationActus.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/pdf/listeConsultationPdf.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/pdf/pdfOrdonnance.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/pdf/pdfRDV.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/pdf/ticketListPdf.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/pdf/ticketListPdfActus.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/pdf/ticketPdf.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/posologie.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/reception.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/reglement.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/rendezvous.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/salle.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/securite.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/structure.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/symptome.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/test.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ticket.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/ticketutilise.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/unite.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/utilisateur.view.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cabinet.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/dashlite.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/dashlite.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/dashlite.rtl.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/dashlite.rtl.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/editors/quill.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/editors/quill.rtl.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/editors/summernote.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/editors/summernote.rtl.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/editors/tinymce.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/editors/tinymce.rtl.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/libs/bootstrap-icons.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/libs/fontawesome-icons.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/libs/jstree.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/libs/themify-icons.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/login_form.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/skins/theme-blue.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/skins/theme-bluelite.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/skins/theme-egyptian.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/skins/theme-purple.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/skins/theme-red.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/style-email.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/theme.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nioicon.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nioicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nioicon.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nioicon.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nunito-Bold.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nunito-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nunito-Bold.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nunito-Bold.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nunito-Regular.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nunito-Regular.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nunito-Regular.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Nunito-Regular.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Bold.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Bold.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Bold.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Light.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Light.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Light.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Light.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Medium.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Medium.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Medium.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Medium.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Regular.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Regular.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Regular.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/Roboto-Regular.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/bootstrap-icons.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/bootstrap-icons.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-brands-400.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-brands-400.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-brands-400.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-brands-400.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-brands-400.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-regular-400.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-regular-400.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-regular-400.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-regular-400.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-regular-400.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-solid-900.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-solid-900.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-solid-900.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-solid-900.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/fa-solid-900.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/summernote.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/summernote.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/summernote.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/summernote.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/themify.eot" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/themify.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/themify.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/themify.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/fonts/tinymce-mobile.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/images/jsTree/32px-dark.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/images/jsTree/32px.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/images/jsTree/40px-dark.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/images/jsTree/40px.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/images/jsTree/throbber-dark.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/images/jsTree/throbber.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/apps/calendar.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/apps/chats.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/apps/file-manager.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/apps/inbox.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/apps/kanban.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/apps/messages.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/bundle.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/charts/chart-ecommerce.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/charts/chart-widgets.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/charts/gd-analytics.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/charts/gd-default.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/charts/gd-hospital.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/charts/gd-pharmacy.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/charts/hospital-report.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/charts/pharmacy-report.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/editors.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/example-chart.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/example-dragula.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/example-listbox.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/example-map.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/example-sweetalert.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/example-toastr.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/example-tree.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/datatable-btns.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/dragula.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/dual-listbox.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/editors/quill.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/editors/skins/content/default/content.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/editors/summernote.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/editors/tinymce.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/fullcalendar.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/jkanban.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/jqvmap.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/jstree.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/libs/tagify.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/scripts.js" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="DatabaseView">
-    <option name="SHOW_INTERMEDIATE" value="true" />
-    <option name="GROUP_DATA_SOURCES" value="true" />
-    <option name="GROUP_SCHEMA" value="true" />
-    <option name="GROUP_CONTENTS" value="false" />
-    <option name="SORT_POSITIONED" value="false" />
-    <option name="SHOW_EMPTY_GROUPS" value="false" />
-    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
-    <option name="HIDDEN_KINDS">
-      <set />
-    </option>
-    <expand />
-    <select />
-  </component>
-  <component name="FavoritesManager">
-    <favorites_list name="MVC" />
-  </component>
-  <component name="FileEditorManager">
-    <leaf />
+  <component name="ComposerSettings">
+    <execution />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JavaScript File" />
         <option value="CSS File" />
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>n</find>
-      <find>date_peramp</find>
-      <find>ordo</find>
-      <find>./</find>
-      <find>require_once ('partials/</find>
-      <find>table</find>
-      <find>card-footer</find>
-      <find>$patients</find>
-      <find>$tickets</find>
-      <find>set_</find>
-      <find>idFournisseur</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>panier</replace>
-      <replace>&lt;?=ROOT?&gt;/</replace>
-      <replace>$this-&gt;view('common/</replace>
-      <replace>submit-footer</replace>
-      <replace>$tickets</replace>
-      <replace>$ticket</replace>
-    </replaceStrings>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/app/controllers/Receptions.php" />
-        <option value="$PROJECT_DIR$/app/models/Ordonnance.php" />
-        <option value="$PROJECT_DIR$/app/consult" />
-        <option value="$PROJECT_DIR$/app/views/payement_ord.view.php" />
-        <option value="$PROJECT_DIR$/app/models/Payement_ordo.php" />
-        <option value="$PROJECT_DIR$/app/tick" />
-        <option value="$PROJECT_DIR$/app/controllers/PDF.php" />
-        <option value="$PROJECT_DIR$/app/views/PDFanalyse.view.php" />
-        <option value="$PROJECT_DIR$/app/views/pdf/analyseReponse.inc.php" />
-        <option value="$PROJECT_DIR$/app/views/ajouter_analyse.view.php" />
-        <option value="$PROJECT_DIR$/app/views/Allpdf.view.php" />
-        <option value="$PROJECT_DIR$/app/views/pdf/analyseDemande.inc.php" />
-        <option value="$PROJECT_DIR$/app/views/ajouter_consultation_rdv.view.php" />
-        <option value="$PROJECT_DIR$/app/views/rendezvous.view.php" />
-        <option value="$PROJECT_DIR$/app/models/Consultation.php" />
-        <option value="$PROJECT_DIR$/app/views/edit_consultation_rdv.view.php" />
-        <option value="$PROJECT_DIR$/app/views/ticket.view.php" />
-        <option value="$PROJECT_DIR$/app/controllers/Tickets.php" />
-        <option value="$PROJECT_DIR$/app/models/Ticket.php" />
-        <option value="$PROJECT_DIR$/app/views/analyseTicket.view.php" />
-        <option value="$PROJECT_DIR$/app/controllers/Consultations.php" />
-        <option value="$PROJECT_DIR$/app/controllers/Analyses.php" />
-        <option value="$PROJECT_DIR$/app/views/analyse_realise.view.php" />
-        <option value="$PROJECT_DIR$/app/views/AnalyseReponse.view.php" />
-        <option value="$PROJECT_DIR$/app/views/login.view.php" />
-        <option value="$PROJECT_DIR$/app/views/home.view.php" />
-        <option value="$PROJECT_DIR$/app/views/common/navbare.php" />
-        <option value="$PROJECT_DIR$/app/views/common/navbare.view.php" />
-        <option value="$PROJECT_DIR$/app/views/fournisseur.view.php" />
-        <option value="$PROJECT_DIR$/app/views/common/footer.view.php" />
-        <option value="$PROJECT_DIR$/app/views/ajouter_fournisseur.view.php" />
-        <option value="$PROJECT_DIR$/app/controllers/Familles.php" />
-        <option value="$PROJECT_DIR$/app/views/ajouter_unite.view.php" />
-        <option value="$PROJECT_DIR$/app/views/ajouter_famille.view.php" />
-        <option value="$PROJECT_DIR$/app/views/unite.view.php" />
-        <option value="$PROJECT_DIR$/app/views/famille.view.php" />
-        <option value="$PROJECT_DIR$/app/controllers/Medicaments.php" />
-        <option value="$PROJECT_DIR$/app/views/ajouter_medicament.view.php" />
-        <option value="$PROJECT_DIR$/app/views/medicament.view.php" />
-        <option value="$PROJECT_DIR$/app/views/commande.view.php" />
-        <option value="$PROJECT_DIR$/app/controllers/AjouterAnalyses.php" />
-        <option value="$PROJECT_DIR$/app/controllers/Fournisseurs.php" />
-        <option value="$PROJECT_DIR$/app/views/ajouter_commande.view.php" />
-        <option value="$PROJECT_DIR$/app/models/Commande.php" />
-        <option value="$PROJECT_DIR$/app/models/Reception.php" />
-        <option value="$PROJECT_DIR$/app/views/common/header.view.php" />
-        <option value="$PROJECT_DIR$/app/views/ajouter_reception.view.php" />
-        <option value="$PROJECT_DIR$/app/views/common/sidebare.view.php" />
-        <option value="$PROJECT_DIR$/app/views/ordonnance.view.php" />
-        <option value="$PROJECT_DIR$/app/views/ajouter_ordonnance.view.php" />
-        <option value="$PROJECT_DIR$/app/controllers/Ordonnances.php" />
-      </list>
-    </option>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="C:\xampp\php\php.exe" />
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 8
+}]]></component>
+  <component name="ProjectId" id="2ke1t9OPhl7L0iRJ9W5xnCkS7xz" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
-  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
-  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
-  <component name="JsGulpfileManager">
-    <detection-done>true</detection-done>
-    <sorting>DEFINITION_ORDER</sorting>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/xampp/htdocs/formeinscription",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PS-241.18034.69" />
+        <option value="bundled-php-predefined-ba97393d7c68-48a1a656d44e-com.jetbrains.php.sharedIndexes-PS-241.18034.69" />
+      </set>
+    </attachedChunks>
   </component>
-  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
-    <option name="y" value="-8" />
-    <option name="width" value="699" />
-    <option name="height" value="744" />
-  </component>
-  <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1">
-      <flattenPackages />
-      <showMembers />
-      <showModules />
-      <showLibraryContents />
-      <hideEmptyPackages />
-      <abbreviatePackageNames />
-      <autoscrollToSource />
-      <autoscrollFromSource />
-      <sortByType />
-      <manualOrder />
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="cabinetwassa2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cabinetwassa2" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="cabinetwassa2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cabinetwassa2" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="app" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="cabinetwassa2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cabinetwassa2" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="app" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="controllers" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="cabinetwassa2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cabinetwassa2" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="app" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="views" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="cabinetwassa2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cabinetwassa2" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="app" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="views" type="2a2b976b:PhpTreeStructureProvider$1" />
-              <item name="pdf" type="2a2b976b:PhpTreeStructureProvider$1" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-    </panes>
-  </component>
-  <component name="PropertiesComponent">
-    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../demo2" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
-    <property name="list.type.of.created.stylesheet" value="CSS" />
-    <property name="last_directory_selection" value="$PROJECT_DIR$/app/controllers" />
-  </component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\xampp\htdocs\cabinetwassa2\public\assets" />
-      <recent name="C:\xampp\htdocs\cabinetwassa2\public" />
-      <recent name="C:\xampp\htdocs\Nouveaudossier\app\views\pdf" />
-      <recent name="C:\xampp\htdocs\Nouveaudossier\app\views" />
-      <recent name="C:\xampp\htdocs\MVC\public\js" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\xampp\htdocs\cabinetwassa2\public\assets\css" />
-      <recent name="C:\xampp\htdocs\cabinetwassa2\public\assets" />
-      <recent name="C:\xampp\htdocs\cabinetwassa2\app\views" />
-      <recent name="C:\xampp\htdocs\cabinetwassa2" />
-      <recent name="C:\xampp\htdocs\cabinetwassa2\app\models" />
-    </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="ShelveChangesManager" show_recycled="false">
-    <option name="remove_strategy" value="false" />
-  </component>
-  <component name="SvnConfiguration">
-    <configuration />
-  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="4e24da5e-c366-4412-877d-087fc295cd42" name="Default" comment="" />
-      <created>1669028163409</created>
+      <changelist id="c5622afe-456d-4330-bab3-7138aadcaa23" name="Changes" comment="" />
+      <created>1723629439294</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1669028163409</updated>
-      <workItem from="1669028165429" duration="7694000" />
-      <workItem from="1669315668993" duration="1678000" />
-      <workItem from="1669359242766" duration="17037000" />
-      <workItem from="1669444709872" duration="6083000" />
-      <workItem from="1669496724834" duration="4421000" />
-      <workItem from="1669502709872" duration="279000" />
-      <workItem from="1669505716362" duration="662000" />
-      <workItem from="1669556759008" duration="42000" />
-      <workItem from="1669571536078" duration="19141000" />
-      <workItem from="1669677300724" duration="17098000" />
-      <workItem from="1669761646398" duration="3652000" />
-      <workItem from="1669782428407" duration="17330000" />
-      <workItem from="1669817167562" duration="8045000" />
-      <workItem from="1669874275824" duration="3164000" />
-      <workItem from="1669899855844" duration="4465000" />
-      <workItem from="1669964527164" duration="5374000" />
-      <workItem from="1669974069403" duration="8235000" />
-      <workItem from="1669997788973" duration="76000" />
-      <workItem from="1670001398688" duration="285000" />
-      <workItem from="1670001716172" duration="11462000" />
-      <workItem from="1670080882981" duration="5418000" />
-      <workItem from="1670109294774" duration="12696000" />
-      <workItem from="1670261287556" duration="1201000" />
-      <workItem from="1670306741025" duration="10058000" />
-      <workItem from="1670397667728" duration="6266000" />
-      <workItem from="1670499710909" duration="6198000" />
-      <workItem from="1670531029249" duration="29107000" />
-      <workItem from="1670686727576" duration="35234000" />
-      <workItem from="1671060191187" duration="5840000" />
-      <workItem from="1671259052073" duration="12303000" />
-      <workItem from="1671434417535" duration="1224000" />
-      <workItem from="1672069518991" duration="36241000" />
-      <workItem from="1672384198373" duration="30361000" />
-      <workItem from="1672818947699" duration="4932000" />
-      <workItem from="1672931060926" duration="1170000" />
-      <workItem from="1673006761656" duration="3598000" />
-      <workItem from="1673418702346" duration="12103000" />
-      <workItem from="1673529492187" duration="21000" />
-      <workItem from="1673531249540" duration="2983000" />
-      <workItem from="1673555835993" duration="369000" />
-      <workItem from="1673600602936" duration="11973000" />
-      <workItem from="1673618565770" duration="1917000" />
-      <workItem from="1673624468862" duration="7960000" />
-      <workItem from="1673705964787" duration="14225000" />
-      <workItem from="1673915812760" duration="5181000" />
-      <workItem from="1674292818796" duration="31059000" />
-      <workItem from="1674488043798" duration="7043000" />
-      <workItem from="1674581160730" duration="2755000" />
-      <workItem from="1674612454272" duration="18819000" />
-      <workItem from="1674671897810" duration="11197000" />
-      <workItem from="1674892804376" duration="15694000" />
-      <workItem from="1675384873471" duration="21978000" />
-      <workItem from="1675755490416" duration="14729000" />
-      <workItem from="1675943654740" duration="5437000" />
-      <workItem from="1676230267708" duration="10144000" />
-      <workItem from="1676374769380" duration="6795000" />
-      <workItem from="1676416951816" duration="10000" />
-      <workItem from="1676703628099" duration="572000" />
-      <workItem from="1676785791253" duration="23995000" />
-      <workItem from="1676981616212" duration="3323000" />
-      <workItem from="1677136878056" duration="4004000" />
-      <workItem from="1677183347470" duration="7174000" />
-      <workItem from="1677274523024" duration="386000" />
-      <workItem from="1677288674199" duration="16440000" />
-      <workItem from="1677413762026" duration="10043000" />
-      <workItem from="1677584409360" duration="6522000" />
-      <workItem from="1677615729415" duration="41000" />
-      <workItem from="1677616148360" duration="6972000" />
-      <workItem from="1677882361834" duration="15545000" />
-      <workItem from="1677998942980" duration="266000" />
-      <workItem from="1678000670258" duration="420000" />
-      <workItem from="1678044030820" duration="7777000" />
-      <workItem from="1678193123738" duration="2349000" />
-      <workItem from="1678401657170" duration="2084000" />
-      <workItem from="1678436818503" duration="94000" />
-      <workItem from="1678459079158" duration="694000" />
-      <workItem from="1678461276705" duration="1507000" />
-      <workItem from="1678463996645" duration="1947000" />
-      <workItem from="1678486890778" duration="4548000" />
-      <workItem from="1678560566109" duration="13036000" />
-      <workItem from="1678622684634" duration="4214000" />
-      <workItem from="1678690944980" duration="7963000" />
-      <workItem from="1678737588293" duration="1403000" />
-      <workItem from="1678750778798" duration="1468000" />
-      <workItem from="1678789196669" duration="38837000" />
-      <workItem from="1678907794764" duration="5260000" />
-      <workItem from="1678960286494" duration="13459000" />
-      <workItem from="1679048811868" duration="13086000" />
-      <workItem from="1679137474406" duration="1195000" />
-      <workItem from="1679206631907" duration="597000" />
-      <workItem from="1679304802180" duration="43922000" />
-      <workItem from="1679488527298" duration="16023000" />
-      <workItem from="1679518613609" duration="1861000" />
-      <workItem from="1679522496577" duration="561000" />
-      <workItem from="1679555459731" duration="6904000" />
-      <workItem from="1679591746525" duration="49575000" />
-      <workItem from="1679863462852" duration="4229000" />
-      <workItem from="1679897365885" duration="20818000" />
-      <workItem from="1679989748105" duration="19161000" />
-      <workItem from="1680060657988" duration="9811000" />
-      <workItem from="1680175379452" duration="6281000" />
-      <workItem from="1680205371691" duration="599000" />
-      <workItem from="1680292132001" duration="339000" />
-      <workItem from="1680343139680" duration="14435000" />
-      <workItem from="1680382013000" duration="11218000" />
-      <workItem from="1680436780468" duration="8533000" />
-      <workItem from="1680506415396" duration="11696000" />
-      <workItem from="1680715942161" duration="7019000" />
-      <workItem from="1680782393101" duration="6067000" />
-      <workItem from="1681225291960" duration="5968000" />
-      <workItem from="1681282035433" duration="2600000" />
-      <workItem from="1681311637614" duration="1179000" />
-      <workItem from="1681370020351" duration="1331000" />
-      <workItem from="1681396211504" duration="3845000" />
-      <workItem from="1681402724835" duration="1009000" />
-      <workItem from="1681461786702" duration="7060000" />
-      <workItem from="1681546161524" duration="17000" />
-      <workItem from="1681549094303" duration="10088000" />
-      <workItem from="1681721934977" duration="2814000" />
-      <workItem from="1681750333861" duration="685000" />
-      <workItem from="1681764883779" duration="1526000" />
-      <workItem from="1681802198468" duration="1386000" />
-      <workItem from="1681823495261" duration="4687000" />
-      <workItem from="1681850592212" duration="2815000" />
-      <workItem from="1681909179518" duration="5602000" />
-      <workItem from="1681925047258" duration="945000" />
-      <workItem from="1681936002133" duration="1278000" />
-      <workItem from="1681980402192" duration="7653000" />
-      <workItem from="1681997086649" duration="341000" />
-      <workItem from="1682360209812" duration="682000" />
-      <workItem from="1682532991862" duration="1622000" />
-      <workItem from="1682575188140" duration="1539000" />
-      <workItem from="1682599693874" duration="9297000" />
-      <workItem from="1682665668642" duration="1775000" />
-      <workItem from="1682681338453" duration="1420000" />
-      <workItem from="1682924975064" duration="1118000" />
-      <workItem from="1682940982037" duration="6882000" />
-      <workItem from="1682969586153" duration="5385000" />
-      <workItem from="1683044671274" duration="8963000" />
-      <workItem from="1683121109436" duration="6181000" />
-      <workItem from="1683242188174" duration="1254000" />
-      <workItem from="1683363837898" duration="2234000" />
-      <workItem from="1683395221123" duration="5395000" />
-      <workItem from="1683569035857" duration="3555000" />
-      <workItem from="1683580939947" duration="688000" />
-      <workItem from="1683812493600" duration="214000" />
-      <workItem from="1683895372091" duration="594000" />
-      <workItem from="1683979321053" duration="595000" />
-      <workItem from="1684085584279" duration="653000" />
-      <workItem from="1684160297813" duration="595000" />
-      <workItem from="1684166385154" duration="13073000" />
-      <workItem from="1684514144558" duration="4052000" />
-      <workItem from="1684621809817" duration="2778000" />
-      <workItem from="1684675849462" duration="1284000" />
-      <workItem from="1684786593675" duration="1814000" />
-      <workItem from="1684932891046" duration="9772000" />
-      <workItem from="1685096702190" duration="142000" />
-      <workItem from="1685096866819" duration="237000" />
-      <workItem from="1685097123554" duration="1358000" />
-      <workItem from="1685176206803" duration="653000" />
-      <workItem from="1685306969564" duration="789000" />
-      <workItem from="1687261291615" duration="5293000" />
-      <workItem from="1687271992365" duration="9299000" />
-      <workItem from="1687352250532" duration="605000" />
-      <workItem from="1687365506845" duration="746000" />
-      <workItem from="1687442906578" duration="6714000" />
-      <workItem from="1687703152391" duration="10473000" />
-      <workItem from="1687804008464" duration="23994000" />
-      <workItem from="1688206471925" duration="8419000" />
-      <workItem from="1688329016615" duration="299000" />
-      <workItem from="1688402812711" duration="7001000" />
-      <workItem from="1688557105233" duration="5689000" />
-      <workItem from="1688738807042" duration="2596000" />
-      <workItem from="1688919360825" duration="1188000" />
-      <workItem from="1688935393659" duration="920000" />
-      <workItem from="1689589248412" duration="4787000" />
-      <workItem from="1689597826905" duration="2091000" />
-      <workItem from="1689617863745" duration="1514000" />
-      <workItem from="1689672242350" duration="12118000" />
-      <workItem from="1689763047680" duration="235000" />
-      <workItem from="1689765603286" duration="1196000" />
-      <workItem from="1689792588292" duration="2241000" />
-      <workItem from="1689845269691" duration="4666000" />
-      <workItem from="1689860537158" duration="747000" />
-      <workItem from="1689924352556" duration="2258000" />
-      <workItem from="1689944841929" duration="7963000" />
-      <workItem from="1689954482320" duration="2587000" />
-      <workItem from="1690036399064" duration="1211000" />
-      <workItem from="1690192151653" duration="2051000" />
-      <workItem from="1690196459844" duration="8464000" />
-      <workItem from="1690284099137" duration="2573000" />
-      <workItem from="1690288663767" duration="8076000" />
-      <workItem from="1690450031994" duration="13808000" />
-      <workItem from="1690545023917" duration="19751000" />
-      <workItem from="1690829410893" duration="2138000" />
-      <workItem from="1690905650274" duration="351000" />
-      <workItem from="1690978658621" duration="688000" />
-      <workItem from="1690994376380" duration="1781000" />
-      <workItem from="1691174865075" duration="34000" />
-      <workItem from="1691489712894" duration="2328000" />
-      <workItem from="1691777488500" duration="26000" />
-      <workItem from="1691826662799" duration="7138000" />
-      <workItem from="1691864415274" duration="3278000" />
-      <workItem from="1692283827267" duration="2474000" />
-      <workItem from="1692286619367" duration="3222000" />
-      <workItem from="1692368784063" duration="2007000" />
-      <workItem from="1692566623428" duration="1089000" />
-      <workItem from="1692609318895" duration="5760000" />
-      <workItem from="1692873205949" duration="25000" />
-      <workItem from="1692972315460" duration="1676000" />
-      <workItem from="1693079500453" duration="1602000" />
-      <workItem from="1693401303657" duration="3323000" />
-      <workItem from="1693425225980" duration="1641000" />
-      <workItem from="1693511588179" duration="200000" />
-      <workItem from="1694011143830" duration="235000" />
-      <workItem from="1694291403656" duration="4650000" />
-      <workItem from="1694435337874" duration="608000" />
-      <workItem from="1694460154343" duration="1797000" />
-      <workItem from="1694483109480" duration="2584000" />
-      <workItem from="1694519651617" duration="419000" />
-      <workItem from="1694557398404" duration="650000" />
-      <workItem from="1694689153418" duration="575000" />
-      <workItem from="1694809341154" duration="124000" />
-      <workItem from="1695213641346" duration="3639000" />
-      <workItem from="1695291006274" duration="18000" />
-      <workItem from="1695375389123" duration="2543000" />
-      <workItem from="1695450410637" duration="1165000" />
-      <workItem from="1695647943793" duration="579000" />
-      <workItem from="1695654697731" duration="15001000" />
-      <workItem from="1695849967162" duration="26000" />
-      <workItem from="1695851125099" duration="881000" />
-      <workItem from="1695936677195" duration="1631000" />
-      <workItem from="1696031248695" duration="29000" />
-      <workItem from="1696056455034" duration="1325000" />
-      <workItem from="1696080892395" duration="599000" />
-      <workItem from="1696369952296" duration="1063000" />
-      <workItem from="1696371229144" duration="1615000" />
-      <workItem from="1696546532734" duration="3230000" />
-      <workItem from="1696597844703" duration="1955000" />
-      <workItem from="1696861781455" duration="533000" />
-      <workItem from="1696865582340" duration="6422000" />
-      <workItem from="1696887635854" duration="2178000" />
-      <workItem from="1696922032372" duration="884000" />
-      <workItem from="1696923447566" duration="599000" />
-      <workItem from="1696958872943" duration="7465000" />
-      <workItem from="1697019466840" duration="1517000" />
-      <workItem from="1697028171452" duration="2554000" />
-      <workItem from="1697040965848" duration="808000" />
-      <workItem from="1697052214004" duration="1020000" />
-      <workItem from="1697053285053" duration="2425000" />
-      <workItem from="1697100123329" duration="2887000" />
-      <workItem from="1697139552940" duration="2639000" />
-      <workItem from="1697213100063" duration="1299000" />
-      <workItem from="1697229200834" duration="8000" />
-      <workItem from="1697354502263" duration="7879000" />
-      <workItem from="1697469420499" duration="3932000" />
-      <workItem from="1697587758354" duration="2287000" />
-      <workItem from="1697729697648" duration="3561000" />
-      <workItem from="1697733491151" duration="42000" />
-      <workItem from="1697917777460" duration="2161000" />
-      <workItem from="1697925506592" duration="695000" />
-      <workItem from="1697980003001" duration="78000" />
-      <workItem from="1698022586174" duration="3891000" />
-      <workItem from="1698182677476" duration="52000" />
-      <workItem from="1698861480054" duration="1149000" />
-      <workItem from="1699392354661" duration="1493000" />
-      <workItem from="1699553466368" duration="950000" />
-      <workItem from="1699611013806" duration="610000" />
-      <workItem from="1699671408601" duration="2882000" />
-      <workItem from="1699674756776" duration="5533000" />
-      <workItem from="1699859914276" duration="3724000" />
-      <workItem from="1700058826539" duration="10776000" />
-      <workItem from="1700136192363" duration="493000" />
-      <workItem from="1700136792293" duration="5514000" />
-      <workItem from="1700173165274" duration="5707000" />
-      <workItem from="1700271956167" duration="17563000" />
-      <workItem from="1700546600960" duration="4783000" />
-      <workItem from="1700589366079" duration="2433000" />
-      <workItem from="1700648976120" duration="2733000" />
-      <workItem from="1701337046710" duration="15211000" />
-      <workItem from="1701882501845" duration="2637000" />
-      <workItem from="1701887594771" duration="137000" />
-      <workItem from="1702616346420" duration="4828000" />
-      <workItem from="1703877820332" duration="6136000" />
-      <workItem from="1703940964062" duration="2207000" />
-      <workItem from="1704093413098" duration="13443000" />
-      <workItem from="1704140905334" duration="2384000" />
-      <workItem from="1704143853603" duration="1700000" />
-      <workItem from="1704196779782" duration="6878000" />
-      <workItem from="1704286534766" duration="6438000" />
-      <workItem from="1704388028849" duration="4647000" />
-      <workItem from="1704458792095" duration="2743000" />
-      <workItem from="1704683119764" duration="2928000" />
-      <workItem from="1704726769360" duration="2095000" />
-      <workItem from="1704810960272" duration="573000" />
-      <workItem from="1704859833371" duration="6521000" />
-      <workItem from="1704889528731" duration="4587000" />
-      <workItem from="1705227671383" duration="10928000" />
-      <workItem from="1705416171532" duration="3093000" />
-      <workItem from="1705482766251" duration="3576000" />
-      <workItem from="1705557609883" duration="3624000" />
-      <workItem from="1705588524280" duration="7663000" />
-      <workItem from="1705641966579" duration="11926000" />
-      <workItem from="1711637400597" duration="2508000" />
-      <workItem from="1711640260737" duration="702000" />
-      <workItem from="1711641016598" duration="1666000" />
-      <workItem from="1711699596426" duration="3206000" />
-      <workItem from="1712053589625" duration="10186000" />
-      <workItem from="1712077022132" duration="6304000" />
-      <workItem from="1712150934161" duration="1433000" />
-      <workItem from="1712240145759" duration="434000" />
-      <workItem from="1712304178896" duration="1893000" />
-      <workItem from="1712317599394" duration="13526000" />
-      <workItem from="1712394122887" duration="1114000" />
-      <workItem from="1712395255564" duration="5940000" />
-      <workItem from="1712501207840" duration="5084000" />
-      <workItem from="1712561714665" duration="1444000" />
-      <workItem from="1712569818166" duration="17334000" />
-      <workItem from="1712849458882" duration="3633000" />
-      <workItem from="1712875070163" duration="1423000" />
-      <workItem from="1712907585892" duration="4663000" />
-      <workItem from="1712925685351" duration="3984000" />
-      <workItem from="1712937244780" duration="10545000" />
-      <workItem from="1713198083227" duration="4338000" />
-      <workItem from="1713256660938" duration="151000" />
-      <workItem from="1713278309231" duration="7172000" />
-      <workItem from="1713337946875" duration="12000" />
-      <workItem from="1713425053286" duration="4000" />
-      <workItem from="1713522700552" duration="1207000" />
-      <workItem from="1713548584715" duration="10728000" />
-      <workItem from="1713893410774" duration="2111000" />
-      <workItem from="1713950118540" duration="838000" />
-      <workItem from="1713962509926" duration="8268000" />
-      <workItem from="1713982599133" duration="5686000" />
-      <workItem from="1714029654729" duration="1556000" />
-      <workItem from="1714074382196" duration="6987000" />
-      <workItem from="1714121386702" duration="9697000" />
-      <workItem from="1714251377210" duration="6268000" />
-      <workItem from="1714400308114" duration="853000" />
-      <workItem from="1714571590438" duration="649000" />
-      <workItem from="1714601695367" duration="5511000" />
-      <workItem from="1714727277550" duration="943000" />
-      <workItem from="1714889913491" duration="54000" />
-      <workItem from="1714934713680" duration="2946000" />
-      <workItem from="1715050388147" duration="2565000" />
-      <workItem from="1715097525006" duration="181000" />
-      <workItem from="1715643238911" duration="3285000" />
-      <workItem from="1715784447431" duration="129000" />
-      <workItem from="1715951960039" duration="4746000" />
-      <workItem from="1716059130642" duration="1365000" />
-      <workItem from="1716112321634" duration="4103000" />
-      <workItem from="1716127118901" duration="2610000" />
-      <workItem from="1716188899115" duration="1226000" />
-      <workItem from="1716201817448" duration="10085000" />
-      <workItem from="1716223948880" duration="3139000" />
-      <workItem from="1716294802890" duration="9531000" />
-      <workItem from="1716654309425" duration="2183000" />
-      <workItem from="1716673643443" duration="1932000" />
-      <workItem from="1716894759421" duration="1333000" />
-      <workItem from="1716965118380" duration="6718000" />
-      <workItem from="1717083992376" duration="1238000" />
-      <workItem from="1717129923903" duration="5698000" />
-      <workItem from="1717169810436" duration="434000" />
-      <workItem from="1717174612644" duration="4222000" />
-      <workItem from="1717215092728" duration="2192000" />
-      <workItem from="1717225747931" duration="4699000" />
-      <workItem from="1717400531648" duration="14565000" />
-      <workItem from="1717455394401" duration="597000" />
-      <workItem from="1717487894226" duration="3043000" />
-      <workItem from="1717504270268" duration="595000" />
-      <workItem from="1717515864709" duration="1192000" />
-      <workItem from="1717525962504" duration="1436000" />
-      <workItem from="1717540298520" duration="651000" />
-      <workItem from="1717572720446" duration="1228000" />
-      <workItem from="1717583408895" duration="4299000" />
-      <workItem from="1717594097758" duration="3133000" />
-      <workItem from="1717610536622" duration="1000" />
-      <workItem from="1717948165773" duration="58000" />
-      <workItem from="1718029732658" duration="4241000" />
-      <workItem from="1718363289018" duration="1135000" />
-      <workItem from="1718450167914" duration="397000" />
-      <workItem from="1718454845373" duration="5860000" />
-      <workItem from="1718609586694" duration="722000" />
-      <workItem from="1718718996764" duration="9904000" />
-      <workItem from="1718731054349" duration="986000" />
-      <workItem from="1718759124720" duration="127000" />
-      <workItem from="1718889105327" duration="2318000" />
-      <workItem from="1718909918237" duration="20000" />
-      <workItem from="1719181182127" duration="89000" />
-      <workItem from="1719185446716" duration="959000" />
-      <workItem from="1719220493024" duration="236000" />
-      <workItem from="1719258588978" duration="3592000" />
-      <workItem from="1719304536674" duration="735000" />
-      <workItem from="1719347018424" duration="2442000" />
-      <workItem from="1719474607354" duration="1535000" />
-      <workItem from="1719639498099" duration="1969000" />
-      <workItem from="1720021786307" duration="7069000" />
-      <workItem from="1720078526179" duration="1981000" />
-      <workItem from="1720114224807" duration="5110000" />
-      <workItem from="1720186968793" duration="6862000" />
-      <workItem from="1720245059849" duration="2340000" />
-      <workItem from="1720263268975" duration="2602000" />
-      <workItem from="1720510949955" duration="3214000" />
-      <workItem from="1720530252449" duration="2600000" />
-      <workItem from="1720597895156" duration="406000" />
-      <workItem from="1720619002193" duration="2959000" />
-      <workItem from="1720684643790" duration="1432000" />
-      <workItem from="1720773789452" duration="1974000" />
-      <workItem from="1721026626899" duration="1228000" />
+      <updated>1723629439294</updated>
+      <workItem from="1723629440332" duration="646000" />
     </task>
     <servers />
   </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2064837000" />
-  </component>
-  <component name="TodoView">
-    <todo-panel id="selected-file">
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
-    <todo-panel id="all">
-      <are-packages-shown value="true" />
-    </todo-panel>
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25416037" sideWeight="0.49346405" order="1" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295838" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32716763" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290469" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2494612" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32733408" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23146747" sideWeight="0.50653595" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32760596" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-    </layout>
-    <layout-to-restore>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295838" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32716763" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32733408" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23903178" sideWeight="0.49346405" order="1" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290469" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32760596" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2494612" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23146747" sideWeight="0.50653595" order="0" side_tool="true" content_ui="tabs" />
-    </layout-to-restore>
-  </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
-  </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <option name="time" value="38" />
-    </breakpoint-manager>
-    <watches-manager />
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/views/ajouter_structure.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="71" column="141" lean-forward="false" selection-start-line="71" selection-start-column="129" selection-end-line="71" selection-end-column="141" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/public/assets/css/theme.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/public/assets/css/dashlite.rtl.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/Analyses.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="48" column="146" lean-forward="false" selection-start-line="48" selection-start-column="146" selection-end-line="48" selection-end-column="146" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/home.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="32">
-          <caret line="32" column="52" lean-forward="false" selection-start-line="32" selection-start-column="52" selection-end-line="32" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/ajouter_analyse.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="89" column="88" lean-forward="false" selection-start-line="89" selection-start-column="88" selection-end-line="89" selection-end-column="88" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/public/assets/js/apps/chats.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/common/navbare.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="234" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/common/navbare.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1108">
-          <caret line="301" column="6" lean-forward="false" selection-start-line="301" selection-start-column="6" selection-end-line="301" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/Medicament.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-51">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/common/footer.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="22" lean-forward="false" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/fournisseur.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="79" column="52" lean-forward="true" selection-start-line="43" selection-start-column="25" selection-end-line="79" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/ajouter_fournisseur.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1683">
-          <caret line="99" column="47" lean-forward="false" selection-start-line="99" selection-start-column="47" selection-end-line="99" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/ajouter_famille.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="486">
-          <caret line="35" column="106" lean-forward="false" selection-start-line="35" selection-start-column="106" selection-end-line="35" selection-end-column="106" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/famille.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="731">
-          <caret line="43" column="50" lean-forward="true" selection-start-line="43" selection-start-column="50" selection-end-line="43" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/Familles.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="18" column="47" lean-forward="false" selection-start-line="18" selection-start-column="47" selection-end-line="18" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/ajouter_unite.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="833">
-          <caret line="49" column="76" lean-forward="false" selection-start-line="49" selection-start-column="38" selection-end-line="49" selection-end-column="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/ajouter_medicament.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-629">
-          <caret line="48" column="71" lean-forward="false" selection-start-line="48" selection-start-column="71" selection-end-line="48" selection-end-column="71" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/common/cardParametre.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="29" lean-forward="false" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/structure.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="715">
-          <caret line="76" column="56" lean-forward="true" selection-start-line="50" selection-start-column="47" selection-end-line="76" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/unite.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-473">
-          <caret line="28" column="96" lean-forward="false" selection-start-line="28" selection-start-column="96" selection-end-line="28" selection-end-column="96" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/Medicaments.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-34">
-          <caret line="24" column="79" lean-forward="false" selection-start-line="24" selection-start-column="73" selection-end-line="24" selection-end-column="79" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/medicament.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="88" column="52" lean-forward="true" selection-start-line="44" selection-start-column="28" selection-end-line="88" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/AjouterAnalyses.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="12" column="0" lean-forward="true" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/core/model.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3774">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/core/app.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-136">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/core/Controller.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-204">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/core/function.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/public/assets/css/login_form.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/Fournisseurs.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="79" column="29" lean-forward="false" selection-start-line="79" selection-start-column="29" selection-end-line="79" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/Receptions.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="49" lean-forward="true" selection-start-line="12" selection-start-column="49" selection-end-line="12" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/Reception.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="108" column="78" lean-forward="false" selection-start-line="108" selection-start-column="78" selection-end-line="108" selection-end-column="78" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/payement_ord_vendu.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3890">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/payement_ord.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/ajouter_salle.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/common/header.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="88" lean-forward="false" selection-start-line="12" selection-start-column="88" selection-end-line="12" selection-end-column="88" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/Commande.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="140" column="89" lean-forward="false" selection-start-line="140" selection-start-column="89" selection-end-line="140" selection-end-column="89" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/Commandes.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="244" column="42" lean-forward="false" selection-start-line="244" selection-start-column="42" selection-end-line="244" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/salle.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/commande.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1530">
-          <caret line="90" column="101" lean-forward="false" selection-start-line="90" selection-start-column="101" selection-end-line="90" selection-end-column="101" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/ajouter_commande.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6273">
-          <caret line="369" column="43" lean-forward="false" selection-start-line="369" selection-start-column="43" selection-end-line="369" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/PDFanalyse.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/ajouter_reception.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="147" column="0" lean-forward="false" selection-start-line="147" selection-start-column="0" selection-end-line="147" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/PDF.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="62" column="27" lean-forward="false" selection-start-line="62" selection-start-column="27" selection-end-line="62" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/AjouterRendezvous.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/Tickets.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="140" column="45" lean-forward="true" selection-start-line="140" selection-start-column="45" selection-end-line="140" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/Ordonnances.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="23" column="70" lean-forward="false" selection-start-line="23" selection-start-column="70" selection-end-line="23" selection-end-column="70" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/ajouter_ordonnance.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="56" column="0" lean-forward="false" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/ordonnance.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="26" column="106" lean-forward="false" selection-start-line="26" selection-start-column="106" selection-end-line="26" selection-end-column="106" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/common/sidebare.view.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="153" column="48" lean-forward="false" selection-start-line="153" selection-start-column="48" selection-end-line="153" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/pdf/analyseReponse.inc.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <option name="version" value="3" />
   </component>
 </project>

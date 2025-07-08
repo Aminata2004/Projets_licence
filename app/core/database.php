@@ -1,35 +1,29 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: SNT
- * Date: 21/11/2022
- * Time: 12:24
- */
-class Database{
+* Created by PhpStorm.
+* User: SNT
+* Date: 21/11/2022
+* Time: 12:24
+*/
+ //session_start();
 
-        function connect (){
+class Database {
+    private ?PDO $database = null;
 
-            $string = DBDRIVER.":host=".DBHOST.";dbname=".DBNAME;
-
-            if (!$bdd=new PDO($string,DBUSER,DBPASS)) {
-               
-               die('echec de connection a la bas de données');
-            };
+    public function connect() {
+        try {
+            $bdd = new PDO('mysql:host=' . DBHOST . ';dbname=' . DBNAME, DBUSERNAME, DBPASSWORD);
+            $bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Optionnel mais recommandé
             return $bdd;
+        } catch (PDOException $e) {
+            die('Erreur de connexion à la base de données : ' . $e->getMessage());
         }
+    }
 
-
-        /*Parties
-         sur les insertions
-         * */
-
-
-
-        public function bdd(){
-            $bdd= $this->connect();
-            return $bdd;
+    public function bdd() {
+        if ($this->database === null) {
+            $this->database = $this->connect();
         }
-    // fin des fonction de sseclect
-//function pour verification de l'utilisateur
-
+        return $this->database;
+    }
 }
