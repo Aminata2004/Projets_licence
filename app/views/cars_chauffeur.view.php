@@ -85,7 +85,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <ul class="nav nav-tabs flex-column vertical-tabs-3" role="tablist">
+                            Modifier<ul class="nav nav-tabs flex-column vertical-tabs-3" role="tablist">
                                 <?php if ($_SESSION['droit'] === 'super_admin'): ?>
                                     <li class="nav-item">
                                         <a class="nav-link text-break" role="tab"
@@ -138,13 +138,6 @@
                                     </a>
                                 </li>
 
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/Programmation_cars"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Programmation des cars
-                                    </a>
-                                </li>
                                    <li class="nav-item mt-2">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/Compagnies/place_limite"

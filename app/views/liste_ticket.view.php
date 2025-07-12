@@ -59,7 +59,7 @@
                         </li>
 
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link" href="<?= BASE_URL ?>/Liste_tickets/liste_de_demain" role="tab" aria-selected="false">
+                            <a class="nav-link" href="<?= BASE_URL ?>/Liste_tickets/liste_de_demain" role="tab" aria-selected="true">
                                 <div class="d-flex align-items-center">
                                     <div class="tab-icon">
                                         <i class="fadeIn animated bx bx-time-five font-19"></i> <!-- Icône horloge -->

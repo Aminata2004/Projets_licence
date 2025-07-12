@@ -36,6 +36,8 @@ class Loguin extends Model
             // Connexion réussie
             $_SESSION['id_utilisateur'] = $utilisateur->idUser;
             $_SESSION['emailUser'] = $utilisateur->emailUser;
+            $_SESSION['nom'] = $utilisateur->utilisateurs;
+            
             $_SESSION['droit'] = $utilisateur->droit;
             $_SESSION['status'] = $utilisateur->status;
             $_SESSION['ville'] = $utilisateur->localite;

@@ -13,10 +13,11 @@ class Liste_gare extends Model
         $db = $this->connect();
 
         // Vérifier si la combinaison localité + numéroGare existe
-        $check = $db->prepare("SELECT idAgence FROM agence WHERE localite = :localite AND numeroGare = :numeroGare");
+        $check = $db->prepare("SELECT idAgence FROM agence WHERE localite = :localite AND numeroGare = :numeroGare AND id_compagnie = :id_compagnie" );
         $check->execute([
             ':localite' => $localite,
-            ':numeroGare' => $numeroGare
+            ':numeroGare' => $numeroGare,
+            ':id_compagnie' =>$id_compagnie
         ]);
         $existe = $check->fetch();
 
@@ -43,14 +44,14 @@ class Liste_gare extends Model
 
         if (count($errors) === 0) {
             $insertion = $this->insertion_update_simples(
-                "INSERT INTO agence(code, localite, numeroGare, tel, localite, id_compagnie) 
-         VALUES(:code, :localite, :numeroGare, :tel, :localite, :id_compagnie)",
+                "INSERT INTO agence(code, localite, numeroGare, tel, libele, id_compagnie) 
+         VALUES(:code, :localite, :numeroGare, :tel, :libele, :id_compagnie)",
                 [
                     ":code" => $code,
                     ":localite" => $localite,
                     ":numeroGare" => $numeroGare,
                     ":tel" => $tel,
-                    ":localite" => $localite,
+                    ":libele" => $libele,
                     ":id_compagnie" => $id_compagnie
                 ]
             );

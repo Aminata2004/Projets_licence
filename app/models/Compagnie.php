@@ -58,26 +58,26 @@
 
 
                     echo '<script>
-document.addEventListener("DOMContentLoaded", function () {
-    Swal.fire({
-        title: "🎉 Bravo !",
-        text: "Compagnie ajoutée avec succes.",
-        icon: "success",
-        iconColor: "#0d6efd", // ← couleur primary Bootstrap
-        confirmButtonColor: "#0d6efd", // ← bouton OK bleu
-        background: "#f0f8ff", // couleur de fond douce, proche du bleu
-        confirmButtonText: "OK",
-        showClass: {
-            popup: "animate__animated animate__zoomIn"
-        },
-        hideClass: {
-            popup: "animate__animated animate__fadeOut"
-        }
-    }).then(() => {
-        window.location.href = "' . BASE_URL . '/Compagnies";
-    });
-});
-</script>';
+                        document.addEventListener("DOMContentLoaded", function () {
+                            Swal.fire({
+                                title: "🎉 Bravo !",
+                                text: "Compagnie ajoutée avec succes.",
+                                icon: "success",
+                                iconColor: "#0d6efd", // ← couleur primary Bootstrap
+                                confirmButtonColor: "#0d6efd", // ← bouton OK bleu
+                                background: "#f0f8ff", // couleur de fond douce, proche du bleu
+                                confirmButtonText: "OK",
+                                showClass: {
+                                    popup: "animate__animated animate__zoomIn"
+                                },
+                                hideClass: {
+                                    popup: "animate__animated animate__fadeOut"
+                                }
+                            }).then(() => {
+                                window.location.href = "' . BASE_URL . '/Compagnies";
+                            });
+                        });
+                    </script>';
                 }
             } else {
 

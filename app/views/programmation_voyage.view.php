@@ -84,12 +84,15 @@
                                                     <select class="form-select" name="id_destination[]">
                                                         <option selected disabled value="">Sélectionner la destination</option>
                                                         <?php foreach ($destinations as $d): ?>
-                                                            <option value="<?= htmlspecialchars($d->destination) ?>">
-                                                                <?= htmlspecialchars($d->depart . ' -> ' . $d->destination) ?>
+                                                            <option
+                                                                value="<?= htmlspecialchars($d->idDestination) ?>"
+                                                                <?= ($d->idDepart != $_SESSION['ville']) ? 'disabled' : '' ?>>
+                                                                <?= htmlspecialchars($d->idDepart . ' -> ' . $d->idDestination) ?>
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </td>
+
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else : ?>
@@ -123,8 +126,7 @@
     <?php $this->view('partials/foot') ?>
     <!-- ✅ Script JS pour gérer la sélection de tous les checkboxes -->
     <script>
-
-           const dateInput = document.getElementById('jourVoyage');
+        const dateInput = document.getElementById('jourVoyage');
 
 
 
@@ -141,7 +143,7 @@
             dateInput.value = dateInput.min;
         })();
 
-        
+
         document.getElementById('selectAll').addEventListener('change', function() {
             const isChecked = this.checked;
             document.querySelectorAll('.checkbox-car').forEach(function(checkbox) {

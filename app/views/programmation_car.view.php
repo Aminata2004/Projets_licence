@@ -39,79 +39,8 @@
             </div>
             <!--end breadcrumb-->
             <div class="row">
-                <div class="col-xxl-3">
-                    <div class="card custom-card">
-                        <div class="card-header">
-                            <div class="card-title ">
-                                Generale
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <ul class="nav nav-tabs flex-column vertical-tabs-3" role="tablist">
-                                <?php if ($_SESSION['droit'] === 'super_admin'): ?>
-                                    <li class="nav-item">
-                                        <a class="nav-link text-break" role="tab"
-                                            aria-current="page" href="<?= BASE_URL ?>/Compagnies"
-                                            aria-selected="true">
-                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Compagnie
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
-                                <li class="nav-item">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/Configurations"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/Liste_gares"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/Add_liste_escales"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Escale
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/Add_liste_trajets"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Trajets
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/Cars_chauffeurs"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
-                                    </a>
-                                </li>
 
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  active text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/Programmation_cars"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Programmation des cars
-                                    </a>
-                                </li>
-                                   <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/Compagnies/place_limite"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Place limite
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xxl-9">
+                <div class="col-xxl-12">
                     <?php $this->view("set_flash") ?>
                     <div class="card custom-card">
                         <div class="card-header">
@@ -181,12 +110,12 @@
                                         <select class="form-control multiple-select" multiple="multiple" placeholder="Choisissez un ou plusieurs escale" name="idTrajet[]">
                                             <option value="" disabled>Choisissez un ou plusieurs trajet</option>
                                             <?php foreach ($listeTrajet as $listeTrajets): ?>
-                                                <option
-                                                    value="<?= htmlspecialchars($listeTrajets->idTrajet); ?>">
-                                                    <?= htmlspecialchars($listeTrajets->depart . ' - ' . $listeTrajets->destination) ?>
+                                                <option value="<?= htmlspecialchars($listeTrajets->idProgrammer); ?>">
+                                                    <?= htmlspecialchars($listeTrajets->idDepart . ' - ' . $listeTrajets->idDestination) ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
+
                                     </div>
                                 </div>
                                 <div class="modal-footer">

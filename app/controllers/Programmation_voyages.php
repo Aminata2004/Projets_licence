@@ -105,8 +105,14 @@ class Programmation_voyages extends Controller
     {
         // Récupérer les données des filières
         $programmation_voyage = new Programmation_voyage();
-        $listeProgrammer = $programmation_voyage->SelectAllData("*", "programmation_voyage 
-        ");
+        $id_compagnie= $_SESSION['id_compagnie'];
+
+       $listeProgrammer =  $programmation_voyage->FetchSelectWheres(
+          '*',
+          'programmation_voyage',
+          'id_compagnie = :id_compagnie',
+          ['id_compagnie' => $id_compagnie]
+        );
         $this->view('programmer_voyage_journalier', [
 
             'listeProgrammer' => $listeProgrammer

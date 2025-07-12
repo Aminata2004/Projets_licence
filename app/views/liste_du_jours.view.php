@@ -97,13 +97,13 @@
                         </div>
                         <div class="col-md-6">
                             <label for="heure" class="form-label">Heure de départ</label>
-                            <select class="form-select" id="selectheure" name="heure">
-                                <option value="">Toutes les heures</option>
+                           
+                             <select class="single-select" id="selectheure" name="heure">
+                                <option value="United States">Toutes les heures</option>
                                 <?php foreach ($liste_horaires as $liste_horaire): ?>
 
                                     <option value="<?= htmlspecialchars($liste_horaire->heuredepart) ?>"><?= $liste_horaire->heuredepart ?></option>
                                 <?php endforeach ?>
-
                             </select>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
 
                 </div>
             </div>
-
+            <?php $this->view("set_flash") ?>
             <div class="card">
                 <div class="card-body">
 
@@ -138,21 +138,31 @@
                                             <td><?= $item->Heur_departs ?></td>
                                             <td><?= $item->jourVoyage ?></td>
                                             <td><?= $item->date_expiration ?></td>
-                                             <td class=" ">
-                                            <div class="dropup ">
-                                                <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    &#8943; <!-- Trois points horizontaux -->
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end">
-                                                     <a class="dropdown-item" href="#">Details</a>
-                                                    <a class="dropdown-item" href="#">Modifier</a>
-                                                    <a class="dropdown-item" href="<?= BASE_URL ?>/Colis_prise_en_charges/imprimer_recu/<?= $colis['id_colis'] ?>" target="_blank">
-                                                        Imprimer le reçu
+                                            <td class=" ">
+                                                <div class="dropup ">
+                                                    <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        &#8943; <!-- Trois points horizontaux -->
                                                     </a>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <a class="dropdown-item" href="#">Details</a>
+                                                        <a class="dropdown-item" href="#">Modifier</a>
+                                                        <a href="#" class="dropdown-item report-btn"
+                                                            data-idclient="<?= $item->idBillets ?>"
+                                                            data-jour_voyage="<?= date('Y-m-d', strtotime($item->jourVoyage)) ?>"
+                                                            data-destinationid="<?= $item->destinationId ?>"
+                                                            data-date_expiration="<?= date('Y-m-d', strtotime($item->date_expiration)) ?>"
+                                                            data-heure_actuelle="<?= $item->Heur_departs ?>"
+                                                            data-bs-toggle="modal" data-bs-target="#exampleDangerModal">
+                                                            Reporter le voyage
+                                                        </a>
 
+                                                        <a class="dropdown-item" href="<?= BASE_URL ?>/Liste_du_jours/recu/<?= $item->idBillets ?>" target="_blank">
+                                                            Imprimer le reçu
+                                                        </a>
+
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
+                                            </td>
                                         </tr>
                                     <?php endif ?>
                                 <?php endforeach ?>
@@ -179,7 +189,48 @@
 
     </div>
     <!--end wrapper-->
+    <!-- Button trigger modal -->
 
+    <!-- Modal -->
+    <div class="modal fade" id="exampleDangerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content ">
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title text-white">Reporter un voyage</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-dart">
+                    <form action="<?= BASE_URL ?>/Liste_du_jours/reporter" method="post">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="validationCustom01" class="form-label">Nouveau jour de voyage</label>
+                                <input type="date" class="form-control" id="nouvelleDate" name="nouvelle_date" required>
+
+                            </div>
+                            <div class="col-md-12 mt-1">
+                                <label for="validationCustom02" class="form-label">Nouveau heure de depart</label>
+                                <select class="form-select" name="heure_depart" id="heureDepartSelect">
+
+                                </select>
+
+                            </div>
+
+                            <input type="hidden" id="dateExpiration" name="date_expiration">
+                            <input type="hidden" id="destination" name="destinationId">
+                            <input type="hidden" name="idClient" value="">
+
+
+                        </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary" name="edit">Modifier</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <?php $this->view('partials/foot') ?>
     <!-- JQuery et SweetAlert2 déjà inclus -->
@@ -211,6 +262,85 @@
                             Swal.fire('Erreur AJAX', xhr.responseText, 'error');
                         }
                     });
+                }
+            });
+        });
+ $(document).ready(function() {
+            $('.report-btn').click(function(e) {
+                e.preventDefault();
+
+                let idClient = $(this).data('idclient');
+                let jourVoyage = $(this).data('jour_voyage');
+                let destinationId = $(this).data('destinationid');
+                let dateExpiration = $(this).data('date_expiration');
+                let heureActuelle = $(this).data('heure_actuelle'); // Heure à présélectionner
+
+                let today = new Date();
+                let expirationDate = new Date(dateExpiration);
+                let voyageDate = new Date(jourVoyage);
+
+                today.setHours(0, 0, 0, 0);
+                expirationDate.setHours(0, 0, 0, 0);
+                voyageDate.setHours(0, 0, 0, 0);
+
+                if (today <= expirationDate) {
+                    // Limites de date
+                    let minDate = voyageDate.toISOString().split('T')[0];
+                    let maxDateObj = new Date(voyageDate);
+                    maxDateObj.setDate(maxDateObj.getDate() + 7);
+                    let maxDate = maxDateObj.toISOString().split('T')[0];
+
+                    // Appliquer limites au champ de date
+                    $('#nouvelleDate').attr('min', minDate);
+                    $('#nouvelleDate').attr('max', maxDate);
+                    $('#nouvelleDate').val(minDate);
+
+                    // Champs cachés
+                    $('#dateExpiration').val(dateExpiration);
+                    $('#destination').val(destinationId);
+                    $('input[name="idClient"]').val(idClient);
+
+                    // Charger les heures disponibles
+                    $.ajax({
+                        url: '<?= BASE_URL ?>/Liste_du_jours/getHeuresDisponibles',
+                        method: 'POST',
+                        data: {
+                            destination_id: destinationId
+                        },
+                        success: function(response) {
+                            let heures = JSON.parse(response);
+                            let heureSelect = $('#heureDepartSelect');
+                            heureSelect.empty();
+                            heureSelect.append('<option value="">Choisissez une heure de départ</option>');
+
+                            if (heures.length === 0) {
+                                heureSelect.append('<option disabled>Aucune heure disponible</option>');
+                            } else {
+                                let ancienneHeureDansListe = false;
+
+                                heures.forEach(function(h) {
+                                    let selected = '';
+                                    if (h === heureActuelle) {
+                                        selected = 'selected';
+                                        ancienneHeureDansListe = true;
+                                    }
+                                    heureSelect.append('<option value="' + h + '" ' + selected + '>' + h + '</option>');
+                                });
+
+                                // Si l’ancienne heure n’est plus dans la base, on l’affiche quand même
+                                if (!ancienneHeureDansListe && heureActuelle) {
+                                    heureSelect.prepend('<option value="' + heureActuelle + '" selected disabled>' + heureActuelle + ' (ancienne)</option>');
+                                }
+                            }
+                        },
+                        error: function() {
+                            alert("Erreur lors du chargement des heures.");
+                        }
+                    });
+
+                    $('#exampleDangerModal').modal('show');
+                } else {
+                    alert("La période de modification de ce voyage est expirée !");
                 }
             });
         });

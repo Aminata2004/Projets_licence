@@ -89,4 +89,21 @@
 
             return $errors;
         }
+
+        public function editPrix($data)
+        {
+            $req = "UPDATE programmer 
+            SET prix = :prix 
+            WHERE idProgrammer = :idProgrammer";
+
+            $params = [
+                ":prix" => $data['prix'],
+                ":idProgrammer" => $data['idProgrammer'],
+            ];
+
+            $modification = $this->insertion_update_simples($req, $params);
+            if ($modification == true) {
+                $this->set_flash("Modification faite avec succès", "primary");
+            }
+        }
     }

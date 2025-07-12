@@ -80,10 +80,13 @@
           <div class="menu-title">G-programmer</div>
         </a>
         <ul>
-          <li> <a href="<?= BASE_URL ?>/Programmation_voyages/liste_programmer_voyage"><i class="bi bi-arrow-right-short"></i>Programmation du voyage</a>
+          <li> <a href="<?= BASE_URL ?>/Programmer_voyages"><i class="bi bi-arrow-right-short"></i>Programme du voyage</a>
           </li>
-          <li> <a href="<?= BASE_URL ?>/Programmer_voyages"><i class="bi bi-arrow-right-short"></i>Programmer du voyage</a>
+          <li> <a href="<?= BASE_URL ?>/Programmation_cars"><i class="bi bi-arrow-right-short"></i>Programmation des car</a>
           </li>
+           <li> <a href="<?= BASE_URL ?>/Programmation_voyages/liste_programmer_voyage"><i class="bi bi-arrow-right-short"></i>Programmation du voyage</a>
+          </li>
+          
           <li> <a href="#"><i class="bi bi-arrow-right-short"></i>Hors programmer</a>
           </li>
         </ul>

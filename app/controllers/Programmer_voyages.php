@@ -33,7 +33,7 @@ class Programmer_voyages extends  Controller
       $programmer_voyage->redirect("Login/index");
       return;
     }
-    $this->view('programmer_voyage',['listeProgrammer'=>$listeProgrammer]);
+    $this->view('programmer_voyage', ['listeProgrammer' => $listeProgrammer]);
   }
 
 
@@ -98,5 +98,21 @@ class Programmer_voyages extends  Controller
       'listehoraire' => $listehoraire,
       'liste_agence' => $liste_agence
     ]);
+  }
+
+  public function edit()
+  {
+    $programmer_voyage = new Programmer_voyage();
+
+    if (isset($_POST['edit'])) {
+      $data = [
+        "prix" => $_POST['prix'],
+        "idProgrammer" => $_POST['idProgrammer']
+      ];
+
+      $programmer_voyage->editPrix($data);
+      header("Location: " . BASE_URL . "/Programmer_voyages/index");
+      exit;
+    }
   }
 }

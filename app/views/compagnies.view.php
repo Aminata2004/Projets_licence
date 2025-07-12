@@ -4,11 +4,13 @@
     <!--start wrapper-->
     <div class="wrapper">
         <!--start top header-->
-        <?php $this->view('partials/navbar') ?>
+        <?php $this->view('partials/navbar') 
+        ?>
         <!--end top header-->
 
         <!--start sidebar -->
-        <?php $this->view('partials/sidebar') ?>
+        <?php $this->view('partials/sidebar') 
+        ?>
         <!--end sidebar -->
 
         <!--start content-->
@@ -152,13 +154,6 @@
                                     </a>
                                 </li>
                                 <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/Programmation_cars"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Programmation des cars
-                                    </a>
-                                </li>
-                                   <li class="nav-item mt-2">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/Compagnies/place_limite"
                                         aria-selected="true">

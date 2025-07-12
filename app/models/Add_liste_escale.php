@@ -12,9 +12,16 @@
             if (empty($escales)) {
                 $errors[] = "L'escales est obligatoire.";
             }
-            // Vérifier si le téléphone existe déjà
-            $telExiste = $this->existe('escale', 'escales', $escales);
-            if ($telExiste) {
+            $db = $this->connect();
+            // Vérifier si la combinaison localité + numéroGare existe
+            $check = $db->prepare("SELECT id_escale FROM escale WHERE  escales = :escales AND id_compagnie = :id_compagnie");
+            $check->execute([
+                ':escales' => $escales,
+                ':id_compagnie' => $id_compagnie
+            ]);
+            $existe = $check->fetch();
+
+            if ($existe) {
                 $errors[] = "Cet escale existe deja.";
             }
 

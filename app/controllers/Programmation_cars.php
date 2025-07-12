@@ -28,12 +28,20 @@ class Programmation_cars extends  Controller
       );
 
       // Admin : liste des trajets appartenant à sa compagnie
-      $listeTrajet = $programmation_car->FetchSelectWheres(
-        '*',
-        'trajet',
-        'id_compagnie = :id_compagnie',
-        [':id_compagnie' => $id_compagnie]
-      );
+      $listeTrajet = $programmation_car->customQuery("
+            SELECT MIN(idProgrammer) AS idProgrammer, idDepart, idDestination
+            FROM programmer
+            WHERE id_compagnie = :id_compagnie
+            GROUP BY idDepart, idDestination
+        ", [':id_compagnie' => $id_compagnie]);
+
+
+      // $listeTrajet = $programmation_car->SelectAllData(
+      //   'MIN(idProgrammer) as idProgrammer, idDestination, idDepart',
+      //   'programmer',
+      //   'id_compagnie = :id_compagnie GROUP BY idDestination, idDepart',
+      //   [':id_compagnie' => $id_compagnie]
+      // );
 
       // Admin : référence des cars appartenant à sa compagnie
       $Select_car1 = $programmation_car->FetchSelectWheres(
@@ -51,7 +59,7 @@ class Programmation_cars extends  Controller
         [':programmer_car' => 'off']
       );
 
-      $listeTrajet = $programmation_car->SelectAllData('*', "trajet");
+      $listeTrajet = $programmation_car->SelectAllData('*', "programmer");
 
       $Select_car1 = $programmation_car->SelectAllData("*", "reference_car INNER JOIN car ON reference_car.id_car = car.id_car");
     }
@@ -63,3 +71,4 @@ class Programmation_cars extends  Controller
     ]);
   }
 }
+// End of file Programmation_cars.php

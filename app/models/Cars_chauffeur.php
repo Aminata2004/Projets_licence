@@ -33,7 +33,7 @@
             // Si aucune erreur, on procède à l'insertion
             if (count($errors) === 0) {
                 $insertion = $this->insertion_update_simples(
-                    "INSERT INTO car (numero_car, matriculle, nbr_place, nbr_place_reserve programmer_car, id_compagnie) 
+                    "INSERT INTO car (numero_car, matriculle, nbr_place, nbr_place_reserve, programmer_car, id_compagnie) 
         VALUES (:numero_car, :matriculle, :nbr_place, :nbr_place_reserve,:programmer_car,:id_compagnie)",
                     [
                         ":numero_car" => $numero_car,

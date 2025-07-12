@@ -12,8 +12,16 @@
             if (empty($heuredepart)) {
                 $errors[] = "L'heure de depart  est obligatoire.";
             }
-            // Vérification d'unicité du numéro du car
-            if ($this->existe_deja('heuredepart', $heuredepart, 'horaire')) {
+            $db = $this->connect();
+            // Vérifier si la combinaison localité + numéroGare existe
+            $check = $db->prepare("SELECT id_heure FROM horaire WHERE  heuredepart = :heuredepart AND id_compagnie = :id_compagnie");
+            $check->execute([
+                ':heuredepart' => $heuredepart,
+                ':id_compagnie' => $id_compagnie
+            ]);
+            $existe = $check->fetch();
+
+            if ($existe) {
                 $errors[] = "Cet heure de depart existe déjà.";
             }
             // Si aucune erreur, on procède à l'insertion

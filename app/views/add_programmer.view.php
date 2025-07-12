@@ -4,7 +4,7 @@
     <!--start wrapper-->
     <div class="wrapper">
         <!--start top header-->
-        <?php  $this->view('partials/navbar') ?>
+        <?php $this->view('partials/navbar') ?>
         <!--end top header-->
 
         <!--start sidebar -->
@@ -111,9 +111,10 @@
                                 <div class="col-md-6 ">
                                     <label for="bsValidation10" class="form-label">Heur de depart<span
                                             class="text-danger scale5 ms-2">*</span></label>
-                                    <select class="default-select wide form-control" id="heureDepart"
-                                        name="heureDepart" onchange="calculerRDV()">
-                                        <option data-display="Select">Sélectionner l'heure</option>
+
+
+                                    <select class="single-select" id="heureDepart" name="heureDepart" onchange="calculerRDV()">
+                                        <option value="United States">Toutes les heures</option>
                                         <?php foreach ($listehoraire as $listehoraires): ?>
                                             <option value="<?= $listehoraires->heuredepart ?>">
                                                 <?= $listehoraires->heuredepart ?>

@@ -96,13 +96,7 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
                                     </a>
                                 </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/Programmation_cars"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Programmation des cars
-                                    </a>
-                                </li>
+                                
                                    <li class="nav-item mt-2">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/Compagnies/place_limite"

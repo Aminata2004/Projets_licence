@@ -325,12 +325,12 @@ class Model extends Database
     }
 
     public function FetchSelectWhere1($select, $table, $where, $params)
-{
-    $sql = "SELECT $select FROM $table WHERE $where";
-    $stmt = $this->connect()->prepare($sql);
-    $stmt->execute($params);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC); // 👈 retourne TOUJOURS un tableau
-}
+    {
+        $sql = "SELECT $select FROM $table WHERE $where";
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // 👈 retourne TOUJOURS un tableau
+    }
 
 
     public function FetchSelectWheres($select, $fields, $whereValue, $value = [])
@@ -347,12 +347,12 @@ class Model extends Database
 
 
     public function FetchWheresJoin($select, $from, $where, $params)
-{
-    $sql = "SELECT $select FROM $from WHERE $where";
-    $stmt = $this->connect()->prepare($sql);
-    $stmt->execute($params);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+    {
+        $sql = "SELECT $select FROM $from WHERE $where";
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     /*partie  find all dataavec where */
     public function SelectData($select = [], $fields)
@@ -447,20 +447,20 @@ class Model extends Database
         return $count;
     }
     public function existe($table, $champ, $valeur)
-{
-    $sql = "SELECT COUNT(*) FROM $table WHERE $champ = :valeur";
-    $stmt = $this->connect()->prepare($sql);
-    $stmt->execute([':valeur' => $valeur]);
-    return $stmt->fetchColumn() > 0;
-}
+    {
+        $sql = "SELECT COUNT(*) FROM $table WHERE $champ = :valeur";
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute([':valeur' => $valeur]);
+        return $stmt->fetchColumn() > 0;
+    }
 
 
 
-function set_swal(string $title, string $text, string $icon = 'info', string $confirmColor = '#0d6efd', ?string $redirectUrl = null): void
-{
-    
-    echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4/animate.min.css">';
-    echo '<script>
+    function set_swal(string $title, string $text, string $icon = 'info', string $confirmColor = '#0d6efd', ?string $redirectUrl = null): void
+    {
+
+        echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4/animate.min.css">';
+        echo '<script>
         document.addEventListener("DOMContentLoaded", function () {
             Swal.fire({
                 title: ' . json_encode($title) . ',
@@ -477,40 +477,43 @@ function set_swal(string $title, string $text, string $icon = 'info', string $co
             })' . ($redirectUrl ? '.then(() => { window.location.href = ' . json_encode($redirectUrl) . '; })' : '') . ';
         });
     </script>';
-}
-
-// public function infoCompagnie($id_compagnie)
-// {
-//     $sql = "SELECT * FROM compagnie WHERE id_compagnie = :id_compagnie";
-//     $stmt = $this->connect()->prepare($sql);
-//     $stmt->execute(['id_compagnie' => $id_compagnie]);
-//     return $stmt->fetch();
-// }
-
-public function fetchAll($sql, $params = [])
-{
-    try {
-        // Remplace ceci par ta manière d'accéder à PDO
-        $pdo = $this->connect(); // OU global $pdo;
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        // Tu peux logger l'erreur ou l'afficher en debug
-        die("Erreur dans fetchAll() : " . $e->getMessage());
     }
-}
 
-protected function fetchOne(string $sql, array $params = [])
+    // public function infoCompagnie($id_compagnie)
+    // {
+    //     $sql = "SELECT * FROM compagnie WHERE id_compagnie = :id_compagnie";
+    //     $stmt = $this->connect()->prepare($sql);
+    //     $stmt->execute(['id_compagnie' => $id_compagnie]);
+    //     return $stmt->fetch();
+    // }
+
+    public function fetchAll($sql, $params = [])
+    {
+        try {
+            // Remplace ceci par ta manière d'accéder à PDO
+            $pdo = $this->connect(); // OU global $pdo;
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Tu peux logger l'erreur ou l'afficher en debug
+            die("Erreur dans fetchAll() : " . $e->getMessage());
+        }
+    }
+
+    protected function fetchOne(string $sql, array $params = [])
+    {
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: false;
+    }
+
+    public function customQuery($sql, $params = [])
 {
     $stmt = $this->connect()->prepare($sql);
     $stmt->execute($params);
-    return $stmt->fetch(PDO::FETCH_ASSOC) ?: false;
+    return $stmt->fetchAll(PDO::FETCH_OBJ);
 }
-
-
-
-
 
 }
