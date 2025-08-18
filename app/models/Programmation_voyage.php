@@ -6,7 +6,13 @@ class Programmation_voyage extends Model
 
     public function getHoraires()
     {
-        return $this->SelectAllData('*', "horaire");
+        $id_compagnie = $_SESSION['id_compagnie'];
+        return $this->FetchSelectWhereS(
+            "*",
+            "horaire",
+            "id_compagnie = :id_compagnie",
+            [":id_compagnie" => $id_compagnie]
+        );
     }
 
     // public function getProgrammationCars()
@@ -92,40 +98,40 @@ class Programmation_voyage extends Model
     //     return $this->insertion_update_simples($insert, $params);
     // }
 
-   public function insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre)
-{
-    $localite_user = $_SESSION['ville'];
-    $id_compagnie = $_SESSION["id_compagnie"];
-    $jourVoyage = $_POST['jourVoyage'];
+    public function insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre)
+    {
+        $localite_user = $_SESSION['ville'];
+        $id_compagnie = $_SESSION["id_compagnie"];
+        $jourVoyage = $_POST['jourVoyage'];
 
-    if ($id_destination == $localite_user) {
-        return false;
-    }
+        if ($id_destination == $localite_user) {
+            return false;
+        }
 
-    // 1. Insertion dans programmation_voyage
-    $insert = "INSERT INTO programmation_voyage (
+        // 1. Insertion dans programmation_voyage
+        $insert = "INSERT INTO programmation_voyage (
             id_car_programmer, id_horaire, id_trajet, localite_user, date_enregistre, id_compagnie
        ) VALUES (
             :id_car_programmer, :id_horaire, :id_trajet, :localite_user, :date_enregistre, :id_compagnie
        )";
 
-    $params = [
-        ':id_car_programmer' => $id_care,
-        ':id_horaire' => $id_horaire,
-        ':id_trajet' => $id_destination,
-        ':localite_user' => $localite_user,
-        ':date_enregistre' => $jourVoyage,
-        ':id_compagnie' => $id_compagnie
-    ];
+        $params = [
+            ':id_car_programmer' => $id_care,
+            ':id_horaire' => $id_horaire,
+            ':id_trajet' => $id_destination,
+            ':localite_user' => $localite_user,
+            ':date_enregistre' => $jourVoyage,
+            ':id_compagnie' => $id_compagnie
+        ];
 
-    $result = $this->insertion_update_simples($insert, $params);
+        $result = $this->insertion_update_simples($insert, $params);
 
-    // 2. Réinitialiser le nombre de places réservées à 0 (par sécurité)
-    $update = "UPDATE car SET nbr_place_reserve = 0 WHERE numero_car = :numero_car";
-    $this->insertion_update_simples($update, [':numero_car' => $id_care]);
+        // 2. Réinitialiser le nombre de places réservées à 0 (par sécurité)
+        $update = "UPDATE car SET nbr_place_reserve = 0 WHERE numero_car = :numero_car";
+        $this->insertion_update_simples($update, [':numero_car' => $id_care]);
 
-    // 3. 🔁 Rechercher dans la table suivis si une réservation pour demain existe déjà
-    $stmt = $this->connect()->prepare("
+        // 3. 🔁 Rechercher dans la table suivis si une réservation pour demain existe déjà
+        $stmt = $this->connect()->prepare("
         SELECT place_reserve
         FROM suivis
         WHERE depart = :dep
@@ -135,30 +141,30 @@ class Programmation_voyage extends Model
           AND id_compagnie = :id_compagnie
         LIMIT 1
     ");
-    $stmt->execute([
-        ':dep'           => $localite_user,
-        ':dest'          => $id_destination,
-        ':h'             => $id_horaire,
-        ':jr'            => $jourVoyage,
-        ':id_compagnie'  => $id_compagnie
-    ]);
-
-    $suivi = $stmt->fetch();
-
-    // 4. Si on a une ligne de réservation pour ce jour et cette destination
-    if ($suivi && $suivi['place_reserve'] > 0) {
-        $placeReserve = (int)$suivi['place_reserve'];
-
-        // 5. Mettre à jour le nombre de places réservées du car programmé
-        $stmt = $this->connect()->prepare("UPDATE car SET nbr_place_reserve = :n WHERE numero_car = :num");
         $stmt->execute([
-            ':n'   => $placeReserve,
-            ':num' => $id_care
+            ':dep'           => $localite_user,
+            ':dest'          => $id_destination,
+            ':h'             => $id_horaire,
+            ':jr'            => $jourVoyage,
+            ':id_compagnie'  => $id_compagnie
         ]);
-    }
 
-    return $result;
-}
+        $suivi = $stmt->fetch();
+
+        // 4. Si on a une ligne de réservation pour ce jour et cette destination
+        if ($suivi && $suivi['place_reserve'] > 0) {
+            $placeReserve = (int)$suivi['place_reserve'];
+
+            // 5. Mettre à jour le nombre de places réservées du car programmé
+            $stmt = $this->connect()->prepare("UPDATE car SET nbr_place_reserve = :n WHERE numero_car = :num");
+            $stmt->execute([
+                ':n'   => $placeReserve,
+                ':num' => $id_care
+            ]);
+        }
+
+        return $result;
+    }
 
 
 

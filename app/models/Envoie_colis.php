@@ -83,20 +83,35 @@ class Envoie_colis extends Model
       return $stmt->fetchAll(PDO::FETCH_OBJ);
    }
 
-   public function getCarById($id)
-   {
-      $result = $this->FetchSelectWhere1(
-         "*",
-         "programmation_voyage  inner join horaire on horaire.id_heure= programmation_voyage.id_horaire",
-         "id_car_programmer = :id_car_programmer",
-         [":id_car_programmer" => $id]
-      );
+   // public function getCarById($id)
+   // {
+   //    $result = $this->FetchSelectWhere1(
+   //       "*",
+   //       "programmation_voyage  inner join horaire on horaire.id_heure= programmation_voyage.id_horaire",
+   //       "id_car_programmer = :id_car_programmer",
+   //       [":id_car_programmer" => $id]
+   //    );
 
-      return !empty($result) ? $result[0] : null;
-   }
+   //    return !empty($result) ? $result[0] : null;
+      
+   // }
+   public function getCarById($id)
+{
+    $result = $this->FetchSelectWhere1(
+        "*",
+        "programmation_voyage  inner join horaire on horaire.id_heure = programmation_voyage.id_horaire",
+        "id_car_programmer = :id_car_programmer",
+        [":id_car_programmer" => $id]
+    );
+
+    var_dump($result); // Ajout pour debug
+    return !empty($result) ? $result[0] : null;
+}
+
 
    public function traiterEnvoi1($colis_ids, $id_car)
    {
+      date_default_timezone_set('Africa/Bamako');
       $id_compagnie = $_SESSION['id_compagnie'];
       $date_aujourdhui = date('Y-m-d'); // pour la comparaison
 

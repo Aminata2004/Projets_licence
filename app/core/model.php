@@ -239,6 +239,7 @@ class Model extends Database
             JOIN expediteurs ON colis.id_expediteur = expediteurs.id_expediteur
             JOIN destinataires ON colis.id_destinataire = destinataires.id_destinataire
             JOIN agence a ON colis.id_agence = a.idAgence
+            
             WHERE colis.id_compagnie = :id_compagnie";
 
         $params = [':id_compagnie' => $id_compagnie];
@@ -247,7 +248,7 @@ class Model extends Database
             $sql .= " AND colis.provient_de = :ville";
             $params[':ville'] = $ville;
         } elseif ($droit === 'Utilisateur') {
-            $sql .= " AND colis.provient_de = :ville AND colis.id_gare = :numero_gare";
+            $sql .= " AND colis.provient_de = :ville AND colis.num_gare = :numero_gare";
             $params[':ville'] = $ville;
             $params[':numero_gare'] = $numero_gare;
         }
@@ -323,6 +324,23 @@ class Model extends Database
         $que->closeCursor();
         return $count;
     }
+
+    //    public function getColisByCodeAndCompagnie($code, $idCompagnie) {
+    //     $sql = "SELECT * FROM colis WHERE code_colis = :code AND id_compagnie = :id_compagnie LIMIT 1";
+    //     $stmt = $this->connect()->prepare($sql);
+    //     $stmt->execute([
+    //         ':code' => $code,
+    //         ':id_compagnie' => $idCompagnie
+    //     ]);
+    //     return $stmt->fetch(PDO::FETCH_OBJ); // Retourne un seul objet ou false si non trouvé
+    // }
+    public function getColisByCodeAndCompagnie($sql, $params = [])
+    {
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetch(PDO::FETCH_OBJ); // ou FETCH_ASSOC selon ton système
+    }
+
 
     public function FetchSelectWhere1($select, $table, $where, $params)
     {
@@ -510,10 +528,9 @@ class Model extends Database
     }
 
     public function customQuery($sql, $params = [])
-{
-    $stmt = $this->connect()->prepare($sql);
-    $stmt->execute($params);
-    return $stmt->fetchAll(PDO::FETCH_OBJ);
-}
-
+    {
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
 }

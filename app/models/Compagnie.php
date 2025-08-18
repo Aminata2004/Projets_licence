@@ -137,4 +137,12 @@
                 $this->set_flash("Modification faite avec succès", "primary");
             }
         }
+
+public function getById($id) {
+    $stmt = $this->connect()->prepare("SELECT * FROM compagnie WHERE id_compagnie = ?");
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_OBJ);
+}
+
+
     }

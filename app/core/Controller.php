@@ -34,7 +34,7 @@ class Controller
             extract($data);
             require_once('app/views/'.$view.'.view.php');
         }else {
-            require_once('app/views/404.view.php');
+            require_once('app/views/admin/404.view.php');
         }
     }
 

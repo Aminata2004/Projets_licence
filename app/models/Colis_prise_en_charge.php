@@ -67,9 +67,9 @@
                     // Insertion colis
                     $stmt3 = $pdo->prepare("
                 INSERT INTO colis 
-                (nom_colis, nature, provient_de, id_agence, valeur, fraix_transaction, id_expediteur, id_destinataire, id_utilisateur, date_enregistrement, code_colis, status, id_compagnie)
+                (nom_colis, nature, provient_de, id_agence, valeur, fraix_transaction, id_expediteur, id_destinataire, id_utilisateur, date_enregistrement, code_colis, num_gare, status, id_compagnie)
                 VALUES 
-                (:nom_colis, :nature, :provient_de, :id_agence, :valeur, :fraix_transaction, :id_expediteur, :id_destinataire, :id_utilisateur, :date_enregistrement, :code_colis, :status, :id_compagnie)
+                (:nom_colis, :nature, :provient_de, :id_agence, :valeur, :fraix_transaction, :id_expediteur, :id_destinataire, :id_utilisateur, :date_enregistrement, :code_colis, :num_gare,  :status, :id_compagnie)
             ");
                     $stmt3->execute([
                         ":nom_colis" => $nom_colis,
@@ -83,6 +83,7 @@
                         ":id_utilisateur" => $id_utilisateur,
                         ":date_enregistrement" => $date,
                         ":code_colis" => $code_colis,
+                        ":num_gare" => $_SESSION['numero_gare'] ?? null, // Assurez-vous que cette variable est définie
                         ":status" => $status,
                         ":id_compagnie" => $id_compagnie
                     ]);
@@ -115,4 +116,5 @@
                 );
             }
         }
+       
     }

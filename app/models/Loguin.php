@@ -44,13 +44,16 @@ class Loguin extends Model
             $_SESSION['id_agence'] = $utilisateur->idAgence;
             $_SESSION['numero_gare']=  $utilisateur->numeroGare;
             $_SESSION['id_compagnie'] = $utilisateur->id_compagnie;
+            
          
 
             //echo $_SESSION['ville'] ;exit;
 
             // Redirection
           //  $this->redirect("Homes/home");
-          header("Location: " . BASE_URL . "/Homes/home");
+        //   header("Location: " . BASE_URL . "/Homes/home");
+        header("Location: index.php?url=admin/Homes/home");
+
 
 
             return;
