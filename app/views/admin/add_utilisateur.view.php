@@ -55,19 +55,20 @@
                                     </li>
                                 <?php endif; ?>
                                 <li class="nav-item">
-                                    <a class="nav-link active text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                                    </a>
-                                </li>
-                                <li class="nav-item">
                                     <a class="nav-link text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
                                         aria-selected="true">
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active text-break" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
+                                    </a>
+                                </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
@@ -96,8 +97,14 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
                                     </a>
                                 </li>
-                                
-                                   <li class="nav-item mt-2">
+                                <li class="nav-item mt-2">
+                                    <a class="nav-link  text-break mb-0" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
+                                    </a>
+                                </li>
+                                <li class="nav-item mt-2">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
                                         aria-selected="true">
@@ -110,106 +117,97 @@
                 </div>
                 <div class="col-xxl-9">
                     <?php $this->view("admin/set_flash") ?>
-                    <div class="card custom-card">
-                        <div class="card-header">
-                            <div class="card-title">
-                                Espace d'enregistrement des utilisateurs
-                            </div>
+                    <div class="card shadow-lg rounded-3 border-0">
+                        <div class="card-header d-flex justify-content-between align-items-center rounded-top border-bottom">
+                            <h5 class="mb-0 fw-bold">Espace d'enregistrement des utilisateurs</h5>
                         </div>
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="p-4 border rounded">
-                                    <form class="row g-3 " method="post">
-                                        <div class="col-md-6">
-                                            <label for="validationCustom01" class="form-label">Utilisateurs</label>
-                                            <input type="text" class="form-control" id="validationCustom01" placeholder="Nom & prenom" name="utilisateurs" required>
+                        <div class="card-body p-4">
+                            <div class="p-4 border rounded-3">
+                                <form class="row g-3" method="post">
 
+                                    <div class="col-md-6">
+                                        <label for="validationCustom01" class="form-label fw-semibold">Nom & prénom</label>
+                                        <input type="text" class="form-control" id="validationCustom01" placeholder="Nom & prénom" name="utilisateurs" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="validationCustom02" class="form-label fw-semibold">Email</label>
+                                        <input type="email" class="form-control" id="validationCustom02" placeholder="Email" name="emailUser" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="validationCustomUsername" class="form-label fw-semibold">Mot de passe</label>
+                                        <div class="input-group has-validation">
+                                            <input type="password" class="form-control" name="motPasse" required>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label for="validationCustom02" class="form-label">Email</label>
-                                            <input type="text" class="form-control" id="validationCustom02" placeholder="Email" name="emailUser" required>
+                                    </div>
 
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="validationCustomUsername" class="form-label">Mot de passe</label>
-                                            <div class="input-group has-validation">
-                                                <input type="password" class="form-control" id="" name="motPasse" required>
+                                    <div class="col-md-6">
+                                        <label for="validationCustom03" class="form-label fw-semibold">Confirmer mot de passe</label>
+                                        <input type="password" class="form-control" name="ConfirmermotPasse" required>
+                                    </div>
 
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="validationCustom03" class="form-label">Confirmer mot de passe</label>
-                                            <input type="password" class="form-control" id="validationCustom03" name="ConfirmermotPasse" required>
+                                    <!-- Champ Droit -->
+                                    <div class="col-md-6">
+                                        <label for="droitSelect" class="form-label fw-semibold">Droit</label>
+                                        <select class="form-select" id="droitSelect" name="droit" required>
+                                            <option value="" disabled selected>Le droit</option>
+                                            <option value="Utilisateur">Utilisateur</option>
+                                            <option value="Admin_regionale">Admin régionale</option>
+                                            <option value="Admin">Admin</option>
+                                        </select>
+                                    </div>
 
-                                        </div>
-                                        <!-- Champ Droit -->
-                                        <div class="col-md-6">
-                                            <label for="droitSelect" class="form-label">Droit</label>
-                                            <select class="form-select" id="droitSelect" name="droit" required>
-                                                <option data-display="Select">Le droit</option>
-                                                <option value="Utilisateur">Utilisateur</option>
-                                                <option value="Admin_regionale">Admin_regionale</option>
-                                                <option value="Admin">Admin</option>
-                                            </select>
-                                        </div>
+                                    <!-- Champ Gare -->
+                                    <div class="col-md-6" id="gareField">
+                                        <label for="gareSelect" class="form-label fw-semibold">Gare</label>
+                                        <select class="form-select" id="gareSelect" name="id_agence">
+                                            <option selected disabled value="">Choisissez une gare</option>
+                                            <?php foreach ($listeGares as $listeGare): ?>
+                                                <option value="<?= htmlspecialchars($listeGare->idAgence); ?>">
+                                                    <?= htmlspecialchars($listeGare->localite . ' ( ' . $listeGare->numeroGare . ' )'); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
 
-                                        <!-- Champ Gare -->
-                                        <div class="col-md-6" id="gareField">
-                                            <label for="gareSelect" class="form-label">Gare</label>
-                                            <select class="form-select" id="gareSelect" name="id_agence">
-                                                <option selected disabled value="">Choisissez une gare</option>
-                                                <?php foreach ($listeGares as $listeGare): ?>
-                                                    <option value="<?= htmlspecialchars($listeGare->idAgence); ?>">
-                                                        <?= htmlspecialchars($listeGare->localite . ' ( ' . $listeGare->numeroGare . ' )'); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
+                                    <!-- Champ Compagnie -->
+                                    <div class="col-md-12" id="compagnieField" style="display: none;">
+                                        <label for="compagnieSelect" class="form-label fw-semibold">Compagnie</label>
+                                        <select class="form-select" id="compagnieSelect" name="id_compagnie">
+                                            <option value="" disabled selected>Sélectionnez une compagnie</option>
+                                            <?php foreach ($listeCompagnie as $listeCompagnies): ?>
+                                                <option value="<?= htmlspecialchars($listeCompagnies->id_compagnie); ?>">
+                                                    <?= htmlspecialchars($listeCompagnies->nom_compagnie); ?>
+                                                </option>
+                                            <?php endforeach ?>
+                                        </select>
+                                    </div>
 
+                                    <div class="col-12 mt-3 d-flex gap-2">
+                                        <button class="btn btn-outline-primary fw-semibold" type="submit" name="saveutilisateur">Enregistrer</button>
+                                        <a href="<?= BASE_URL ?>/admin/Configurations" class="btn btn-outline-secondary fw-semibold">Voir la liste</a>
+                                    </div>
 
-                                        <!-- Champ Compagnie -->
-                                        <div class="col-md-12" id="compagnieField" style="display: none;">
-                                            <label for="compagnieSelect" class="form-label">Compagnie</label>
-                                            <select class="form-select" id="compagnieSelect" name="id_compagnie">
-                                                <option data-display="Select"></option>
-                                                <?php foreach ($listeCompagnie as $listeCompagnies): ?>
-                                                    <option value="<?= htmlspecialchars($listeCompagnies->id_compagnie); ?>">
-                                                        <?= htmlspecialchars($listeCompagnies->nom_compagnie); ?>
-                                                    </option>
-                                                <?php endforeach ?>
-                                            </select>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <button class="btn btn-primary" type="submit" name="saveutilisateur">Enregistre</button>
-                                            <a href="<?= BASE_URL ?>/admin/Configurations" class="btn btn-info">Voir la liste</a>
-
-                                        </div>
-                                    </form>
-                                </div>
+                                </form>
                             </div>
-
                         </div>
                     </div>
                 </div>
+
+
             </div>
             <!--end row-->
         </main>
         <!--end page main-->
-
         <!--start overlay-->
         <div class="overlay nav-toggle-icon"></div>
         <!--end overlay-->
-
         <!--Start Back To Top Button-->
         <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
         <!--End Back To Top Button-->
-
-
     </div>
     <!--end wrapper-->
-
-
     <?php $this->view('admin/partials/foot') ?>
     <!-- JS -->
     <script>

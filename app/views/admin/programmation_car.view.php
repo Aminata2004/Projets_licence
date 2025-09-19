@@ -15,7 +15,7 @@
         <main class="page-content">
             <!--breadcrumb-->
             <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-                <div class="breadcrumb-title pe-3">Configuration</div>
+                <div class="breadcrumb-title pe-3">G-programme</div>
                 <div class="ps-3">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
@@ -43,42 +43,39 @@
                 <div class="col-xxl-12">
                     <?php $this->view("admin/set_flash") ?>
                     <div class="card custom-card">
-                        <div class="card-header">
-                            <div class="card-title">
-                                Liste des cars programmer
-                            </div>
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top">
+                            <h5 class="mb-0 fw-bold">Liste des cars programmer
+</h5>
                         </div>
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
-                                        <thead>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Numero de car</th>
+                                            <th>Nbr de place</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($Select_car1 as $Select_cars) : ?>
                                             <tr>
-                                                <th>Numero de car</th>
-                                                <th>Nbr de place</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($Select_car1 as $Select_cars) : ?>
-                                                <tr>
-                                                    <td> Car : <?= $Select_cars->numero_car ?></td>
-                                                    <td> <?= $Select_cars->nbr_place ?></td>
-                                                    <td class=" ">
-                                                        <div class="dropup text-center">
-                                                            <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                &#8943; <!-- Trois points horizontaux -->
-                                                            </a>
-                                                            <div class="dropdown-menu dropdown-menu-end">
-                                                                <a class="dropdown-item" href="#">Modifier</a>
-                                                                <a class="dropdown-item" href="#">Désactiver</a>
-                                                            </div>
+                                                <td> Car : <?= $Select_cars->numero_car ?></td>
+                                                <td> <?= $Select_cars->nbr_place ?></td>
+                                                <td class=" ">
+                                                    <div class="dropup text-center">
+                                                        <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            &#8943; <!-- Trois points horizontaux -->
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <a class="dropdown-item" href="#">Modifier</a>
+                                                            <a class="dropdown-item" href="#">Désactiver</a>
                                                         </div>
-                                                    </td>
-                                                <?php endforeach ?>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                    </div>
+                                                </td>
+                                            <?php endforeach ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

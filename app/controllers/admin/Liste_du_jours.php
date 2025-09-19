@@ -17,12 +17,13 @@ class Liste_du_jours extends  Controller
 
   public function index()
   {
+    date_default_timezone_set('Africa/Bamako');
     $id_compagnie = $_SESSION['id_compagnie'];
     $idDepart = $_SESSION['ville'];
     $model = new Liste_du_jour();
 
     $resultats = $model->listeBillets();
-    $liste_horaires = $model->SelectAllData(
+    $liste_horaires = $model->FetchSelectWheres(
       '*',
       'horaire',
       'id_compagnie = :id_compagnie',

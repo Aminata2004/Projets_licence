@@ -42,7 +42,7 @@ class Livraison_colis extends Controller
                 $colisModel->set_flash("Pas les droits pour livrer.", 'danger');
             }
 
-            // Envoi mail avec PHPMailer
+            // EnvLivraison_colisoi mail avec PHPMailer
             $mail = new PHPMailer(true);
             try {
                 $mail->isSMTP();
@@ -61,12 +61,12 @@ class Livraison_colis extends Controller
                 $date = date('d/m/Y');
                 $mail->Subject = "Confirmation de réception de colis";
                 $mail->Body = <<<HTML
-<p><strong>À CONSERVER</strong></p>
-<p>Madame, Monsieur,</p>
-<p>Votre colis <strong>n° {$colis['id_colis']}</strong> a été remis avec succès à
-<strong>{$colis['localite']}</strong> le <strong>$date</strong>.</p>
-<p>Merci de votre confiance,<br>L’équipe Airbarry</p>
-HTML;
+                <p><strong>À CONSERVER</strong></p>
+                <p>Madame, Monsieur,</p>
+                <p>Votre colis <strong>n° {$colis['id_colis']}</strong> a été remis avec succès à
+                <strong>{$colis['localite']}</strong> le <strong>$date</strong>.</p>
+                <p>Merci de votre confiance,<br>L’équipe Airbarry</p>
+                HTML;
 
                 $mail->send();
             } catch (Exception $e) {
@@ -85,35 +85,41 @@ HTML;
         }
 
         // 2) Recherche de colis par code
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['envoi'])) {
-            $code = trim($_POST['code'] ?? '');
-            if ($code === '') {
-                $colisModel->set_flash("Merci de renseigner un code colis.", 'danger');
-            }
+      $colis = null;
+$peutLivrer = false;
 
-            $colis = $colisModel->findByCode($code);
-            if (!$colis) {
-                $colisModel->set_flash("Le code colis n’existe pas.", 'danger');
-            }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['envoi'])) {
+    $code = trim($_POST['code'] ?? '');
 
+    if ($code === '') {
+        $colisModel->set_flash("Merci de renseigner un code colis.", 'danger');
+    } else {
+        $colis = $colisModel->findByCode($code);
+
+        if (!$colis || !is_array($colis)) {
+            $colisModel->set_flash("Le code colis n’existe pas.", 'danger');
+            $colis = null;
+        } else {
             // Vérification droits
-            $droit      = $_SESSION['droit'] ?? '';
-            $memeVille  = $colis['localite'] === ($_SESSION['ville'] ?? '');
-            $memeGare   = $colis['numero_gare'] === ($_SESSION['numero_gare'] ?? '');
-            $bonStatut  = $colis['status'] === 'recu';
+            $droit = $_SESSION['droit'] ?? '';
+            $memeVille = isset($colis['localite']) && $colis['localite'] === ($_SESSION['ville'] ?? '');
+            $memeGare  = isset($colis['numero_gare']) && $colis['numero_gare'] === ($_SESSION['numero_gare'] ?? '');
+            $bonStatut = isset($colis['status']) && $colis['status'] === 'recu';
 
             $peutLivrer = match ($droit) {
                 'Admin_regionale' => $memeVille && $bonStatut,
                 'utilisateur'     => $memeVille && $memeGare && $bonStatut,
                 default           => false,
             };
-
-            // Affichage du formulaire avec infos colis + bouton livrer si autorisé
-            $this->view('admin/livraison_colis', ['colis' => $colis, 'peutLivrer' => $peutLivrer]);
-            return;
         }
+    }
+}
 
-        // 3) Page d’accueil du formulaire (aucun colis trouvé)
-        $this->view('admin/livraison_colis', ['colis' => null, 'peutLivrer' => false]);
+// Toujours passer $colis et $peutLivrer à la vue
+$this->view('admin/livraison_colis', [
+    'colis' => $colis,
+    'peutLivrer' => $peutLivrer
+]);
+
     }
 }

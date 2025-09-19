@@ -26,7 +26,7 @@
                 </div>
                 <div class="ms-auto">
                     <div class="btn-group">
-                        <a href="<?= BASE_URL ?>/Colis_prise_en_charges/ajouter_colis/" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
+                        <a href="<?= BASE_URL ?>/admin/Add_billets" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
                         <a href="javascript:history.back()" class="btn btn-primary "><i
                                 class="fadeIn animated bx bx-left-arrow-alt"></i></a>
 
@@ -59,7 +59,7 @@
                         </li>
 
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link" href="<?= BASE_URL ?>/admin/Liste_tickets/liste_de_demain" role="tab" aria-selected="true">
+                            <a class="nav-link" href="<?= BASE_URL ?>/admin/Liste_de_demains" role="tab" aria-selected="true">
                                 <div class="d-flex align-items-center">
                                     <div class="tab-icon">
                                         <i class="fadeIn animated bx bx-time-five font-19"></i> <!-- Icône horloge -->

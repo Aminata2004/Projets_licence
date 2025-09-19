@@ -7,6 +7,7 @@
                 $heure = $_POST['selectheure'] ?? '';
                 $destination = $_POST['id_destination'] ?? '';
                 $id_compagnie = $_SESSION['id_compagnie'];
+                date_default_timezone_set('Africa/Bamako');
                 $aujourd = date('Y-m-d');
 
                 if ($heure && $destination) {

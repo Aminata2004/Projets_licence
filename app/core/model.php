@@ -196,7 +196,7 @@ class Model extends Database
         $bdd = $this->connect();
         $stm = $bdd->prepare($select);
         $stm->execute($excute_data);
-        $data = $stm->fetch(PDO::FETCH_OBJ);
+        $data = $stm->fetchAll(PDO::FETCH_OBJ);
         return $data;
     }
 
@@ -310,6 +310,16 @@ class Model extends Database
         $que->closeCursor();
         return $count;
     }
+
+    public function FetchSelectAllWhere($select, $fields, $whereValue, $value = [])
+    {
+        $bdd = $this->bdd();
+        $que = $bdd->prepare("SELECT $select FROM $fields WHERE $whereValue");
+        $que->execute($value);
+        $results = $que->fetchAll(PDO::FETCH_OBJ);  // Récupère toutes les lignes
+        $que->closeCursor();
+        return $results;
+    }
     /* end find  find all avec where*/
 
     /* parite select find avec where*/
@@ -325,6 +335,17 @@ class Model extends Database
         return $count;
     }
 
+    public function FetchSelectWhere2($select, $fields, $whereValue, $value = [])
+    {
+        $bdd = $this->connect();
+        $que = $bdd->prepare("SELECT $select
+                FROM $fields
+                WHERE $whereValue");
+        $que->execute($value);
+        $count = $que->fetchAll(PDO::FETCH_OBJ);
+        $que->closeCursor();
+        return $count;
+    }
     //    public function getColisByCodeAndCompagnie($code, $idCompagnie) {
     //     $sql = "SELECT * FROM colis WHERE code_colis = :code AND id_compagnie = :id_compagnie LIMIT 1";
     //     $stmt = $this->connect()->prepare($sql);
@@ -497,6 +518,21 @@ class Model extends Database
     </script>';
     }
 
+    public function set_toast_top(string $title, string $text, ?string $bgColor = null, ?string $redirectUrl = null, ?int $timer = null)
+    {
+        $_SESSION['toast'] = [
+            'title' => $title,
+            'text'  => $text,
+            'bg'    => $bgColor,
+            'url'   => $redirectUrl,
+            'timer' => $timer
+        ];
+    }
+
+
+
+
+
     // public function infoCompagnie($id_compagnie)
     // {
     //     $sql = "SELECT * FROM compagnie WHERE id_compagnie = :id_compagnie";
@@ -520,12 +556,15 @@ class Model extends Database
         }
     }
 
-    protected function fetchOne(string $sql, array $params = [])
+    public function fetchOne(string $sql, array $params = [])
     {
         $stmt = $this->connect()->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: false;
     }
+
+
+    
 
     public function customQuery($sql, $params = [])
     {

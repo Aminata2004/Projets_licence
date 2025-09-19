@@ -26,7 +26,7 @@
                 </div>
                 <div class="ms-auto">
                     <div class="btn-group">
-                        <a href="<?= BASE_URL ?>/Add_billets" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
+                        <a href="<?= BASE_URL ?>/admin/Add_billets" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
                         <a href="javascript:history.back()" class="btn btn-primary "><i
                                 class="fadeIn animated bx bx-left-arrow-alt"></i></a>
 
@@ -129,8 +129,13 @@
                                 </tr>
                             </thead>
                             <tbody id="tableClient">
-                                <?php foreach ($liste_du_jour as $item): ?>
-                                    <?php if ($item->jourVoyage == date("Y-m-d")): ?>
+                                
+                                <?php 
+                                
+                                foreach ($liste_du_jour as $item): ?>
+                                    <?php 
+                                     date_default_timezone_set('Africa/Bamako');
+                                    if ($item->jourVoyage == date("Y-m-d")): ?>
                                         <tr class="text-center">
                                             <td><?= $item->Client ?></td>
                                             <td><?= $item->destinationId ?></td>
@@ -156,7 +161,7 @@
                                                             Reporter le voyage
                                                         </a>
 
-                                                        <a class="dropdown-item" href="<?= BASE_URL ?>/Liste_du_jours/recu/<?= $item->idBillets ?>" target="_blank">
+                                                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Liste_du_jours/recu/<?= $item->idBillets ?>" target="_blank">
                                                             Imprimer le reçu
                                                         </a>
 
@@ -244,7 +249,7 @@
 
                 if (selectheure && id_destination) {
                     $.ajax({
-                        url: '<?= BASE_URL ?>/AjaxFiltreListeClient', // Contrôleur AJAX MVC
+                        url: '<?= BASE_URL ?>/admin/AjaxFiltreListeClient', // Contrôleur AJAX MVC
                         type: 'POST',
                         data: {
                             selectheure: selectheure,

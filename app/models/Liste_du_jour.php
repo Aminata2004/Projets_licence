@@ -21,17 +21,20 @@
       $liste = $this->FetchSelectWheres(
         '*',
         'billets inner join client on billets.id_client = client.idClient',
-        'billets.id_compagnie = :id_compagnie ORDER BY billets.idBillets DESC LIMIT 10',
-        ['id_compagnie' => $id_compagnie]
+        'billets.id_compagnie = :id_compagnie AND billets.validation_billets = :validation ORDER BY billets.idBillets DESC LIMIT 10',
+        [
+          'id_compagnie' => $id_compagnie,
+        
+          'validation'   => 'valider'
+        ]
       );
       return $liste;
     }
 
-
     public function getBilletById($idBillets)
     {
       $sql = "SELECT * FROM billets inner join client on billets.id_client = client.idClient 
-        inner join utilisateur on utilisateur.idUser = client.idUser
+        inner join utilisateur on utilisateur.idUser = billets.idUser
         WHERE idBillets = :id ";
       $stmt = $this->connect()->prepare($sql);
       $stmt->execute([':id' => $idBillets]);
@@ -73,24 +76,23 @@
 
       return $results;
     }
-   public function reporte_voyage($data)
-{
-    $req = "UPDATE billets 
+    public function reporte_voyage($data)
+    {
+      $req = "UPDATE billets 
             SET jourVoyage = :jourVoyage,
                 Heur_departs = :Heur_departs
             WHERE idBillets = :idBillets";
 
-    $params = [
+      $params = [
         ":jourVoyage" => $data['jourVoyage'],
         ":Heur_departs" => $data['Heur_departs'],
         ":idBillets" => $data['idBillets'],
-    ];
+      ];
 
-    $modification = $this->insertion_update_simples($req, $params);
+      $modification = $this->insertion_update_simples($req, $params);
 
-    if ($modification == true) {
+      if ($modification == true) {
         $this->set_flash("Modification faite avec succès", "primary");
+      }
     }
-}
-
   }

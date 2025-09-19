@@ -74,7 +74,7 @@
                                     popup: "animate__animated animate__fadeOut"
                                 }
                             }).then(() => {
-                                window.location.href = "' . BASE_URL . '/Compagnies";
+                                window.location.href = "' . BASE_URL . '/admin/Compagnies";
                             });
                         });
                     </script>';
@@ -93,7 +93,6 @@
         </script>';
             }
         }
-
 
 
         // function pour la modification
@@ -138,11 +137,10 @@
             }
         }
 
-public function getById($id) {
-    $stmt = $this->connect()->prepare("SELECT * FROM compagnie WHERE id_compagnie = ?");
-    $stmt->execute([$id]);
-    return $stmt->fetch(PDO::FETCH_OBJ);
-}
-
-
+        public function getById($id)
+        {
+            $stmt = $this->connect()->prepare("SELECT * FROM compagnie WHERE id_compagnie = ?");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_OBJ);
+        }
     }

@@ -15,38 +15,34 @@
 
         <!--start content-->
         <main class="page-content ">
-            <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-                <div class="breadcrumb-title pe-3">G-colis</div>
-                <div class="ps-3">
+          
+            <!-- Breadcrumb -->
+            <div class="page-breadcrumb d-flex flex-column flex-sm-row align-items-start align-items-sm-center mb-3">
+                <div class="breadcrumb-title pe-3 text-primary"><i class="bx bx-package me-1"></i> G-colis</div>
+                <div class="ps-3 flex-grow-1">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
-                            <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
-                            </li>
-                            <li class="breadcrumb-item active text-primary" aria-current="page">Colis envoyés pour le car N° <?= htmlspecialchars($id_car) ?>
+                            <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
+                            <li class="breadcrumb-item active " aria-current="page">
+                                Colis envoyés pour le car N° <?= htmlspecialchars($id_car) ?>
                                 le <?= date('d/m/Y à H:i', strtotime($date_envoi)) ?>
-
                             </li>
                         </ol>
                     </nav>
                 </div>
-                <div class="ms-auto">
-                    <div class="btn-group">
-
-                        <a href="javascript:history.back()" class="btn btn-primary "><i
-                                class="fadeIn animated bx bx-left-arrow-alt"></i></a>
-
-                    </div>
+                <div class="ms-auto mt-2 mt-sm-0">
+                    <a href="javascript:history.back()" class="btn btn-sm btn-outline-primary rounded-pill shadow-sm">
+                        <i class="bx bx-left-arrow-alt me-1"></i>Retour
+                    </a>
                 </div>
             </div>
+            <!-- /Breadcrumb -->
 
-            <div class="card">
-                <div class="card-body ">
-                    <div class="">
-
-                        <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
-
-                            <thead>
+            <div class="card shadow-sm rounded-3">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="example" class="table table-striped table-hover table-bordered align-middle shadow-sm">
+                            <thead class="table-primary text-center">
                                 <tr>
                                     <th>Nom du colis</th>
                                     <th>Nature</th>
@@ -55,20 +51,17 @@
                                     <th>Date d'envoi</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="text-center">
                                 <?php foreach ($liste_colis as $colis): ?>
                                     <tr>
                                         <td><?= htmlspecialchars($colis->nom_colis) ?></td>
                                         <td><?= htmlspecialchars($colis->nature) ?></td>
                                         <td><?= htmlspecialchars($colis->valeur) ?></td>
                                         <td><?= htmlspecialchars($colis->fraix_transaction) ?></td>
-                                        <td><?= htmlspecialchars($colis->date_enregistre) ?></td>
+                                        <td><?= date('d/m/Y H:i', strtotime($colis->date_enregistre)) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
-                        </table>
-                        </table>
-
                         </table>
                     </div>
                 </div>

@@ -9,7 +9,7 @@ class Add_billets extends Controller
     public function index()
     {
         $model = new Add_billet();
-
+        date_default_timezone_set('Africa/Bamako');
         $data['destinations'] = $model->getDestinationsWithHeuresAndEscales();
 
         if (isset($_POST['save'])) {

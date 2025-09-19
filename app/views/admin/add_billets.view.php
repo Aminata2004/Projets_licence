@@ -1,4 +1,4 @@
-<?php $this->view('admin/partials/header') ?>
+<?php $this->view('admin/partials/headers') ?>
 
 <body>
     <!--start wrapper-->
@@ -40,6 +40,7 @@
             <div class="row">
                 <div class="col-xl-12 mx-auto">
                     <?php $this->view("admin/set_flash") ?>
+                    <?php $this->view("admin/helpers") ?>
                     <div class="card">
                         <div class="card-header px-4 py-3">
                             <h5 class="mb-0 text-primary">Reservation des billets</h5>
@@ -118,10 +119,9 @@
                                             <!-- Escales (cases à cocher) -->
                                             <div class="mb-3 row">
                                                 <label class="col-lg-4 col-form-label" for="escalesList">Escales</label>
-                                                <div class="col-lg-8" id="escalesList" style="margin-top:8px;"></div>
+                                                <div class="col-lg-8" id="escalesList" style="margin-top:8px"></div>
+                                                <input type="hidden" id="escaleSelected" name="escaleNom" value="">
                                             </div>
-                                            <input type="hidden" name="escaleNom" id="escaleSelected" value="">
-
 
                                             <!-- Champ Nombre de passagers -->
                                             <div class="mb-3 row" id="nombrePassagersRow">
@@ -165,7 +165,7 @@
                                                 <div class="col-lg-8">
                                                     <input type="text" class="form-control"
                                                         id="validationCustom06" name="numeroBillets"
-                                                        value="SMT<?= date("ismd") ?>" readonly>
+                                                        value="<?= genererNumeroBillet() ?>" readonly>
                                                 </div>
                                             </div>
 
@@ -173,7 +173,7 @@
                                                 <div class="col-lg-8 ms-auto">
                                                     <button type="submit" name="save" class="btn btn-primary px-4">Enregistre</button>
 
-                                                    <a href="<?= BASE_URL ?>/Liste_tickets/liste_actuelle"><button type="button"
+                                                    <a href="<?= BASE_URL ?>/admin/Liste_tickets"><button type="button"
                                                             class="btn btn-primary px-4 split-bg-primary ">
                                                             Liste clients
                                                         </button></a>
@@ -262,23 +262,21 @@
 
         // Quand une escale est cochée, on stocke son nom, on masque destinationId ou on laisse intact,
         // et on affiche la boîte pour le prix manuel.
-        escalesList.addEventListener('change', (e) => {
-            const checkedEscales = escalesList.querySelectorAll('input[type="checkbox"]:checked');
-            if (checkedEscales.length > 0) {
-                const escaleNom = checkedEscales[0].value; // ✅ value = bon nom maintenant
-                document.getElementById('escaleSelected').value = escaleNom;
+        escalesList.addEventListener('change', () => {
+            const checkedEscale = escalesList.querySelector('input[type="radio"]:checked');
+            const escaleInput = document.getElementById('escaleSelected');
 
-
-                // Affiche la saisie du prix manuel
+            if (checkedEscale) {
+                escaleInput.value = checkedEscale.value; // met le nom de l'escale sélectionnée
                 prixManuelBox.classList.remove('d-none');
-                // Si tu veux, tu peux remplir prixManuelInput.value = le prix de l’escale
-                // (si tu as ce prix côté client)
+                prixManuelInput.value = checkedEscale.dataset.prix || 0; // optionnel : prix automatique
             } else {
-                document.getElementById('escaleSelected').value = '';
+                escaleInput.value = '';
                 prixManuelBox.classList.add('d-none');
                 prixManuelInput.value = '';
             }
         });
+
 
 
         /* --------- 3) Helpers --------- */
@@ -327,6 +325,25 @@
             updateProgrammeOptions(); // toujours garder ça
         });
 
+        function gererAffichagePrixSelonEscale() {
+            const checkedEscales = escalesList.querySelectorAll('input[type="checkbox"]:checked');
+            if (checkedEscales.length > 0) {
+                const escale = checkedEscales[0];
+                document.getElementById('escaleSelected').value = escale.value;
+
+                // Récupérer le prix depuis l'attribut data-prix
+                prixManuelInput.value = escale.dataset.prix || '';
+                prixManuelBox.classList.remove('d-none');
+            } else {
+                document.getElementById('escaleSelected').value = '';
+                prixManuelInput.value = '';
+                prixManuelBox.classList.add('d-none');
+            }
+        }
+
+        // Attacher l’événement
+        escalesList.addEventListener('change', gererAffichagePrixSelonEscale);
+
 
 
         /* --------- 5) Afficher les escales lorsque l’on choisit une heure --------- */
@@ -337,15 +354,18 @@
             escalesList.innerHTML =
                 escales.length ?
                 escales.map(e => `
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox"
-                name="escales[]" id="escale_${e.id}" value="${e.escale_nom}">
-            <label class="form-check-label" for="escale_${e.id}">
-                ${e.escale_nom}
-            </label>
-        </div>
-    `).join('') :
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio"
+                    name="escale" id="escale_${e.id}" 
+                    value="${e.escale_nom}"
+                    data-prix="${e.prix_escale || 0}">
+                <label class="form-check-label" for="escale_${e.id}">
+                    ${e.escale_nom} - ${e.prix_escale || 0} FCFA
+                </label>
+            </div>
+        `).join('') :
                 '<em>Pas d\'escale pour ce trajet.</em>';
+
 
 
             // Re-attacher les événements de changement sur chaque checkbox escale
@@ -363,6 +383,80 @@
 
         /* --------- 7) Premier remplissage (si destination déjà choisie) --------- */
         updateProgrammeOptions();
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const escalesList = document.getElementById('escalesList');
+            const prixInput = document.getElementById('prix');
+            const prixTotalInput = document.getElementById('prixTotal');
+            const passagersInput = document.getElementById('nombrePassagers');
+            const programmeSelect = document.getElementById('programmeSelect');
+
+            let nbPassagers = parseInt(passagersInput.value) || 1;
+
+            // Écoute les changements du nombre de passagers
+            passagersInput.addEventListener('input', () => {
+                nbPassagers = parseInt(passagersInput.value) || 1;
+                calculerPrix();
+            });
+
+            // Affiche les escales du programme sélectionné
+            function afficherEscales() {
+                const selectedOption = programmeSelect.options[programmeSelect.selectedIndex];
+                if (!selectedOption) {
+                    escalesList.innerHTML = '';
+                    return;
+                }
+
+                const escales = JSON.parse(selectedOption.dataset.escales || '[]');
+
+                escalesList.innerHTML = escales.length ?
+                    escales.map(e => `
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio"
+                        name="escale" id="escale_${e.id}" 
+                        value="${e.escale_nom}"
+                        data-prix="${e.prix_escale || 0}">
+                    <label class="form-check-label" for="escale_${e.id}">
+                        ${e.escale_nom} - ${e.prix_escale || 0} FCFA
+                    </label>
+                </div>
+            `).join('') :
+                    '<em>Pas d\'escale pour ce trajet.</em>';
+            }
+
+            // Calculer le prix (trajet ou escale) * nombre de passagers
+            function calculerPrix() {
+                const selectedOption = programmeSelect.options[programmeSelect.selectedIndex];
+                if (!selectedOption) return;
+
+                const prixProgramme = parseFloat(selectedOption.dataset.prix || 0);
+
+                // Si une escale est cochée, on prend son prix
+                const escaleSelectionnee = escalesList.querySelector('input[type="radio"]:checked');
+                const prixUnitaire = escaleSelectionnee ?
+                    parseFloat(escaleSelectionnee.dataset.prix || 0) :
+                    prixProgramme;
+
+                const total = prixUnitaire * nbPassagers;
+
+                prixInput.value = prixUnitaire || '';
+                prixTotalInput.value = total > 0 ? `${total.toLocaleString('fr-FR')} FCFA` : '';
+            }
+
+            // Recalcul automatique si on change d’escale
+            escalesList.addEventListener('change', calculerPrix);
+
+            // Recalcul automatique si on change de programme
+            programmeSelect.addEventListener('change', () => {
+                afficherEscales();
+                calculerPrix();
+            });
+
+            // Premier calcul au chargement
+            afficherEscales();
+            calculerPrix();
+        });
     </script>
 
 </body>

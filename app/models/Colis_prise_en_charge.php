@@ -87,6 +87,37 @@
                         ":status" => $status,
                         ":id_compagnie" => $id_compagnie
                     ]);
+
+                    // === Alimentation de la caisse ===
+                    $stmt = $pdo->prepare("
+            SELECT c.id_caisse, c.montant_colis
+            FROM caisse c
+            INNER JOIN agence a ON c.id_agence = a.idAgence
+            WHERE c.id_compagnie = :id_compagnie
+              AND a.localite = :ville
+               AND a.numeroGare = :numeroGare
+           
+            LIMIT 1
+        ");
+                    $stmt->execute([
+                        ':id_compagnie' => $_SESSION['id_compagnie'],
+                        ':ville'        => $_SESSION['ville'],
+                        ':numeroGare'   => $_SESSION['numero_gare']
+
+                    ]);
+                    $caisse = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if ($caisse) {
+                        $stmtUpdate = $pdo->prepare("
+                UPDATE caisse
+                SET montant_colis = montant_colis + :montant
+                WHERE id_caisse = :id_caisse
+            ");
+                        $stmtUpdate->execute([
+                            ':montant'   => $fraix_transaction,
+                            ':id_caisse' => $caisse['id_caisse']
+                        ]);
+                    }
                     $pdo->commit();
 
                     // ✅ Notification de succès
@@ -116,5 +147,4 @@
                 );
             }
         }
-       
     }

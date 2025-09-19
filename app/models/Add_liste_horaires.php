@@ -49,4 +49,39 @@
                 }
             }
         }
+        public function savePermission()
+        {
+            // Récupération sécurisée des données du formulaire
+            extract($_POST);
+            $errors = [];
+            //$id_compagnie = $_SESSION["id_compagnie"];
+            // Vérification des champs requis
+            if (empty($nom_permission)) {
+                $errors[] = "Permission est obligatoire.";
+            }
+            // Si aucune erreur, on procède à l'insertion
+            if (count($errors) === 0) {
+
+                $insertion = $this->insertion_update_simples(
+                    "INSERT INTO permision 
+                ( nom_permission ) VALUES(:nom_permission)",
+                    [
+                        ":nom_permission" => $nom_permission
+
+                    ]
+                );
+                if ($insertion == true) {
+                    $this->set_flash('Permission ajouter avec succes', 'info');
+                    //  header("Location: " . $_SERVER['PHP_SELF']); // Redirection vers la même page
+                    //  exit();
+                } else {
+                    $this->set_flash('heure non ajouter');
+                }
+            } else {
+                // Affichage des erreurs
+                foreach ($errors as $error) {
+                    $this->set_flash($error, "danger");
+                }
+            }
+        }
     }

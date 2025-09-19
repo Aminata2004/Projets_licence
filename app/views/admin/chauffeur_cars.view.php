@@ -100,6 +100,13 @@
                                         </a>
                                     </li>
                                 <?php endif; ?>
+                                  <li class="nav-item">
+                                    <a class="nav-link  text-break" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
+                                    </a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
@@ -107,13 +114,7 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
-                                    </a>
-                                </li>
+                              
                                 <li class="nav-item">
                                     <a class="nav-link text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
@@ -142,6 +143,13 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
                                     </a>
                                 </li>
+                                  <li class="nav-item mt-2">
+                                    <a class="nav-link  text-break mb-0" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
+                                    </a>
+                                </li>
 
                                    <li class="nav-item mt-2">
                                     <a class="nav-link  text-break" role="tab"
@@ -162,11 +170,10 @@
                                 Liste des chauffeurs
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="card-body">
                                 <ul class="nav nav-pills nav-pills-primary mb-3" role="tablist">
                                     <li class="nav-item" role="presentation">
-                                        <a class="nav-link " href="<?= BASE_URL ?>/Cars_chauffeurs" role="tab" aria-selected="true">
+                                        <a class="nav-link " href="<?= BASE_URL ?>/admin/Cars_chauffeurs" role="tab" aria-selected="true">
                                             <div class="d-flex align-items-center">
                                                 <div class="tab-icon"><i class='bx bx-home font-18 me-1'></i>
                                                 </div>
@@ -175,7 +182,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <a class="nav-link active" href="<?= BASE_URL ?>/Chauffeurs_cars" role="tab" aria-selected="false">
+                                        <a class="nav-link active" href="<?= BASE_URL ?>/admin/Chauffeurs_cars" role="tab" aria-selected="false">
                                             <div class="d-flex align-items-center">
                                                 <div class="tab-icon"><i class='bx bx-user-pin font-18 me-1'></i>
                                                 </div>
@@ -225,7 +232,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
                     </div>
                 </div>
             </div>

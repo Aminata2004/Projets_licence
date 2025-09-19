@@ -55,19 +55,20 @@
                                     </li>
                                 <?php endif; ?>
                                 <li class="nav-item">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                                    </a>
-                                </li>
-                                <li class="nav-item">
                                     <a class="nav-link active text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
                                         aria-selected="true">
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link  text-break" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
+                                    </a>
+                                </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
@@ -96,8 +97,14 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
                                     </a>
                                 </li>
-                               
-                                  <li class="nav-item mt-2">
+                                <li class="nav-item mt-2">
+                                    <a class="nav-link  text-break mb-0" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
+                                    </a>
+                                </li>
+                                <li class="nav-item mt-2">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
                                         aria-selected="true">
@@ -116,69 +123,65 @@
                                 Espace d'enregistrement des gares
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="p-4 border rounded">
-                                    <form class="row g-3 " onsubmit="return validerFormulaire()"
-                                        method="post">
+                        <div class="card-body">
+                            <div class="p-4 border rounded">
+                                <form class="row g-3 " onsubmit="return validerFormulaire()"
+                                    method="post">
 
-                                        <div class="col-md-6">
-                                            <label for="bsValidation3" class="form-label">Localite<span
-                                                    class="text-danger scale5 ms-2">*</span></label>
-                                            <input type="text" class="form-control" id=""
-                                                name="localite"
-                                                value="" placeholder="ex:Segou" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="tel" class="form-label">Libelle
-                                                <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control"
-                                                value="" name="libele"
-                                                placeholder="" required>
+                                    <div class="col-md-6">
+                                        <label for="bsValidation3" class="form-label">Localite<span
+                                                class="text-danger scale5 ms-2">*</span></label>
+                                        <input type="text" class="form-control" id=""
+                                            name="localite"
+                                            value="" placeholder="ex:Segou" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="tel" class="form-label">Libelle
+                                            <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control"
+                                            value="" name="libele"
+                                            placeholder="" required>
 
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="tel" class="form-label">Code marchant du gare
-                                                <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control"
-                                                value="" name="code"
-                                                placeholder="ex:123489" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="tel" class="form-label">Code marchant du gare
+                                            <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control"
+                                            value="" name="code"
+                                            placeholder="ex:123489" required>
 
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="bsValidation10"
-                                                class="form-label">Numero d'orange<span
-                                                    class="text-danger scale5 ms-2">*</span></label>
-                                            <input type="text" class="form-control" id="tel"
-                                                maxlength="11" oninput="verifierNumero()"
-                                                value="" name="tel" placeholder="ex:78907812" required>
-                                            <small id="messageErreur" class="text-danger"></small>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="bsValidation10"
+                                            class="form-label">Numero d'orange<span
+                                                class="text-danger scale5 ms-2">*</span></label>
+                                        <input type="text" class="form-control" id="tel"
+                                            maxlength="11" oninput="verifierNumero()"
+                                            value="" name="tel" placeholder="ex:78907812" required>
+                                        <small id="messageErreur" class="text-danger"></small>
 
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="bsValidation11" class="form-label">Numero
+                                            de
+                                            gars<span
+                                                class="text-danger scale5 ms-2">*</span></label>
+                                        <input type="text" class="form-control" id=""
+                                            value=""
+                                            name="numeroGare" placeholder="ex:Gare I" required>
+                                        <div class="invalid-feedback">
+                                            Please select a valid State.
                                         </div>
-                                        <div class="col-md-2">
-                                            <label for="bsValidation11" class="form-label">Numero
-                                                de
-                                                gars<span
-                                                    class="text-danger scale5 ms-2">*</span></label>
-                                            <input type="text" class="form-control" id=""
-                                                value=""
-                                                name="numeroGare" placeholder="ex:Gare I" required>
-                                            <div class="invalid-feedback">
-                                                Please select a valid State.
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="d-md-flex d-grid align-items-center gap-3">
-                                                <button type="submit" name="enregistre"
-                                                    class="btn btn-primary px-4">Enregistre</button>
-                                                <a href="<?= BASE_URL ?>/Liste_gares" class="btn btn-info">Voir la liste</a>
-                                            </div>
-                                        </div>
+                                    </div>
 
-                                    </form>
-                                </div>
+
+                                    <div class="col-12 mt-3 d-flex gap-2">
+                                        <button class="btn btn-outline-primary fw-semibold" type="submit" name="enregistre">Enregistrer</button>
+                                        <a href="<?= BASE_URL ?>/admin/Liste_gares" class="btn btn-outline-secondary fw-semibold">Voir la liste</a>
+                                    </div>
+
+                                </form>
                             </div>
-
                         </div>
                     </div>
                 </div>

@@ -10,7 +10,7 @@
 
                 if ($heure && $destination) {
                     $model = new Liste_du_jour();
-
+                    date_default_timezone_set('Africa/Bamako');
                     $demain = date('Y-m-d', strtotime('+1 day'));
 
                     $resultats = $model->FetchSelectWheres(

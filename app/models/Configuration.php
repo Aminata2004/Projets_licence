@@ -1,90 +1,16 @@
  <?php
     class Configuration extends Model
     {
-        // public function saveUtilisateur()
-        // {
-        //     // Initialiser un tableau d'erreurs
-        //     $errors = [];
+        /**
+         * Sauvegarde un nouvel utilisateur dans la base de données.
+         *
+         * Valide les données du formulaire, hache le mot de passe, et insère
+         * l'utilisateur dans la table `utilisateur`.
+         *
+         * Affiche des messages d'erreur ou de succès via SweetAlert.
+         */
 
-        //     // Récupération sécurisée des données du formulaire
-        //     extract($_POST);
-        //     $status = 1;
-        //     $id_compagnie = $_SESSION["id_compagnie"];
-        //     // Vérification des champs obligatoires
-        //     if (empty($utilisateurs)) {
-        //         $errors[] = "Le nom de l'utilisateur est obligatoire.";
-        //     }
-
-        //     if (!filter_var($emailUser, FILTER_VALIDATE_EMAIL)) {
-        //         $errors[] = "L'email n'est pas valide.";
-        //     }
-
-        //     if (empty($motPasse)) {
-        //         $errors[] = "Le mot de passe est obligatoire.";
-        //     }
-
-        //     if (empty($ConfirmermotPasse)) {
-        //         $errors[] = "La confirmation du mot de passe est obligatoire.";
-        //     }
-
-        //     if (!empty($motPasse) && !empty($ConfirmermotPasse) && $motPasse !== $ConfirmermotPasse) {
-        //         $errors[] = "Les mots de passe ne correspondent pas.";
-        //     }
-
-
-        //     if (empty($droit)) {
-        //         $errors[] = "Le droit est obligatoire.";
-        //     }
-
-        //     // Vérification de l'existence de l'email
-        //     if (!empty($emailUser) && $this->existe_deja('emailUser', $emailUser, 'utilisateur')) {
-        //         $errors[] = "Cet email est déjà utilisé.";
-        //     }
-
-        //     // Si aucune erreur, on procède à l'insertion
-        //     if (count($errors) === 0) {
-        //         // Hachage du mot de passe
-        //         $motPasseHash = password_hash($motPasse, PASSWORD_DEFAULT);
-
-        //         $droit = $_POST['droit'];
-        //         // Initialisation des deux champs à null
-        //         $id_agence = null;
-        //         $id_compagnie = null;
-
-        //         // Choisir les IDs selon le rôle
-        //         if ($droit === 'Admin') {
-        //             $id_compagnie = $_POST['id_compagnie'] ?? null;
-        //         } else {
-        //             $id_agence = $_POST['id_agence'] ?? null;
-        //         }
-
-        //         // Insertion avec les deux colonnes
-        //         $insertion = $this->insertion_update_simples(
-        //             "INSERT INTO utilisateur (utilisateurs, emailUser, motPasse, status, id_agence, id_compagnie, droit) 
-        //              VALUES (:utilisateurs, :emailUser, :motPasse, :status, :id_agence, :id_compagnie, :droit)",
-        //             [
-        //                 ":utilisateurs"  => $utilisateurs,
-        //                 ":emailUser"     => $emailUser,
-        //                 ":motPasse"      => $motPasseHash,
-        //                 ":status"        => $status,
-        //                 ":id_agence"     => $id_agence,
-        //                 ":id_compagnie"  => $id_compagnie,
-        //                 ":droit"         => $droit
-        //             ]
-        //         );
-
-        //         if ($insertion) {
-        //             $this->set_flash('Utilisateur ajouté avec succès', 'info');
-        //         } else {
-        //             $this->set_flash("Échec de l'ajout de l'utilisateur.", 'danger');
-        //         }
-        //     } else {
-        //         // Affichage des erreurs
-        //         foreach ($errors as $error) {
-        //             $this->set_flash($error, 'danger');
-        //         }
-        //     }
-        // }
+        private $idUser;
 
         public function saveUtilisateur()
         {
@@ -159,7 +85,7 @@
                         "L'utilisateur a été ajouté avec succès.",
                         "success",
                         "#0d6efd", // couleur primary pour l'icône et le bouton
-                        BASE_URL . "/Configurations" // redirection après confirmation
+                        BASE_URL . "/admin/Configurations/add_utilisateurs" // redirection après confirmation
                     );
                 } else {
                     $this->set_swal(
@@ -179,4 +105,31 @@
                 );
             }
         }
+
+        public function findById($id)
+    {
+        $sql = "SELECT * FROM utilisateur WHERE idUser = ?";
+        $result = $this->select_data_table_join_where($sql, [$id]);
+        return !empty($result) ? $result[0] : null;
+    }
+    public function __construct($idUser = null)
+    {
+        if ($idUser) {
+            $this->idUser = $idUser;
+        }
+    }
+
+
+    public function userHasPermission($userPermissionName)
+    {
+        $sql = "SELECT p.nom_permission
+                FROM permision p
+                JOIN user_permission up ON p.id_permision = up.permission_id
+                JOIN utilisateur u ON u.idUser = up.user_id
+                WHERE u.idUser = ? AND p.nom_permission = ?";
+        $result = $this->select_data_table_join_where($sql, [$this->idUser, $userPermissionName]);
+        return count($result) > 0;
+        
+    }
+             
     }

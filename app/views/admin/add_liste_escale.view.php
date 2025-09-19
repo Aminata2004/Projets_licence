@@ -59,6 +59,13 @@
                                         </a>
                                     </li>
                                 <?php endif; ?>
+                                  <li class="nav-item">
+                                    <a class="nav-link text-break" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
+                                    </a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
@@ -66,13 +73,7 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
-                                    </a>
-                                </li>
+                              
                                 <li class="nav-item">
                                     <a class="nav-link active text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
@@ -99,6 +100,13 @@
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
                                         aria-selected="true">
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
+                                    </a>
+                                </li>
+                                  <li class="nav-item mt-2">
+                                    <a class="nav-link  text-break mb-0" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
                                     </a>
                                 </li>
                                

@@ -62,15 +62,18 @@ class  Liste_gares extends  Controller
         $liste_gare = new Liste_gare();
         if (isset($_POST['edit'])) {
 
-            extract($_POST);
+            // extract($_POST);
+            // var_dump($_POST); exit;
             $numeroGare = $_POST["numeroGare"];
             $localite = $_POST["localite"];
             $code = $_POST["code"];
             $tel = $_POST["tel"];
             $idAgence = $_POST["idAgence"];
             $liste_gare->editAgence(['idAgence' => $idAgence, 'numeroGare' => $numeroGare, 'localite' => $localite, 'code' => $code, 'tel' => $tel]);
-            // header("Location: " . BASE_URL . "/Liste_gares/index");
+            header("Location: " . BASE_URL . "/admin/Liste_gares/index");
             // exit;
         }
     }
+
+  
 }

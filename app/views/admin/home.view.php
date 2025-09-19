@@ -1,4 +1,4 @@
-<?php $this->view('admin/partials/header')?>
+<?php $this->view('admin/partials/headers') ?>
 
 <body>
 
@@ -6,162 +6,243 @@
   <!--start wrapper-->
   <div class="wrapper">
     <!--start top header-->
-      <?php $this->view('admin/partials/navbar')?>
-       <!--end top header-->
+    <?php $this->view('admin/partials/navbar') ?>
+    <!--end top header-->
 
-        <!--start sidebar -->
-      <?php $this->view('admin/partials/sidebar')?>
-       <!--end sidebar -->
+    <!--start sidebar -->
+    <?php $this->view('admin/partials/sidebar') ?>
+    <!--end sidebar -->
 
-       <!--start content-->
-          <main class="page-content">
-              
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-4">
-              <div class="col">
-                <div class="card radius-10">
-                  <div class="card-body">
-                      <div class="d-flex align-items-center">
-                          <div>
-                              <p class="mb-0 text-secondary">Total Orders</p>
-                              <h4 class="my-1">4805</h4>
-                              <p class="mb-0 font-13 text-success"><i class="bi bi-caret-up-fill"></i> 5% from last week</p>
-                          </div>
-                          <div class="widget-icon-large bg-gradient-purple text-white ms-auto"><i class="bi bi-basket2-fill"></i>
-                          </div>
-                      </div>
-                  </div>
-                </div>
-               </div>
-               <div class="col">
-                  <div class="card radius-10">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <p class="mb-0 text-secondary">Total Revenue</p>
-                                <h4 class="my-1">$24K</h4>
-                                <p class="mb-0 font-13 text-success"><i class="bi bi-caret-up-fill"></i> 4.6 from last week</p>
-                            </div>
-                            <div class="widget-icon-large bg-gradient-success text-white ms-auto"><i class="bi bi-currency-exchange"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-               </div>
-               <div class="col">
-                <div class="card radius-10">
-                  <div class="card-body">
-                      <div class="d-flex align-items-center">
-                          <div>
-                              <p class="mb-0 text-secondary">Total Customers</p>
-                              <h4 class="my-1">5.8K</h4>
-                              <p class="mb-0 font-13 text-danger"><i class="bi bi-caret-down-fill"></i> 2.7 from last week</p>
-                          </div>
-                          <div class="widget-icon-large bg-gradient-danger text-white ms-auto"><i class="bi bi-people-fill"></i>
-                          </div>
-                      </div>
-                  </div>
-               </div>
-               </div>
-               <div class="col">
-                <div class="card radius-10">
-                  <div class="card-body">
-                      <div class="d-flex align-items-center">
-                          <div>
-                              <p class="mb-0 text-secondary">Bounce Rate</p>
-                              <h4 class="my-1">38.15%</h4>
-                              <p class="mb-0 font-13 text-success"><i class="bi bi-caret-up-fill"></i> 12.2% from last week</p>
-                          </div>
-                          <div class="widget-icon-large bg-gradient-info text-white ms-auto"><i class="bi bi-bar-chart-line-fill"></i>
-                          </div>
-                      </div>
-                  </div>
-                </div>
-               </div>
-            </div><!--end row-->
+    <!--start content-->
+    <main class="page-content">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-xl-4 g-4 mb-4">
 
-
-            
-            
-          </main>
-       <!--end page main-->
-
-       <!--start overlay-->
-        <div class="overlay nav-toggle-icon"></div>
-       <!--end overlay-->
-
-       <!--Start Back To Top Button-->
-		     <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
-       <!--End Back To Top Button-->
-
-       <!--start switcher-->
-       <div class="switcher-body">
-        <button class="btn btn-primary btn-switcher shadow-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"><i class="bi bi-paint-bucket me-0"></i></button>
-        <div class="offcanvas offcanvas-end shadow border-start-0 p-2" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling">
-          <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Theme Customizer</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
-          </div>
-          <div class="offcanvas-body">
-            <h6 class="mb-0">Theme Variation</h6>
-            <hr>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="LightTheme" value="option1">
-              <label class="form-check-label" for="LightTheme">Light</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="DarkTheme" value="option2">
-              <label class="form-check-label" for="DarkTheme">Dark</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="SemiDarkTheme" value="option3">
-              <label class="form-check-label" for="SemiDarkTheme">Semi Dark</label>
-            </div>
-            <hr>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="MinimalTheme" value="option3" checked>
-              <label class="form-check-label" for="MinimalTheme">Minimal Theme</label>
-            </div>
-            <hr/>
-            <h6 class="mb-0">Header Colors</h6>
-            <hr/>
-            <div class="header-colors-indigators">
-              <div class="row row-cols-auto g-3">
-                <div class="col">
-                  <div class="indigator headercolor1" id="headercolor1"></div>
-                </div>
-                <div class="col">
-                  <div class="indigator headercolor2" id="headercolor2"></div>
-                </div>
-                <div class="col">
-                  <div class="indigator headercolor3" id="headercolor3"></div>
-                </div>
-                <div class="col">
-                  <div class="indigator headercolor4" id="headercolor4"></div>
-                </div>
-                <div class="col">
-                  <div class="indigator headercolor5" id="headercolor5"></div>
-                </div>
-                <div class="col">
-                  <div class="indigator headercolor6" id="headercolor6"></div>
-                </div>
-                <div class="col">
-                  <div class="indigator headercolor7" id="headercolor7"></div>
-                </div>
-                <div class="col">
-                  <div class="indigator headercolor8" id="headercolor8"></div>
-                </div>
+        <!-- Billets en présentiel -->
+        <div class="col">
+          <div class="card shadow-lg border-0 rounded-4 hover-shadow">
+            <div class="card-body d-flex align-items-center p-4">
+              <div>
+                <p class="mb-1 text-muted fw-semibold">Billets en présentiel</p>
+                <h4 class="mb-0 text-primary">
+                  <?= htmlspecialchars($data['billetsJour']['presentiel']); ?>
+                </h4>
+                <small class="text-muted text-primary">
+                  <i class="bi bi-calendar-day"></i> Aujourd'hui
+                </small>
+              </div>
+              <div class="ms-auto fs-2 text-white bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width:60px; height:60px;">
+                <i class="bi bi-person-badge"></i>
               </div>
             </div>
           </div>
         </div>
-       </div>
-       <!--end switcher-->
+
+        <!-- Billets en ligne validés -->
+        <div class="col">
+          <div class="card shadow-lg border-0 rounded-4 hover-shadow">
+            <div class="card-body d-flex align-items-center p-4">
+              <div>
+                <p class="mb-1 text-muted fw-semibold">Billets en ligne validés</p>
+                <h4 class="mb-0 text-success">
+                  <?= htmlspecialchars($data['billetsJour']['en_ligne']); ?>
+                </h4>
+                <small class="text-muted text-success">
+                  <i class="bi bi-calendar-day"></i> Aujourd'hui
+                </small>
+              </div>
+              <div class="ms-auto fs-2 text-white bg-success rounded-circle d-flex align-items-center justify-content-center" style="width:60px; height:60px;">
+                <i class="bi bi-laptop"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Billets en attente de validation -->
+        <div class="col">
+          <div class="card shadow-lg border-0 rounded-4 hover-shadow">
+            <div class="card-body d-flex align-items-center p-4">
+              <div>
+                <p class="mb-1 text-muted fw-semibold">Billets en attente</p>
+                <h4 class="mb-0 text-danger">
+                  <?= htmlspecialchars($data['billetsJour']['en_attente']); ?>
+                </h4>
+                <small class="text-muted text-danger">
+                  <i class="bi bi-calendar-day"></i> Aujourd'hui
+                </small>
+              </div>
+              <div class="ms-auto fs-2 text-white bg-danger rounded-circle d-flex align-items-center justify-content-center" style="width:60px; height:60px;">
+                <i class="bi bi-hourglass-split"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Voyages programmés -->
+        <div class="col">
+          <div class="card shadow-lg border-0 rounded-4 hover-shadow">
+            <div class="card-body d-flex align-items-center p-4">
+              <div>
+                <p class="mb-1 text-muted fw-semibold">Voyages programmés</p>
+                <h4 class="mb-0 text-warning">
+                  <?= htmlspecialchars($data['voyagesJour']); ?>
+                </h4>
+                <small class="text-muted text-warning">
+                  <i class="bi bi-calendar-day "></i> Aujourd'hui
+                </small>
+              </div>
+              <div class="ms-auto fs-2 text-white bg-warning rounded-circle d-flex align-items-center justify-content-center" style="width:60px; height:60px;">
+                <i class="bi bi-bus-front"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+
+      <!-- Graphique Billets -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-header bg-transparent d-flex justify-content-between">
+              <h5 class="mb-0">Statistiques des billets (présentiel, ligne, reportés)</h5>
+              <i class="bi bi-three-dots-vertical"></i>
+            </div>
+            <div class="card-body">
+              <div id="chart1" style="height:300px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Indicateurs Colis -->
+    <div class="row g-4 mb-4">
+
+  <!-- Colis pris en charge -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card shadow-lg border-0 rounded-4 hover-shadow">
+      <div class="card-body d-flex align-items-center p-4">
+        <div>
+          <p class="mb-1 text-muted fw-semibold">Colis pris en charge</p>
+          <h4 class="mb-0 text-primary">
+            <?= htmlspecialchars($data['colisMensuel']['prise_en_charge']); ?>
+          </h4>
+          <small class="text-primary">Aujourd'hui</small>
+        </div>
+        <div class="ms-auto fs-2 text-white bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width:60px; height:60px;">
+          <i class="bi bi-box-seam"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colis en cours -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card shadow-lg border-0 rounded-4 hover-shadow">
+      <div class="card-body d-flex align-items-center p-4">
+        <div>
+          <p class="mb-1 text-muted fw-semibold">Colis entente </p>
+          <h4 class="mb-0 text-warning">
+            <?= htmlspecialchars($data['colisMensuel']['en_cours']); ?>
+          </h4>
+          <small class="text-warning">Aujourd'hui</small>
+        </div>
+        <div class="ms-auto fs-2 text-white bg-warning rounded-circle d-flex align-items-center justify-content-center" style="width:60px; height:60px;">
+          <i class="bi bi-truck"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colis reçus -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card shadow-lg border-0 rounded-4 hover-shadow">
+      <div class="card-body d-flex align-items-center p-4">
+        <div>
+          <p class="mb-1 text-muted fw-semibold">Colis recu</p>
+          <h4 class="mb-0 text-success">
+         <?= htmlspecialchars($data['colisMensuel']['recu'] ?? 0); ?>
+
+
+          </h4>
+          <small class="text-success">Aujourd'hui</small>
+        </div>
+        <div class="ms-auto fs-2 text-white bg-success rounded-circle d-flex align-items-center justify-content-center" style="width:60px; height:60px;">
+          <i class="bi bi-inbox"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colis livrés -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card shadow-lg border-0 rounded-4 hover-shadow">
+      <div class="card-body d-flex align-items-center p-4">
+        <div>
+          <p class="mb-1 text-muted fw-semibold">Colis livrés</p>
+          <h4 class="mb-0 text-info">
+            <?= htmlspecialchars($data['colisMensuel']['livre']); ?>
+          </h4>
+          <small class="text-info">Aujourd'hui</small>
+        </div>
+        <div class="ms-auto fs-2 text-white bg-info rounded-circle d-flex align-items-center justify-content-center" style="width:60px; height:60px;">
+          <i class="bi bi-check2-circle"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+      <!-- Statistiques Colis -->
+      <div class="row mb-4">
+        <div class="col-lg-8">
+          <div class="card shadow-sm">
+            <div class="card-header bg-transparent">
+              <h5 class="mb-0">Statistiques colis (livrés, non livrés)</h5>
+            </div>
+            <div class="card-body">
+              <div id="chart2" style="height:300px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card shadow-sm">
+            <div class="card-header bg-transparent">
+              <h5 class="mb-0">Répartition colis</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between">Nouveaux <span class="badge bg-primary">25%</span></li>
+              <li class="list-group-item d-flex justify-content-between">Complétés <span class="badge bg-warning">65%</span></li>
+              <li class="list-group-item d-flex justify-content-between">En attente <span class="badge bg-success">10%</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Situation de Caisse -->
+
+
+    </main>
+    <!--end page main-->
+
+    <!--start overlay-->
+    <div class="overlay nav-toggle-icon"></div>
+    <!--end overlay-->
+
+    <!--Start Back To Top Button-->
+    <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+    <!--End Back To Top Button-->
+
+
 
   </div>
   <!--end wrapper-->
 
 
-<?php $this->view('admin/partials/foot')?>
+  <?php $this->view('admin/partials/foot') ?>
 
 </body>
 

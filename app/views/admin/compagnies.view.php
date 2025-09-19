@@ -4,12 +4,12 @@
     <!--start wrapper-->
     <div class="wrapper">
         <!--start top header-->
-        <?php $this->view('admin/partials/navbar') 
+        <?php $this->view('admin/partials/navbar')
         ?>
         <!--end top header-->
 
         <!--start sidebar -->
-        <?php $this->view('admin/partials/sidebar') 
+        <?php $this->view('admin/partials/sidebar')
         ?>
         <!--end sidebar -->
 
@@ -153,6 +153,13 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
                                     </a>
                                 </li>
+                                  <li class="nav-item mt-2">
+                                    <a class="nav-link  text-break mb-0" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
+                                    </a>
+                                </li>
                                 <li class="nav-item mt-2">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
@@ -166,61 +173,63 @@
                 </div>
                 <div class="col-xxl-9">
                     <?php $this->view("admin/set_flash") ?>
-                    <div class="card custom-card  border-primary border-4">
-                        <div class="card-header  ">
-                            <div class="card-title">
-                                Liste des compagnies
-                            </div>
+                    <div class="card shadow-lg border-0 rounded-3">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top">
+                            <h5 class="mb-0 fw-bold">📋 Liste des compagnies</h5>
                         </div>
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="example" class="table table-striped table-bordered  table-hover-effect table-custom-header" style="width:100%">
-                                        <thead>
-                                            <tr>
-                                                <th>Nom compagnie</th>
-                                                <th>Libele</th>
-                                                <th>Slogant</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($liste as $listes): ?>
-                                                <tr>
-                                                    <td><?= $listes->nom_compagnie ?></td>
-                                                    <td><?= $listes->libele ?></td>
-                                                    <td><?= $listes->slogant ?></td>
-                                                    <td class="">
-                                                        <div class="dropup text-center">
-                                                            <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                &#8943; <!-- Trois points horizontaux -->
-                                                            </a>
-                                                            <div class="dropdown-menu dropdown-menu-end">
+                        <div class="card-body p-4">
+                            <div class="table-responsive">
+                                <table id="example" class="table table-hover align-middle text-center">
+                                    <thead class="table-primary text-center">
+                                        <tr>
+                                            <th class="fw-semibold">Nom compagnie</th>
+                                            <th class="fw-semibold">Libellé</th>
+                                            <th class="fw-semibold">Slogan</th>
+                                            <th class="fw-semibold">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($liste as $listes): ?>
+                                            <tr class="hover-shadow">
+                                                <td><?= $listes->nom_compagnie ?></td>
+                                                <td><?= $listes->libele ?></td>
+                                                <td><?= $listes->slogant ?></td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            &#8943;
+                                                        </a>
+                                                        <ul class="dropdown-menu shadow-sm">
+                                                            <li>
                                                                 <a class="dropdown-item edit-btn"
-                                                                    data-bs-toggle="modal" data-bs-target="#exampleDangerModal1"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#exampleDangerModal1"
                                                                     data-id_compagnie="<?= $listes->id_compagnie ?>"
                                                                     data-nom_compagnie="<?= htmlspecialchars($listes->nom_compagnie, ENT_QUOTES) ?>"
                                                                     data-libele="<?= htmlspecialchars($listes->libele, ENT_QUOTES) ?>"
                                                                     data-slogant="<?= htmlspecialchars($listes->slogant, ENT_QUOTES) ?>"
-                                                                    href="#">Modifier</a>
-                                                                <a class="dropdown-item delete-button"
-                                                                    href="<?= BASE_URL ?>/Compagnies/delete/<?= $listes->id_compagnie ?>">
-                                                                    Supprimer
+                                                                    href="#">
+                                                                    ✏️ Modifier
                                                                 </a>
-
-
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach ?>
-
-                                    </table>
-                                </div>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item text-danger delete-button"
+                                                                    href="<?= BASE_URL ?>/admin/Compagnies/delete/<?= $listes->id_compagnie ?>">
+                                                                    🗑 Supprimer
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
             <!--end row-->
         </main>

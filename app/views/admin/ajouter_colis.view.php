@@ -14,24 +14,33 @@
         <!--start content-->
         <main class="page-content">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-                <div class="breadcrumb-title pe-3">G-colis</div>
-                <div class="ps-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-4 p-2 rounded  ">
+                <div class="breadcrumb-title pe-3 text-primary ">
+                    <i class="bx bx-package me-1"></i> G-colis
+                </div>
+                <div class="ps-3 flex-grow-1">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
-                            <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
+                            <li class="breadcrumb-item">
+                                <a href="javascript:;" class="text-decoration-none text-muted">
+                                    <i class="bx bx-home-alt"></i>
+                                </a>
                             </li>
-                            <li class="breadcrumb-item active" aria-current="page">Enregistrement des colis</li>
+                            <li class="breadcrumb-item active f text-dark" aria-current="page">
+                                Enregistrement des colis
+                            </li>
                         </ol>
                     </nav>
                 </div>
-                <div class="ms-auto">
-                    <div class="btn-group">
-                        <a href="<?= BASE_URL ?>/admin/Colis_prise_en_charges" class="btn btn-primary split-bg-primary  text-white"> Liste des colis</a> &nbsp;
-                        <a href="javascript:history.back()" class="btn btn-primary "><i
-                                class="fadeIn animated bx bx-left-arrow-alt"></i></a>
-
-                    </div>
+                <div class="ms-auto d-flex gap-2">
+                    <a href="<?= BASE_URL ?>/admin/Colis_prise_en_charges"
+                        class="btn btn-sm btn-outline-primary rounded-pill shadow-sm">
+                        <i class="bx bx-list-ul me-1"></i> Liste des colis
+                    </a>
+                    <a href="javascript:history.back()"
+                        class="btn btn-sm btn-primary rounded-pill shadow-sm">
+                        <i class="bx bx-left-arrow-alt"></i> Retour
+                    </a>
                 </div>
             </div>
             <!--end breadcrumb-->
@@ -42,44 +51,56 @@
                     <div class="col-xl-12 mx-auto">
                         <div id="stepper1" class="bs-stepper">
                             <div class="card border-top border-primary border-3">
-                                <div class="card-header ">
+                                <div class="card-header">
                                     <div class="d-lg-flex flex-lg-row align-items-lg-center justify-content-lg-between"
                                         role="tablist">
+
+                                        <!-- Étape 1 : Expéditeur -->
                                         <div class="step" data-target="#test-l-1">
-                                            <div class="step-trigger" role="tab" id="stepper1trigger1"
-                                                aria-controls="test-l-1">
-                                                <div class="bs-stepper-circle">1</div>
-                                                <div class="">
-                                                    <h5 class="mb-0 steper-title">Expediteurs</h5>
-                                                    <p class="mb-0 steper-sub-title"></p>
+                                            <div class="step-trigger" role="tab" id="stepper1trigger1" aria-controls="test-l-1">
+                                                <div class="bs-stepper-circle bg-primary text-white">
+                                                    <i class="bx bx-user"></i>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="bs-stepper-line"></div>
-                                        <div class="step" data-target="#test-l-2">
-                                            <div class="step-trigger" role="tab" id="stepper1trigger2"
-                                                aria-controls="test-l-2">
-                                                <div class="bs-stepper-circle">2</div>
-                                                <div class="">
-                                                    <h5 class="mb-0 steper-title">Destinataire</h5>
-                                                    <p class="mb-0 steper-sub-title"></p>
+                                                <div>
+                                                    <h5 class="mb-0 steper-title">Expéditeur</h5>
+                                                    <p class="mb-0 steper-sub-title small text-muted">Infos expéditeur</p>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="bs-stepper-line"></div>
-                                        <div class="step" data-target="#test-l-4">
-                                            <div class="step-trigger" role="tab" id="stepper1trigger4"
-                                                aria-controls="test-l-4">
-                                                <div class="bs-stepper-circle">4</div>
-                                                <div class="">
-                                                    <h5 class="mb-0 steper-title">Colis</h5>
-                                                    <p class="mb-0 steper-sub-title"></p>
+
+                                        <!-- Étape 2 : Destinataire -->
+                                        <div class="step" data-target="#test-l-2">
+                                            <div class="step-trigger" role="tab" id="stepper1trigger2" aria-controls="test-l-2">
+                                                <div class="bs-stepper-circle bg-primary text-white">
+                                                    <i class="bx bx-user-check"></i>
+                                                </div>
+                                                <div>
+                                                    <h5 class="mb-0 steper-title">Destinataire</h5>
+                                                    <p class="mb-0 steper-sub-title small text-muted">Infos destinataire</p>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div class="bs-stepper-line"></div>
+
+                                        <!-- Étape 3 : Colis -->
+                                        <div class="step" data-target="#test-l-4">
+                                            <div class="step-trigger" role="tab" id="stepper1trigger4" aria-controls="test-l-4">
+                                                <div class="bs-stepper-circle bg-primary text-white">
+                                                    <i class="bx bx-package"></i>
+                                                </div>
+                                                <div>
+                                                    <h5 class="mb-0 steper-title">Colis</h5>
+                                                    <p class="mb-0 steper-sub-title small text-muted">Détails du colis</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
+
                                 <div class="card-body">
 
                                     <div class="bs-stepper-content">
@@ -169,7 +190,8 @@
                                                                 <label class="form-label" for="destination">Destination</label>
                                                                 <select class="form-control" name="destination" id="destination" required>
                                                                     <option value="" disabled selected>Choisissez la destination</option>
-                                                                    <?php foreach ($listes as $liste): if ($liste->idAgence !== $_SESSION['id_agence']) : ?>
+                                                                    <?php foreach ($listes as $liste): ?>
+                                                                        <?php if ($liste->idAgence != $_SESSION['id_agence']): ?>
                                                                             <option value="<?= htmlspecialchars($liste->idAgence); ?>">
                                                                                 <?= htmlspecialchars($liste->localite . ' ( ' . $liste->numeroGare . ' )'); ?>
                                                                             </option>
@@ -200,7 +222,11 @@
                                                     <div class="col-12">
                                                         <div class="d-flex align-items-center gap-3">
                                                             <button type="button" class="btn btn-outline-secondary px-4" onclick="stepper1.previous()"><i class='bx bx-left-arrow-alt me-2'></i>Previous</button>
-                                                            <button type="submit" class="btn btn-success px-4" name="envoi">Submit</button>
+
+                                                            <button type="submit" class="btn btn-success rounded-pill shadow-sm" name="envoi">
+                                                                <i class="bx bx-check me-1"></i> Enregistrer
+                                                            </button>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -241,7 +267,7 @@
     <!-- Scripts de validation -->
     <script src="<?= BASE_URL ?>/assets/js/scrip_validations.js"></script>
     <script>
-       
+
     </script>
 
 </body>

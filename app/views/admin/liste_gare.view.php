@@ -56,19 +56,20 @@
                                     </li>
                                 <?php endif; ?>
                                 <li class="nav-item">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                                    </a>
-                                </li>
-                                <li class="nav-item">
                                     <a class="nav-link  active text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
                                         aria-selected="true">
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link  text-break" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
+                                    </a>
+                                </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
@@ -97,8 +98,14 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
                                     </a>
                                 </li>
-
-                                   <li class="nav-item mt-2">
+                                <li class="nav-item mt-2">
+                                    <a class="nav-link  text-break mb-0" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
+                                    </a>
+                                </li>
+                                <li class="nav-item mt-2">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
                                         aria-selected="true">
@@ -110,59 +117,55 @@
                     </div>
                 </div>
                 <div class="col-xxl-9">
-                     <?php $this->view("admin/set_flash") ?>
+                    <?php $this->view("admin/set_flash") ?>
                     <div class="card custom-card">
-                        <div class="card-header">
-                            <div class="card-title">
-                                Liste des gares
-                            </div>
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top">
+                            <h5 class="mb-0 fw-bold"> Liste des gares</h5>
                         </div>
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
-                                        <thead>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>N gare</th>
+                                            <th>Localite</th>
+                                            <th>Code marchant</th>
+                                            <th>Tel</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($listes as $liste) : ?>
                                             <tr>
-                                                <th>N gare</th>
-                                                <th>Localite</th>
-                                                <th>Code marchant</th>
-                                                <th>Tel</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($listes as $liste) : ?>
-                                                <tr>
-                                                    <td><?= $liste->numeroGare ?></td>
-                                                    <td><?= $liste->localite ?></td>
-                                                    <td><?= $liste->code ?></td>
-                                                    <td><?= $liste->tel ?></td>
-                                                    <td class=" ">
-                                                        <div class="dropup text-center">
-                                                            <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                &#8943; <!-- Trois points horizontaux -->
-                                                            </a>
-                                                            <div class="dropdown-menu dropdown-menu-end">
-                                                                <a class="dropdown-item edit-btn"
-                                                                    data-bs-toggle="modal" data-bs-target="#exampleDangerModal1"
-                                                                    data-idAgence="<?= $liste->idAgence ?>"
-                                                                   
-                                                                     data-numero="<?= htmlspecialchars($liste->numeroGare, ENT_QUOTES) ?>"
-                                                                    data-localite="<?= htmlspecialchars($liste->localite, ENT_QUOTES) ?>"
-                                                                    data-code="<?= htmlspecialchars($liste->code, ENT_QUOTES) ?>"
-                                                                    data-tel="<?= htmlspecialchars($liste->tel, ENT_QUOTES) ?>"
-                                                                    href="">Modifier</a>
-                                                                <a class="dropdown-item" href="#">Désactiver</a>
-                                                            </div>
+                                                <td><?= $liste->numeroGare ?></td>
+                                                <td><?= $liste->localite ?></td>
+                                                <td><?= $liste->code ?></td>
+                                                <td><?= $liste->tel ?></td>
+                                                <td class=" ">
+                                                    <div class="dropup text-center">
+                                                        <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            &#8943; <!-- Trois points horizontaux -->
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <a class="dropdown-item edit-btn"
+                                                                data-bs-toggle="modal" data-bs-target="#exampleDangerModal1"
+                                                                data-idAgence="<?= $liste->idAgence ?>"
+
+                                                                data-numero="<?= htmlspecialchars($liste->numeroGare, ENT_QUOTES) ?>"
+                                                                data-localite="<?= htmlspecialchars($liste->localite, ENT_QUOTES) ?>"
+                                                                data-code="<?= htmlspecialchars($liste->code, ENT_QUOTES) ?>"
+                                                                data-tel="<?= htmlspecialchars($liste->tel, ENT_QUOTES) ?>"
+                                                                href="">Modifier</a>
+                                                            <a class="dropdown-item" href="#">Désactiver</a>
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach ?>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach ?>
 
-                                        </tbody>
+                                    </tbody>
 
-                                    </table>
-                                </div>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -193,14 +196,14 @@
                 </div>
                 <div class="modal-body text-dart">
                     <form class="row g-3 "
-                        method="post" action="<?= BASE_URL ?>/Liste_gares/edit">
-                        <input type="hidden" name="idAgence" id="inputidAgence">
+                        method="post" action="<?= BASE_URL ?>/admin/Liste_gares/edit">
+                        <input type="" name="idAgence" id="inputidAgence">
                         <div class="col-md-6">
                             <label for="tel" class="form-label">Numero du gare
                             </label>
                             <input type="text" class="form-control"
                                 value="" name="numeroGare" id="inputnumero"
-                                placeholder=""  required >
+                                placeholder="" required>
                         </div>
                         <div class="col-md-6">
                             <label for="tel" class="form-label">Localite
@@ -211,7 +214,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="tel" class="form-label">Code marchant du gare
-                                </label>
+                            </label>
                             <input type="text" class="form-control"
                                 value="" name="code"
                                 placeholder="" required id="inputcode">
@@ -237,9 +240,9 @@
         </div>
         <!-- la fin du model  -->
 
-      <?php $this->view('admin/partials/foot') ?>
-    <script src="<?= BASE_URL ?>/mon_js/scrip_agence.js"></script>
-    <script src="<?= BASE_URL ?>/mon_js/alert_delete.js"></script>
+        <?php $this->view('admin/partials/foot') ?>
+        <script src="<?= BASE_URL ?>/mon_js/scrip_agence.js"></script>
+        <script src="<?= BASE_URL ?>/mon_js/alert_delete.js"></script>
 
 </body>
 

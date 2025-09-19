@@ -16,21 +16,29 @@ class Programmer_voyages extends  Controller
         // Admin : voit seulement ce qui est lié à sa compagnie
         $id_compagnie = $_SESSION['id_compagnie'];
 
-        // Escales liées à cette compagnie
-        $listeProgrammer = $programmer_voyage->FetchSelectWheres(
-          '*',
-          'programmer',
-          'id_compagnie = :id_compagnie',
-          ['id_compagnie' => $id_compagnie]
-        );
+        $listeProgrammer = $programmer_voyage->FetchSelectCustom("
+    SELECT 
+        programmer.idProgrammer,
+        programmer.idDepart,
+        programmer.idDestination,
+        programmer.heureDepart,
+        programmer.rdv,
+        programmer.prix,
+        GROUP_CONCAT(CONCAT(escale.escales, ' (', ligneTrajet.prix_escale, ' FCFA)') SEPARATOR ', ') AS escales
+    FROM programmer
+    LEFT JOIN ligneTrajet ON programmer.idProgrammer = ligneTrajet.id_trajets
+    LEFT JOIN escale ON ligneTrajet.id_escales = escale.id_escale
+    WHERE programmer.id_compagnie = :id_compagnie
+    GROUP BY programmer.idProgrammer
+", ['id_compagnie' => $id_compagnie]);
       } else {
         $programmer_voyage->set_flash("Accès refusé ou session invalide", "danger");
-        $programmer_voyage->redirect("admin/Login/index");
+        $programmer_voyage->redirect("/admin/Login/index");
         return;
       }
     } else {
       $programmer_voyage->set_flash("Vous devez vous connecter", "warning");
-      $programmer_voyage->redirect("admin/Login/index");
+      $programmer_voyage->redirect("/admin/Login/index");
       return;
     }
     $this->view('admin/programmer_voyage', ['listeProgrammer' => $listeProgrammer]);
@@ -48,16 +56,16 @@ class Programmer_voyages extends  Controller
     if (isset($_POST['enregistre'])) {
       $programmer_voyage->saveProgrammer();
     }
-$id_compagnie = $_SESSION['id_compagnie'] ;
+    $id_compagnie = $_SESSION['id_compagnie'];
     $liste_agence = [];
     $listeEscale = [];
     $listehoraire = [];
     $listehoraire = $programmer_voyage->FetchSelectWhereS(
-        "*",
-        "horaire",
-        "id_compagnie = :id_compagnie",
-        [":id_compagnie" => $id_compagnie]
-      );
+      "*",
+      "horaire",
+      "id_compagnie = :id_compagnie",
+      [":id_compagnie" => $id_compagnie]
+    );
     if (isset($_SESSION['droit'])) {
       $role = $_SESSION['droit'];
 
@@ -87,12 +95,12 @@ $id_compagnie = $_SESSION['id_compagnie'] ;
         );
       } else {
         $add_liste_trajet->set_flash("Accès refusé ou session invalide", "danger");
-        $add_liste_trajet->redirect("Login/index");
+        $add_liste_trajet->redirect("admin/Login/index");
         return;
       }
     } else {
       $add_liste_trajet->set_flash("Vous devez vous connecter", "warning");
-      $add_liste_trajet->redirect("admin/Login/index");
+      $add_liste_trajet->redirect("/admin/Login/index");
       return;
     }
 

@@ -9,6 +9,7 @@ class Envoi_colis extends  Controller
 
   public  function  index()
   {
+    date_default_timezone_set('Africa/Bamako');
     // recuperation des colis
     $envoie_colis = new Envoie_colis();
     $id_compagnie = $_SESSION['id_compagnie'];
@@ -46,7 +47,7 @@ class Envoi_colis extends  Controller
         exit;
       }
     }
-
+date_default_timezone_set('Africa/Bamako');
     // les partie views
     $this->view('admin/envoi_colis', ['listeprogrammer' => $listeprogrammer, 'liste_colis' => $liste_colis]);
 

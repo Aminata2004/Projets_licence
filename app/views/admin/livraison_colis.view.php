@@ -4,7 +4,7 @@
     <!--start wrapper-->
     <div class="wrapper">
         <!--start top header-->
-        <?php $this->view('admin/partials/navbar') 
+        <?php  $this->view('admin/partials/navbar') 
         ?>
         <!--end top header-->
 
@@ -54,10 +54,15 @@
                                     required
                                     autocomplete="off">
                             </div>
+                            <?php
+                            $colis = $colis ?? null;
+                            $peutLivrer = $peutLivrer ?? false;
+                            ?>
 
                             <?php if ($colis): ?>
                                 <!-- Champ caché pour permettre la livraison -->
-                                <input type="hidden" name="id_colis" value="<?= $colis['id_colis'] ?>">
+                                <input type="hidden" name="id_colis" value="<?= htmlspecialchars($colis['id_colis']) ?>">
+
 
                                 <!-- ===== Détails du colis ===== -->
                                 <div class="col-12">
@@ -148,6 +153,7 @@
                                     <?= $colis && !$peutLivrer ? 'disabled' : '' ?>>
                                     <?= $colis ? ($peutLivrer ? 'Valider la livraison' : 'Livraison impossible') : 'Valider' ?>
                                 </button>
+
                             </div>
                         </div> <!-- /row -->
                     </form>

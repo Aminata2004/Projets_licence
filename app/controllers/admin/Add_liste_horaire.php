@@ -37,4 +37,20 @@ class Add_liste_horaire extends  Controller
 
     $this->view('admin/add_liste_horaire', ['liste' => $liste]);
   }
+  public function add_permission()
+  {
+     // instanciation 
+    $add_liste_horaire = new Add_liste_horaires();
+    // enregistrement des escales
+    if (isset($_POST["enregistre"])) {
+      // var_dump($_POST);exit;
+      $add_liste_horaire->savePermission();
+    }
+
+     $liste = $add_liste_horaire->SelectAllData(
+        "*","permision" );
+
+    $this->view('admin/add_permission',["liste"=>$liste]);
+  }
+  
 }

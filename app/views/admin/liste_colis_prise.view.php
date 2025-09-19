@@ -1,4 +1,5 @@
 <?php $this->view('admin/partials/headers') ?>
+
 <body>
     <!--start wrapper-->
     <div class="wrapper">
@@ -12,73 +13,95 @@
         <!--start content-->
         <main class="page-content ">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-                <div class="breadcrumb-title pe-3">G-colis</div>
-                <div class="ps-3">
+            <!-- Breadcrumb -->
+
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
+                <div class="breadcrumb-title pe-3 text-primary">
+                    <i class="bx bx-package me-1"></i> G-colis
+                </div>
+                <div class="ps-3 flex-grow-1">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
-                            <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
+                            <li class="breadcrumb-item">
+                                <a href="javascript:;"><i class="bx bx-home-alt"></i></a>
                             </li>
-                            <li class="breadcrumb-item active text-primary" aria-current="page">Liste des colis </li>
+                            <li class="breadcrumb-item active" aria-current="page">Liste des colis</li>
                         </ol>
                     </nav>
                 </div>
-                <div class="ms-auto">
-                    <div class="btn-group">
-                        <a href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/ajouter_colis/" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
-                        <a href="javascript:history.back()" class="btn btn-primary "><i
-                                class="fadeIn animated bx bx-left-arrow-alt"></i></a>
 
-                    </div>
+                <div class="ms-auto mt-2 mt-sm-0 d-flex gap-2">
+                    <a href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/ajouter_colis/"
+                        class="btn btn-sm btn-success rounded-pill shadow-sm">
+                        <i class="bx bx-plus me-1"></i> Ajouter
+                    </a>
+                    <a href="javascript:history.back()"
+                        class="btn btn-sm btn-outline-primary rounded-pill shadow-sm">
+                        <i class="bx bx-left-arrow-alt"></i> Retour
+                    </a>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body ">
+
+            <!-- End Breadcrumb -->
+
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white fw-bold">
+                    <i class="bx bx-list-ul me-1"></i> Liste des colis enregistrés
+                </div>
+                <div class="card-body">
                     <div class="table-responsive">
-                        <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
-                            <thead>
+                        <table id="example"
+                            class="table table-hover align-middle mb-0 table-striped table-bordered rounded-3">
+                            <thead class="table-primary text-center">
                                 <tr>
                                     <th>Nom colis</th>
                                     <th>Nature</th>
                                     <th>Valeur</th>
-                                    <th>Fraix de transaction</th>
+                                    <th>Frais de transaction</th>
                                     <th>Destination</th>
                                     <th>Status</th>
                                     <th>Action</th>
-                                    <!-- ajoute ici les autres colonnes -->
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="text-center">
                                 <?php $this->view('admin/helpers') ?>
                                 <?php foreach ($liste_colis as $colis) : ?>
                                     <tr>
                                         <td><?= htmlspecialchars($colis['nom_colis']) ?></td>
                                         <td><?= htmlspecialchars($colis['nature']) ?></td>
-                                        <td><?= htmlspecialchars($colis['valeur']) ?></td>
-                                        <td><?= htmlspecialchars($colis['fraix_transaction']) ?></td>
+                                        <td><span class="badge bg-light text-dark"><?= htmlspecialchars($colis['valeur']) ?></span></td>
+                                        <td><span class="badge bg-secondary"><?= htmlspecialchars($colis['fraix_transaction']) ?></span></td>
                                         <td><?= htmlspecialchars($colis['destination']) ?></td>
                                         <td><?= afficherBadgeStatus($colis['status']) ?></td>
-                                        <td class=" ">
-                                            <div class="dropup ">
-                                                <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    &#8943; <!-- Trois points horizontaux -->
+                                        <td>
+                                            <div class="dropdown">
+                                                <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bx bx-dots-vertical-rounded"></i>
                                                 </a>
-                                                <div class="dropdown-menu dropdown-menu-end">
-                                                     <a class="dropdown-item" href="#">Details</a>
-                                                    <a class="dropdown-item" href="#">Modifier</a>
-                                                    <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimer_recu/<?= $colis['id_colis'] ?>" target="_blank">
-                                                        Imprimer le reçu
-                                                    </a>
-
-                                                </div>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                    <li>
+                                                        <a class="dropdown-item" href="#">
+                                                            <i class="bx bx-show-alt me-2"></i>Détails
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="#">
+                                                            <i class="bx bx-edit me-2"></i>Modifier
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item"
+                                                            href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimer_recu/<?= $colis['id_colis'] ?>"
+                                                            target="_blank">
+                                                            <i class="bx bx-printer me-2"></i>Imprimer le reçu
+                                                        </a>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </td>
-                                        <!-- autres colonnes -->
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
-                        </table>
-
                         </table>
                     </div>
                 </div>

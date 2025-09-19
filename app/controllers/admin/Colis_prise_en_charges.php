@@ -9,6 +9,7 @@ use Endroid\QrCode\ErrorCorrectionLevel;                 // ← énumération 5.
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\RoundBlockSizeMode;   // ← au lieu du namespace\RoundBlockSizeModeMargin
 
+
 class Colis_prise_en_charges extends  Controller
 {
   public function __construct()
@@ -66,76 +67,6 @@ class Colis_prise_en_charges extends  Controller
     return $code;
   }
 
-  public function imprimer_recu(int $id_colis): void
-  {
-    /* ---------- 1. Récupération DB ---------- */
-    $colisModel = new Livraisons_colis();
-
-    $colis = $colisModel->getById($id_colis);
-    $compagnie = $colisModel->infoCompagnie($_SESSION['id_compagnie'] ?? 0);
-
-    if (!$colis || !$compagnie) {
-      $colisModel->set_flash('Colis ou compagnie introuvable.', 'danger');
-      header('Location: ' . BASE_URL . 'admin/livraison_colis');
-      exit;
-    }
-
-    // Préparation du chemin vers le logo pour Dompdf
-    $logoPath = null;
-    if (!empty($compagnie['logo'])) {
-      $logoPath = '/public/images/logos/' . $compagnie['logo']; // relatif à ROOT (chroot)
-    }
-
-    /* ---------- 2. Génération du QR Code ---------- */
-    $qrData = "Nom du colis : {$colis['nom_colis']}\n" .
-      "Nature       : {$colis['nature']}\n" .
-      "Code         : {$colis['code_colis']}\n" .
-      "Destination  : {$colis['localite']}\n" .
-      "Valeur       : " . number_format($colis['valeur'], 0, ',', ' ') . " FCFA\n" .
-      "Frais        : " . number_format($colis['fraix_transaction'], 0, ',', ' ') . " FCFA";
-
-    $qrPath = ROOT . "/admin/public/qrcodes/qrcode_{$colis['id_colis']}.png";
-
-
-
-    Builder::create()
-      ->writer(new PngWriter())
-      ->data($qrData)
-      ->encoding(new Encoding('UTF-8'))
-      ->errorCorrectionLevel(ErrorCorrectionLevel::High)
-      ->size(200)
-      ->margin(6)
-      ->roundBlockSizeMode(RoundBlockSizeMode::Margin)
-      ->build()
-      ->saveToFile($qrPath);
-
-    // Vérifier que le QR code a bien été généré
-    if (!file_exists($qrPath) || filesize($qrPath) === 0) {
-      throw new \RuntimeException("QR code non généré ou fichier vide : $qrPath");
-    }
-
-    /* ---------- 3. Construction HTML ---------- */
-    ob_start();
-    include ROOT . '/app/views/admin/pdf/recu_colis.php'; // la vue utilise $colis, $compagnie, $qrPath, $logoPath
-    $html = ob_get_clean();
-
-    /* ---------- 4. Génération PDF avec Dompdf ---------- */
-    $opt = new \Dompdf\Options();
-    $opt->setChroot(ROOT);
-    $opt->setIsRemoteEnabled(true);
-
-    $dompdf = new \Dompdf\Dompdf($opt);
-    $dompdf->loadHtml($html);
-    $dompdf->setPaper('A6', 'portrait'); // Taille réduite du reçu
-    $dompdf->render();
-
-
-
-    // Affichage dans le navigateur
-    $dompdf->stream("recu_colis_{$colis['id_colis']}.pdf", ['Attachment' => false]);
-    exit;
-  }
-
   public function historique_colis()
   {
     $id_compagnie = $_SESSION['id_compagnie'];
@@ -156,5 +87,60 @@ class Colis_prise_en_charges extends  Controller
       'liste_horaire' => $liste_horaire,
       'destinations' => $destinations
     ]);
+  }
+  public function imprimer_recu(int $id_colis): void
+  {
+    /* ---------- 1. Récupération DB ---------- */
+    $colisModel = new Livraisons_colis();
+
+    $colis = $colisModel->getById($id_colis);
+    $compagnie = $colisModel->infoCompagnie($_SESSION['id_compagnie'] ?? 0);
+
+    if (!$colis || !$compagnie) {
+      $colisModel->set_flash('Colis ou compagnie introuvable.', 'danger');
+      header('Location: ' . BASE_URL . 'admin/livraison_colis');
+      exit;
+    }
+
+    $logoPath = null;
+    if (!empty($compagnie['logo'])) {
+      $logoPath = '/public/images/logos/' . $compagnie['logo'];
+    }
+
+    /* ---------- 2. Génération du QR Code en base64 ---------- */
+    $qrData = "Nom du colis : {$colis['nom_colis']}\n" .
+      "Nature       : {$colis['nature']}\n" .
+      "Code         : {$colis['code_colis']}\n" .
+      "Destination  : {$colis['localite']}\n" .
+      "Valeur       : " . number_format($colis['valeur'], 0, ',', ' ') . " FCFA\n" .
+      "Frais        : " . number_format($colis['fraix_transaction'], 0, ',', ' ') . " FCFA";
+
+    $qrResult = Builder::create()
+      ->writer(new PngWriter())
+      ->data($qrData)
+      ->size(200)
+      ->margin(6)
+      ->build();
+
+    $qrBase64 = base64_encode($qrResult->getString());
+    $qrPath   = "data:image/png;base64," . $qrBase64;
+
+    /* ---------- 3. Construction HTML ---------- */
+    ob_start();
+    include ROOT . '/app/views/admin/pdf/recu_colis.php';
+    $html = ob_get_clean();
+
+    /* ---------- 4. Génération PDF ---------- */
+    $opt = new \Dompdf\Options();
+    $opt->setChroot(ROOT);
+    $opt->setIsRemoteEnabled(true);
+
+    $dompdf = new \Dompdf\Dompdf($opt);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A6', 'portrait');
+    $dompdf->render();
+
+    $dompdf->stream("recu_colis_{$colis['id_colis']}.pdf", ['Attachment' => false]);
+    exit;
   }
 }

@@ -13,11 +13,11 @@ class Liste_gare extends Model
         $db = $this->connect();
 
         // Vérifier si la combinaison localité + numéroGare existe
-        $check = $db->prepare("SELECT idAgence FROM agence WHERE localite = :localite AND numeroGare = :numeroGare AND id_compagnie = :id_compagnie" );
+        $check = $db->prepare("SELECT idAgence FROM agence WHERE localite = :localite AND numeroGare = :numeroGare AND id_compagnie = :id_compagnie");
         $check->execute([
             ':localite' => $localite,
             ':numeroGare' => $numeroGare,
-            ':id_compagnie' =>$id_compagnie
+            ':id_compagnie' => $id_compagnie
         ]);
         $existe = $check->fetch();
 
@@ -68,28 +68,56 @@ class Liste_gare extends Model
         }
     }
 
-    public function editAgence($data)  {
-         $req = "UPDATE agence 
+    public function editAgence($data)
+    {
+        $req = "UPDATE agence 
            SET numeroGare =:numeroGare, 
                localite=:localite,
                code=:code,
                 tel=:tel
                 WHERE idAgence=:idAgence";
 
-            $params = [
-                ":numeroGare" => $data['numeroGare'],
-                ":localite" => $data['localite'],
-                ':code' => $data['code'],
-                 ':tel' => $data['tel'],
-                ':idAgence' => $data['idAgence'],
-            ];
+        $params = [
+            ":numeroGare" => $data['numeroGare'],
+            ":localite" => $data['localite'],
+            ':code' => $data['code'],
+            ':tel' => $data['tel'],
+            ':idAgence' => $data['idAgence'],
+        ];
 
-            $modification = $this->insertion_update_simples($req, $params);
+        $modification = $this->insertion_update_simples($req, $params);
 
-            if ($modification == true) {
-                $this->set_flash("modification faite avec ", "primary");
-                // $this->redirect("compagnies");
+        if ($modification == true) {
+            $this->set_flash("modification faite avec ", "primary");
+            // $this->redirect("compagnies");
+        }
+    }
+    public function saveCaisse()
+    {
+        $id_compagnie = $_SESSION['id_compagnie'];
+
+        // Récupération sécurisée des données du formulaire
+        extract($_POST);
+        $montant_colis=0;
+        $montant_billets=0;
+        $insertion = $this->insertion_update_simples(
+            "INSERT INTO caisse(id_compagnie, id_agence, montant_initial, montant_billets,montant_colis, date_enregistrement, reference_caise,status_caisse) 
+         VALUES(:id_compagnie, :id_agence, :montant_initial, :montant_billets, :montant_colis,:date_enregistrement, :reference_caise,:status_caisse)",
+            [
+                ":id_compagnie" => $id_compagnie,
+                ":id_agence" => $id_agence,
+                ":montant_initial" => $montant_initial, 
+                ":montant_billets" => $montant_billets,
+                ":montant_colis" => $montant_colis,
+                ":date_enregistrement" => $date_enregistrement,
+                ":reference_caise" => $reference_caise,
+                ":status_caisse" => 1
+            ]
+        );
+         if ($insertion == true) {
+                $this->set_flash('Gare ajoutée avec succès', 'info');
+            } else {
+                $this->set_flash('Gare non ajoutée');
             }
-        
     }
 }

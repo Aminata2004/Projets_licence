@@ -18,44 +18,42 @@ class Loguin extends Model
             return;
         }
 
-        // Requête : Suppression de l’espace inutile dans le nom de la table
+        // Requête : récupération de l'utilisateur et de l'agence si nécessaire
         $utilisateur = $this->FetchSelectWhere(
-            '*',
+            'utilisateur.*, agence.localite, agence.numeroGare', // explicitement ce dont tu as besoin
             'utilisateur 
-        LEFT JOIN agence ON agence.idAgence = utilisateur.id_agence 
-        LEFT JOIN compagnie ON compagnie.id_compagnie = utilisateur.id_compagnie',
+     LEFT JOIN agence ON utilisateur.id_agence = agence.idAgence',
             'emailUser = :emailUser',
             ['emailUser' => $emailUser]
         );
+
 
         if (!$utilisateur) {
             $this->set_flash("Aucun utilisateur trouvé avec cet email", 'danger');
             return;
         }
+
         if (password_verify($motPasse, $utilisateur->motPasse)) {
             // Connexion réussie
             $_SESSION['id_utilisateur'] = $utilisateur->idUser;
             $_SESSION['emailUser'] = $utilisateur->emailUser;
             $_SESSION['nom'] = $utilisateur->utilisateurs;
-            
             $_SESSION['droit'] = $utilisateur->droit;
             $_SESSION['status'] = $utilisateur->status;
-            $_SESSION['ville'] = $utilisateur->localite;
-            $_SESSION['id_agence'] = $utilisateur->idAgence;
-            $_SESSION['numero_gare']=  $utilisateur->numeroGare;
-            $_SESSION['id_compagnie'] = $utilisateur->id_compagnie;
-            
-         
 
-            //echo $_SESSION['ville'] ;exit;
+            // Vérifie si l'utilisateur a une agence
+            $_SESSION['ville'] = $utilisateur->localite ?? null;
+            $_SESSION['id_agence'] = $utilisateur->idAgence ?? null;
+            $_SESSION['numero_gare'] = $utilisateur->numeroGare ?? null;
 
-            // Redirection
-          //  $this->redirect("Homes/home");
-        //   header("Location: " . BASE_URL . "/Homes/home");
-        header("Location: index.php?url=admin/Homes/home");
+            // Prend l'id_compagnie directement depuis la table utilisateur
+            $_SESSION['id_compagnie'] = $utilisateur->id_compagnie ?? null;
 
+            // Affichage pour debug
+            // echo "id_compagnie = " . $_SESSION['id_compagnie'];
+            // exit;
 
-
+            header("Location: index.php?url=admin/Homes/home");
             return;
         } else {
             $this->set_flash("Mot de passe incorrect pour l'utilisateur", 'danger');

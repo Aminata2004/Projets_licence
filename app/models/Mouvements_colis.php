@@ -31,7 +31,7 @@ class Mouvements_colis extends  Model
             $params[':ville'] = $ville;
         } elseif ($droit === 'Utilisateur') {
             // Filtre par localité et par gare
-            $sql .= " AND a.localite = :ville AND colis.id_gare = :numero_gare";
+            $sql .= " AND a.localite = :ville AND colis.num_gare = :numero_gare";
             $params[':ville'] = $ville;
             $params[':numero_gare'] = $numero_gare;
         }
@@ -76,7 +76,7 @@ class Mouvements_colis extends  Model
             $params[':ville'] = $ville;
         } elseif ($droit === 'Utilisateur') {
             // Filtre par localité et par gare
-            $sql .= " AND a.localite = :ville AND colis.id_gare = :numero_gare";
+            $sql .= " AND a.localite = :ville AND colis.num_gare = :numero_gare";
             $params[':ville'] = $ville;
             $params[':numero_gare'] = $numero_gare;
         }
@@ -120,7 +120,7 @@ class Mouvements_colis extends  Model
             $params[':ville'] = $ville;
         } elseif ($droit === 'Utilisateur') {
             // Filtre par localité et par gare
-            $sql .= " AND a.localite = :ville AND colis.id_gare = :numero_gare";
+            $sql .= " AND a.localite = :ville AND colis.num_gare = :numero_gare";
             $params[':ville'] = $ville;
             $params[':numero_gare'] = $numero_gare;
         }

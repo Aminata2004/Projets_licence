@@ -184,6 +184,7 @@
                             </div>
 
                             <div class="table-responsive">
+                                <!-- Tableau des programmes -->
                                 <table class="table table-hover table-bordered shadow-sm rounded text-center align-middle" style="cursor: pointer;">
                                     <thead class="table-primary">
                                         <tr>
@@ -191,24 +192,42 @@
                                             <th>Convocation</th>
                                             <th>Horaire</th>
                                             <th>Tarifs</th>
+                                            <th>Escale</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php foreach ($programmesDepart as $programme) : ?>
                                             <tr class="clickable-row"
-                                                data-id="<?= $programme->idProgrammer?>"
+                                                data-id="<?= $programme->idProgrammer ?>"
+                                                data-depart="<?= htmlspecialchars($programme->depart ?? '') ?>"
                                                 data-destination="<?= htmlspecialchars($programme->idDestination) ?>"
-                                                data-horaire="<?= htmlspecialchars($programme->heureDepart) ?>">
+                                                data-horaire="<?= htmlspecialchars($programme->heureDepart) ?>"
+                                                data-prix="<?= htmlspecialchars($programme->prix) ?>"
+                                                data-compagnie="<?= htmlspecialchars($programme->id_compagnie) ?>"
+                                                data-escales="<?= htmlspecialchars($programme->escales_avec_frais) ?>">
+
                                                 <td><?= htmlspecialchars($programme->idDestination) ?></td>
                                                 <td><?= htmlspecialchars($programme->rdv) ?></td>
                                                 <td><?= htmlspecialchars($programme->heureDepart) ?></td>
                                                 <td><span class="badge bg-primary"><?= htmlspecialchars($programme->prix) ?> FCFA</span></td>
+                                                <td>
+                                                    <?php
+                                                    if (!empty($programme->escales_avec_frais)) {
+                                                        $escales = explode(' - ', $programme->escales_avec_frais);
+                                                        foreach ($escales as $escale) {
+                                                            echo '<span class="badge bg-primary text-white mb-1 d-block">' . htmlspecialchars($escale) . '</span>';
+                                                        }
+                                                    } else {
+                                                        echo '<span class="text-muted">Aucune escale</span>';
+                                                    }
+                                                    ?>
+                                                </td>
                                             </tr>
                                         <?php endforeach; ?>
-
-
                                     </tbody>
                                 </table>
+
+
                             </div>
                             <br>
                         </div>
@@ -251,3 +270,5 @@
             cursor: pointer;
         }
     </style>
+
+ 

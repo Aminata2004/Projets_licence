@@ -5,7 +5,7 @@ class Auth extends Controller
     {
         session_unset();      
         session_destroy();    
-header('Location: ' . BASE_URL . 'admin/Loguins');
+header('Location: ' . BASE_URL . '/admin/Loguins');
 exit();
 
     }

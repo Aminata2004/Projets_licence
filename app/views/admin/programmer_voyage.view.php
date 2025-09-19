@@ -45,9 +45,12 @@
                                 <tr>
                                     <th>Depart</th>
                                     <th>Destination</th>
+                                  
                                     <th>RDV</th>
                                     <th>Heure de depart</th>
                                     <th>Prix </th>
+                                    <th>Escale(s)</th>
+
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -57,9 +60,16 @@
                                         <tr>
                                             <td><?= $listeProgrammers->idDepart ?></td>
                                             <td><?= $listeProgrammers->idDestination ?></td>
+
                                             <td><?= $listeProgrammers->rdv ?></td>
                                             <td><?= $listeProgrammers->heureDepart ?></td>
                                             <td><?= $listeProgrammers->prix ?></td>
+                                            <td>
+                                                <?= !empty($listeProgrammers->escales)
+                                                    ? htmlspecialchars($listeProgrammers->escales)
+                                                    : '<span class="text-muted">Aucune escale</span>' ?>
+                                            </td>
+
                                             <td>
                                                 <div class="dropdown ms-auto ">
                                                     <div class="btn-link" data-bs-toggle="dropdown">

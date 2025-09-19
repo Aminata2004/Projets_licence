@@ -69,7 +69,7 @@
 
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                <!-- <div class="col-md-4">
                                     <label class="form-label">Escale</label>
                                     <select class="form-control multiple-select" multiple="multiple" placeholder="Choisissez un ou plusieurs escale" name="idEscale[]">
                                         <?php foreach ($listeEscale as $listeEscales): ?>
@@ -79,7 +79,18 @@
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
+                                </div> -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Escale</label>
+                                    <select class="form-control multiple-select" multiple name="idEscale[]">
+                                        <?php foreach ($listeEscale as $listeEscales): ?>
+                                            <option value="<?= htmlspecialchars($listeEscales->id_escale); ?>">
+                                                <?= htmlspecialchars($listeEscales->escales); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
+
                                 <div class="col-md-4">
                                     <label for="bsValidation1" class="form-label">Destination<span
                                             class="text-danger scale5 ms-2">*</span></label>
@@ -142,11 +153,16 @@
                                 </div>
                             </div>
 
+                            <div class="row mt-3" id="fraixEscaleField" style="display: none;">
+                                <div class="col-md-12" id="fraixEscaleContainer"></div>
+                            </div>
+
+
                             <div class="col-md-12 text-end mt-3">
                                 <div class="d-md-flex d-grid align-items-center gap-3">
                                     <button type="submit" class="btn btn-primary px-4"
                                         name="enregistre">Enregistre</button>
-                                    <a href="<?= BASE_URL?>/admin/Programmer_voyages"
+                                    <a href="<?= BASE_URL ?>/admin/Programmer_voyages"
                                         class="btn btn-primary split-bg-primary px-4"> voir le liste</a>
 
                                 </div>
@@ -195,6 +211,35 @@
             }
         }
     </script>
+    <script>
+        $(document).ready(function() {
+            const fraixEscaleField = $('#fraixEscaleField');
+            const fraixEscaleContainer = $('#fraixEscaleContainer');
+
+            $('select[name="idEscale[]"]').on('change', function() {
+                const selected = $(this).val(); // Récupère toutes les escales sélectionnées
+                fraixEscaleContainer.empty(); // On vide le contenu précédent
+
+                if (selected && selected.length > 0) {
+                    selected.forEach((id, index) => {
+                        fraixEscaleContainer.append(`
+                    <div class="mb-2">
+                        <label>Frais pour l'escale ${index + 1}</label>
+                        <input type="number" class="form-control" 
+                               name="prix_escale[${id}]" 
+                               placeholder="Montant de l'escale ${index + 1}">
+                    </div>
+                `);
+                    });
+                    fraixEscaleField.show();
+                } else {
+                    fraixEscaleField.hide();
+                }
+            });
+        });
+    </script>
+
+
 </body>
 
 </html>

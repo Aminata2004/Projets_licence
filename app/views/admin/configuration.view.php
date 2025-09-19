@@ -1,19 +1,14 @@
 <?php $this->view('admin/partials/header') ?>
 
-
 <body>
-
-
   <!--start wrapper-->
   <div class="wrapper">
     <!--start top header-->
     <?php $this->view('admin/partials/navbar') ?>
     <!--end top header-->
-
     <!--start sidebar -->
     <?php $this->view('admin/partials/sidebar') ?>
     <!--end sidebar -->
-
     <!--start content-->
     <main class="page-content ">
       <!--breadcrumb-->
@@ -58,19 +53,20 @@
                   </li>
                 <?php endif; ?>
                 <li class="nav-item">
-                  <a class="nav-link active text-break" role="tab"
-                    aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
-                    aria-selected="true">
-                    <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                  </a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link text-break" role="tab"
                     aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
                     aria-selected="true">
                     <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
                   </a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link active text-break" role="tab"
+                    aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
+                    aria-selected="true">
+                    <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
+                  </a>
+                </li>
+
                 <li class="nav-item mt-2">
                   <a class="nav-link text-break mb-0" role="tab"
                     aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
@@ -107,6 +103,13 @@
                   </a>
                 </li>
                 <li class="nav-item mt-2">
+                  <a class="nav-link  text-break mb-0" role="tab"
+                    aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
+                    aria-selected="true">
+                    <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
+                  </a>
+                </li>
+                <li class="nav-item mt-2">
                   <a class="nav-link  text-break" role="tab"
                     aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
                     aria-selected="true">
@@ -118,55 +121,124 @@
           </div>
         </div>
         <div class="col-xxl-9">
-          <div class="card custom-card  border-primary border-4">
-            <div class="card-header  ">
-              <div class="card-title">
-                Liste des utilisateurs
-              </div>
+          <div class="card shadow-lg rounded-3 border-0">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top">
+              <h5 class="mb-0 fw-bold">👥 Liste des utilisateurs</h5>
             </div>
-            <div class="card">
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table id="example" class="table table-striped table-bordered  table-hover-effect table-custom-header" style="width:100%">
-                    <thead>
-                      <tr>
-                        <th>Utilisateur</th>
-                        <th>Email</th>
-                        <th>Gare</th>
-                        <th>Droit</th>
+            <div class="card-body p-4">
+              <div class="table-responsive">
+                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
+                  <thead class="table-light text-center">
+                    <tr>
+                      <th class="fw-semibold">Utilisateur</th>
+                      <th class="fw-semibold">Email</th>
+                      <th class="fw-semibold">Gare</th>
+                      <th class="fw-semibold">Droit</th>
+                      <th class="fw-semibold">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-center">
+                    <?php foreach ($liste as $listes): ?>
+                      <tr class="align-middle text-center">
+                        <td><?= htmlspecialchars($listes->utilisateurs) ?></td>
+                        <td><?= htmlspecialchars($listes->emailUser) ?></td>
+                        <td><?= htmlspecialchars($listes->numeroGare) ?></td>
+                        <td><?= htmlspecialchars($listes->droit) ?></td>
+                        <!-- <td>
+                          <div class="dropdown">
+                            <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
+                              &#8943;
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                              <li>
+                                <a class="dropdown-item" href="#"><i class="bi bi-pencil-square me-2"></i>Modifier</a>
+                              </li>
+                              <li>
+                                <a class="dropdown-item text-danger" href="#"><i class="bi bi-x-circle me-2"></i>Désactiver</a>
+                              </li>
+                            </ul>
+                          </div>
+                        </td> -->
+                        <td class="text-center">
+                          <a href="<?= BASE_URL ?>/admin/Permissions/assigner/<?= htmlspecialchars($listes->idUser) ?>"
+                            title="Permission">
+                            <i class="bx bx-lock-open text-primary fs-4 cursor-pointer"></i>
+                          </a>
 
-                        <th>Action</th>
+
+                          <!-- Modifier -->
+                          <i class="bx bx-edit text-primary me-2 fs-4 cursor-pointer add-button"
+                            title="Modifier"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalModification"
+                            data-id="<?= $listes->idUser ?>"
+                            data-utilisateurs="<?= $listes->utilisateurs ?>"
+                            data-email="<?= $listes->emailUser ?>"
+                            data-motpasse="<?= $listes->motPasse ?>"
+                            data-droit="<?= $listes->droit ?>">
+                          </i>
+
+                          <!-- Activation/Désactivation -->
+                          <?php if ($listes->status == 1): ?>
+
+                            <!-- Activer -->
+                            <i class="bx bx-user-check text-success fs-4 cursor-pointer"
+
+                              data-bs-toggle="modal"
+                              data-bs-target="#animationModal<?= $listes->idUser ?>">
+                            </i>
+                          <?php else: ?>
+                            <!-- Désactiver -->
+                            <i class="bx bx-user-x text-danger fs-4 cursor-pointer"
+                              data-bs-toggle="modal"
+                              data-bs-target="#animationModal<?= $listes->idUser ?>">
+                            </i>
+                          <?php endif; ?>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      <?php foreach ($liste as $listes): ?>
-
-                        <tr>
-                          <td><?= $listes->utilisateurs ?></td>
-                          <td><?= $listes->emailUser ?></td>
-                          <td><?= $listes->numeroGare ?></td>
-                          <td><?= $listes->droit ?></td>
-                          <td class="text-center">
-                            <div class="dropup text-center">
-                              <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
-                                &#8943; <!-- Trois points horizontaux -->
-                              </a>
-                              <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" href="#">Modifier</a>
-                                <a class="dropdown-item" href="#">Désactiver</a>
+                      <!-- Modal Activation/Désactivation -->
+                      <div class="modal fade animate__animated animate__slideInDown"
+                        id="animationModal<?= $listes->idUser ?>"
+                        tabindex="-1"
+                        role="dialog"
+                        aria-labelledby="exampleModalCenterTitle"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                          <div class="modal-content">
+                            <form action="<?= BASE_URL ?>/admin/Configurations" method="post">
+                              <div class="modal-header">
+                                <h5 class="modal-title fw-bold text-primary" id="exampleModalCenterTitle">
+                                  Confirmation de <?= $listes->status == 1 ? 'désactivation' : 'réactivation' ?>
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                </button>
                               </div>
-                            </div>
+                              <div class="modal-body text-center">
+                                <i class="nav-icon fa fa-exclamation-triangle text-danger" style="font-size: 60px;"></i>
+                                <p class="mt-3">
+                                  Voulez-vous vraiment
+                                  <strong class="text-danger">
+                                    <?= $listes->status == 1 ? 'désactiver' : 'activer' ?>
+                                  </strong>
+                                  le compte <br><strong><?= $listes->utilisateurs ?></strong> ?
+                                </p>
 
-
-
-
-                          </td>
-
-                        </tr>
-                      <?php endforeach ?>
-
-                  </table>
-                </div>
+                                <input type="hidden" name="idUser" value="<?= $listes->idUser ?>">
+                                <input type="hidden" name="newStatut" value="<?= $listes->status == 1 ? 0 : 1 ?>">
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <button type="submit" name="valider" class="btn btn-primary">
+                                  Oui <?= $listes->status == 1 ? 'Désactiver' : 'Activer' ?>
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    <?php endforeach ?>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -175,21 +247,15 @@
       <!--end row-->
     </main>
     <!--end page main-->
-
     <!--start overlay-->
     <div class="overlay nav-toggle-icon"></div>
     <!--end overlay-->
-
     <!--Start Back To Top Button-->
     <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
     <!--End Back To Top Button-->
-
   </div>
   <!--end wrapper-->
-
-
   <?php $this->view('admin/partials/foot') ?>
-
 </body>
 
 </html>

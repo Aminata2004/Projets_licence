@@ -9,6 +9,7 @@ class Liste_tickets extends  Controller
 
     public  function  index()
     {
+        date_default_timezone_set('Africa/Bamako');
         $id_compagnie = $_SESSION['id_compagnie'];
         $model = new Liste_du_jour();
 

@@ -31,9 +31,6 @@
                 <div class="ms-auto">
                     <div class="btn-group">
 
-
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleDangerModal">+ Ajouter</button>
-                        &nbsp;
                         <a href="javascript:history.back()" class="btn btn-primary split-bg-primary"><i
                                 class="fadeIn animated bx bx-left-arrow-alt"></i></a>
 
@@ -61,19 +58,20 @@
                                     </li>
                                 <?php endif; ?>
                                 <li class="nav-item">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                                    </a>
-                                </li>
-                                <li class="nav-item">
                                     <a class="nav-link text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
                                         aria-selected="true">
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link  text-break" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
+                                    </a>
+                                </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link  text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
@@ -103,10 +101,10 @@
                                     </a>
                                 </li>
                                 <li class="nav-item mt-2">
-                                    <a class="nav-link text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Programmation_cars"
+                                    <a class="nav-link  text-break mb-0" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
                                         aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Programmation des cars
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
                                     </a>
                                 </li>
                                 <li class="nav-item mt-2">

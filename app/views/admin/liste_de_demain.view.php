@@ -29,7 +29,7 @@
                 </div>
                 <div class="ms-auto">
                     <div class="btn-group">
-                        <a href="<?= BASE_URL ?>/Add_billets" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
+                        <a href="<?= BASE_URL ?>/admin/Add_billets" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
                         <a href="javascript:history.back()" class="btn btn-primary "><i
                                 class="fadeIn animated bx bx-left-arrow-alt"></i></a>
                     </div>
@@ -153,7 +153,7 @@
                                                             data-bs-toggle="modal" data-bs-target="#exampleDangerModal">
                                                             Reporter le voyage
                                                         </a>
-                                                        <a class="dropdown-item" href="<?= BASE_URL ?>/Liste_du_jours/recu/<?= $item->idBillets ?>" target="_blank">
+                                                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Liste_du_jours/recu/<?= $item->idBillets ?>" target="_blank">
                                                             Imprimer le reçu
                                                         </a>
 
@@ -236,7 +236,7 @@
 
                 if (selectheure && id_destination) {
                     $.ajax({
-                        url: '<?= BASE_URL ?>/AjaxFiltreListe', // Contrôleur AJAX MVC
+                        url: '<?= BASE_URL ?>/admin/AjaxFiltreListe', // Contrôleur AJAX MVC
                         type: 'POST',
                         data: {
                             selectheure: selectheure,

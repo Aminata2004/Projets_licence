@@ -60,19 +60,20 @@
                                     </li>
                                 <?php endif; ?>
                                 <li class="nav-item">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                                    </a>
-                                </li>
-                                <li class="nav-item">
                                     <a class="nav-link text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
                                         aria-selected="true">
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link  text-break" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
+                                    </a>
+                                </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link  text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
@@ -101,8 +102,14 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
                                     </a>
                                 </li>
-                                
-                                   <li class="nav-item mt-2">
+                                <li class="nav-item mt-2">
+                                    <a class="nav-link  text-break mb-0" role="tab"
+                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
+                                        aria-selected="true">
+                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
+                                    </a>
+                                </li>
+                                <li class="nav-item mt-2">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
                                         aria-selected="true">
@@ -121,38 +128,36 @@
                                 Liste des horaires
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
-                                        <thead>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Heure </th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <?php foreach ($liste as $listes): ?>
                                             <tr>
-                                                <th>Heure </th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            <?php foreach ($liste as $listes): ?>
-                                                <tr>
-                                                    <td><?= $listes->heuredepart ?></td>
-                                                    <td class=" ">
-                                                        <div class="dropup text-center">
-                                                            <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                &#8943; <!-- Trois points horizontaux -->
-                                                            </a>
-                                                            <div class="dropdown-menu dropdown-menu-end">
-                                                                <a class="dropdown-item" href="#">Modifier</a>
-                                                                <a class="dropdown-item" href="#">Désactiver</a>
-                                                            </div>
+                                                <td><?= $listes->heuredepart ?></td>
+                                                <td class=" ">
+                                                    <div class="dropup text-center">
+                                                        <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            &#8943; <!-- Trois points horizontaux -->
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <a class="dropdown-item" href="#">Modifier</a>
+                                                            <a class="dropdown-item" href="#">Désactiver</a>
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach ?>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach ?>
 
-                                        </tbody>
-                                    </table>
-                                </div>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

@@ -16,80 +16,84 @@
         <!--start content-->
         <main class="page-content ">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-                <div class="breadcrumb-title pe-3">G-programmer</div>
-                <div class="ps-3">
+            <div class="page-breadcrumb d-flex flex-column flex-sm-row align-items-start align-items-sm-center mb-3">
+                <div class="breadcrumb-title pe-3">
+                    <i class="bx bx-calendar-event me-1"></i> G-programmer
+                </div>
+                <div class="ps-0 ps-sm-3">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
-                            <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
+                            <li class="breadcrumb-item">
+                                <a href="javascript:;"><i class="bx bx-home-alt"></i></a>
                             </li>
-                            <li class="breadcrumb-item active" aria-current="page">Programmer journalier </li>
+                            <li class="breadcrumb-item active" aria-current="page">Programmation de voyage</li>
                         </ol>
                     </nav>
                 </div>
-                <div class="ms-auto">
+                <div class="ms-sm-auto mt-2 mt-sm-0">
                     <div class="btn-group">
-                        <a href="<?= BASE_URL ?>/admin/Programmation_voyages" class="btn btn-info text-white "> + Ajouter</a> &nbsp;
-                        <a href="javascript:history.back()" class="btn btn-primary "><i
-                                class="fadeIn animated bx bx-left-arrow-alt"></i></a>
-
+                        <a href="<?= BASE_URL ?>/admin/Programmation_voyages"
+                            class="btn btn-sm btn-info text-white rounded-pill shadow-sm">
+                            <i class="bx bx-plus me-1"></i> Ajouter
+                        </a>
+                        <a href="javascript:history.back()"
+                            class="btn btn-sm btn-outline-primary rounded-pill shadow-sm ms-2">
+                            <i class="bx bx-left-arrow-alt"></i>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-body ">
+
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white fw-bold">
+                    <i class="bx bx-bus me-1"></i> Liste des programmations du jour
+                </div>
+                <div class="card-body">
                     <div class="table-responsive">
-                        <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
-                            <thead>
+                        <table id="example"
+                            class="table table-hover align-middle mb-0 table-striped table-bordered rounded-3">
+                            <thead class="table-primary text-center">
                                 <tr>
-                                    <th>Numero de car</th>
+                                    <th>Numéro de car</th>
                                     <th>Horaire</th>
                                     <th>Destination</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-
-                            <tbody>
-
+                            <tbody class="text-center">
                                 <?php
-                                $dateActuelle = new DateTime(); // Date et heure actuelles
+                                date_default_timezone_set('Africa/Bamako');
+                                $dateActuelle = new DateTime();
 
                                 foreach ($listeProgrammer as $listeProgrammers):
-                                    // Vérifie si la localité correspond à la ville en session
                                     if ($listeProgrammers->localite_user !== $_SESSION['ville']) {
                                         continue;
                                     }
-
-                                    // Vérifie que la date d'enregistrement est aujourd'hui et < 24h
                                     $dateEnregistrement = new DateTime($listeProgrammers->date_enregistre);
                                     $interval = $dateActuelle->getTimestamp() - $dateEnregistrement->getTimestamp();
 
-                                    // Si ce n'est pas aujourd'hui ou si plus de 24h sont passées, on saute
                                     if ($dateEnregistrement->format('Y-m-d') !== $dateActuelle->format('Y-m-d') || $interval > 86400) {
                                         continue;
                                     }
                                 ?>
-
                                     <tr>
                                         <td><?= htmlspecialchars($listeProgrammers->id_car_programmer) ?></td>
                                         <td><?= htmlspecialchars($listeProgrammers->id_horaire) ?></td>
                                         <td><?= htmlspecialchars($listeProgrammers->id_trajet) ?></td>
                                         <td>
-                                            <div class="dropup">
-                                                <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    &#8943;
+                                            <div class="dropdown">
+                                                <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bx bx-dots-vertical-rounded"></i>
                                                 </a>
-                                                <div class="dropdown-menu dropdown-menu-end">
-                                                    <a class="dropdown-item" href="#">Modifier</a>
-                                                    <a class="dropdown-item" href="#">Désactiver</a>
-                                                </div>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                    <li><a class="dropdown-item" href="#"><i class="bx bx-edit me-2"></i>Modifier</a></li>
+                                                    <li><a class="dropdown-item text-danger" href="#"><i class="bx bx-x-circle me-2"></i>Désactiver</a></li>
+                                                </ul>
                                             </div>
                                         </td>
                                     </tr>
-
                                 <?php endforeach; ?>
-
                             </tbody>
                         </table>
                     </div>
