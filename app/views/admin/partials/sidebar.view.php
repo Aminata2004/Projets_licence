@@ -210,11 +210,12 @@
               </a>
             </li> -->
 
-                <?php if (isset($_SESSION['droit']) && ($_SESSION['droit'] === 'Admin' || $_SESSION['droit'] === 'super_admin')): ?>
-
+                <?php if (isset($_SESSION['droit']) && ($_SESSION['droit'] === 'Admin' || $_SESSION['droit'] === 'super_Admin')): ?>
+                <?php if ($user->userHasPermission('configuration_creation')) {
+                ?>
                   <li class="menu-label">Paramètre</li>
                   <li>
-                    <?php if ($_SESSION['droit'] === 'super_admin'): ?>
+                    <?php if ($_SESSION['droit'] === 'super_Admin'): ?>
                       <a href="<?= BASE_URL ?>/admin/Compagnies">
                         <div class="parent-icon">
                           <i class="fadeIn animated bx bx-shape-polygon"></i>
@@ -230,11 +231,9 @@
                       </a>
                     <?php endif; ?>
                   </li>
-
+   <?php } ?>
                 <?php endif; ?>
-
-
-
+                
     </ul>
     <!--end navigation-->
   </aside>

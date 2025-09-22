@@ -1,5 +1,5 @@
 <?php $this->view('admin/partials/header') ?>
-
+  <?php $user = new Configuration($_SESSION['id_utilisateur']) ?>
 <body>
     <!--start wrapper-->
     <div class="wrapper">
@@ -54,6 +54,7 @@
                                         </a>
                                     </li>
                                 <?php endif; ?>
+                                <?php if ($user->userHasPermission('Billets_creation')) { ?>
                                 <li class="nav-item">
                                     <a class="nav-link text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
@@ -61,6 +62,9 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
                                     </a>
                                 </li>
+                                 <?php }
+        ?>
+  <?php if ($user->userHasPermission('Billets_creation')) { ?>
                                 <li class="nav-item">
                                     <a class="nav-link active text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
@@ -68,7 +72,8 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
                                     </a>
                                 </li>
-
+ <?php }
+        ?>
                                 <li class="nav-item">
                                     <a class="nav-link text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"

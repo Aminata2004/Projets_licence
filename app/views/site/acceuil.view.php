@@ -207,47 +207,46 @@
     <?php $this->view('site/partials/nav') ?>
 
     <!-- Hero-Section Start -->
-    <section class="hero-section bg-cover" style="background-image: url(<?= BASE_URL ?>/assets_site/img/shape/1.png);" style=" padding-top: 20px; padding-bottom: 40px; height:100%;">
-        <div class="shape float-bob-x">
-            <img src="<?= BASE_URL ?>/assets_site/img/shape/plane-1.png" alt="">
-        </div>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <div class="hero-wrapper">
-                        <div class="section-title t wow fadeInUp" data-wow-delay="0.2s">
-                            <span class="sub-title text-primary d-block mb-3" style="font-size: 1.5rem; font-weight: 500; letter-spacing: 1px;">
-                                Bienvenue sur la Plateforme de Réservation
-                            </span>
-                            <h2 class="text-white" style="font-size: 2.8rem; font-weight: bold;">
-                                Réservez vos billets de transport<br>ou suivez vos colis en un clic
-                            </h2>
-                        </div>
-                    </div>
+<section class="hero-section position-relative d-flex align-items-center justify-content-center text-center text-dark" 
+         style="min-height: 100vh; 
+                background-image: url('https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1600&q=80');
+                background-position: center center;
+                background-size: cover;
+                background-repeat: no-repeat;">
 
-                </div>
-            </div>
-        </div>
+    <!-- Overlay léger -->
+    <div style="position:absolute; top:0; left:0; width:100%; height:100%; background-color: rgba(255,255,255,0.15);"></div>
 
-    </section>
-    <!-- <section style=" padding-top: 20px; padding-bottom: 40px;" class="hero-section bg-cover" style="background-image: url(<?= BASE_URL ?>/assets_site/img/pageAcueil.png);">
-    <div class="container">
+    <!-- Contenu central -->
+    <div class="container position-relative" style="font-family: 'Poppins', sans-serif;">
         <div class="row">
-            <div class="col-lg-8 mx-auto text-center">
-                <div class="hero-wrapper">
-                    <div class="section-title t wow fadeInUp" data-wow-delay="0.2s">
-                        <span class="sub-title text-primary d-block mb-2" style="font-size: 1.5rem; font-weight: 500; letter-spacing: 1px;">
-                            Bienvenue sur la Plateforme de Réservation
-                        </span>
-                        <h2 class="text-white" style="font-size: 2.8rem; font-weight: bold;">
-                            Réservez vos billets de transport<br>ou suivez vos colis en un clic
-                        </h2>
-                    </div>
-                </div>
+            <div class="col-lg-10 mx-auto">
+                <span class="sub-title text-warning fw-semibold mb-3 d-block" style="font-size: 1.5rem; letter-spacing: 1px;">
+                    ✈ Plateforme de Réservation & Suivi
+                </span>
+                <h1 class="fw-bold mb-4 display-4" style="line-height: 1.2;">
+                    Réservez vos <span class="text-warning">billets</span> facilement<br>
+                    et suivez vos <span class="text-primary">colis</span> en un clic
+                </h1>
+                <p class="lead mb-5" style="max-width: 700px; margin:auto; font-size:1.2rem;">
+                    Une solution simple, rapide et sécurisée pour gérer vos réservations et vos envois.
+                </p>
+
+                <a href="#reservation" class="btn btn-warning btn-lg px-5 me-3 shadow rounded-pill">
+                    Réserver maintenant
+                </a>
+                <a href="#colis" class="btn btn-outline-dark btn-lg px-5 rounded-pill">
+                    Suivre un colis
+                </a>
             </div>
         </div>
     </div>
-</section> -->
+</section>
+
+
+
+
+
 
     <!-- Destination Section Start -->
     <section class="destination-section section-padding fix bg-white" id="compagnies">
