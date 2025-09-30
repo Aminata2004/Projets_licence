@@ -37,4 +37,38 @@ class Add_liste_escales extends  Controller
     // Envoi à la vue
     $this->view('admin/add_liste_escale', ["liste" => $liste]);
   }
+
+  public function update()
+  {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      $id = $_POST['id_escale'] ?? null;
+      $nom = trim($_POST['escales'] ?? '');
+      $add_liste_escale = new Add_liste_escale();
+
+      if ($id && $nom !== '') {
+      
+        $add_liste_escale->updateEscale($id, $nom);
+        $add_liste_escale->set_flash('Escale mise à jour avec succès', 'info');
+      } else {
+        $add_liste_escale->set_flash('veuillez remplir tous les champs', 'info');
+      }
+
+      header("Location: " . BASE_URL . "/admin/Add_liste_escales/index");
+      exit;
+    }
+  }
+
+  public function delete($id) {
+    $add_liste_escale = new Add_liste_escale();
+    if ($add_liste_escale->deleteEscale($id)) {
+      
+         $add_liste_escale->set_flash('Escale supprimée avec succès', 'info');
+    } else {
+       
+         $add_liste_escale->set_flash('Erreur lors de la suppression', 'info');
+    }
+    header("Location: " . BASE_URL . "/admin/Add_liste_escales/index");
+    exit;
+}
+
 }

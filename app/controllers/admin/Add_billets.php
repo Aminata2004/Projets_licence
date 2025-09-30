@@ -24,6 +24,9 @@ class Add_billets extends Controller
             }
         }
 
+
+        // var_dump($data['destinations']);exit;
+    
         $this->view('admin/add_billets', $data);
     }
 }

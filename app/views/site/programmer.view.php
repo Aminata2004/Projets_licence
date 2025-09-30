@@ -167,69 +167,68 @@
                     // Regrouper les programmes par ville de départ
                     $groupedByDepart = [];
                     foreach ($programmes as $programme) {
-                        $depart = htmlspecialchars($programme->idDepart);
+                        $depart = htmlspecialchars($programme->departLocalite .'( '.  $programme->numeroGare1 . ')' ?? $programme->idDepart);
                         $groupedByDepart[$depart][] = $programme;
                     }
                     ?>
 
                     <?php foreach ($groupedByDepart as $depart => $programmesDepart) : ?>
-                        <div class="col-12">
-                            <div class="mb-4">
-                                <div class="progress shadow-sm" style="height: 24px;">
-                                    <div class="progress-bar bg-primary fw-bold" role="progressbar"
-                                        style="width: 100%; font-size: 16px;">
+                        <div class="col-12 mb-4">
+                            <!-- Titre par départ -->
+                            <div class="mb-3">
+                                <div class="progress shadow-sm" style="height: 28px;">
+                                    <div class="progress-bar bg-primary fw-bold text-white d-flex align-items-center justify-content-center"
+                                        role="progressbar" style="width: 100%; font-size: 16px;">
                                         Départ : <?= $depart ?>
                                     </div>
                                 </div>
                             </div>
 
+                            <!-- Tableau des programmes -->
                             <div class="table-responsive">
-                                <!-- Tableau des programmes -->
-                                <table class="table table-hover table-bordered shadow-sm rounded text-center align-middle" style="cursor: pointer;">
+                                <table class="table table-hover table-bordered shadow-sm rounded text-center align-middle"
+                                    style="cursor: pointer;">
                                     <thead class="table-primary">
                                         <tr>
                                             <th>Destination</th>
                                             <th>Convocation</th>
                                             <th>Horaire</th>
                                             <th>Tarifs</th>
-                                            <th>Escale</th>
+                                            <th>Escale(s)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php foreach ($programmesDepart as $programme) : ?>
                                             <tr class="clickable-row"
                                                 data-id="<?= $programme->idProgrammer ?>"
-                                                data-depart="<?= htmlspecialchars($programme->depart ?? '') ?>"
-                                                data-destination="<?= htmlspecialchars($programme->idDestination) ?>"
+                                                data-depart="<?= htmlspecialchars($programme->departLocalite ?? '') ?>"
+                                                data-destination="<?= htmlspecialchars($programme->destinationLocalite  ?? $programme->idDestination) ?>"
                                                 data-horaire="<?= htmlspecialchars($programme->heureDepart) ?>"
                                                 data-prix="<?= htmlspecialchars($programme->prix) ?>"
                                                 data-compagnie="<?= htmlspecialchars($programme->id_compagnie) ?>"
                                                 data-escales="<?= htmlspecialchars($programme->escales_avec_frais) ?>">
 
-                                                <td><?= htmlspecialchars($programme->idDestination) ?></td>
+                                                <td><?= htmlspecialchars($programme->destinationLocalite .'( '.  $programme->numeroGare2 . ')' ?? $programme->idDestination) ?></td>
                                                 <td><?= htmlspecialchars($programme->rdv) ?></td>
                                                 <td><?= htmlspecialchars($programme->heureDepart) ?></td>
-                                                <td><span class="badge bg-primary"><?= htmlspecialchars($programme->prix) ?> FCFA</span></td>
                                                 <td>
-                                                    <?php
-                                                    if (!empty($programme->escales_avec_frais)) {
-                                                        $escales = explode(' - ', $programme->escales_avec_frais);
-                                                        foreach ($escales as $escale) {
-                                                            echo '<span class="badge bg-primary text-white mb-1 d-block">' . htmlspecialchars($escale) . '</span>';
-                                                        }
-                                                    } else {
-                                                        echo '<span class="text-muted">Aucune escale</span>';
-                                                    }
-                                                    ?>
+                                                    <span class="badge bg-primary"><?= htmlspecialchars(number_format($programme->prix, 0, ',', ' ')) ?> FCFA</span>
+                                                </td>
+                                                <td>
+                                                    <?php if (!empty($programme->escales_avec_frais)) :
+                                                        $escales = explode(', ', $programme->escales_avec_frais);
+                                                        foreach ($escales as $escale) : ?>
+                                                            <span class="badge bg-info text-white mb-1 d-block"><?= htmlspecialchars($escale) ?></span>
+                                                        <?php endforeach; ?>
+                                                    <?php else : ?>
+                                                        <span class="text-muted fst-italic">Aucune escale</span>
+                                                    <?php endif; ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
-
-
                             </div>
-                            <br>
                         </div>
                     <?php endforeach; ?>
                 <?php else : ?>
@@ -237,6 +236,7 @@
                         <h5 class="text-muted">Aucun programme disponible pour le moment.</h5>
                     </div>
                 <?php endif; ?>
+
             </div>
         </div>
     </section>
@@ -270,5 +270,3 @@
             cursor: pointer;
         }
     </style>
-
- 

@@ -1,5 +1,5 @@
 <?php $this->view('admin/partials/header') ?>
-
+ <?php $user = new Configuration($_SESSION['id_utilisateur']) ?>
 <body>
 
 
@@ -56,6 +56,7 @@
                                         </a>
                                     </li>
                                 <?php endif; ?>
+                                   <?php if ($user->userHasPermission('Configuration_gestion_gare')) { ?>
                                 <li class="nav-item">
                                     <a class="nav-link text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
@@ -63,6 +64,8 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
                                     </a>
                                 </li>
+                                     <?php } ?>
+                                <?php //if ($user->userHasPermission('utilisateur_apercu')) { ?>
                                 <li class="nav-item">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
@@ -70,6 +73,8 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
                                     </a>
                                 </li>
+                                   <?php // } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_escale')) { ?>
 
                                 <li class="nav-item">
                                     <a class="nav-link  text-break mb-0" role="tab"
@@ -78,13 +83,17 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Escale
                                     </a>
                                 </li>
-                                <li class="nav-item mt-2">
+                                 <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_trajets')) { ?>
+                                <!-- <li class="nav-item mt-2">
                                     <a class="nav-link  text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
                                         aria-selected="true">
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Trajets
                                     </a>
-                                </li>
+                                </li> -->
+                                 <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_horaire')) { ?>
                                 <li class="nav-item mt-2">
                                     <a class="nav-link  text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire"
@@ -92,6 +101,8 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Horaire
                                     </a>
                                 </li>
+                                 <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_car/chauffeur')) { ?>
                                 <li class="nav-item mt-2">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
@@ -99,6 +110,8 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
                                     </a>
                                 </li>
+                                  <?php } ?>
+                                   <?php if ($_SESSION['droit'] === 'super_admin'): ?>
                                 <li class="nav-item mt-2">
                                     <a class="nav-link active text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
@@ -106,6 +119,8 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
                                     </a>
                                 </li>
+                                <?php endif?>
+                                 <?php if ($user->userHasPermission('Configuration_place/limite')) { ?>
                                 <li class="nav-item mt-2">
                                     <a class="nav-link  text-break" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
@@ -113,6 +128,7 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Place limite
                                     </a>
                                 </li>
+                                 <?php } ?>
                             </ul>
                         </div>
                     </div>

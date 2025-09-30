@@ -54,6 +54,10 @@ class Caisse extends Controller
         $this->view('admin/add_caisse', ['listes' => $listes]);
     }
 
+
+
+    
+
     public function getSommeBillets($pdo, $compagnieId, $ville, $periode = 'jour')
     {
         $sql = "

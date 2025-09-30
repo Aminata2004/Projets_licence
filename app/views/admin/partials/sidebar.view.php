@@ -2,7 +2,7 @@
   <aside class="sidebar-wrapper" data-simplebar="true">
     <div class="sidebar-header">
       <div>
-        <a href="<?= BASE_URL ?>/admin/Homes/home"><img src="<?= BASE_URL ?>/assets/images/logo.png" class="logo-icon" alt="logo icon"></a>
+        <a href="<?= BASE_URL ?>/admin/Homes/home"><img src="<?= BASE_URL ?>/assets_site/img/reservation.png" class="logo-icon" alt="logo icon"></a>
 
       </div>
       <div>
@@ -159,7 +159,7 @@
               </ul>
               </li>
 
-              <?php if ($user->userHasPermission('Programmer_Creation')) { ?>
+              <?php if ($user->userHasPermission('Programme_Creation')) { ?>
                 <li class="menu-label">Gestion des programmations</li>
                 <li>
                   <a href="javascript:;" class="has-arrow">
@@ -169,19 +169,19 @@
                   </a>
                 <?php } ?>
                 <ul>
-                  <?php if ($user->userHasPermission('Programmer_Creation')) { ?>
+                  <?php if ($user->userHasPermission('Programme_Creation')) { ?>
                     <li> <a href="<?= BASE_URL ?>/admin/Programmer_voyages"><i class="bi bi-arrow-right-short"></i>Programme du voyage</a>
                     </li>
                   <?php } ?>
-                  <?php if ($user->userHasPermission('ProgrammationCar_Creation')) { ?>
+                  <?php if ($user->userHasPermission('Programme_programmer_car')) { ?>
                     <li> <a href="<?= BASE_URL ?>/admin/Programmation_cars"><i class="bi bi-arrow-right-short"></i>Programmation des car</a>
                     </li>
                   <?php } ?>
-                  <?php if ($user->userHasPermission('ProgrammationVoyage_Creation')) { ?>
+                  <?php if ($user->userHasPermission('Programme_programmation_voyage')) { ?>
                     <li> <a href="<?= BASE_URL ?>/admin/Programmation_voyages/liste_programmer_voyage"><i class="bi bi-arrow-right-short"></i>Programmation du voyage</a>
                     </li>
                   <?php } ?>
-                  <?php if ($user->userHasPermission('Programmer_Creation')) { ?>
+                  <?php if ($user->userHasPermission('Programme_hors_programme')) { ?>
                     <li> <a href="#"><i class="bi bi-arrow-right-short"></i>Hors programmer</a>
                     </li>
                   <?php } ?>
@@ -210,8 +210,8 @@
               </a>
             </li> -->
 
-                <?php if (isset($_SESSION['droit']) && ($_SESSION['droit'] === 'Admin' || $_SESSION['droit'] === 'super_Admin')): ?>
-                <?php if ($user->userHasPermission('configuration_creation')) {
+                <?php if (isset($_SESSION['droit']) && ($_SESSION['droit'] === 'Admin' || $_SESSION['droit'] === 'super_admin')): ?>
+                <?php //if ($user->userHasPermission('configuration_aprecue')) {
                 ?>
                   <li class="menu-label">Paramètre</li>
                   <li>
@@ -231,7 +231,7 @@
                       </a>
                     <?php endif; ?>
                   </li>
-   <?php } ?>
+   <?php // } ?>
                 <?php endif; ?>
                 
     </ul>

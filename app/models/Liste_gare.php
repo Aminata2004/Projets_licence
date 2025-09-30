@@ -92,32 +92,82 @@ class Liste_gare extends Model
             // $this->redirect("compagnies");
         }
     }
-    public function saveCaisse()
-    {
-        $id_compagnie = $_SESSION['id_compagnie'];
+    // public function saveCaisse()
+    // {
+    //     $id_compagnie = $_SESSION['id_compagnie'];
 
-        // Récupération sécurisée des données du formulaire
-        extract($_POST);
-        $montant_colis=0;
-        $montant_billets=0;
-        $insertion = $this->insertion_update_simples(
-            "INSERT INTO caisse(id_compagnie, id_agence, montant_initial, montant_billets,montant_colis, date_enregistrement, reference_caise,status_caisse) 
-         VALUES(:id_compagnie, :id_agence, :montant_initial, :montant_billets, :montant_colis,:date_enregistrement, :reference_caise,:status_caisse)",
-            [
-                ":id_compagnie" => $id_compagnie,
-                ":id_agence" => $id_agence,
-                ":montant_initial" => $montant_initial, 
-                ":montant_billets" => $montant_billets,
-                ":montant_colis" => $montant_colis,
-                ":date_enregistrement" => $date_enregistrement,
-                ":reference_caise" => $reference_caise,
-                ":status_caisse" => 1
-            ]
-        );
-         if ($insertion == true) {
-                $this->set_flash('Gare ajoutée avec succès', 'info');
-            } else {
-                $this->set_flash('Gare non ajoutée');
-            }
+    //     // Récupération sécurisée des données du formulaire
+    //     extract($_POST);
+    //     $montant_colis=0;
+    //     $montant_billets=0;
+    //     $insertion = $this->insertion_update_simples(
+    //         "INSERT INTO caisse(id_compagnie, id_agence, montant_initial, montant_billets,montant_colis, date_enregistrement, reference_caise,status_caisse) 
+    //      VALUES(:id_compagnie, :id_agence, :montant_initial, :montant_billets, :montant_colis,:date_enregistrement, :reference_caise,:status_caisse)",
+    //         [
+    //             ":id_compagnie" => $id_compagnie,
+    //             ":id_agence" => $id_agence,
+    //             ":montant_initial" => $montant_initial, 
+    //             ":montant_billets" => $montant_billets,
+    //             ":montant_colis" => $montant_colis,
+    //             ":date_enregistrement" => $date_enregistrement,
+    //             ":reference_caise" => $reference_caise,
+    //             ":status_caisse" => 1
+    //         ]
+    //     );
+    //      if ($insertion == true) {
+    //             $this->set_flash('Gare ajoutée avec succès', 'info');
+    //         } else {
+    //             $this->set_flash('Gare non ajoutée');
+    //         }
+    // }
+
+public function saveCaisse()
+{
+    $id_compagnie = $_SESSION['id_compagnie'];
+
+    // Récupération sécurisée des données du formulaire
+    extract($_POST);
+    $montant_colis   = 0;
+    $montant_billets = 0;
+
+    // ⚡ Vérifier si une caisse active existe déjà pour cette agence
+    $sql = "SELECT COUNT(*) as total 
+            FROM caisse 
+            WHERE id_agence = :id_agence 
+              AND status_caisse = 1";
+
+    $stmt = $this->connect()->prepare($sql);
+    $stmt->execute([":id_agence" => $id_agence]);
+    $check = $stmt->fetch(PDO::FETCH_OBJ);
+
+    if ($check && $check->total > 0) {
+        // Une caisse active existe déjà → refus
+        $this->set_flash("Impossible d’ouvrir une nouvelle caisse : une caisse active existe déjà pour cette localité.", "danger");
+        return false;
     }
+
+    // ✅ Sinon on insère
+    $insertion = $this->insertion_update_simples(
+        "INSERT INTO caisse(id_compagnie, id_agence, montant_initial, montant_billets, montant_colis, date_enregistrement, reference_caise, status_caisse) 
+         VALUES(:id_compagnie, :id_agence, :montant_initial, :montant_billets, :montant_colis, :date_enregistrement, :reference_caise, :status_caisse)",
+        [
+            ":id_compagnie"       => $id_compagnie,
+            ":id_agence"          => $id_agence,
+            ":montant_initial"    => $montant_initial,
+            ":montant_billets"    => $montant_billets,
+            ":montant_colis"      => $montant_colis,
+            ":date_enregistrement"=> $date_enregistrement,
+            ":reference_caise"    => $reference_caise,
+            ":status_caisse"      => 1
+        ]
+    );
+
+    if ($insertion == true) {
+        $this->set_flash("Caisse ajoutée avec succès ✅", "info");
+    } else {
+        $this->set_flash("Erreur lors de l’ajout de la caisse ❌", "danger");
+    }
+}
+
+
 }

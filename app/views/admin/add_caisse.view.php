@@ -53,8 +53,8 @@
 
                                     <div class="col-md-6">
                                         <label for="validationCustom02" class="form-label fw-semibold">Agence</label>
-                                        <select class="form-select" id="droitSelect" name="id_agence" required>
-                                        <option value="" disabled selected></option>
+                                        <select class="single-select" id="droitSelect" name="id_agence" required>
+                                        <option value="United States" disabled selected></option>
                                          <?php foreach ($listes as $liste): ?>
                                             <option value="<?= htmlspecialchars($liste->idAgence); ?>">
                                                 <?= htmlspecialchars($liste->localite . ' ( ' . $liste->numeroGare . ' )'); ?>

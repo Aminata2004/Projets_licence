@@ -1,4 +1,5 @@
 <?php $this->view('admin/partials/header') ?>
+<?php $user = new Configuration($_SESSION['id_utilisateur']) ?>
 
 <body>
 
@@ -23,21 +24,28 @@
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
                             </li>
-                            <li class="breadcrumb-item active" aria-current="page">Utilisateur</li>
+                            <li class="breadcrumb-item active" aria-current="page">Gestion des escale</li>
                         </ol>
                     </nav>
                 </div>
                 <div class="ms-auto">
-                    <div class="btn-group">
+                    <div class="d-flex gap-2">
 
+                        <!-- Bouton Ajouter -->
+                        <button type="button" class="btn btn-success d-flex align-items-center gap-2 shadow-sm"
+                            data-bs-toggle="modal" data-bs-target="#exampleDangerModal">
+                            <i class="bx bx-plus-circle fs-5"></i> Ajouter
+                        </button>
 
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleDangerModal">+ Ajouter</button>
-                        &nbsp;
-                        <a href="javascript:history.back()" class="btn btn-primary split-bg-primary"><i
-                                class="fadeIn animated bx bx-left-arrow-alt"></i></a>
+                        <!-- Bouton Retour -->
+                        <a href="javascript:history.back()"
+                            class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm">
+                            <i class="bx bx-left-arrow-alt fs-5"></i> Retour
+                        </a>
 
                     </div>
                 </div>
+
             </div>
             <!--end breadcrumb-->
             <div class="row">
@@ -59,64 +67,78 @@
                                         </a>
                                     </li>
                                 <?php endif; ?>
-                                  <li class="nav-item">
-                                    <a class="nav-link text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                                    </a>
-                                </li>
-                              
-                                <li class="nav-item">
-                                    <a class="nav-link active text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Escale
-                                    </a>
-                                </li>
+                                <?php if ($user->userHasPermission('Configuration_gestion_gare')) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('utilisateur_apercu')) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link  text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_escale')) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link active text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Escale
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_trajets')) { ?>
+                                    <!-- <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Trajets
+                                        </a>
+                                    </li> -->
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_horaire')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Horaire
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_car/chauffeur')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                 <?php if ($_SESSION['droit'] === 'super_admin'): ?>
                                 <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Trajets
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Horaire
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
-                                    </a>
-                                </li>
-                                  <li class="nav-item mt-2">
                                     <a class="nav-link  text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
                                         aria-selected="true">
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
                                     </a>
                                 </li>
-                               
-                                   <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Place limite
-                                    </a>
-                                </li>
+<?php  endif?>
+                                <?php if ($user->userHasPermission('Configuration_place/limite')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Place limite
+                                        </a>
+                                    </li>
+                                <?php } ?>
                             </ul>
                         </div>
                     </div>
@@ -129,38 +151,47 @@
                                 Liste des escales
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
-                                        <thead>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Escale</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <?php foreach ($liste as $listes): ?>
                                             <tr>
-                                                <th>Escale</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            <?php foreach ($liste as $listes): ?>
-                                                <tr>
-                                                    <td><?= $listes->escales ?></td>
-                                                    <td class=" ">
-                                                        <div class="dropup text-center">
-                                                            <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                &#8943; <!-- Trois points horizontaux -->
+                                                <td><?= $listes->escales ?></td>
+                                                <td class=" ">
+                                                    <div class="dropup text-center">
+                                                        <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            &#8943; <!-- Trois points horizontaux -->
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <a class="dropdown-item edit-btn"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#exampleDangerModal1"
+                                                                data-id_escale="<?= $listes->id_escale ?>"
+                                                                data-escales="<?= htmlspecialchars($listes->escales, ENT_QUOTES) ?>"
+                                                                href="#">
+                                                                ✏️ Modifier
                                                             </a>
-                                                            <div class="dropdown-menu dropdown-menu-end">
-                                                                <a class="dropdown-item" href="#">Modifier</a>
-                                                                <a class="dropdown-item" href="#">Désactiver</a>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach ?>
+                                                            <a class="dropdown-item text-danger delete-button"
+                                                                href="<?= BASE_URL ?>/admin/Add_liste_escales/delete/<?= $listes->id_escale ?>">
+                                                                🗑 Supprimer
+                                                            </a>
 
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach ?>
+
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -169,22 +200,79 @@
             <!-- modal pour insertion des escale -->
             <div class="modal fade" id="exampleDangerModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header bg-primary split-bg-primary">
-                            <h5 class="modal-title text-white">Nouveau escale</h5>
-                        </div>
-                        <div class="modal-body">
-                            <form action="" method="post">
-                                <div class="col-md-12">
-                                    <label for="bsValidation3" class="form-label"> Escale<span
-                                            class="text-danger scale5 ms-2">*</span></label>
-                                    <input type="text" class="form-control solid"
-                                        aria-label="name" name="escales" placeholder="ex:Fana">
+                    <div class="modal-content border-0 shadow-lg rounded-3">
 
+                        <!-- Header -->
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title fw-bold text-white">
+                                <i class="bx bx-map-pin me-2"></i> Nouvelle escale
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="modal-body">
+                            <form action="" method="post" class="needs-validation" novalidate>
+
+                                <!-- Champ Escale -->
+                                <div class="mb-3">
+                                    <label for="escaleInput" class="form-label fw-semibold">Nom de l’escale
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text"
+                                        class="form-control form-control-lg"
+                                        id="escaleInput"
+                                        name="escales"
+                                        placeholder="Ex : Fana"
+                                        required>
+                                    <div class="invalid-feedback">Veuillez entrer le nom de l’escale.</div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                    <button type="submit" class="btn btn-primary" name="save">Enregistre</button>
+
+                                <!-- Footer -->
+                                <div class="modal-footer border-0">
+                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                                        <i class="bx bx-x me-1"></i> Annuler
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" name="save">
+                                        <i class="bx bx-save me-1"></i> Enregistrer
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- model de modification  -->
+            <div class="modal fade" id="exampleDangerModal1" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-3">
+
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title fw-bold text-white">
+                                <i class="bx bx-edit-alt me-2"></i> Modifier l’escale
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <form action="<?= BASE_URL ?>/admin/Add_liste_escales/update" method="post">
+                                <!-- Champ caché pour l'ID -->
+                                <input type="hidden" id="edit_id_escale" name="id_escale">
+
+                                <!-- Champ escale -->
+                                <div class="mb-3">
+                                    <label for="edit_escale" class="form-label">Nom de l’escale <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-lg" id="edit_escale" name="escales" required>
+                                </div>
+
+                                <div class="modal-footer border-0">
+                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                                        Annuler
+                                    </button>
+                                    <button type="submit" class="btn btn-primary fw-bold">
+                                        Enregistrer les modifications
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -192,6 +280,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- fin de modals -->
             <!--end row-->
         </main>
@@ -211,6 +300,56 @@
 
 
     <?php $this->view('admin/partials/foot') ?>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const editButtons = document.querySelectorAll(".edit-btn");
+
+            editButtons.forEach(btn => {
+                btn.addEventListener("click", function() {
+                    let id = this.getAttribute("data-id_escale");
+                    let escale = this.getAttribute("data-escales");
+
+                    // Remplir le formulaire du modal
+                    document.getElementById("edit_id_escale").value = id;
+                    document.getElementById("edit_escale").value = escale;
+                });
+            });
+        });
+    </script>
+    <!-- script pour la suppression -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.delete-button');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+
+                    const deleteUrl = this.getAttribute('href');
+
+                    Swal.fire({
+                        title: 'Êtes-vous sûr ?',
+                        text: "Cette action est irréversible !",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Oui, supprimer',
+                        cancelButtonText: 'Annuler',
+                        customClass: {
+                            confirmButton: 'btn btn-danger me-2',
+                            cancelButton: 'btn btn-secondary'
+                        },
+                        buttonsStyling: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // On appelle la route de suppression
+                            window.location.href = deleteUrl;
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
 
 </body>
 

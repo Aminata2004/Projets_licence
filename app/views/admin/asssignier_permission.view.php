@@ -1,4 +1,5 @@
 <?php $this->view('admin/partials/header') ?>
+<?php $user = new Configuration($_SESSION['id_utilisateur']) ?>
 
 <body>
 
@@ -56,49 +57,61 @@
                                         </a>
                                     </li>
                                 <?php endif; ?>
-                                <li class="nav-item">
-                                    <a class="nav-link text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link  text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Escale
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Trajets
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Horaire
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
-                                    </a>
-                                </li>
+                                <?php if ($user->userHasPermission('Configuration_gestion_gare')) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('utilisateur_apercu')) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link  text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_escale')) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link  text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Escale
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_trajets')) { ?>
+                                    <!-- <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Trajets
+                                        </a>
+                                    </li> -->
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_horaire')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Horaire
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_car/chauffeur')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                 <?php if ($_SESSION['droit'] === 'super_admin'): ?>
                                 <li class="nav-item mt-2">
                                     <a class="nav-link active text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
@@ -106,13 +119,16 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
                                     </a>
                                 </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Place limite
-                                    </a>
-                                </li>
+                                <?php endif; ?>
+                                <?php if ($user->userHasPermission('Configuration_place/limite')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Place limite
+                                        </a>
+                                    </li>
+                                <?php } ?>
                             </ul>
                         </div>
                     </div>
@@ -246,7 +262,7 @@
 
 
                 </div>
-                
+
             </div>
 
             <!--end row-->
@@ -267,6 +283,28 @@
 
 
     <?php $this->view('admin/partials/foot') ?>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectAll = document.getElementById("select_all_permissions");
+            const checkboxes = document.querySelectorAll(".permission-checkbox");
+
+            // Quand on clique sur "tout cocher/décocher"
+            selectAll.addEventListener("change", function() {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            });
+
+            // Si l’utilisateur décoche manuellement une case
+            checkboxes.forEach(cb => {
+                cb.addEventListener("change", function() {
+                    if (!this.checked) {
+                        selectAll.checked = false;
+                    } else if ([...checkboxes].every(c => c.checked)) {
+                        selectAll.checked = true;
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 

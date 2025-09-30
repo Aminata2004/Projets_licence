@@ -16,21 +16,28 @@ class Programmer_voyages extends  Controller
         // Admin : voit seulement ce qui est lié à sa compagnie
         $id_compagnie = $_SESSION['id_compagnie'];
 
-        $listeProgrammer = $programmer_voyage->FetchSelectCustom("
+       $listeProgrammer = $programmer_voyage->FetchSelectCustom("
     SELECT 
-        programmer.idProgrammer,
-        programmer.idDepart,
-        programmer.idDestination,
-        programmer.heureDepart,
-        programmer.rdv,
-        programmer.prix,
-        GROUP_CONCAT(CONCAT(escale.escales, ' (', ligneTrajet.prix_escale, ' FCFA)') SEPARATOR ', ') AS escales
-    FROM programmer
-    LEFT JOIN ligneTrajet ON programmer.idProgrammer = ligneTrajet.id_trajets
-    LEFT JOIN escale ON ligneTrajet.id_escales = escale.id_escale
-    WHERE programmer.id_compagnie = :id_compagnie
-    GROUP BY programmer.idProgrammer
+        p.idProgrammer,
+        p.idDepart,
+        a1.localite AS departLocalite,       -- Jointure pour départ
+        a1.numeroGare AS numeroGare1,
+        p.idDestination,
+        a2.localite AS destinationLocalite, -- Jointure pour destination
+        a2.numeroGare AS numeroGare2,
+        p.heureDepart,
+        p.rdv,
+        p.prix,
+        GROUP_CONCAT(CONCAT(e.escales, ' (', lt.prix_escale, ' FCFA)') SEPARATOR ', ') AS escales
+    FROM programmer p
+    LEFT JOIN ligneTrajet lt ON p.idProgrammer = lt.id_trajets
+    LEFT JOIN escale e ON lt.id_escales = e.id_escale
+    LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
+    LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
+    WHERE p.id_compagnie = :id_compagnie
+    GROUP BY p.idProgrammer
 ", ['id_compagnie' => $id_compagnie]);
+
       } else {
         $programmer_voyage->set_flash("Accès refusé ou session invalide", "danger");
         $programmer_voyage->redirect("/admin/Login/index");

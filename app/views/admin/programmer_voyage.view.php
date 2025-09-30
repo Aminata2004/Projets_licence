@@ -16,89 +16,96 @@
         <!--start content-->
         <main class="page-content ">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-                <div class="breadcrumb-title pe-3">G-programmer</div>
-                <div class="ps-3">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0 p-0">
-                            <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">Programer du voyage</li>
-                        </ol>
-                    </nav>
-                </div>
-                <div class="ms-auto">
-                    <div class="btn-group">
-                        <a href="<?= BASE_URL ?>/admin/Programmer_voyages/add_programmer" class="btn btn-info text-white"> + Ajouter</a> &nbsp;
-                        <a href="javascript:history.back()" class="btn btn-primary "><i
-                                class="fadeIn animated bx bx-left-arrow-alt"></i></a>
-
+          
+            <div class="page-breadcrumb d-flex align-items-center justify-content-between mb-3">
+                <!-- Titre + Fil d'Ariane -->
+                <div class="d-flex align-items-center">
+                    <div class="breadcrumb-title pe-3  ">
+                        <i class="bx bx-calendar-check me-1"></i> G-Programme
+                    </div>
+                    <div class="ps-3">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0 p-0 small">
+                                <li class="breadcrumb-item">
+                                    <a href="<?= BASE_URL ?>/admin/dashboard" class="text-decoration-none text-muted">
+                                        <i class="bx bx-home-alt"></i>
+                                    </a>
+                                </li>
+                                <li class="breadcrumb-item active " aria-current="page">Programmes du voyage</li>
+                            </ol>
+                        </nav>
                     </div>
                 </div>
+
+                <!-- Boutons -->
+                <div class="btn-group gap-1">
+                    <a href="<?= BASE_URL ?>/admin/Programmer_voyages/add_programmer"
+                        class="btn btn-sm btn-success shadow-sm">
+                        <i class="bx bx-plus-circle me-1"></i> Ajouter
+                    </a>
+
+                    <a href="javascript:history.back()"
+                        class="btn btn-sm btn-outline-primary shadow-sm">
+                        <i class="bx bx-left-arrow-alt"></i> Retour
+                    </a>
+                </div>
             </div>
+
             <?php $this->view("admin/set_flash") ?>
             <div class="card">
-                <div class="card-body ">
-                    <div class="table-responsive">
-                        <table id="example" class="table table-striped table-bordered" style="width:100%">
-                            <thead>
+                <div class="card-body">
+                    <div class="table-responsive shadow-sm rounded-3">
+                        <table id="example"
+                            class="table table-striped table-hover align-middle table-bordered mb-0">
+                            <thead class="table-primary text-center">
                                 <tr>
-                                    <th>Depart</th>
+                                    <th>Départ</th>
                                     <th>Destination</th>
-                                  
                                     <th>RDV</th>
-                                    <th>Heure de depart</th>
-                                    <th>Prix </th>
+                                    <th>Heure de départ</th>
+                                    <th>Prix</th>
                                     <th>Escale(s)</th>
-
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="text-center">
                                 <?php foreach ($listeProgrammer as $listeProgrammers): ?>
-                                    <?php if ($listeProgrammers->idDepart === $_SESSION['ville']): ?>
+                                    <?php if ($_SESSION['droit'] === 'Admin' || $listeProgrammers->departLocalite === $_SESSION['ville']): ?>
                                         <tr>
-                                            <td><?= $listeProgrammers->idDepart ?></td>
-                                            <td><?= $listeProgrammers->idDestination ?></td>
-
+                                            <td><?= $listeProgrammers->departLocalite .' ( ' . $listeProgrammers->numeroGare1 . ' ) ' ?></td>
+                                            <td><?= $listeProgrammers->destinationLocalite  .' ( ' . $listeProgrammers->numeroGare2 . ' ) ' ?></td>
                                             <td><?= $listeProgrammers->rdv ?></td>
                                             <td><?= $listeProgrammers->heureDepart ?></td>
-                                            <td><?= $listeProgrammers->prix ?></td>
+                                            <td><strong class="text-danger"><?= number_format($listeProgrammers->prix, 0, ',', ' ') ?> FCFA</strong></td>
                                             <td>
                                                 <?= !empty($listeProgrammers->escales)
-                                                    ? htmlspecialchars($listeProgrammers->escales)
-                                                    : '<span class="text-muted">Aucune escale</span>' ?>
+                                                    ? '<span class="text-dark">' . htmlspecialchars($listeProgrammers->escales) . '</span>'
+                                                    : '<span class="text-muted fst-italic">Aucune escale</span>' ?>
                                             </td>
-
-                                            <td>
-                                                <div class="dropdown ms-auto ">
-                                                    <div class="btn-link" data-bs-toggle="dropdown">
-                                                        <svg width="24px" height="24px" viewBox="0 0 24 24"
-                                                            version="1.1">
-                                                            <g stroke="none" stroke-width="1" fill="none"
-                                                                fill-rule="evenodd">
-                                                                <rect x="0" y="0" width="24" height="24"></rect>
-                                                                <circle fill="#000000" cx="5" cy="12" r="2">
-                                                                </circle>
-                                                                <circle fill="#000000" cx="12" cy="12" r="2">
-                                                                </circle>
-                                                                <circle fill="#000000" cx="19" cy="12" r="2">
-                                                                </circle>
-                                                            </g>
-                                                        </svg>
-                                                    </div>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <a class="dropdown-item add-button"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#basicModale"
-                                                            data-id="<?= $listeProgrammers->idProgrammer  ?>"
-                                                            data-prix="<?= $listeProgrammers->prix   ?>"
-                                                            data-iddepart="<?= $listeProgrammers->departLocalite ?>"
-                                                            data-iddestination="<?= $listeProgrammers->destinationLocalite ?>"
-                                                            href="">Modifer</a>
-                                                        <a class="dropdown-item"
-                                                            href="">Supprimer</a>
-                                                    </div>
+                                            <td class="text-center">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-light border-0 shadow-sm" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots-vertical"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                        <li>
+                                                            <a class="dropdown-item add-button"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#basicModale"
+                                                                data-id="<?= $listeProgrammers->idProgrammer  ?>"
+                                                                data-prix="<?= $listeProgrammers->prix   ?>"
+                                                                data-iddepart="<?= $listeProgrammers->departLocalite ?>"
+                                                                data-iddestination="<?= $listeProgrammers->destinationLocalite ?>"
+                                                                href="#">
+                                                                <i class="bi bi-pencil-square text-primary me-2"></i>Modifier
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item text-danger" href="#">
+                                                                <i class="bi bi-trash3 me-2"></i>Supprimer
+                                                            </a>
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </td>
                                         </tr>
@@ -108,6 +115,7 @@
                         </table>
                     </div>
                 </div>
+
             </div>
 
             <!--end row-->

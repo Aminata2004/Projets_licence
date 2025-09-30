@@ -1,5 +1,6 @@
 <?php $this->view('admin/partials/header') ?>
-  <?php $user = new Configuration($_SESSION['id_utilisateur']) ?>
+<?php $user = new Configuration($_SESSION['id_utilisateur']) ?>
+
 <body>
     <!--start wrapper-->
     <div class="wrapper">
@@ -54,54 +55,63 @@
                                         </a>
                                     </li>
                                 <?php endif; ?>
-                                <?php if ($user->userHasPermission('Billets_creation')) { ?>
-                                <li class="nav-item">
-                                    <a class="nav-link text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
-                                    </a>
-                                </li>
-                                 <?php }
-        ?>
-  <?php if ($user->userHasPermission('Billets_creation')) { ?>
-                                <li class="nav-item">
-                                    <a class="nav-link active text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                                    </a>
-                                </li>
- <?php }
-        ?>
-                                <li class="nav-item">
-                                    <a class="nav-link text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Escale
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Trajets
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Horaire
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
-                                    </a>
-                                </li>
+                                <?php if ($user->userHasPermission('Configuration_gestion_gare')) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
+                                        </a>
+                                    </li>
+                                <?php }
+                                ?>
+                                <?php if ($user->userHasPermission('utilisateur_apercu')) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link active text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_escale')) { ?>
+
+                                    <li class="nav-item">
+                                        <a class="nav-link text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Escale
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_trajets')) { ?>
+                                    <!-- <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Trajets
+                                        </a>
+                                    </li> -->
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_horaire')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Horaire
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_car/chauffeur')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                 <?php if ($_SESSION['droit'] === 'super_admin'): ?>
                                 <li class="nav-item mt-2">
                                     <a class="nav-link  text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
@@ -109,13 +119,16 @@
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
                                     </a>
                                 </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Place limite
-                                    </a>
-                                </li>
+                                <?php endif ?>
+                                <?php if ($user->userHasPermission('Configuration_place/limite')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Place limite
+                                        </a>
+                                    </li>
+                                <?php } ?>
                             </ul>
                         </div>
                     </div>
@@ -140,7 +153,7 @@
                                         <input type="email" class="form-control" id="validationCustom02" placeholder="Email" name="emailUser" required>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <!-- <div class="col-md-6">
                                         <label for="validationCustomUsername" class="form-label fw-semibold">Mot de passe</label>
                                         <div class="input-group has-validation">
                                             <input type="password" class="form-control" name="motPasse" required>
@@ -150,7 +163,7 @@
                                     <div class="col-md-6">
                                         <label for="validationCustom03" class="form-label fw-semibold">Confirmer mot de passe</label>
                                         <input type="password" class="form-control" name="ConfirmermotPasse" required>
-                                    </div>
+                                    </div> -->
 
                                     <!-- Champ Droit -->
                                     <div class="col-md-6">

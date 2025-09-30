@@ -88,20 +88,29 @@
                                                     <select class="form-select shadow-sm" name="id_destination[]">
                                                         <option selected disabled value="">Choisir une destination</option>
                                                         <?php foreach ($destinations as $d): ?>
-                                                            <option
-                                                                value="<?= htmlspecialchars($d->idDestination) ?>"
-                                                                <?php
-                                                                if (
-                                                                    ($_SESSION['droit'] !== 'Admin' && $_SESSION['droit'] !== 'Admin_regionale')
-                                                                    || $d->idDepart != $_SESSION['ville']
-                                                                ) {
-                                                                    echo 'disabled';
-                                                                }
-                                                                ?>>
-                                                                <?= htmlspecialchars($d->idDepart . ' -> ' . $d->idDestination) ?>
-                                                            </option>
+                                                            <?php
+                                                            // Cas 1 : Admin => il voit tout
+                                                            if ($_SESSION['droit'] === 'Admin') {
+                                                                $afficher = true;
+                                                            }
+                                                            // Cas 2 : Admin_regionale => il voit uniquement les départs qui correspondent à sa ville
+                                                            elseif ($_SESSION['droit'] === 'Admin_regionale' && $d->departLocalite === $_SESSION['ville']) {
+                                                                $afficher = true;
+                                                            }
+                                                            // Cas 3 : autres => rien
+                                                            else {
+                                                                $afficher = false;
+                                                            }
+                                                            ?>
+
+                                                            <?php if ($afficher): ?>
+                                                                <option value="<?= htmlspecialchars($d->destinationLocalite) ?>">
+                                                                    <?= htmlspecialchars($d->departLocalite . ' -> ' . $d->destinationLocalite) ?>
+                                                                </option>
+                                                            <?php endif; ?>
                                                         <?php endforeach; ?>
                                                     </select>
+
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -142,8 +151,6 @@
     <!-- ✅ Script JS pour gérer la sélection de tous les checkboxes -->
     <script>
         const dateInput = document.getElementById('jourVoyage');
-
-
 
         (function initDateLimits() {
             const today = new Date();

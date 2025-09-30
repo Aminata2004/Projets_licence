@@ -48,4 +48,38 @@ class Chauffeurs_cars extends  Controller
       'listeChaufeur' => $listeChaufeur
     ]);
   }
+
+  public function update()
+  {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      $id = $_POST['id_chauffeur'];
+      $data = [
+        'nom_prenom' => $_POST['nom_prenom'],
+        'numero'     => $_POST['numero'],
+        'numero_car' => $_POST['numero_car']
+      ];
+
+      $chauffeurs_car = new Chauffeurs_car();
+      $chauffeurs_car->updateChauffeur($id, $data);
+      $chauffeurs_car->set_flash('Chauffeur mise à jour avec succès', 'info');
+      header("Location: " . BASE_URL . "/admin/Chauffeurs_cars/index");
+      exit;
+    }
+  }
+
+  public function delete($id)
+  {
+    $chauffeurs_car = new Chauffeurs_car();
+
+    if ($chauffeurs_car->deleteChauffeur($id)) {
+
+      $chauffeurs_car->set_flash("Chauffeur supprimé avec succès.", 'info');
+    } else {
+
+      $chauffeurs_car->set_flash("Erreur lors de la suppression du chauffeur.", 'info');
+    }
+
+    header("Location: " . BASE_URL . "/admin/Chauffeurs_cars/index");
+    exit;
+  }
 }

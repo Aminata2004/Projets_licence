@@ -43,10 +43,22 @@ class Programmation_voyage extends Model
 
     public function getProgrammationCars()
     {
-        $select = "liaison_car_trajet.*, programmer.*, car.*";
-        $fromAndWhere = "liaison_car_trajet 
-        INNER JOIN programmer ON liaison_car_trajet.id_trajets = programmer.idProgrammer
-        INNER JOIN car ON liaison_car_trajet.id_car = car.id_car";
+        // $select = "liaison_car_trajet.*, programmer.*, car.*";
+        // $fromAndWhere = "liaison_car_trajet 
+        // INNER JOIN programmer ON liaison_car_trajet.id_trajets = programmer.idProgrammer
+        // INNER JOIN car ON liaison_car_trajet.id_car = car.id_car";
+        $select = "liaison_car_trajet.*, 
+           programmer.*, 
+           car.*, 
+           a1.localite AS departLocalite, 
+           a2.localite AS destinationLocalite";
+
+$fromAndWhere = "liaison_car_trajet
+    INNER JOIN programmer ON liaison_car_trajet.id_trajets = programmer.idProgrammer
+    INNER JOIN car ON liaison_car_trajet.id_car = car.id_car
+    LEFT JOIN agence a1 ON programmer.idDepart = a1.idAgence
+    LEFT JOIN agence a2 ON programmer.idDestination = a2.idAgence";
+
 
         $where = "";
         $params = [];

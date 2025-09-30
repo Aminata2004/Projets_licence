@@ -1,5 +1,7 @@
 <!--<< All JS Plugins >>-->
 <?php $this->view('site/partials/header') ?>
+<!-- Bootstrap CSS -->
+
 
 <style>
     /* Animation hover card */
@@ -132,59 +134,9 @@
                             </button>
                         </div>
                     </div>
-                    <p class="text d-none d-xl-block">
-                        Nullam dignissim, ante scelerisque the is euismod fermentum odio sem semper the is erat, a
-                        feugiat leo urna eget eros. Duis Aenean a imperdiet risus.
-                    </p>
+                 
                     <div class="mobile-menu fix mb-3"></div>
-                    <div class="offcanvas__contact">
-                        <h4>Contact Info</h4>
-                        <ul>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon">
-                                    <i class="fal fa-map-marker-alt"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a target="_blank" href="#">Main Street, Melbourne, Australia</a>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon mr-15">
-                                    <i class="fal fa-envelope"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a href="mailto:info@example.com"><span
-                                            class="mailto:info@example.com">info@example.com</span></a>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon mr-15">
-                                    <i class="fal fa-clock"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a target="_blank" href="#">Mod-friday, 09am -05pm</a>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon mr-15">
-                                    <i class="far fa-phone"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a href="tel:+11002345909">+11002345909</a>
-                                </div>
-                            </li>
-                        </ul>
-                        <div class="header-button mt-4">
-                            <a href="contact.html" class="theme-btn"> Request A Quote <i
-                                    class="fa-sharp fa-regular fa-arrow-right"></i></a>
-                        </div>
-                        <div class="social-icon d-flex align-items-center">
-                            <a href="#"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#"><i class="fab fa-twitter"></i></a>
-                            <a href="#"><i class="fab fa-youtube"></i></a>
-                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
+                 
                 </div>
             </div>
         </div>
@@ -207,46 +159,125 @@
     <?php $this->view('site/partials/nav') ?>
 
     <!-- Hero-Section Start -->
-<section class="hero-section position-relative d-flex align-items-center justify-content-center text-center text-dark" 
-         style="min-height: 100vh; 
-                background-image: url('https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1600&q=80');
-                background-position: center center;
-                background-size: cover;
-                background-repeat: no-repeat;">
+    <!-- Hero Slider Start -->
+    <section id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-inner">
 
-    <!-- Overlay léger -->
-    <div style="position:absolute; top:0; left:0; width:100%; height:100%; background-color: rgba(255,255,255,0.15);"></div>
-
-    <!-- Contenu central -->
-    <div class="container position-relative" style="font-family: 'Poppins', sans-serif;">
-        <div class="row">
-            <div class="col-lg-10 mx-auto">
-                <span class="sub-title text-warning fw-semibold mb-3 d-block" style="font-size: 1.5rem; letter-spacing: 1px;">
-                    ✈ Plateforme de Réservation & Suivi
-                </span>
-                <h1 class="fw-bold mb-4 display-4" style="line-height: 1.2;">
-                    Réservez vos <span class="text-warning">billets</span> facilement<br>
-                    et suivez vos <span class="text-primary">colis</span> en un clic
-                </h1>
-                <p class="lead mb-5" style="max-width: 700px; margin:auto; font-size:1.2rem;">
-                    Une solution simple, rapide et sécurisée pour gérer vos réservations et vos envois.
-                </p>
-
-                <a href="#reservation" class="btn btn-warning btn-lg px-5 me-3 shadow rounded-pill">
-                    Réserver maintenant
-                </a>
-                <a href="#colis" class="btn btn-outline-dark btn-lg px-5 rounded-pill">
-                    Suivre un colis
-                </a>
+            <!-- Slide 1 -->
+            <div class="carousel-item active">
+                <div class="hero-slide" style="background-image: url('<?php echo BASE_URL; ?>/assets_site/img/acc.png');">
+                    <div class="overlay"></div>
+                    <div class="hero-content d-flex flex-column justify-content-center align-items-center text-center">
+                        <span class="sub-title fw-semibold mb-3">
+                            <h3 class="fw-bold text-white">Plateforme de Réservation & Suivi</h3>
+                        </span>
+                        <h1 class="fw-bold mb-4 display-4 text-white">Réservez vos billets facilement</h1>
+                        <p class="lead mb-5" style="max-width: 1000px; font: size 24px;">Une solution simple, rapide et sécurisée pour gérer vos réservations et vos envois.</p>
+                        <div>
+                            <a href="#reservation" class="btn btn-warning btn-lg px-5 me-3 shadow rounded-pill btn-animate">Réserver maintenant</a>
+                            <a href="#colis" class="btn btn-outline-light btn-lg px-5 rounded-pill btn-animate">Suivre un colis</a>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Slide 2 -->
+            <div class="carousel-item">
+                <div class="hero-slide" style="background-image: url('<?php echo BASE_URL; ?>/assets_site/img/colis.png');">
+                    <div class="overlay"></div>
+                    <div class="hero-content d-flex flex-column justify-content-center align-items-center text-center">
+                        <span class="sub-title fw-semibold mb-3">
+                            <h3 class="fw-bold text-white">Plateforme de Réservation & Suivi</h3>
+                        </span>
+                        <h1 class="fw-bold mb-4 display-4 text-white">Suivez vos colis en temps réel</h1>
+                        <p class="lead mb-5" style="max-width: 700px;">Gardez toujours un œil sur vos envois grâce à notre suivi intelligent.</p>
+                        <div>
+                            <a href="#reservation" class="btn btn-warning btn-lg px-5 me-3 shadow rounded-pill btn-animate">Réserver maintenant</a>
+                            <a href="#colis" class="btn btn-outline-light btn-lg px-5 rounded-pill btn-animate">Suivre un colis</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </div>
-</section>
 
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </section>
 
+    <style>
+        /* Hero Slide */
+        .hero-slide {
+            position: relative;
+            height: 100vh;
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
 
+        /* Overlay très léger */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
 
+        /* Contenu centré verticalement */
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            padding: 0 15px;
+            color: #fff;
+            /* tout le texte en blanc */
+        }
 
+        /* Animation fade-in */
+        .fade-in {
+            animation: fadeInUp 1.2s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Boutons animés */
+        .btn-animate {
+            transition: all 0.3s ease;
+        }
+
+        .btn-animate:hover {
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2rem !important;
+            }
+
+            .hero-content p {
+                font-size: 1rem !important;
+            }
+        }
+    </style>
 
     <!-- Destination Section Start -->
     <section class="destination-section section-padding fix bg-white" id="compagnies">
@@ -473,5 +504,7 @@
             },
         });
     </script>
+    <!-- Bootstrap JS Bundle (inclut Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <?php $this->view('site/partials/foot') ?>

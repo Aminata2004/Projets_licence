@@ -58,4 +58,20 @@
                 }
             }
         }
+
+        public function updateCar($id, $data) {
+        $stmt = $this->connect()->prepare("UPDATE car SET numero_car = :numero, matriculle = :matriculle, nbr_place = :places WHERE id_car = :id");
+        $stmt->bindParam(':numero', $data['numero_car']);
+        $stmt->bindParam(':matriculle', $data['matricule']);
+        $stmt->bindParam(':places', $data['nbr_place']);
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
+    }
+
+        public function deleteCar($id) {
+        $stmt = $this->connect()->prepare("DELETE FROM car WHERE id_car = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
     }

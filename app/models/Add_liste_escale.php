@@ -49,4 +49,21 @@
                 }
             }
         }
+
+        public function updateEscale($id, $nom)
+        {
+            $sql = "UPDATE escale SET escales = :nom WHERE id_escale = :id";
+            $stmt = $this->connect()->prepare($sql);
+            $stmt->bindValue(':nom', $nom, PDO::PARAM_STR);
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
+        }
+
+        public function deleteEscale($id)
+        {
+            $sql = "DELETE FROM escale WHERE id_escale = :id";
+            $stmt = $this->connect()->prepare($sql);
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
+        }
     }

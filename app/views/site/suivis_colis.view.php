@@ -1,5 +1,6 @@
 <!--<< All JS Plugins >>-->
 <?php $this->view('site/partials/header') ?>
+
 <body>
     <!-- Preloader Start -->
     <div id="preloader" class="preloader">
@@ -139,17 +140,22 @@
     </div>
     <!-- header-top -->
     <?php $this->view('site/partials/nav') ?>
-    <!-- Breadcrumb-Section Start -->
     <section class="breadcrumb-wrapper fix bg-cover"
-        style="background-image: url(<?= BASE_URL ?>/assets_site/img/breadcrumb/breadcrumb.jpg);">
+        style="background-image: url('<?= BASE_URL ?>/assets_site/img/Suividecolis.png');
+          background-size: cover;
+           background-position: center;
+           width: 100%;
+           height: 700px; 
+          display: flex;
+         align-items: center; 
+         ">
+
         <div class="container">
             <div class="row">
                 <div class="page-heading">
                     <h2>Suivis Colis</h2>
                     <ul class="breadcrumb-list">
-                        <li>
-                            <a href="index.html">Accueil</a>
-                        </li>
+                        <li><a href="index.html">Accueil</a></li>
                         <li><i class="fa-solid fa-chevrons-right"></i></li>
                         <li class="active">reserver</li>
                     </ul>
@@ -157,6 +163,9 @@
             </div>
         </div>
     </section>
+
+
+
     <!-- Destination Section 2 Start -->
     <section class="section-padding bg-light">
         <div class="container">

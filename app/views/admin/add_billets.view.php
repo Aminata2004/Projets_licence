@@ -77,10 +77,20 @@
                                                         <option value="">Choisissez une destination</option>
                                                         <?php foreach ($destinations as $i => $dest): ?>
                                                             <option value="<?= $i ?>" data-id="<?= $dest['nom'] ?>">
-                                                                <?= htmlspecialchars($dest['nom']) ?>
+                                                                <?= htmlspecialchars($dest['nom'] ) ?>
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </select>
+
+                                                    <!-- <select class="form-select" name="destination" id="destinationSelect">
+    <option value="">Choisissez une destination</option>
+    <?php foreach ($destinations as $dest): ?>
+        <option value="<?= htmlspecialchars($dest['idProgrammer']) ?>" data-id="<?= htmlspecialchars($dest['destinationLocalite']) ?>">
+            <?= htmlspecialchars($dest['destinationLocalite']) ?>
+        </option>
+    <?php endforeach; ?>
+</select> -->
+
 
                                                     <div class="invalid-feedback">
                                                         Veuillez choisir la destination du client.

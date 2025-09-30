@@ -1,6 +1,5 @@
 <?php $this->view('admin/partials/header') ?>
-<!-- Inclure Select2 CSS et JS -->
-<!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
+ <?php $user = new Configuration($_SESSION['id_utilisateur']) ?>
 
 <body>
     <!--start wrapper-->
@@ -23,7 +22,7 @@
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
                             </li>
-                            <li class="breadcrumb-item active" aria-current="page">Utilisateur</li>
+                            <li class="breadcrumb-item active" aria-current="page">Gestion des trajets</li>
                         </ol>
                     </nav>
                 </div>
@@ -114,13 +113,21 @@
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleDangerModal">
-                            + Ajouter
+                                 <div class="d-flex gap-2">
+
+                        <!-- Bouton Ajouter -->
+                        <button type="button" class="btn btn-success d-flex align-items-center gap-2 shadow-sm"
+                            data-bs-toggle="modal" data-bs-target="#exampleDangerModal">
+                            <i class="bx bx-plus-circle fs-5"></i> Ajouter
                         </button>
 
-                        &nbsp;
-                        <a href="javascript:history.back()" class="btn btn-primary split-bg-primary"><i
-                                class="fadeIn animated bx bx-left-arrow-alt"></i></a>
+                        <!-- Bouton Retour -->
+                        <a href="javascript:history.back()"
+                            class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm">
+                            <i class="bx bx-left-arrow-alt fs-5"></i> Retour
+                        </a>
+
+                    </div>
 
                     </div>
                 </div>
@@ -145,63 +152,79 @@
                                         </a>
                                     </li>
                                 <?php endif; ?>
-                                <li class="nav-item">
-                                    <a class="nav-link text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                                    </a>
-                                </li>
+                                <?php if ($user->userHasPermission('Configuration_gestion_gare')) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('utilisateur_apercu')) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link  text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_escale')) { ?>
 
-                                <li class="nav-item">
-                                    <a class="nav-link  text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Escale
-                                    </a>
-                                </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link  text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Escale
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_trajets')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link active text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Trajets
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_horaire')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break mb-0" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Horaire
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if ($user->userHasPermission('Configuration_gestion_car/chauffeur')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                 <?php if ($_SESSION['droit'] === 'super_admin'): ?>
                                 <li class="nav-item mt-2">
-                                    <a class="nav-link active text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Trajets
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Horaire
-                                    </a>
-                                </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
-                                    </a>
-                                </li>
-  <li class="nav-item mt-2">
                                     <a class="nav-link  text-break mb-0" role="tab"
                                         aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
                                         aria-selected="true">
                                         <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
                                     </a>
                                 </li>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Place limite
-                                    </a>
-                                </li>
+<?php endif?>
+                                <?php if ($user->userHasPermission('Configuration_place/limite')) { ?>
+                                    <li class="nav-item mt-2">
+                                        <a class="nav-link  text-break" role="tab"
+                                            aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
+                                            aria-selected="true">
+                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Place limite
+                                        </a>
+                                    </li>
+                                <?php } ?>
                             </ul>
                         </div>
                     </div>
@@ -236,8 +259,11 @@
                                                             &#8943; <!-- Trois points horizontaux -->
                                                         </a>
                                                         <div class="dropdown-menu dropdown-menu-end">
-                                                            <a class="dropdown-item" href="#">Modifier</a>
-                                                            <a class="dropdown-item" href="#">Désactiver</a>
+                                                            <a class="dropdown-item" href="#">Details</a>
+                                                            <a class="dropdown-item text-danger delete-button"
+                                                                href="<?= BASE_URL ?>/admin/Add_liste_trajets/delete/<?= $listes->idTrajet ?>">
+                                                                🗑 Supprimer
+                                                            </a>
                                                         </div>
                                                     </div>
                                                 </td>

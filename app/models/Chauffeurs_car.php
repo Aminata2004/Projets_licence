@@ -21,7 +21,7 @@
             if (empty($id_car)) {
                 $errors[] = "Le car qu il conduit est obligatoire.";
             }
-            
+
             // Si aucune erreur, on procède à l'insertion
             if (count($errors) === 0) {
                 $insertion = $this->insertion_update_simples(
@@ -31,7 +31,7 @@
                         ":nom_prenom" => $nom_prenom,
                         ":numero" => $numero,
                         ":id_car"  => $id_car,
-                        ":id_compagnie"=>$id_compagnie
+                        ":id_compagnie" => $id_compagnie
                     ]
                 );
 
@@ -47,4 +47,21 @@
                 }
             }
         }
+
+
+        public function updateChauffeur($id, $data)
+        {
+            $stmt = $this->connect()->prepare("UPDATE chauffeur SET nom_prenom = :nom, numero = :numero WHERE id_chauffeur = :id");
+            $stmt->bindParam(':nom', $data['nom_prenom']);
+            $stmt->bindParam(':numero', $data['numero']);
+            // $stmt->bindParam(':car', $data['numero_car']);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
+        }
+
+         public function deleteChauffeur($id) {
+        $stmt = $this->connect()->prepare("DELETE FROM chauffeur WHERE id_chauffeur = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
     }

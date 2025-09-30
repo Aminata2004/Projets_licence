@@ -1,180 +1,86 @@
- <footer class="footer-section fix footer-3 section-padding pb-0">
-        <div class="container">
-            <div class="footer-top style-new">
-                <div class="logo-items">
-                    <a href="index.html">
-                        <img src="assets_site/img/logo/white-logo.svg" alt="img">
-                    </a>
-                </div>
-                <div class="contact-info">
-                    <div class="contact-items">
-                        <div class="icon">
-                            <i class="fa-solid fa-phone"></i>
-                        </div>
-                        <div class="content">
-                            <h6><a href="tel:+10987654321">+256 214 203 216</a></h6>
-                        </div>
-                    </div>
-                    <div class="contact-items">
-                        <div class="icon">
-                            <i class="fa-regular fa-envelope"></i>
-                        </div>
-                        <div class="content">
-                            <h6><a href="mailto:info@touron.com">info-help@travo.com</a></h6>
-                        </div>
-                    </div>
-                    <div class="contact-items">
-                        <div class="icon">
-                            <i class="fa-regular fa-location-dot"></i>
-                        </div>
-                        <div class="content">
-                            <h6>Niagara Falls, Banff and Jasper <br> National Park</h6>
-                        </div>
-                    </div>
-                </div>
+<footer class="footer-section fix footer-3 section-padding pb-0">
+    <div class="container">
+        <!-- Footer Haut : Logo + Contact -->
+        <div class="footer-top style-new d-flex flex-column flex-md-row justify-content-between align-items-start mb-5">
+            <div class="logo-items mb-3">
+                <a href="index.html">
+                    <img src="assets_site/img/logo/white-logo.svg" alt="Logo">
+                </a>
             </div>
-            <div class="footer-widget-wrapper-new style-2 style-new-area">
-                <div class="row">
-                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 wow fadeInUp wow" data-wow-delay=".2s">
-                        <div class="single-widget-items">
-                            <div class="footer-content style-3">
-                                <h3>Subscribe Newsletter</h3>
-                                <p>Get Our Latest Deals and Update</p>
-                                <div class="footer-input style-3">
-                                    <input type="email" id="email2" placeholder="Your email address">
-                                    <button class="newsletter-btn theme-btn" type="submit">
-                                        Subscribe <i class="fa-sharp fa-regular fa-arrow-right"></i>
-                                    </button>
-                                </div>
-                                <div class="social-icon style-3 d-flex align-items-center">
-                                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                                    <a href="#"><i class="fab fa-twitter"></i></a>
-                                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                                    <a href="#"><i class="fab fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 ps-lg-5 wow fadeInUp wow" data-wow-delay=".4s">
-                        <div class="single-widget-items">
-                            <div class="widget-head">
-                                <h4 class="style-3">Company</h4>
-                            </div>
-                            <ul class="list-items style-3">
-                                <li>
-                                    <a href="tour-details.html">Wanderlust Adventures</a>
-                                </li>
-                                <li>
-                                    <a href="tour-details.html">Globe Trotters Travel</a>
-                                </li>
-                                <li>
-                                    <a href="tour-details.html">Odyssey Travel Services</a>
-                                </li>
-                                <li>
-                                    <a href="tour-details.html">Jet Set Journeys</a>
-                                </li>
-                                <li>
-                                    <a href="tour-details.html">Dream Destinations Travel</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 ps-lg-5 wow fadeInUp wow" data-wow-delay=".6s">
-                        <div class="single-widget-items">
-                            <div class="widget-head">
-                                <h4 class="style-3">Quick Links</h4>
-                            </div>
-                            <ul class="list-items style-3">
-                                <li>
-                                    <a href="index.html">Home</a>
-                                </li>
-                                <li>
-                                    <a href="index.html">About Us</a>
-                                </li>
-                                <li>
-                                    <a href="news.html">Blog</a>
-                                </li>
-                                <li>
-                                    <a href="tour-details.html">Tour</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 ps-lg-5 wow fadeInUp wow" data-wow-delay=".8s">
-                        <div class="single-widget-items">
-                            <div class="widget-head">
-                                <h4 class="style-3">Gallery Post</h4>
-                            </div>
-                            <div class="footer-gallery">
-                                <div class="gallery-wrap">
-                                    <div class="gallery-item">
-                                        <div class="thumb style-3">
-                                            <a href="assets_site/img/footer/gallery-1.jpg" class="img-popup">
-                                                <img src="assets_site/img/footer/gallery-1.jpg" alt="gallery-img">
-                                                <div class="icon">
-                                                    <i class="far fa-plus"></i>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div class="thumb style-3">
-                                            <a href="assets_site/img/footer/gallery-2.jpg" class="img-popup">
-                                                <img src="assets_site/img/footer/gallery-2.jpg" alt="gallery-img">
-                                                <div class="icon">
-                                                    <i class="far fa-plus"></i>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div class="thumb style-3">
-                                            <a href="assets_site/img/footer/gallery-3.jpg" class="img-popup">
-                                                <img src="assets_site/img/footer/gallery-3.jpg" alt="gallery-img">
-                                                <div class="icon">
-                                                    <i class="far fa-plus"></i>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="gallery-item">
-                                        <div class="thumb style-3">
-                                            <a href="assets_site/img/footer/gallery-4.jpg" class="img-popup">
-                                                <img src="assets_site/img/footer/gallery-4.jpg" alt="gallery-img">
-                                                <div class="icon">
-                                                    <i class="far fa-plus"></i>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div class="thumb style-3">
-                                            <a href="assets_site/img/footer/gallery-5.jpg" class="img-popup">
-                                                <img src="assets_site/img/footer/gallery-5.jpg" alt="gallery-img">
-                                                <div class="icon">
-                                                    <i class="far fa-plus"></i>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div class="thumb style-3">
-                                            <a href="assets_site/img/footer/gallery-6.jpg" class="img-popup">
-                                                <img src="assets_site/img/footer/gallery-6.jpg" alt="gallery-img">
-                                                <div class="icon">
-                                                    <i class="far fa-plus"></i>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="contact-info d-flex flex-column flex-md-row gap-4">
+                <div class="contact-items d-flex align-items-center">
+                    <div class="icon me-2"><i class="fa-solid fa-phone"></i></div>
+                    <div class="content"><a href="tel:+256214203216">+256 214 203 216</a></div>
                 </div>
-            </div>
-            <div class="footer-bottom style-2">
-                <div class="footer-wrapper">
-                    <p class="wow fadeInUp" data-wow-delay=".3s">
-                        ©<span class="style-3">Travo</span> 2025. All Rights Reserved
-                    </p>
-                    <ul class="bottom-list wow fadeInUp" data-wow-delay=".5s">
-                        <li>Terms of use</li>
-                        <li>Privacy Environmental Policy</li>
-                    </ul>
+                <div class="contact-items d-flex align-items-center">
+                    <div class="icon me-2"><i class="fa-regular fa-envelope"></i></div>
+                    <div class="content"><a href="mailto:info-help@travo.com">info-help@travo.com</a></div>
+                </div>
+                <div class="contact-items d-flex align-items-center">
+                    <div class="icon me-2"><i class="fa-regular fa-location-dot"></i></div>
+                    <div class="content"><span>Niagara Falls, Banff et Jasper <br> Parc National</span></div>
                 </div>
             </div>
         </div>
-    </footer>
+
+        <!-- Widgets du Footer -->
+        <div class="footer-widget-wrapper-new style-2 row gy-4">
+            <!-- Newsletter -->
+            <div class="col-xl-4 col-lg-6 col-md-12">
+                <div class="single-widget-items">
+                    <h3 class="text-white">Abonnez-vous à la newsletter</h3>
+                    <p>Recevez nos dernières offres et mises à jour</p>
+                    <div class="footer-input style-3 d-flex gap-2">
+                        <input type="email" id="email2" placeholder="Votre adresse e-mail" class="form-control">
+                        <button class="newsletter-btn theme-btn" type="submit">
+                            S'abonner <i class="fa-sharp fa-regular fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="social-icon style-3 mt-3 d-flex gap-2">
+                        <a href="#"><i class="fab fa-facebook-f text-white"></i></a>
+                        <a href="#"><i class="fab fa-twitter text-white"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in text-white"></i></a>
+                        <a href="#"><i class="fab fa-instagram text-white"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compagnies -->
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="single-widget-items">
+                    <h4 class="style-3 text-white"> Nos Partenaire Compagnies</h4>
+                    <ul class="list-items style-3">
+                        <li><a href="tour-details.html">Wanderlust Adventures</a></li>
+                        <li><a href="tour-details.html">Globe Trotters Travel</a></li>
+                    
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Liens rapides -->
+            <div class="col-xl-2 col-lg-6 col-md-6">
+                <div class="single-widget-items">
+                    <h4 class="style-3 text-white">Liens rapides</h4>
+                    <ul class="list-items style-3">
+                        <li><a href="<?= BASE_URL ?>/site/Accueil">Accueil</a></li>
+                        <li><a href="#" onclick="alerteReservation(event)">Reservation</a></li>
+                        <li><a href="<?= BASE_URL ?>/site/Suivis_colis">Suivis de colis</a></li>
+                        <li><a href="<?= BASE_URL ?>/site/Reservation_formulaire">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Galerie -->
+          
+        </div>
+
+        <!-- Footer Bas -->
+        <div class="footer-bottom style-2 mt-4 pt-3 border-top d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <p>© <span class="style-3">G-compagnie</span> 2025. Tous droits réservés</p>
+            <ul class="bottom-list d-flex gap-3">
+                <li>Conditions d'utilisation</li>
+                <li>Politique de confidentialité et environnementale</li>
+            </ul>
+        </div>
+    </div>
+</footer>

@@ -2,39 +2,102 @@
     class Add_billet extends Model
     {
 
+        // public function getDestinationsWithHeuresAndEscales()
+        // {
+        //     $idDepart    = $_SESSION['ville'];
+        //     $idCompagnie = $_SESSION['id_compagnie'];
+
+        //     $sql = "SELECT DISTINCT p.idProgrammer,
+        //                 p.idDestination AS destination_nom,
+        //                 p.heureDepart,
+        //                 p.prix
+        //         FROM programmer p
+        //         WHERE p.idDepart = :idDepart
+        //           AND p.id_compagnie = :idCompagnie
+        //         ORDER BY p.idDestination, p.heureDepart";
+
+        //     $rows = $this->fetchAll($sql, [
+        //         ':idDepart' => $idDepart,
+        //         ':idCompagnie' => $idCompagnie
+        //     ]);
+
+        //     $result = [];
+
+        //     foreach ($rows as $row) {
+        //         $destNom = $row['destination_nom'];
+        //         $progId  = $row['idProgrammer'];
+
+        //         if (!isset($result[$destNom])) {
+        //             $result[$destNom] = [
+        //                 'nom' => $destNom,
+        //                 'programmes' => []
+        //             ];
+        //         }
+
+        //         $escales = $this->fetchAll(
+        //             "SELECT e.id_escale, prix_escale, e.escales AS escale_nom
+        //          FROM ligneTrajet lt
+        //          JOIN escale e ON e.id_escale = lt.id_escales
+        //          WHERE lt.id_trajets = :progId",
+        //             [':progId' => $progId]
+        //         );
+
+        //         $result[$destNom]['programmes'][] = [
+        //             'idProgrammer' => $progId,
+        //             'heureDepart' => $row["heureDepart"],
+        //             'prix'        => $row['prix'],
+        //             'escales'     => $escales
+        //         ];
+        //     }
+
+        //     return array_values($result);
+        // }
+
+
         public function getDestinationsWithHeuresAndEscales()
         {
-            $idDepart    = $_SESSION['ville'];
-            $idCompagnie = $_SESSION['id_compagnie'];
+            $idDepart    = $_SESSION['ville'] ?? null;
+            $idCompagnie = $_SESSION['id_compagnie'] ?? null;
 
-            $sql = "SELECT DISTINCT p.idProgrammer,
-                        p.idDestination AS destination_nom,
-                        p.heureDepart,
-                        p.prix
-                FROM programmer p
-                WHERE p.idDepart = :idDepart
-                  AND p.id_compagnie = :idCompagnie
-                ORDER BY p.idDestination, p.heureDepart";
+            if (!$idDepart || !$idCompagnie) return [];
+
+            // Récupère les programmes avec les noms de localité
+            $sql = "SELECT 
+                p.idProgrammer,
+                p.heureDepart,
+                p.prix,
+                a1.localite AS departLocalite,
+                 a1.numeroGare AS departnumeroGare,
+                a2.localite AS destinationLocalite
+            FROM programmer p
+            LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
+            LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
+            WHERE a1.localite = :departLocalite
+              AND p.id_compagnie = :idCompagnie
+           ";
 
             $rows = $this->fetchAll($sql, [
-                ':idDepart' => $idDepart,
+                ':departLocalite' => $idDepart,
                 ':idCompagnie' => $idCompagnie
             ]);
 
             $result = [];
 
             foreach ($rows as $row) {
-                $destNom = $row['destination_nom'];
+                $destNom = $row['destinationLocalite'] ?? $row['idDestination'];
                 $progId  = $row['idProgrammer'];
+                $departnumeroGare= $row['departnumeroGare'] ?? null;
 
                 if (!isset($result[$destNom])) {
                     $result[$destNom] = [
                         'nom' => $destNom,
+                        'departLocalite' => $row['departLocalite'],
+                        'departnumeroGare' => $departnumeroGare,
                         'programmes' => []
                     ];
                 }
 
-                $escales = $this->fetchAll(
+              $escales = $this->fetchAll(
                     "SELECT e.id_escale, prix_escale, e.escales AS escale_nom
                  FROM ligneTrajet lt
                  JOIN escale e ON e.id_escale = lt.id_escales
@@ -44,14 +107,18 @@
 
                 $result[$destNom]['programmes'][] = [
                     'idProgrammer' => $progId,
-                    'heureDepart' => $row["heureDepart"],
-                    'prix'        => $row['prix'],
-                    'escales'     => $escales
+                    'heureDepart'  => $row["heureDepart"],
+                    'prix'         => $row['prix'],
+                    'depart'       => $row['departLocalite'],
+                    'destination'  => $row['destinationLocalite'],
+                    'escales'      => $escales
                 ];
             }
 
+            // Retourne un tableau indexé pour le foreach
             return array_values($result);
         }
+
 
         // public function saveBillets(): bool
         // {

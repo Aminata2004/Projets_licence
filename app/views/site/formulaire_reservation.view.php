@@ -1,6 +1,6 @@
 <!--<< All JS Plugins >>-->
 <?php $this->view('site/partials/header') ?>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
 <style>
     .object-fit-cover {
@@ -149,7 +149,7 @@
     <?php $this->view('site/partials/nav') ?>
     <!-- Breadcrumb-Section Start -->
     <section class="breadcrumb-wrapper fix bg-cover"
-        style="background-image: url(<?= BASE_URL ?>/assets_site/img/breadcrumb/breadcrumb.jpg);">
+        style="background-image: url(<?= BASE_URL ?>/assets_site/img/reservation.png);  background-size: cover;background-position: center;width: 100%;height: 700px; display: flex;align-items: center; ">
         <div class="container">
             <div class="row">
                 <div class="page-heading">
@@ -170,9 +170,9 @@
     $t = $trajet ?? [];
     ?>
     <?php $this->view("admin/helpers") ?>
-    <section class="tour-section section-padding fix bg-light">
+    <section class="tour-section section-padding bg-light">
         <div class="container">
-            <div class="row align-items-center shadow rounded-4 overflow-hidden bg-white">
+            <div class="row align-items-center rounded-4 overflow-hidden bg-white">
                 <!-- Image à gauche -->
                 <div class="col-md-6 p-0">
                     <div class="ratio ratio-1x1 ratio-md-16x9">
@@ -182,43 +182,57 @@
                             style="object-fit: cover;">
                     </div>
                 </div>
+
                 <!-- Formulaire de réservation -->
                 <div class="col-md-6 p-5">
-                    <div class="card border-0 shadow" style="box-shadow: 0 4px 20px rgba(0, 123, 255, 0.2);">
+                    <div class="card border-0" style="border-radius: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);">
                         <div class="card-body">
                             <h3 class="text-primary fw-bold mb-4">Planifiez votre prochaine aventure</h3>
                             <form method="post" action="">
                                 <div class="row g-3">
+
                                     <!-- Départ -->
                                     <div class="col-12 col-md-6">
                                         <label class="form-label fw-semibold">Départ</label>
-                                        <input type="text" name="departId" value="<?= htmlspecialchars($t['depart'] ?? '') ?>" class="form-control rounded-pill" readonly>
+                                        <input type="text" name=""
+                                            value="<?= htmlspecialchars($t['depart'] . ' ( ' . $t['numeroGare1']  . ' ) ' ?? '') ?>"
+                                            class="form-control border border-secondary"
+                                            style="border-radius: 8px;" readonly>
+                                            <input type="hidden" name="departId" value="<?= htmlspecialchars($t['depart'] ?? '') ?>">
+                                            <input type="hidden" name="numeroGare" value="<?= htmlspecialchars($t['numeroGare1'] ?? '') ?>">
+
                                     </div>
 
                                     <!-- Destination & Escales -->
                                     <div class="col-12 col-md-6">
                                         <label class="form-label fw-semibold">Destination & Escales</label>
-                                        <input type="text" name="destinationId" value="<?= htmlspecialchars($t['destination'] ?? '') ?>" class="form-control mb-2 rounded-pill" readonly>
+                                        <input type="text" name=""
+                                            value="<?= htmlspecialchars($t['destination'] . ' ( ' . $t['numeroGare1']  . ' ) ' ?? '') ?>"
+                                            class="form-control border border-secondary mb-2"
+                                            style="border-radius: 8px;" readonly>
+                                            <input type="hidden" name="destinationId" value="<?= htmlspecialchars($t['destination'] ?? '') ?>">
                                         <input type="hidden" name="id_compagnie" value="<?= htmlspecialchars($t['id_compagnie'] ?? '') ?>">
+
                                         <p class="text-muted mb-2" style="font-size: 0.85rem;">Sélectionnez une escale optionnelle :</p>
                                         <?php
                                         if (!empty($t['escales_avec_frais'])) {
-                                            $escales = explode(' - ', $t['escales_avec_frais']);
+                                            $escales = explode(', ', $t['escales_avec_frais']); // <-- CORRECT: ', ' au lieu de ' - '
                                             foreach ($escales as $index => $escale) {
                                                 if (preg_match('/^(.*?)\s*\((\d+)\s*FCFA\)/', $escale, $matches)) {
                                                     $ville = trim($matches[1]);
                                                     $prix = intval($matches[2]);
                                                 } else {
+                                                    continue;
                                                 }
                                         ?>
                                                 <div class="form-check mb-1">
                                                     <input class="form-check-input escale-radio" type="radio" name="escale_finale" id="escale_<?= $index ?>" value="<?= htmlspecialchars($ville) ?>" data-prix="<?= $prix ?>">
-                                                    <label class="form-check-label" for="escale_<?= $index ?>"><?= htmlspecialchars($ville) ?> (<?= number_format($prix) ?> FCFA)</label>
+                                                    <label class="form-check-label fw-medium" for="escale_<?= $index ?>"><?= htmlspecialchars($ville) ?> (<?= number_format($prix) ?> FCFA)</label>
                                                 </div>
                                         <?php
                                             }
                                         } else {
-                                            echo '<p class="text-muted">Pas d\'escale disponible</p>';
+                                            echo '<p class="text-muted fst-italic">Pas d\'escale disponible</p>';
                                         }
                                         ?>
 
@@ -227,73 +241,66 @@
                                     <!-- Jour et heure -->
                                     <div class="col-12 col-md-6">
                                         <label class="form-label fw-semibold">Jour du voyage</label>
-                                        <input type="date" name="jourVoyage" class="form-control rounded-pill">
+                                        <?php
+                                        $today = date('Y-m-d');
+                                        $tomorrow = date('Y-m-d', strtotime('+1 day'));
+                                        ?>
+                                        <input type="date" name="jourVoyage"
+                                            class="form-control border border-secondary"
+                                            style="border-radius: 8px;"
+                                            min="<?= $today ?>"
+                                            max="<?= $tomorrow ?>"
+                                            value="<?= $today ?>">
+
                                     </div>
                                     <div class="col-12 col-md-6">
                                         <label class="form-label fw-semibold">Heure de départ</label>
-                                        <input type="text" name="Heur_departs" value="<?= htmlspecialchars($t['heure_depart'] ?? '') ?>" class="form-control rounded-pill" readonly>
+                                        <input type="text" name="Heur_departs" value="<?= htmlspecialchars($t['heure_depart'] ?? '') ?>" class="form-control border border-secondary" style="border-radius: 8px;" readonly>
                                     </div>
 
                                     <!-- Infos client -->
                                     <div class="col-12 col-md-6">
                                         <label class="form-label fw-semibold">Nom & Prénom</label>
-                                        <input type="text" name="Client" class="form-control rounded-pill" placeholder="Ex: Jean Dupont">
+                                        <input type="text" name="Client" class="form-control border border-secondary" style="border-radius: 8px;" placeholder="Ex: Diallo Aminata" required>
                                     </div>
                                     <div class="col-12 col-md-6">
                                         <label class="form-label fw-semibold">Nombre de passagers</label>
-                                        <input type="number" name="nombrePassages" id="nombrePassages"
-                                            class="form-control rounded-pill" min="1" value="1" placeholder="1">
+                                        <input type="number" name="nombrePassages" id="nombrePassages" class="form-control border border-secondary" style="border-radius: 8px;" min="1" value="1" placeholder="1">
                                     </div>
 
-                                    <div class="col-12 col-md-6 mb-3">
+                                    <div class="col-12 col-md-6">
                                         <label class="form-label fw-semibold">Téléphone</label>
-                                        <input type="text" id="numeroClient" name="numeroClient"
-                                            class="form-control rounded-pill border-primary"
-                                            placeholder="77 78 88 88" required>
+                                        <input type="text" id="numeroClient" name="numeroClient" class="form-control border border-secondary" style="border-radius: 8px;" placeholder="77 78 88 88" required>
                                     </div>
-
 
                                     <div class="col-12 col-md-6">
                                         <label class="form-label fw-semibold">Email</label>
-                                        <input type="email" name="emailClient" class="form-control rounded-pill" placeholder="exemple@mail.com">
+                                        <input type="email" name="emailClient" class="form-control border border-secondary" style="border-radius: 8px;" placeholder="exemple@mail.com">
                                     </div>
 
                                     <!-- Paiement -->
-
-
-
-
-                                    <div class="col-12 col-md-6 mb-3">
+                                    <div class="col-12 col-md-6">
                                         <label class="form-label fw-semibold">Numéro de paiement</label>
-                                        <input type="text" id="numeroPaiement" name="numeroPaiement"
-                                            class="form-control rounded-pill border-primary"
-                                            placeholder="66 77 88 99" required>
+                                        <input type="text" id="numeroPaiement" name="numeroPaiement" class="form-control border border-secondary" style="border-radius: 8px;" placeholder="66 77 88 99" required>
                                     </div>
-
-
-
 
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Code marchand</label>
-                                        <input type="text" name="code_marchand" class="form-control rounded-pill" placeholder="#123456">
+                                        <label class="form-label fw-semibold">Code marchand du gare</label>
+                                        <input type="text" name="code_marchand" class="form-control border border-secondary" style="border-radius: 8px;" value="<?= htmlspecialchars($t['codeDepart'] ?? '') ?>" readonly>
                                     </div>
 
-                                    <!-- Infos supplémentaires -->
+                                    <!-- Prix et billets -->
                                     <div class="col-12 col-md-6">
                                         <label class="form-label fw-semibold">Prix total</label>
-                                        <input type="text" name="montant_payer" id="montant_payer"
-                                            value="<?= htmlspecialchars($t['prix'] ?? '') ?>"
-                                            class="form-control rounded-pill" readonly>
+                                        <input type="text" name="montant_payer" id="montant_payer" value="<?= htmlspecialchars($t['prix'] ?? '') ?>" class="form-control border border-secondary" style="border-radius: 8px;" readonly>
                                     </div>
-
-
                                     <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Numero de billets</label>
-                                        <input type="text" name="numeroBillets" class="form-control rounded-pill" value="<?= genererNumeroBillet() ?>" placeholder="#123456" readonly>
+                                        <label class="form-label fw-semibold">Numéro de billets</label>
+                                        <input type="text" name="numeroBillets" class="form-control border border-secondary" style="border-radius: 8px;" value="<?= genererNumeroBillet() ?>" readonly>
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary w-100 py-3 mt-4 rounded-pill" name="reserver">
+                                <button type="submit" class="btn btn-primary w-100 py-3 mt-4 fw-bold" style="border-radius: 8px;" name="reserver">
                                     Réserver maintenant
                                     <img src="<?= BASE_URL ?>/assets_site/img/icon/white-arrow.svg" alt="→" class="ms-2">
                                 </button>
@@ -302,11 +309,9 @@
                     </div>
                 </div>
 
-
-
             </div>
-        </div>
     </section>
+
 
     <!-- Footer-Section Start -->
     <script>
@@ -375,21 +380,38 @@
         formatMaliPhone('numeroClient');
         formatMaliPhone('numeroPaiement');
 
-
         document.addEventListener('DOMContentLoaded', function() {
-            // Récupère le prix de base (prix unitaire) depuis le champ "montant_payer"
-            const prixUnitaire = parseFloat(document.getElementById('montant_payer').value) || 0;
-            const nombrePassagesInput = document.getElementById('nombrePassages');
             const montantPayerInput = document.getElementById('montant_payer');
+            const nombrePassagesInput = document.getElementById('nombrePassages');
+            const radios = document.querySelectorAll('.escale-radio');
 
-            // Ajoute un écouteur d'événement sur le champ nombre de passagers
-            nombrePassagesInput.addEventListener('input', function() {
-                let nombre = parseInt(this.value) || 0;
-                let total = prixUnitaire * nombre;
-                montantPayerInput.value = total.toLocaleString('fr-FR'); // Format : 12 000
+            // Prix de base du trajet (sans escale)
+            let prixBase = <?= intval($t['prix'] ?? 0) ?>;
+            let prixUnitaire = prixBase; // initialisation
+
+            // Fonction pour mettre à jour le total
+            function updateTotal() {
+                const nombre = parseInt(nombrePassagesInput.value) || 1;
+                montantPayerInput.value = (prixUnitaire * nombre).toLocaleString('fr-FR');
+            }
+
+            // Écouteur sur les escales
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const prixEscale = parseInt(this.dataset.prix) || 0;
+                    prixUnitaire = prixEscale; // on prend uniquement le prix de l’escale
+                    updateTotal();
+                });
             });
+
+            // Écouteur sur le nombre de passagers
+            nombrePassagesInput.addEventListener('input', updateTotal);
+
+            // Initialisation du champ montant
+            updateTotal();
         });
     </script>
+
 
 
 

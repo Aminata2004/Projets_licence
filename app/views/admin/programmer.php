@@ -51,12 +51,23 @@
                                     <label for="bsValidation1" class="form-label">Depart<span
                                             class="text-danger scale5 ms-2">*</span></label>
                                     <select id="choixAgence" name="idDepart" class="form-control">
-                                        <option> Selectionner le depart</option> <!-- option vide pour permettre le placeholder -->
+                                        <option></option> <!-- option vide pour permettre le placeholder -->
                                         <?php
-               
-                                        foreach ($liste_agence as $liste_agences):?>
-                                            <option value="<?= htmlspecialchars($liste_agences->idAgence ); ?>">
-                                                <?= htmlspecialchars($liste_agences->localite . '  ( ' .    $liste_agences->numeroGare . ' )'); ?>
+                                        $localites_vues = []; // tableau pour suivre les localités déjà affichées
+
+                                        foreach ($liste_agence as $liste_agences):
+                                            $localite = $liste_agences->localite;
+
+                                            // Vérifie si cette localité a déjà été affichée
+                                            if (in_array($localite, $localites_vues)) {
+                                                continue; // on saute si elle est déjà dans la liste
+                                            }
+
+                                            // Sinon, on l'affiche et on la marque comme vue
+                                            $localites_vues[] = $localite;
+                                        ?>
+                                            <option value="<?= htmlspecialchars($localite); ?>">
+                                                <?= htmlspecialchars($localite); ?>
                                             </option>
                                         <?php endforeach; ?>
 
@@ -88,12 +99,23 @@
                                     <label for="bsValidation1" class="form-label">Destination<span
                                             class="text-danger scale5 ms-2">*</span></label>
                                     <select id="choixAgences" name="idDestination" class="form-control">
-                                        <option> Selectionner la destination</option> <!-- option vide pour permettre le placeholder -->
+                                        <option></option> <!-- option vide pour permettre le placeholder -->
                                         <?php
-                      
-                                         foreach ($liste_agence as $liste_agences):?>
-                                            <option value="<?= htmlspecialchars($liste_agences->idAgence ); ?>">
-                                                <?= htmlspecialchars($liste_agences->localite . '  ( ' .    $liste_agences->numeroGare . ' )'); ?>
+                                        $localites_vues = []; // tableau pour suivre les localités déjà affichées
+
+                                        foreach ($liste_agence as $liste_agences):
+                                            $localite = $liste_agences->localite;
+
+                                            // Vérifie si cette localité a déjà été affichée
+                                            if (in_array($localite, $localites_vues)) {
+                                                continue; // on saute si elle est déjà dans la liste
+                                            }
+
+                                            // Sinon, on l'affiche et on la marque comme vue
+                                            $localites_vues[] = $localite;
+                                        ?>
+                                            <option value="<?= htmlspecialchars($localite); ?>">
+                                                <?= htmlspecialchars($localite); ?>
                                             </option>
                                         <?php endforeach; ?>
 
