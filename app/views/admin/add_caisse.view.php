@@ -1,4 +1,4 @@
-<?php $this->view('admin/partials/header') ?>
+<?php $this->view('admin/partials/headers') ?>
 
 <body>
     <!--start wrapper-->
@@ -15,13 +15,13 @@
         <main class="page-content">
             <!--breadcrumb-->
             <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-                <div class="breadcrumb-title pe-3">Configuration</div>
+                <div class="breadcrumb-title pe-3">Gestion des caisses</div>
                 <div class="ps-3">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
                             </li>
-                            <li class="breadcrumb-item active" aria-current="page">Utilisateur</li>
+                            <li class="breadcrumb-item active" aria-current="page">Ajout </li>
                         </ol>
                     </nav>
                 </div>
@@ -40,7 +40,7 @@
                     <?php $this->view("admin/set_flash") ?>
                     <div class="card shadow-lg rounded-3 border-0">
                         <div class="card-header d-flex justify-content-between align-items-center rounded-top border-bottom">
-                            <h5 class="mb-0 fw-bold">Espace d'enregistrement des caisse</h5>
+                            <h5 class="mb-0 fw-bold text-primary">Espace d'enregistrement des caisse</h5>
                         </div>
                         <div class="card-body p-4">
                             <div class="p-4 border rounded-3">

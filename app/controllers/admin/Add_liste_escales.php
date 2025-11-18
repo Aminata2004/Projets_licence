@@ -46,7 +46,7 @@ class Add_liste_escales extends  Controller
       $add_liste_escale = new Add_liste_escale();
 
       if ($id && $nom !== '') {
-      
+
         $add_liste_escale->updateEscale($id, $nom);
         $add_liste_escale->set_flash('Escale mise à jour avec succès', 'info');
       } else {
@@ -58,17 +58,17 @@ class Add_liste_escales extends  Controller
     }
   }
 
-  public function delete($id) {
+  public function delete($id)
+  {
     $add_liste_escale = new Add_liste_escale();
     if ($add_liste_escale->deleteEscale($id)) {
-      
-         $add_liste_escale->set_flash('Escale supprimée avec succès', 'info');
+
+      $add_liste_escale->set_flash('Escale supprimée avec succès', 'info');
     } else {
-       
-         $add_liste_escale->set_flash('Erreur lors de la suppression', 'info');
+
+      $add_liste_escale->set_flash('Erreur lors de la suppression', 'info');
     }
     header("Location: " . BASE_URL . "/admin/Add_liste_escales/index");
     exit;
-}
-
+  }
 }

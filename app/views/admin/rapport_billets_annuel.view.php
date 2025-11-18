@@ -168,9 +168,6 @@
             </div>
 
 
-
-
-
         </main>
 
         <!--end page main-->
@@ -187,8 +184,6 @@
     <!--end wrapper-->
 
     <?php $this->view('admin/partials/foot') ?>
-
-
 
 </body>
 

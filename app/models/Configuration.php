@@ -16,91 +16,6 @@
 
         private $idUser;
 
-        // public function saveUtilisateur()
-        // {
-        //     $errors = [];
-
-        //     extract($_POST);
-        //     $status = 1;
-
-        //     // Récupération de la compagnie de l'Admin connecté
-        //     $id_compagnie_session = $_SESSION["id_compagnie"] ?? null;
-
-        //     // Validation des champs
-        //     if (empty($utilisateurs)) {
-        //         $errors[] = "Le nom de l'utilisateur est obligatoire.";
-        //     }
-
-        //     if (!filter_var($emailUser, FILTER_VALIDATE_EMAIL)) {
-        //         $errors[] = "L'email n'est pas valide.";
-        //     }
-
-
-
-        //     if (empty($droit)) {
-        //         $errors[] = "Le droit est obligatoire.";
-        //     }
-
-        //     if (!empty($emailUser) && $this->existe_deja('emailUser', $emailUser, 'utilisateur')) {
-        //         $errors[] = "Cet email est déjà utilisé.";
-        //     }
-
-        //     if (count($errors) === 0) {
-        //         // Générer un mot de passe aléatoire de 10 caractères
-        //         function genererMotDePasse($longueur = 10)
-        //         {
-        //             $caracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
-        //             return substr(str_shuffle(str_repeat($caracteres, $longueur)), 0, $longueur);
-        //         }
-
-        //         $motPasseGenere = genererMotDePasse(); // mot de passe en clair
-        //         $motPasseHash = password_hash($motPasseGenere, PASSWORD_DEFAULT);
-
-        //         $id_agence = $_POST['id_agence'] ?? null;
-        //         $id_compagnie = null;
-
-        //         if ($droit === 'Admin') {
-        //             $id_compagnie = $_POST['id_compagnie'] ?? null;
-        //         } else {
-        //             $id_compagnie = $id_compagnie_session;
-        //             $id_agence = $_POST['id_agence'] ?? null;
-        //         }
-
-        //         $insertion = $this->insertion_update_simples(
-        //             "INSERT INTO utilisateur (utilisateurs, emailUser, motPasse, status, id_agence, id_compagnie, droit) 
-        //  VALUES (:utilisateurs, :emailUser, :motPasse, :status, :id_agence, :id_compagnie, :droit)",
-        //             [
-        //                 ":utilisateurs"  => $utilisateurs,
-        //                 ":emailUser"     => $emailUser,
-        //                 ":motPasse"      => $motPasseHash,
-        //                 ":status"        => $status,
-        //                 ":id_agence"     => $id_agence,
-        //                 ":id_compagnie"  => $id_compagnie,
-        //                 ":droit"         => $droit
-        //             ]
-        //         );
-
-        //         if ($insertion) {
-        //             // Ici tu peux afficher ou envoyer le mot de passe généré à l’utilisateur
-        //             $this->set_swal(
-        //                 "👤 Utilisateur ajouté !",
-        //                 "L'utilisateur a été ajouté avec succès. <br> Son mot de passe est : <b>{$motPasseGenere}</b>",
-        //                 "success",
-        //                 "#0d6efd",
-        //                 BASE_URL . "/admin/Configurations/add_utilisateurs"
-        //             );
-        //         }
-        //     } else {
-        //         $errorsHtml = implode("<br>", array_map('htmlspecialchars', $errors));
-        //         $this->set_swal(
-        //             "Erreurs détectées",
-        //             $errorsHtml,
-        //             "warning",
-        //             "#ffc107" // jaune warning
-        //         );
-        //     }
-        // }
-
 
         public function saveUtilisateur()
         {
@@ -251,38 +166,36 @@
 
 
         // Récupérer les infos d’un utilisateur
-    public function getUserById($idUser)
-    {
-        $stmt = $this->connect()->prepare("SELECT * FROM utilisateur WHERE idUser = ?");
-        $stmt->execute([$idUser]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+        public function getUserById($idUser)
+        {
+            $stmt = $this->connect()->prepare("SELECT * FROM utilisateur WHERE idUser = ?");
+            $stmt->execute([$idUser]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }
 
-    // Mise à jour du mot de passe
-    public function updatePassword($idUser, $newPassword)
-    {
-        $stmt = $this->connect()->prepare("UPDATE utilisateur SET motPasse = ? WHERE idUser = ?");
-        return $stmt->execute([$newPassword, $idUser]);
-    }
-
-
-    public function getByEmail($email)
-    {
-        $sql = "SELECT * FROM utilisateur WHERE emailUser = :emailUser";
-        $stmt = $this->connect()->prepare($sql);
-        $stmt->bindParam(':emailUser', $email, PDO::PARAM_STR);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC); // Retourne un tableau ou false
-    }
-
-  public function updatePassword1($email, $newPassword)
-{
-    $sql = "UPDATE utilisateur SET motPasse = :motPasse WHERE emailUser = :emailUser";
-    $stmt = $this->connect()->prepare($sql);
-    $stmt->bindParam(':motPasse', $newPassword, PDO::PARAM_STR); // Ici $newPassword est déjà hashé
-    $stmt->bindParam(':emailUser', $email, PDO::PARAM_STR);
-    return $stmt->execute();
-}
+        // Mise à jour du mot de passe
+        public function updatePassword($idUser, $newPassword)
+        {
+            $stmt = $this->connect()->prepare("UPDATE utilisateur SET motPasse = ? WHERE idUser = ?");
+            return $stmt->execute([$newPassword, $idUser]);
+        }
 
 
+        public function getByEmail($email)
+        {
+            $sql = "SELECT * FROM utilisateur WHERE emailUser = :emailUser";
+            $stmt = $this->connect()->prepare($sql);
+            $stmt->bindParam(':emailUser', $email, PDO::PARAM_STR);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC); // Retourne un tableau ou false
+        }
+
+        public function updatePassword1($email, $newPassword)
+        {
+            $sql = "UPDATE utilisateur SET motPasse = :motPasse WHERE emailUser = :emailUser";
+            $stmt = $this->connect()->prepare($sql);
+            $stmt->bindParam(':motPasse', $newPassword, PDO::PARAM_STR); // Ici $newPassword est déjà hashé
+            $stmt->bindParam(':emailUser', $email, PDO::PARAM_STR);
+            return $stmt->execute();
+        }
     }

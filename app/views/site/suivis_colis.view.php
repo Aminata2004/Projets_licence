@@ -163,9 +163,6 @@
             </div>
         </div>
     </section>
-
-
-
     <!-- Destination Section 2 Start -->
     <section class="section-padding bg-light">
         <div class="container">

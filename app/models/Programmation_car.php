@@ -61,4 +61,10 @@ class Programmation_car extends Model
             }
         }
     }
+    public function FetchSelectCustom($query, $params = [])
+    {
+        $stmt = $this->connect()->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
 }

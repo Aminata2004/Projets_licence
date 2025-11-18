@@ -167,7 +167,7 @@
                     // Regrouper les programmes par ville de départ
                     $groupedByDepart = [];
                     foreach ($programmes as $programme) {
-                        $depart = htmlspecialchars($programme->departLocalite .'( '.  $programme->numeroGare1 . ')' ?? $programme->idDepart);
+                        $depart = htmlspecialchars($programme->departLocalite . '( ' .  $programme->numeroGare1 . ')' ?? $programme->idDepart);
                         $groupedByDepart[$depart][] = $programme;
                     }
                     ?>
@@ -208,7 +208,7 @@
                                                 data-compagnie="<?= htmlspecialchars($programme->id_compagnie) ?>"
                                                 data-escales="<?= htmlspecialchars($programme->escales_avec_frais) ?>">
 
-                                                <td><?= htmlspecialchars($programme->destinationLocalite .'( '.  $programme->numeroGare2 . ')' ?? $programme->idDestination) ?></td>
+                                                <td><?= htmlspecialchars($programme->destinationLocalite . '( ' .  $programme->numeroGare2 . ')' ?? $programme->idDestination) ?></td>
                                                 <td><?= htmlspecialchars($programme->rdv) ?></td>
                                                 <td><?= htmlspecialchars($programme->heureDepart) ?></td>
                                                 <td>
@@ -262,7 +262,6 @@
             });
         });
     </script>
-
     <!-- Un peu de style -->
     <style>
         .clickable-row:hover {

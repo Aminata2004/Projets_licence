@@ -1,8 +1,6 @@
 <!--<< All JS Plugins >>-->
 <?php $this->view('site/partials/header') ?>
 <!-- Bootstrap CSS -->
-
-
 <style>
     /* Animation hover card */
     .card:hover {
@@ -67,7 +65,6 @@
         opacity: 1;
     }
 </style>
-
 <body>
     <!-- Preloader Start -->
     <div id="preloader" class="preloader">
@@ -461,7 +458,6 @@
             </div>
         </div>
     </section>
-
     <!-- Team-Section Start -->
     <!-- Footer-Section Start -->
     <?php $this->view('site/partials/footer') ?>
@@ -506,5 +502,4 @@
     </script>
     <!-- Bootstrap JS Bundle (inclut Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <?php $this->view('site/partials/foot') ?>

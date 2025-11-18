@@ -262,8 +262,6 @@
             </div>
         </div>
     </div>
-
-
     <!-- Footer-Section Start -->
     <?php $this->view('site/partials/footer') ?>
     <!--<< All JS Plugins >>-->

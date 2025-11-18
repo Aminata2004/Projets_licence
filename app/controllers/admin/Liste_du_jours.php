@@ -130,20 +130,20 @@ class Liste_du_jours extends  Controller
     echo json_encode($heures);
   }
 
-public function reporter(){
+  public function reporter()
+  {
     $billets = new Liste_du_jour();
 
     if (isset($_POST['edit'])) {
-        $data = [
-            "jourVoyage" => $_POST['nouvelle_date'],
-            "Heur_departs" => $_POST['heure_depart'],
-            "idBillets" => $_POST['idClient'],
-        ];
+      $data = [
+        "jourVoyage" => $_POST['nouvelle_date'],
+        "Heur_departs" => $_POST['heure_depart'],
+        "idBillets" => $_POST['idClient'],
+      ];
 
-        $billets->reporte_voyage($data);
-        header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
-        exit;
+      $billets->reporte_voyage($data);
+      header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
+      exit;
     }
-}
-
+  }
 }

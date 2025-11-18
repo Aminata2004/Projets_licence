@@ -73,13 +73,14 @@
                                                 <td> Car : <?= $Select_cars->numero_car ?></td>
                                                 <td> <?= $Select_cars->nbr_place ?></td>
                                                 <td class=" ">
-                                                    <div class="dropup text-center">
+                                                    <div class="dropup ">
                                                         <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
                                                             &#8943; <!-- Trois points horizontaux -->
                                                         </a>
                                                         <div class="dropdown-menu dropdown-menu-end">
-                                                            <a class="dropdown-item" href="#">Modifier</a>
-                                                            <a class="dropdown-item" href="#">Désactiver</a>
+                                                            <a class="dropdown-item" href="#">Ajouter</a>
+                                                            <a class="dropdown-item" href="#">Supprimer</a>
+                                                            <a class="dropdown-item" href="#">Details</a>
                                                         </div>
                                                     </div>
                                                 </td>

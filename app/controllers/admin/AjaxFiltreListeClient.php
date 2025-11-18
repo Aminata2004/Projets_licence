@@ -49,4 +49,5 @@
             echo json_encode(['error' => 'Requête invalide.']);
             exit;
         }
+        
     }
