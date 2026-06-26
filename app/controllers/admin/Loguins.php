@@ -14,9 +14,8 @@ class Loguins extends Controller {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["connexion"])) {
             $model = new \Loguin();  // instancie ton modèle
             $model->connecter();
-        } else {
-            $this->view("admin/loguin");  // affiche le formulaire
         }
+        $this->view("admin/loguin");  // affiche le formulaire
     }
 }
 

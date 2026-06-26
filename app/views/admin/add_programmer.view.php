@@ -36,10 +36,10 @@
             </div>
             <!--end breadcrumb-->
             <div class="col-xl-12 mx-auto">
-                <div class="card">
+                <div class="card shadow-lg border-0 rounded-3">
 
-                    <div class="card-header bg-primary text-white px-4 py-3">
-                        <h5 class="mb-0">
+                    <div class="card-header bg-primary text-white px-4 py-3 fw-bold">
+                        <h5 class="mb-0 text-white">
                             <i class="bi bi-calendar-check me-2"></i> Gestion du programme de voyage
                         </h5>
                     </div>

@@ -30,7 +30,7 @@ class Rapport_billets extends Controller
         if ($_SESSION['droit'] === 'Admin') {
             // Admin voit toutes les localités
             $billetsParGare = $this->rapportBilletModel->getSommeBilletsParLocaliteEtGare($compagnieId, null, $mois);
-        } elseif ($_SESSION['droit'] === 'Admin_regionale') {
+        } elseif ($_SESSION['droit'] === 'chef_d_escale') {
             // Admin régionale voit seulement sa localité
             $localite = $_SESSION['ville'];
             $billetsParGare = $this->rapportBilletModel->getSommeBilletsParLocaliteEtGare($compagnieId, $localite, $mois);
@@ -80,7 +80,7 @@ class Rapport_billets extends Controller
         // Billets par gare et localité
         if ($_SESSION['droit'] === 'Admin') {
             $billetsParGare = $this->rapportBilletModel->getSommeBilletsParLocaliteEtGareAnnuel($compagnieId, null, $annee);
-        } elseif ($_SESSION['droit'] === 'Admin_regionale') {
+        } elseif ($_SESSION['droit'] === 'chef_d_escale') {
             $localite = $_SESSION['ville'];
             $billetsParGare = $this->rapportBilletModel->getSommeBilletsParLocaliteEtGareAnnuel($compagnieId, $localite, $annee);
         } else {

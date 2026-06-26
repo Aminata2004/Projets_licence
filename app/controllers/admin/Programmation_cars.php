@@ -52,23 +52,58 @@ class Programmation_cars extends  Controller
       );
     } else {
       // SuperAdmin ou autre : voit tout
-      $listeCar = $programmation_car->FetchAllSelectWhere(
+      $listeCar = $programmation_car->FetchSelectWheres(
         '*',
         'car',
         'programmer_car = :programmer_car',
         [':programmer_car' => 'off']
       );
+      $id_compagnie = $_SESSION['id_compagnie'];
 
-      $listeTrajet = $programmation_car->SelectAllData('*', "programmer");
+
+
+      $listeTrajet = $programmation_car->FetchSelectWheres(
+        "programmer.idProgrammer,
+     depart.localite AS depart,
+     destination.localite AS destination",
+        "programmer
+     INNER JOIN agence AS depart ON programmer.idDepart = depart.idAgence
+     INNER JOIN agence AS destination ON programmer.idDestination = destination.idAgence",
+        "programmer.id_compagnie = :id_compagnie
+     GROUP BY programmer.idDepart, programmer.idDestination",
+        [':id_compagnie' => $id_compagnie]
+      );
+
+
 
       $Select_car1 = $programmation_car->SelectAllData("*", "reference_car INNER JOIN car ON reference_car.id_car = car.id_car");
     }
+
 
     $this->view('admin/programmation_car', [
       'listeTrajet' => $listeTrajet,
       'listeCar' => $listeCar,
       'Select_car1' => $Select_car1
     ]);
+  }
+
+  function details($id_car)
+  {
+    $programmation_car = new Programmation_car();
+
+    // Récupérer les détails du car programmé
+    $details = $programmation_car->FetchSelectWheres(
+      "car.numero_car, car.nbr_place, programmer.idProgrammer, depart.localite AS depart, destination.localite AS destination",
+      "car
+       INNER JOIN liaison_car_trajet ON car.id_car = liaison_car_trajet.id_car
+        INNER JOIN programmer ON liaison_car_trajet.id_trajets = programmer.idProgrammer
+       INNER JOIN agence AS depart ON programmer.idDepart = depart.idAgence
+       INNER JOIN agence AS destination ON programmer.idDestination = destination.idAgence",
+      "car.id_car = :id_car",
+      [':id_car' => $id_car]
+    );
+
+    $this->view('admin/details_programmation_car', ['details' => $details]);
   }
 }
 // End of file Programmation_cars.php

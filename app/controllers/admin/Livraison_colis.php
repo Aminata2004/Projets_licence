@@ -34,7 +34,7 @@ class Livraison_colis extends Controller
             $bonStatut  = $colis['status'] === 'recu';
 
             $peutLivrer = match ($droit) {
-                'Admin_regionale' => $memeVille && $bonStatut,
+                'chef_d_escale' => $memeVille && $bonStatut,
                 'utilisateur'     => $memeVille && $memeGare && $bonStatut,
                 default           => false,
             };
@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['envoi'])) {
             $bonStatut = isset($colis['status']) && $colis['status'] === 'recu';
 
             $peutLivrer = match ($droit) {
-                'Admin_regionale' => $memeVille && $bonStatut,
+                'chef_d_escale' => $memeVille && $bonStatut,
                 'utilisateur'     => $memeVille && $memeGare && $bonStatut,
                 default           => false,
             };

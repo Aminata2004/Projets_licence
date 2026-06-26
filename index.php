@@ -6,11 +6,8 @@
 // require_once __DIR__ . '/vendor/autoload.php';
 // require_once __DIR__ . '/app/core/autoload.php';
 
-
 // require_once ("app/core/autoload.php");
 // $app=new App();
-
-
 
 //  ob_end_flush(); 
 
@@ -21,26 +18,11 @@ define('ROOT', __DIR__); // ✅ Ne rien ajouter après __DIR__
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/app/core/autoload.php';
 
-// 🔁 Redirection automatique si on tape directement "/admin"
-if (isset($_SERVER['REQUEST_URI'])) {
-    $uri = $_SERVER['REQUEST_URI'];
-    $basePath = '/Gestion_compagnie_mcv';
-
-    if ($uri === $basePath . '/admin' || $uri === $basePath . '/admin/') {
-        header('Location: ' . $basePath . '/index.php?url=admin/loguins/index');
-        exit();
-    }
-}
 
 $app = new App();
 
-
-
 ob_end_flush();
         
-
-
-
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -56,5 +38,9 @@ if (php_sapi_name() === 'cli') {
 // Pour URL classique (HTTP)
 $url_path = $_GET['controller'] ?? 'home';   // controller par défaut
 $action = $_GET['action'] ?? 'index';        // action par défaut
+
+
+
+
 
  

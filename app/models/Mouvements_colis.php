@@ -25,7 +25,7 @@ class Mouvements_colis extends  Model
             ':status' => 'en_cours'
         ];
 
-        if ($droit === 'Admin_regionale') {
+        if ($droit === 'chef_d_escale') {
             // On filtre selon la localité de l'agence
             $sql .= " AND a.localite = :ville";
             $params[':ville'] = $ville;
@@ -70,7 +70,7 @@ class Mouvements_colis extends  Model
             ':status' => 'recu'
         ];
 
-        if ($droit === 'Admin_regionale') {
+        if ($droit === 'chef_d_escale') {
             // On filtre selon la localité de l'agence
             $sql .= " AND a.localite = :ville";
             $params[':ville'] = $ville;
@@ -114,7 +114,7 @@ class Mouvements_colis extends  Model
             ':status' => 'livre'
         ];
 
-        if ($droit === 'Admin_regionale') {
+        if ($droit === 'chef_d_escale') {
             // On filtre selon la localité de l'agence
             $sql .= " AND a.localite = :ville";
             $params[':ville'] = $ville;

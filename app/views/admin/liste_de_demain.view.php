@@ -23,7 +23,7 @@
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
                             </li>
-                            <li class="breadcrumb-item active text-primary" aria-current="page">Liste des tickets </li>
+                            <li class="breadcrumb-item active text-primary" aria-current="page">Liste des tickets de demain </li>
                         </ol>
                     </nav>
                 </div>
@@ -120,7 +120,7 @@
                                 <tr class="text-center">
                                     <th>Client</th>
                                     <th>Destionation</th>
-                                    <th>Nbr de passages</th>
+                                    <th>Nbr de place</th>
                                     <th>heure de depart</th>
                                     <th>Jour de voyage</th>
                                     <th>Date d'expiration</th>

@@ -18,16 +18,16 @@
             $logoNameInDb = null;
             if ($file && $file['error'] === UPLOAD_ERR_OK) {
                 $mime = mime_content_type($file['tmp_name']);
-                $allowed = ['image/png', 'image/jpeg'];
+                $allowed = ['image/png', 'image/jpeg', 'image/webp'];
                 if (!in_array($mime, $allowed, true)) {
-                    $errors[] = "Logo : format non autorisé.";
+                    $errors[] = "Logo : format non autorisé (png, jpg, webp uniquement).";
                 }
                 if ($file['size'] > 2 * 1024 * 1024) {
                     $errors[] = "Logo : trop grand (max 2Mo).";
                 }
 
                 if (!$errors) {
-                    $ext = $mime === 'image/png' ? '.png' : '.jpg';
+                    $ext = ($mime === 'image/png') ? '.png' : (($mime === 'image/webp') ? '.webp' : '.jpg');
                     $uploadDir = ROOT . '/public/images/logos';
 
                     if (!is_dir($uploadDir)) mkdir($uploadDir, 0775, true);
@@ -55,42 +55,14 @@
                 ]);
 
                 if ($ok) {
-
-
-                    echo '<script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            Swal.fire({
-                                title: "🎉 Bravo !",
-                                text: "Compagnie ajoutée avec succes.",
-                                icon: "success",
-                                iconColor: "#0d6efd", // ← couleur primary Bootstrap
-                                confirmButtonColor: "#0d6efd", // ← bouton OK bleu
-                                background: "#f0f8ff", // couleur de fond douce, proche du bleu
-                                confirmButtonText: "OK",
-                                showClass: {
-                                    popup: "animate__animated animate__zoomIn"
-                                },
-                                hideClass: {
-                                    popup: "animate__animated animate__fadeOut"
-                                }
-                            }).then(() => {
-                                window.location.href = "' . BASE_URL . '/admin/Compagnies";
-                            });
-                        });
-                    </script>';
+                    $this->set_flash("Compagnie ajoutée avec succès.", "success");
+                    header("Location: " . BASE_URL . "/admin/Compagnies");
+                    exit;
                 }
             } else {
-
-                echo '<script>
-            document.addEventListener("DOMContentLoaded", function () {
-                Swal.fire({
-                    title: "Erreur",
-                    html: "' . implode('<br>', array_map('htmlspecialchars', $errors)) . '",
-                    icon: "error",
-                    confirmButtonText: "OK"
-                });
-            });
-        </script>';
+                $this->set_flash(implode('<br>', array_map('htmlspecialchars', $errors)), "danger");
+                header("Location: " . BASE_URL . "/admin/Compagnies");
+                exit;
             }
         }
 
@@ -101,21 +73,22 @@
             $req = "UPDATE compagnie 
            SET nom_compagnie =:nom_compagnie, 
                libele=:libele,
-               slogant=:slogant
+               slogant=:slogant,
+               logo=:logo
                 WHERE id_compagnie=:id_compagnie";
 
             $params = [
                 ":nom_compagnie" => $data['nom_compagnie'],
                 ":libele" => $data['libele'],
                 ':slogant' => $data['slogant'],
+                ':logo' => $data['logo'],
                 ':id_compagnie' => $data['id_compagnie'],
             ];
 
             $modification = $this->insertion_update_simples($req, $params);
 
             if ($modification == true) {
-                $this->set_flash("modification faite avec ssssss", "primary");
-                // $this->redirect("compagnies");
+                $this->set_flash("Modification faite avec succès", "success");
             }
         }
 

@@ -63,7 +63,7 @@ class  Liste_gares extends  Controller
         if (isset($_POST['edit'])) {
 
             // extract($_POST);
-            // var_dump($_POST); exit;
+             //var_dump($_POST); exit;
             $numeroGare = $_POST["numeroGare"];
             $localite = $_POST["localite"];
             $code = $_POST["code"];

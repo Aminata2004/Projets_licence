@@ -27,7 +27,7 @@ class Home extends Model
         ];
 
         // Si c'est Admin régional → filtre ville
-        if ($_SESSION['droit'] === 'Admin_regionale') {
+        if ($_SESSION['droit'] === 'chef_d_escale') {
             $sql .= " AND departId = :ville";
             $params[':ville'] = $_SESSION['ville'];
         }
@@ -64,7 +64,7 @@ class Home extends Model
         ];
 
         // Si Admin régional OU Utilisateur → filtre aussi par ville
-        if ($_SESSION['droit'] === 'Admin_regionale' || $_SESSION['droit'] === 'Utilisateur') {
+        if ($_SESSION['droit'] === 'chef_d_escale' || $_SESSION['droit'] === 'Utilisateur') {
             $sql .= " AND localite_user = :ville";
             $params[':ville'] = $_SESSION['ville'];
         }
@@ -131,7 +131,7 @@ class Home extends Model
 
 
     //         ];
-    //     } elseif ($role === 'Admin_regionale') {
+    //     } elseif ($role === 'chef_d_escale') {
     //         // Admin régionale : filtre seulement sur ville
     //         $sql .= " AND agence.localite = :ville";
     //         $params = [
@@ -181,7 +181,7 @@ class Home extends Model
 
 
     //         ];
-    //     } elseif ($role === 'Admin_regionale') {
+    //     } elseif ($role === 'chef_d_escale') {
     //         // Admin régionale : filtre seulement sur ville
     //         $sql .= " AND agence.localite = :ville";
     //         $params = [
@@ -209,7 +209,7 @@ class Home extends Model
 
 public function getColisMensuel($session)
 {
-    $role         = $_SESSION['droit']; // 'Utilisateur', 'Admin_regionale', 'Admin'
+    $role         = $_SESSION['droit']; // 'Utilisateur', 'chef_d_escale', 'Admin'
     $ville        = $_SESSION['ville'] ?? null;
     $num_gare     = $_SESSION['numero_gare'] ?? null;
     $user_id      = $session['id_utilisateur'];
@@ -241,7 +241,7 @@ public function getColisMensuel($session)
         $sql .= " OR (status = 'enregistre' AND provient_de = :ville_prov)";
         $params[':ville_prov'] = $ville;
 
-    } elseif ($role === 'Admin_regionale') {
+    } elseif ($role === 'chef_d_escale') {
         $sql .= " AND (status <> 'enregistre' AND agence.localite = :ville)";
         $params[':ville'] = $ville;
         $sql .= " OR (status = 'enregistre' AND provient_de = :ville_prov)";
@@ -270,5 +270,32 @@ public function getColisMensuel($session)
     ];
 }
 
+    public function getTopGares()
+    {
+        if ($_SESSION['droit'] !== 'Admin') {
+            return [];
+        }
+
+        $id_compagnie = $_SESSION['id_compagnie'];
+        $debutMois = date('Y-m-01');
+        $finMois   = date('Y-m-t');
+
+        $sql = "SELECT departId as gare, COUNT(*) as total_billets, SUM(nombrePassages) as total_passagers
+                FROM billets
+                WHERE id_compagnie = :compagnie
+                  AND date_reservation BETWEEN :debut AND :fin
+                GROUP BY departId
+                ORDER BY total_billets DESC
+                LIMIT 5";
+
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute([
+            ':compagnie' => $id_compagnie,
+            ':debut'     => $debutMois,
+            ':fin'       => $finMois
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
 }

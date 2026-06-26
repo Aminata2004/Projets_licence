@@ -52,7 +52,10 @@
             </div>
 
             <?php $this->view("admin/set_flash") ?>
-            <div class="card">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white fw-bold">
+                    <i class="bx bx-calendar-check me-1"></i> Liste des programmes de voyage
+                </div>
                 <div class="card-body">
                     <div class="table-responsive shadow-sm rounded-3">
                         <table id="example"

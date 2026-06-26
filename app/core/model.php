@@ -98,39 +98,39 @@ class Model extends Database
     {
         $_SESSION['notification']['message'] = $message;
         $_SESSION['notification']['type'] = $type;
-        $_SESSION['notification']['class'] = $this->get_alert_class($type);
+        $_SESSION['notification']['class'] = $this->get_alert_class($type); // ici code couleur
         $_SESSION['notification']['icon'] = $this->get_alert_icon($type);
     }
 
     private function get_alert_class($type)
     {
         switch ($type) {
-            case 'primary':
             case 'success':
+                return '#10b981'; // Vert moderne (Emerald)
             case 'danger':
+                return '#e11d48'; // Rouge moderne (Rose)
             case 'warning':
-                return $type;
+                return '#f59e0b'; // Orange clair TransGest
+            case 'primary':
             default:
-                return 'primary';
+                return '#ea580c'; // Orange principal TransGest
         }
     }
-
 
     private function get_alert_icon($type)
     {
         switch ($type) {
-            case 'primary':
-                return 'bx bx-info-circle'; // Icône pour primary
             case 'success':
-                return 'bx bx-check-circle'; // Icône pour success
+                return 'bx bx-check-circle';
             case 'danger':
-                return 'bx bx-error'; // Icône pour danger
+                return 'bx bx-error';
             case 'warning':
-                return 'bx bx-warning'; // Icône pour warning
+                return 'bx bx-warning';
             default:
-                return 'bx bx-info-circle'; // Icône par défaut
+                return 'bx bx-info-circle';
         }
     }
+
     //   save input (enregistrement des contenue)
     public function save_input_data()
     {
@@ -244,7 +244,7 @@ class Model extends Database
 
         $params = [':id_compagnie' => $id_compagnie];
 
-        if ($droit === 'Admin_regionale') {
+        if ($droit === 'chef_d_escale') {
             $sql .= " AND colis.provient_de = :ville";
             $params[':ville'] = $ville;
         } elseif ($droit === 'Utilisateur') {
@@ -564,7 +564,7 @@ class Model extends Database
     }
 
 
-    
+
 
     public function customQuery($sql, $params = [])
     {

@@ -58,6 +58,7 @@
                                     <th>Numéro de car</th>
                                     <th>Horaire</th>
                                     <th>Destination</th>
+                                    <th>Place disponible</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -78,16 +79,21 @@
                                     }
                                 ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($listeProgrammers->id_car_programmer) ?></td>
+                                        <td><?= htmlspecialchars($listeProgrammers->numero_car) ?></td>
+
                                         <td><?= htmlspecialchars($listeProgrammers->id_horaire) ?></td>
                                         <td><?= htmlspecialchars($listeProgrammers->id_trajet) ?></td>
+                                        <td class="fw-bold text-success">
+                                            <?= htmlspecialchars($listeProgrammers->place_disponible) ?>
+                                        </td>
+
                                         <td>
                                             <div class="dropdown">
                                                 <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="bx bx-dots-vertical-rounded"></i>
                                                 </a>
                                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                                    <li><a class="dropdown-item" href="#"><i class="bx bx-edit me-2"></i>Modifier</a></li>
+                                                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Programmation_voyages/edit/<?= $listeProgrammers->id_programmation ?>"><i class="bx bx-edit me-2"></i>Modifier</a></li>
                                                     <li><a class="dropdown-item text-danger" href="#"><i class="bx bx-x-circle me-2"></i>Désactiver</a></li>
                                                 </ul>
                                             </div>

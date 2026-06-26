@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="<?= BASE_URL ?>/assets/images/favicon-32x32.png" type="image/png" />
+    <!-- <link rel="icon" href="<?= BASE_URL ?>/assets/images/favicon-32x32.png" type="image/png" /> -->
     <!--plugins-->
     <link href="<?= BASE_URL ?>/assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
     <link href="<?= BASE_URL ?>/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
@@ -33,7 +33,7 @@
     <link href="<?= BASE_URL ?>/assets/plugins/select2/css/bootstrap-custom-colors.css" rel="stylesheet" />
     <link href="<?= BASE_URL ?>/assets/plugins/js/bs-stepper.css" rel="stylesheet" />
     <!-- <title>Skodash - Bootstrap 5 Admin Template</title> -->
-    <title>G_compagnie </title>
+    <title>TransGest </title>
   <!-- Bootstrap CSS -->
 
 

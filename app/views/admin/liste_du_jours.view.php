@@ -121,7 +121,7 @@
                                 <tr class="text-center">
                                     <th>Client</th>
                                     <th>Destionation</th>
-                                    <th>Nbr de passages</th>
+                                    <th>Nbr de place</th>
                                     <th>heure de depart</th>
                                     <th>Jour de voyage</th>
                                     <th>Date d'expiration</th>

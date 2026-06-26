@@ -16,6 +16,7 @@
 
         private $idUser;
 
+        
 
         public function saveUtilisateur()
         {
@@ -162,8 +163,6 @@
             $result = $this->select_data_table_join_where($sql, [$this->idUser, $userPermissionName]);
             return count($result) > 0;
         }
-
-
 
         // Récupérer les infos d’un utilisateur
         public function getUserById($idUser)

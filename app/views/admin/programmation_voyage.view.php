@@ -68,14 +68,16 @@
                                 </thead>
                                 <tbody class="text-center">
                                     <?php if (!empty($cars_destinations)) : ?>
-                                        <?php foreach ($cars_destinations as $numero_car => $destinations) : ?>
+                                        <?php $indexRow = 0; ?>
+                                        <?php foreach ($cars_destinations as $numero_car => $destinations ) : ?>
                                             <tr>
-                                                <td><input type="checkbox" name="select_car[]" class="form-check-input checkbox-car"></td>
+                                                <td><input type="checkbox" name="select_car[]" value="<?= $indexRow ?>" class="form-check-input checkbox-car"></td>
                                                 <td>
-                                                    <input type="text" name="id_care[]" class="form-control text-center shadow-sm" value="<?= htmlspecialchars($numero_car) ?>" readonly>
+                                                    <input type="text" name="numero_car[]" class="form-control text-center shadow-sm" value="<?= htmlspecialchars($numero_car) ?>" readonly>
+                                                    <input type="hidden" name="id_care[]" value="<?= htmlspecialchars($destinations[0]->id_car) ?>">
                                                 </td>
                                                 <td>
-                                                    <select class="form-select shadow-sm" name="id_horaire[]" required>
+                                                    <select class="form-select shadow-sm" name="id_horaire[]" >
                                                         <option value="" disabled selected>Choisir un horaire</option>
                                                         <?php foreach ($listehoraire as $horaire): ?>
                                                             <option value="<?= $horaire->heuredepart ?>">
@@ -93,8 +95,8 @@
                                                             if ($_SESSION['droit'] === 'Admin') {
                                                                 $afficher = true;
                                                             }
-                                                            // Cas 2 : Admin_regionale => il voit uniquement les départs qui correspondent à sa ville
-                                                            elseif ($_SESSION['droit'] === 'Admin_regionale' && $d->departLocalite === $_SESSION['ville']) {
+                                                            // Cas 2 : chef_d_escale => il voit uniquement les départs qui correspondent à sa ville
+                                                            elseif ($_SESSION['droit'] === 'chef_d_escale' && $d->departLocalite === $_SESSION['ville']) {
                                                                 $afficher = true;
                                                             }
                                                             // Cas 3 : autres => rien
@@ -110,9 +112,9 @@
                                                             <?php endif; ?>
                                                         <?php endforeach; ?>
                                                     </select>
-
                                                 </td>
                                             </tr>
+                                            <?php $indexRow++; ?>
                                         <?php endforeach; ?>
                                     <?php else : ?>
                                         <tr>
@@ -136,6 +138,52 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Véhicules en approche -->
+            <?php if (!empty($cars_en_transit)): ?>
+            <div class="card shadow-lg border-0 rounded-3 mt-4">
+                <div class="card-header bg-success text-white fw-bold">
+                    <i class="bx bx-check-shield me-1"></i> Véhicules en approche (Validation d'arrivée)
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle shadow-sm rounded">
+                            <thead class="table-success text-center">
+                                <tr>
+                                    <th>Numéro Car</th>
+                                    <th>Places Totales</th>
+                                    <th>Destination prévue</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <?php foreach ($cars_en_transit as $car): ?>
+                                    <tr>
+                                        <td class="fw-bold"><?= htmlspecialchars($car->numero_car) ?></td>
+                                        <td><?= htmlspecialchars($car->nbr_place) ?></td>
+                                        <td>
+                                            <?php 
+                                                // Extract the destination string from En_transit_X
+                                                $dest = substr($car->status_car, 11);
+                                                echo htmlspecialchars($dest);
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <form action="" method="post" class="d-inline">
+                                                <input type="hidden" name="id_car_arrivee" value="<?= $car->id_car ?>">
+                                                <button type="submit" name="valider_arrivee" class="btn btn-sm btn-success shadow-sm rounded-pill px-3">
+                                                    <i class="bx bx-check-double me-1"></i> Valider l'arrivée
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
 
         </main>
         <!--end page main-->

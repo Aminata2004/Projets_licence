@@ -588,8 +588,8 @@ INSERT INTO `utilisateur` (`idUser`, `utilisateurs`, `droit`, `contact`, `motPas
 (1, 'Aminata diallo', 'super_admin', 90249438, '$2y$12$P2DQY37kv0nqRTZrfN2kEuwWCdnu7DRLGeuocbWDPKRDCX7j/aGSy', 1, 'amitacompt90@gmail.com', NULL, NULL, NULL),
 (3, 'Zara ', 'Admin', NULL, '$2y$12$P2DQY37kv0nqRTZrfN2kEuwWCdnu7DRLGeuocbWDPKRDCX7j/aGSy', 1, 'zara@gmail.com', NULL, '1', NULL),
 (4, 'zeina', 'Admin', NULL, '$2y$10$O6DTJmH0y/VXR552i9V8OOFT/Y23yxmJxSqb7I5QWnWZKBy2QESWe', 1, 'zei@gmail.com', NULL, '2', NULL),
-(5, 'Rokiatou Djire', 'Admin_regionale', NULL, '$2y$10$kEIEBuUKQdfcXmyjxqiC8Ob7AT1jN52DMXKrHspfgWhCtbfvbVNZC', 1, 'rokia@gmail.com', '1', '1', NULL),
-(6, 'Oumar', 'Admin_regionale', NULL, '$2y$10$XDzwMYBrxSiX4.hdcVPhxu5jE/WeZteZu0LfhdsuORlhzMTomTPfS', 1, 'oumar@gmail.com', '3', '1', NULL),
+(5, 'Rokiatou Djire', 'chef_d_escale', NULL, '$2y$10$kEIEBuUKQdfcXmyjxqiC8Ob7AT1jN52DMXKrHspfgWhCtbfvbVNZC', 1, 'rokia@gmail.com', '1', '1', NULL),
+(6, 'Oumar', 'chef_d_escale', NULL, '$2y$10$XDzwMYBrxSiX4.hdcVPhxu5jE/WeZteZu0LfhdsuORlhzMTomTPfS', 1, 'oumar@gmail.com', '3', '1', NULL),
 (7, 'Oumou', 'Utilisateur', NULL, '$2y$10$jQEgl61RLOrCkOZN0Qa.NuC/lxpis7YD7bARC4zKMIzD/FeSIzESe', 1, 'oumou@gmail.com', '2', '1', NULL),
 (8, 'Hawa', 'Utilisateur', NULL, '$2y$10$j3nynxsZHQnLGZYsYmdGV.uecPL4lQaGMfrP7/jcKXOaE3I34nSR2', 1, 'awa@gmail.com', '3', '1', NULL);
 

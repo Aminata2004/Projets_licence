@@ -1,420 +1,737 @@
-<!--<< All JS Plugins >>-->
-<?php $this->view('site/partials/header') ?>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Réservation - TransGest</title>
+    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>/assets_site/css/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<style>
-    .object-fit-cover {
-        object-fit: cover;
-    }
-</style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            color: #1a1f2e;
+            overflow-x: hidden;
+        }
 
+        /* ========== VARIABLES ========== */
+        :root {
+            --primary: #0f3b5e;
+            --primary-dark: #0a2a44;
+            --primary-light: #1a5276;
+            --secondary: #e67e22;
+            --secondary-dark: #c0392b;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --gray-light: #ecf0f1;
+            --gray: #7f8c8d;
+            --dark: #2c3e50;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 5px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .logo span {
+            color: var(--secondary);
+        }
+        .nav {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        .nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav a:hover, .nav a.active {
+            color: var(--secondary);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 350px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            padding: 80px 30px 30px;
+            transition: right 0.3s ease;
+        }
+        .mobile-nav.active { right: 0; }
+        .mobile-nav a {
+            display: block;
+            padding: 15px 0;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            border-bottom: 1px solid #eee;
+        }
+        .close-menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            display: none;
+        }
+        .overlay.active { display: block; }
+
+        /* ========== PAGE HEADER avec IMAGE DE FOND (nouvelle) ========== */
+        .page-header {
+            position: relative;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+            overflow: hidden;
+            min-height: 350px;
+            display: flex;
+            align-items: center;
+        }
+        .page-header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+        .page-header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(15, 59, 94, 0.6) 0%, rgba(10, 42, 68, 0.5) 100%);
+            z-index: 1;
+        }
+        .page-header .container {
+            position: relative;
+            z-index: 2;
+        }
+        .page-header h1 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            font-weight: 800;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.3);
+        }
+
+        /* ========== FORMULAIRE ========== */
+        .booking-section {
+            padding: 60px 0;
+        }
+        .booking-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        .booking-image {
+            position: relative;
+            overflow: hidden;
+            min-height: 100%;
+        }
+        .booking-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .booking-image:hover img {
+            transform: scale(1.05);
+        }
+        .booking-image-overlay {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            z-index: 2;
+        }
+        .booking-image-overlay p {
+            font-size: 1rem;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+        .booking-form {
+            padding: 40px;
+        }
+        .booking-form h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        .booking-form .subtitle {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        .form-group label i {
+            color: var(--secondary);
+            margin-right: 6px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+        }
+        .form-control[readonly] {
+            background: #f1f5f9;
+            cursor: not-allowed;
+        }
+        .form-check {
+            margin-bottom: 10px;
+        }
+        .form-check-input {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .form-check-label {
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .price-box {
+            background: linear-gradient(135deg, #fef3e8, #fff5eb);
+            border-radius: var(--radius-lg);
+            padding: 15px 20px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .price-label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .price-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+        .price-value small {
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+        .btn-reserver {
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+            color: white;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-reserver:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(230, 126, 34, 0.3);
+        }
+        .info-badge {
+            background: #e8f4fd;
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: var(--primary);
+        }
+        .info-badge i {
+            font-size: 1.2rem;
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            background: #1a1f2e;
+            color: #94a3b8;
+            padding: 48px 0 24px;
+            margin-top: 60px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+        .footer h4 {
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        .footer a {
+            color: #94a3b8;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+        .footer a:hover { color: var(--secondary); }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid #334155;
+            font-size: 0.75rem;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 992px) {
+            .booking-card {
+                grid-template-columns: 1fr;
+            }
+            .booking-image {
+                min-height: 300px;
+            }
+            .booking-image img {
+                height: 300px;
+            }
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .nav { display: none; }
+            .menu-toggle { display: block; }
+            .row-grid { grid-template-columns: 1fr; gap: 15px; }
+            .booking-form { padding: 25px; }
+            .booking-form h2 { font-size: 1.4rem; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .page-header h1 { font-size: 2rem; }
+            .page-header { padding: 60px 0; min-height: 280px; }
+            .page-header p { font-size: 0.9rem; }
+        }
+        @media (max-width: 480px) {
+            .booking-form { padding: 20px; }
+            .price-value { font-size: 1.4rem; }
+        }
+    </style>
+</head>
 <body>
-    <!-- Preloader Start -->
-    <div id="preloader" class="preloader">
-        <div class="animation-preloader">
-            <div class="spinner">
-            </div>
-            <div class="txt-loading">
-                <span data-text-preloader="T" class="letters-loading">
-                    T
-                </span>
-                <span data-text-preloader="R" class="letters-loading">
-                    R
-                </span>
-                <span data-text-preloader="A" class="letters-loading">
-                    A
-                </span>
-                <span data-text-preloader="V" class="letters-loading">
-                    V
-                </span>
-                <span data-text-preloader="O" class="letters-loading">
-                    O
-                </span>
-            </div>
-            <p class="text-center">Loading</p>
-        </div>
-        <div class="loader">
-            <div class="row">
-                <div class="col-3 loader-section section-left">
-                    <div class="bg"></div>
-                </div>
-                <div class="col-3 loader-section section-left">
-                    <div class="bg"></div>
-                </div>
-                <div class="col-3 loader-section section-right">
-                    <div class="bg"></div>
-                </div>
-                <div class="col-3 loader-section section-right">
-                    <div class="bg"></div>
-                </div>
-            </div>
-        </div>
+
+<!-- HEADER -->
+<?php $this->view('site/partials/nav') ?>
+
+
+<!-- PAGE HEADER avec NOUVELLE IMAGE DE FOND (route et montagnes) -->
+<section class="page-header">
+    <img src="<?= BASE_URL ?>/assets_site/img/reservation-bg.jpg" alt="Route de montagne" class="page-header-bg">
+    <div class="page-header-overlay"></div>
+    <div class="container">
+        <h1 data-aos="fade-up">Réservez votre voyage</h1>
+        <p data-aos="fade-up" data-aos-delay="100">Remplissez le formulaire ci-dessous pour réserver vos billets en toute simplicité</p>
     </div>
-    <!--<< Mouse Cursor Start >>-->
-    <div class="mouse-cursor cursor-outer"></div>
-    <div class="mouse-cursor cursor-inner"></div>
-    <!--<< Back-Top Start >>-->
-    <button id="back-top" class="back-to-top">
-        <i class="fa-regular fa-arrow-up"></i>
-    </button>
-    <!-- Offcanvas Area Start -->
-    <div class="fix-area">
-        <div class="offcanvas__info">
-            <div class="offcanvas__wrapper">
-                <div class="offcanvas__content">
-                    <div class="offcanvas__top mb-5 d-flex justify-content-between align-items-center">
-                        <div class="offcanvas__logo">
-                            <a href="index.html">
-                                <img src="<?= BASE_URL ?>/assets_site/img/logo/black-logo.svg" alt="logo-img">
-                            </a>
-                        </div>
-                        <div class="offcanvas__close">
-                            <button>
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <p class="text d-none d-xl-block">
-                        Nullam dignissim, ante scelerisque the is euismod fermentum odio sem semper the is erat, a
-                        feugiat leo urna eget eros. Duis Aenean a imperdiet risus.
-                    </p>
-                    <div class="mobile-menu fix mb-3"></div>
-                    <div class="offcanvas__contact">
-                        <h4>Contact Info</h4>
-                        <ul>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon">
-                                    <i class="fal fa-map-marker-alt"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a target="_blank" href="#">Main Street, Melbourne, Australia</a>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon mr-15">
-                                    <i class="fal fa-envelope"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a href="mailto:info@example.com"><span
-                                            class="mailto:info@example.com">info@example.com</span></a>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon mr-15">
-                                    <i class="fal fa-clock"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a target="_blank" href="#">Mod-friday, 09am -05pm</a>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon mr-15">
-                                    <i class="far fa-phone"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a href="tel:+11002345909">+11002345909</a>
-                                </div>
-                            </li>
-                        </ul>
-                        <div class="header-button mt-4">
-                            <a href="contact.html" class="theme-btn"> Request A Quote <i
-                                    class="fa-sharp fa-regular fa-arrow-right"></i></a>
-                        </div>
-                        <div class="social-icon d-flex align-items-center">
-                            <a href="#"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#"><i class="fab fa-twitter"></i></a>
-                            <a href="#"><i class="fab fa-youtube"></i></a>
-                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
+</section>
+
+<?php
+$t = $trajet ?? [];
+$this->view("admin/helpers");
+?>
+<!-- FORMULAIRE DE RÉSERVATION -->
+<section class="booking-section">
+    <div class="container">
+        <div class="booking-card" data-aos="fade-up">
+            <!-- Partie Image - Bus avec des passagers (NOUVELLE IMAGE) -->
+            <div class="booking-image">
+                <img src="<?= BASE_URL ?>/assets_site/img/reservation-bus.jpg" alt="Passagers dans un bus">
+                <div class="booking-image-overlay">
+                    <p><i class="fas fa-users"></i> Voyagez avec vos proches</p>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="offcanvas__overlay"></div>
-    <!-- Search Area Start -->
-    <div class="search-wrap">
-        <div class="search-inner">
-            <i class="fas fa-times search-close" id="search-close"></i>
-            <div class="search-cell">
-                <form method="get">
-                    <div class="search-field-holder">
-                        <input type="search" class="main-search-input" placeholder="Search...">
+
+            <!-- Formulaire -->
+            <div class="booking-form">
+                <h2>Planifiez votre voyage</h2>
+                <p class="subtitle">Voyagez confortablement avec TransGest</p>
+
+                <form method="post" action="" id="bookingForm">
+                    <div class="row-grid">
+                        <!-- Départ -->
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Départ</label>
+                            <input type="text" name="depart" value="<?= htmlspecialchars(($t['depart'] ?? '') . ' ( ' . ($t['numeroGare1'] ?? '') . ' )') ?>" class="form-control" readonly>
+                            <input type="hidden" name="departId" value="<?= htmlspecialchars($t['depart'] ?? '') ?>">
+                            <input type="hidden" name="numeroGare" value="<?= htmlspecialchars($t['numeroGare1'] ?? '') ?>">
+                        </div>
+
+                        <!-- Destination -->
+                        <div class="form-group">
+                            <label><i class="fas fa-flag-checkered"></i> Destination</label>
+                            <input type="text" name="destination" value="<?= htmlspecialchars(($t['destination'] ?? '') . ' ( ' . ($t['numeroGare1'] ?? '') . ' )') ?>" class="form-control" readonly>
+                            <input type="hidden" name="destinationId" value="<?= htmlspecialchars($t['destination'] ?? '') ?>">
+                            <input type="hidden" name="id_compagnie" value="<?= htmlspecialchars($t['id_compagnie'] ?? '') ?>">
+                        </div>
                     </div>
+
+                    <!-- Escales -->
+                    <div class="form-group">
+                        <label><i class="fas fa-code-branch"></i> Escale optionnelle</label>
+                        <?php
+                        if (!empty($t['escales_avec_frais'])) {
+                            $escales = explode(', ', $t['escales_avec_frais']);
+                            foreach ($escales as $index => $escale) {
+                                if (preg_match('/^(.*?)\s*\((\d+)\s*FCFA\)/', $escale, $matches)) {
+                                    $ville = trim($matches[1]);
+                                    $prix = intval($matches[2]);
+                                } else {
+                                    continue;
+                                }
+                        ?>
+                                <div class="form-check">
+                                    <input class="form-check-input escale-radio" type="radio" name="escale_finale" id="escale_<?= $index ?>" value="<?= htmlspecialchars($ville) ?>" data-prix="<?= $prix ?>">
+                                    <label class="form-check-label" for="escale_<?= $index ?>"><?= htmlspecialchars($ville) ?> <span class="text-muted">(+<?= number_format($prix, 0, ',', ' ') ?> FCFA)</span></label>
+                                </div>
+                        <?php
+                            }
+                        } else {
+                            echo '<p class="text-muted fst-italic" style="font-size: 0.9rem;">Pas d\'escale disponible</p>';
+                        }
+                        ?>
+                    </div>
+
+                    <div class="row-grid">
+                        <!-- Date -->
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt"></i> Date du voyage</label>
+                            <?php
+                            $today = date('Y-m-d');
+                            $tomorrow = date('Y-m-d', strtotime('+1 day'));
+                            ?>
+                            <input type="date" name="jourVoyage" class="form-control" min="<?= $today ?>" max="<?= $tomorrow ?>" value="<?= $today ?>">
+                        </div>
+
+                        <!-- Heure -->
+                        <div class="form-group">
+                            <label><i class="fas fa-clock"></i> Heure de départ</label>
+                            <input type="text" name="Heur_departs" value="<?= htmlspecialchars($t['heure_depart'] ?? '') ?>" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row-grid">
+                        <!-- Nom complet -->
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Nom complet</label>
+                            <input type="text" name="Client" class="form-control" placeholder="Ex: Diallo Aminata" required>
+                        </div>
+
+                        <!-- Nombre passagers -->
+                        <div class="form-group">
+                            <label><i class="fas fa-users"></i> Nombre de passagers</label>
+                            <input type="number" name="nombrePassages" id="nombrePassages" class="form-control" min="1" value="1" required>
+                        </div>
+                    </div>
+
+                    <div class="row-grid">
+                        <!-- Téléphone -->
+                        <div class="form-group">
+                            <label><i class="fas fa-phone-alt"></i> Téléphone</label>
+                            <input type="tel" name="numeroClient" id="numeroClient" class="form-control" placeholder="77 78 88 99" required>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" name="emailClient" class="form-control" placeholder="exemple@mail.com">
+                        </div>
+                    </div>
+
+                    <div class="row-grid">
+                        <!-- Numéro paiement -->
+                        <div class="form-group">
+                            <label><i class="fas fa-credit-card"></i> Numéro de paiement</label>
+                            <input type="text" name="numeroPaiement" id="numeroPaiement" class="form-control" placeholder="66 77 88 99" required>
+                        </div>
+
+                        <!-- Code marchand -->
+                        <div class="form-group">
+                            <label><i class="fas fa-qrcode"></i> Code marchand</label>
+                            <input type="text" name="code_marchand" class="form-control" value="<?= htmlspecialchars($t['codeDepart'] ?? '') ?>" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row-grid">
+                        <!-- Numéro billet -->
+                        <div class="form-group">
+                            <label><i class="fas fa-ticket-alt"></i> Numéro de billet</label>
+                            <input type="text" name="numeroBillets" class="form-control" value="<?= genererNumeroBillet() ?>" readonly>
+                        </div>
+
+                        <!-- Prix -->
+                        <div class="form-group">
+                            <label><i class="fas fa-money-bill-wave"></i> Prix unitaire</label>
+                            <input type="text" name="prix_unitaire" id="prix_unitaire" value="<?= number_format(intval($t['prix'] ?? 0), 0, ',', ' ') ?> FCFA" class="form-control" readonly>
+                            <input type="hidden" name="montant_payer" id="montant_payer" value="<?= intval($t['prix'] ?? 0) ?>">
+                        </div>
+                    </div>
+
+                    <!-- Prix total dynamique -->
+                    <div class="price-box">
+                        <span class="price-label"><i class="fas fa-calculator"></i> Total à payer</span>
+                        <span class="price-value"><span id="totalPrice">5 000</span> <small>FCFA</small></span>
+                    </div>
+
+                    <!-- Informations supplémentaires -->
+                    <div class="info-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Votre réservation est sécurisée. Un email de confirmation vous sera envoyé après validation du paiement.</span>
+                    </div>
+
+                    <button type="submit" name="reserver" class="btn-reserver">
+                        <i class="fas fa-check-circle"></i> Réserver maintenant
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
                 </form>
             </div>
         </div>
     </div>
-    <!-- header-top -->
-    <?php $this->view('site/partials/nav') ?>
-    <!-- Breadcrumb-Section Start -->
-    <section class="breadcrumb-wrapper fix bg-cover"
-        style="background-image: url(<?= BASE_URL ?>/assets_site/img/reservation.png);  background-size: cover;background-position: center;width: 100%;height: 700px; display: flex;align-items: center; ">
-        <div class="container">
-            <div class="row">
-                <div class="page-heading">
-                    <h2>Espace de reservation des billiets </h2>
-                    <ul class="breadcrumb-list">
-                        <li>
-                            <a href="index.html">Accueil</a>
-                        </li>
-                        <li><i class="fa-solid fa-chevrons-right"></i></li>
-                        <li class="active">reserver</li>
-                    </ul>
-                </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <h4>TransGest</h4>
+                <p style="font-size: 0.85rem;">La plateforme N°1 de réservation de billets de bus et suivi de colis au Mali.</p>
+            </div>
+            <div>
+                <h4>Liens rapides</h4>
+                <a href="#">Accueil</a>
+                <a href="#">Compagnies</a>
+                <a href="#">Destinations</a>
+                <a href="#">Contact</a>
+            </div>
+            <div>
+                <h4>Support</h4>
+                <a href="#">FAQ</a>
+                <a href="#">Conditions générales</a>
+                <a href="#">Politique de confidentialité</a>
+            </div>
+            <div>
+                <h4>Contact</h4>
+                <a href="#"><i class="fas fa-phone"></i> +223 20 00 00 00</a>
+                <a href="#"><i class="fas fa-envelope"></i> contact@transgest.com</a>
+                <a href="#"><i class="fas fa-map-marker-alt"></i> Bamako, Mali</a>
             </div>
         </div>
-    </section>
-    <!-- Tour-Details Section Start -->
-    <?php
-    $t = $trajet ?? [];
-    ?>
-    <?php $this->view("admin/helpers") ?>
-    <section class="tour-section section-padding bg-light">
-        <div class="container">
-            <div class="row align-items-center rounded-4 overflow-hidden bg-white">
-                <!-- Image à gauche -->
-                <div class="col-md-6 p-0">
-                    <div class="ratio ratio-1x1 ratio-md-16x9">
-                        <img src="<?= BASE_URL ?>/assets_site/formulaire.png"
-                            alt="Voyageur"
-                            class="img-fluid w-100 h-100"
-                            style="object-fit: cover;">
-                    </div>
-                </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 TransGest - Tous droits réservés</p>
+        </div>
+    </div>
+</footer>
 
-                <!-- Formulaire de réservation -->
-                <div class="col-md-6 p-5">
-                    <div class="card border-0" style="border-radius: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);">
-                        <div class="card-body">
-                            <h3 class="text-primary fw-bold mb-4">Planifiez votre prochaine aventure</h3>
-                            <form method="post" action="">
-                                <div class="row g-3">
+<script src="<?= BASE_URL ?>/assets_site/js/aos.js"></script>
+<script>
+    AOS.init({ duration: 600, once: true, offset: 50 });
 
-                                    <!-- Départ -->
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Départ</label>
-                                        <input type="text" name=""
-                                            value="<?= htmlspecialchars($t['depart'] . ' ( ' . $t['numeroGare1']  . ' ) ' ?? '') ?>"
-                                            class="form-control border border-secondary"
-                                            style="border-radius: 8px;" readonly>
-                                            <input type="hidden" name="departId" value="<?= htmlspecialchars($t['depart'] ?? '') ?>">
-                                            <input type="hidden" name="numeroGare" value="<?= htmlspecialchars($t['numeroGare1'] ?? '') ?>">
+    // Mobile Menu
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileNav = document.getElementById('mobileNav');
+    const closeMenu = document.getElementById('closeMenu');
+    const overlay = document.getElementById('overlay');
+    
+    function openMenu() { 
+        mobileNav.classList.add('active'); 
+        overlay.classList.add('active'); 
+        document.body.style.overflow = 'hidden'; 
+    }
+    
+    function closeMenuFunc() { 
+        mobileNav.classList.remove('active'); 
+        overlay.classList.remove('active'); 
+        document.body.style.overflow = ''; 
+    }
+    
+    menuToggle.addEventListener('click', openMenu);
+    closeMenu.addEventListener('click', closeMenuFunc);
+    overlay.addEventListener('click', closeMenuFunc);
+    
+    window.addEventListener('resize', () => { 
+        if (window.innerWidth > 768) closeMenuFunc(); 
+    });
 
-                                    </div>
+    // Format Mali Phone
+    function formatMaliPhone(inputId) {
+        document.getElementById(inputId).addEventListener('input', function() {
+            let val = this.value.replace(/\D/g, '');
+            val = val.slice(0, 8);
+            let formatted = val;
+            if (val.length > 2) formatted = val.slice(0, 2) + ' ' + val.slice(2);
+            if (val.length > 4) formatted = formatted.slice(0, 5) + ' ' + formatted.slice(5);
+            if (val.length > 6) formatted = formatted.slice(0, 8) + ' ' + formatted.slice(8);
+            this.value = formatted;
+        });
+    }
 
-                                    <!-- Destination & Escales -->
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Destination & Escales</label>
-                                        <input type="text" name=""
-                                            value="<?= htmlspecialchars($t['destination'] . ' ( ' . $t['numeroGare1']  . ' ) ' ?? '') ?>"
-                                            class="form-control border border-secondary mb-2"
-                                            style="border-radius: 8px;" readonly>
-                                            <input type="hidden" name="destinationId" value="<?= htmlspecialchars($t['destination'] ?? '') ?>">
-                                        <input type="hidden" name="id_compagnie" value="<?= htmlspecialchars($t['id_compagnie'] ?? '') ?>">
+    formatMaliPhone('numeroClient');
+    formatMaliPhone('numeroPaiement');
 
-                                        <p class="text-muted mb-2" style="font-size: 0.85rem;">Sélectionnez une escale optionnelle :</p>
-                                        <?php
-                                        if (!empty($t['escales_avec_frais'])) {
-                                            $escales = explode(', ', $t['escales_avec_frais']); // <-- CORRECT: ', ' au lieu de ' - '
-                                            foreach ($escales as $index => $escale) {
-                                                if (preg_match('/^(.*?)\s*\((\d+)\s*FCFA\)/', $escale, $matches)) {
-                                                    $ville = trim($matches[1]);
-                                                    $prix = intval($matches[2]);
-                                                } else {
-                                                    continue;
-                                                }
-                                        ?>
-                                                <div class="form-check mb-1">
-                                                    <input class="form-check-input escale-radio" type="radio" name="escale_finale" id="escale_<?= $index ?>" value="<?= htmlspecialchars($ville) ?>" data-prix="<?= $prix ?>">
-                                                    <label class="form-check-label fw-medium" for="escale_<?= $index ?>"><?= htmlspecialchars($ville) ?> (<?= number_format($prix) ?> FCFA)</label>
-                                                </div>
-                                        <?php
-                                            }
-                                        } else {
-                                            echo '<p class="text-muted fst-italic">Pas d\'escale disponible</p>';
-                                        }
-                                        ?>
+    // Calcul dynamique du prix total
+    let prixBase = <?= intval($t['prix'] ?? 0) ?>;
+    let prixUnitaireActuel = prixBase;
+    
+    const nombrePassagesInput = document.getElementById('nombrePassages');
+    const totalPriceSpan = document.getElementById('totalPrice');
+    const montantPayerInput = document.getElementById('montant_payer');
+    const escaleRadios = document.querySelectorAll('.escale-radio');
 
-                                    </div>
+    function updateTotalPrice() {
+        let nbPassagers = parseInt(nombrePassagesInput.value) || 1;
+        let total = prixUnitaireActuel * nbPassagers;
+        
+        totalPriceSpan.textContent = total.toLocaleString('fr-FR');
+        if(montantPayerInput) montantPayerInput.value = total;
+    }
 
-                                    <!-- Jour et heure -->
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Jour du voyage</label>
-                                        <?php
-                                        $today = date('Y-m-d');
-                                        $tomorrow = date('Y-m-d', strtotime('+1 day'));
-                                        ?>
-                                        <input type="date" name="jourVoyage"
-                                            class="form-control border border-secondary"
-                                            style="border-radius: 8px;"
-                                            min="<?= $today ?>"
-                                            max="<?= $tomorrow ?>"
-                                            value="<?= $today ?>">
+    escaleRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const prixEscale = parseInt(this.dataset.prix) || 0;
+            prixUnitaireActuel = prixEscale;
+            updateTotalPrice();
+        });
+    });
 
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Heure de départ</label>
-                                        <input type="text" name="Heur_departs" value="<?= htmlspecialchars($t['heure_depart'] ?? '') ?>" class="form-control border border-secondary" style="border-radius: 8px;" readonly>
-                                    </div>
-
-                                    <!-- Infos client -->
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Nom & Prénom</label>
-                                        <input type="text" name="Client" class="form-control border border-secondary" style="border-radius: 8px;" placeholder="Ex: Diallo Aminata" required>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Nombre de passagers</label>
-                                        <input type="number" name="nombrePassages" id="nombrePassages" class="form-control border border-secondary" style="border-radius: 8px;" min="1" value="1" placeholder="1">
-                                    </div>
-
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Téléphone</label>
-                                        <input type="text" id="numeroClient" name="numeroClient" class="form-control border border-secondary" style="border-radius: 8px;" placeholder="77 78 88 88" required>
-                                    </div>
-
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Email</label>
-                                        <input type="email" name="emailClient" class="form-control border border-secondary" style="border-radius: 8px;" placeholder="exemple@mail.com">
-                                    </div>
-
-                                    <!-- Paiement -->
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Numéro de paiement</label>
-                                        <input type="text" id="numeroPaiement" name="numeroPaiement" class="form-control border border-secondary" style="border-radius: 8px;" placeholder="66 77 88 99" required>
-                                    </div>
-
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Code marchand du gare</label>
-                                        <input type="text" name="code_marchand" class="form-control border border-secondary" style="border-radius: 8px;" value="<?= htmlspecialchars($t['codeDepart'] ?? '') ?>" readonly>
-                                    </div>
-
-                                    <!-- Prix et billets -->
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Prix total</label>
-                                        <input type="text" name="montant_payer" id="montant_payer" value="<?= htmlspecialchars($t['prix'] ?? '') ?>" class="form-control border border-secondary" style="border-radius: 8px;" readonly>
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label fw-semibold">Numéro de billets</label>
-                                        <input type="text" name="numeroBillets" class="form-control border border-secondary" style="border-radius: 8px;" value="<?= genererNumeroBillet() ?>" readonly>
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary w-100 py-3 mt-4 fw-bold" style="border-radius: 8px;" name="reserver">
-                                    Réserver maintenant
-                                    <img src="<?= BASE_URL ?>/assets_site/img/icon/white-arrow.svg" alt="→" class="ms-2">
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-    </section>
-
-
-    <!-- Footer-Section Start -->
+    nombrePassagesInput.addEventListener('input', updateTotalPrice);
+    updateTotalPrice();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php if (isset($_SESSION['toast'])): ?>
     <script>
-        const radios = document.querySelectorAll('.escale-radio');
-        const prixInput = document.getElementById('montant_payer');
-        const prixDeBase = <?= intval($t['prix'] ?? 0) ?>;
-
-        radios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                const prixEscale = parseInt(this.dataset.prix);
-                if (!isNaN(prixEscale)) {
-                    prixInput.value = prixEscale; // met à jour le prix selon l’escale
-                } else {
-                    prixInput.value = prixDeBase;
-                }
-            });
+        Swal.fire({
+            position: "top-end",
+            icon: "info",
+            title: "<?= addslashes($_SESSION['toast']['title']); ?>",
+            text: "<?= addslashes($_SESSION['toast']['text']); ?>",
+            showConfirmButton: true,
+            confirmButtonText: "OK",
+            background: "<?= $_SESSION['toast']['bg'] ?: '#fff'; ?>",
+            color: "#000"
+        }).then(() => {
+            <?php if (!empty($_SESSION['toast']['url'])): ?>
+                window.location.href = "<?= $_SESSION['toast']['url']; ?>";
+            <?php endif; ?>
         });
     </script>
-
-
-
-
-    <!-- SweetAlert2 -->
-    <?php if (isset($_SESSION['toast'])): ?>
-        <script>
-            Swal.fire({
-                position: "top-end",
-                icon: "info",
-                title: "<?= addslashes($_SESSION['toast']['title']); ?>",
-                text: "<?= addslashes($_SESSION['toast']['text']); ?>",
-                showConfirmButton: true,
-                confirmButtonText: "OK",
-                background: "<?= $_SESSION['toast']['bg'] ?: '#fff'; ?>",
-                color: "#000"
-            }).then(() => {
-                <?php if (!empty($_SESSION['toast']['url'])): ?>
-                    window.location.href = "<?= $_SESSION['toast']['url']; ?>";
-                <?php endif; ?>
-            });
-        </script>
-        <?php unset($_SESSION['toast']); ?>
-    <?php endif; ?>
-
-
-
-
-    <script>
-        function formatMaliPhone(inputId) {
-            document.getElementById(inputId).addEventListener('input', function() {
-                let val = this.value.replace(/\D/g, ''); // Supprime tout sauf les chiffres
-
-                // Limiter à 8 chiffres (format standard au Mali)
-                val = val.slice(0, 8);
-
-                // Formatage : XX XX XX XX
-                let formatted = val;
-                if (val.length > 2) formatted = val.slice(0, 2) + ' ' + val.slice(2);
-                if (val.length > 4) formatted = formatted.slice(0, 5) + ' ' + formatted.slice(5);
-                if (val.length > 6) formatted = formatted.slice(0, 8) + ' ' + formatted.slice(8);
-
-                this.value = formatted;
-            });
-        }
-
-        // Appliquer sur les deux champs
-        formatMaliPhone('numeroClient');
-        formatMaliPhone('numeroPaiement');
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const montantPayerInput = document.getElementById('montant_payer');
-            const nombrePassagesInput = document.getElementById('nombrePassages');
-            const radios = document.querySelectorAll('.escale-radio');
-
-            // Prix de base du trajet (sans escale)
-            let prixBase = <?= intval($t['prix'] ?? 0) ?>;
-            let prixUnitaire = prixBase; // initialisation
-
-            // Fonction pour mettre à jour le total
-            function updateTotal() {
-                const nombre = parseInt(nombrePassagesInput.value) || 1;
-                montantPayerInput.value = (prixUnitaire * nombre).toLocaleString('fr-FR');
-            }
-
-            // Écouteur sur les escales
-            radios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const prixEscale = parseInt(this.dataset.prix) || 0;
-                    prixUnitaire = prixEscale; // on prend uniquement le prix de l’escale
-                    updateTotal();
-                });
-            });
-
-            // Écouteur sur le nombre de passagers
-            nombrePassagesInput.addEventListener('input', updateTotal);
-
-            // Initialisation du champ montant
-            updateTotal();
-        });
-    </script>
-
-
-
-
-    <?php $this->view('site/partials/footer') ?>
-    <!--<< All JS Plugins >>-->
-    <?php $this->view('site/partials/foot') ?>
+    <?php unset($_SESSION['toast']); ?>
+<?php endif; ?>
+</body>
+</html>

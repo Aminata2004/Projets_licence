@@ -40,18 +40,19 @@ class Programmation_car extends Model
                     $id_trajets = $_POST['idTrajet'][$i]; // Assumption: les index 
 
                     $Save_ligne_chauffeur = $this->insertion_update_simples(
-                        "INSERT INTO  liaison_car_trajet(id_car , id_trajets) VALUES (:id_car,:id_trajets)",
+                        "INSERT INTO  liaison_car_trajet(id_car , id_trajets,id_compagnie) VALUES (:id_car,:id_trajets,:id_compagnie)",
                         [
                             ":id_car" => $id_car,
-                            ":id_trajets" => $id_trajets
+                            ":id_trajets" => $id_trajets,
+                            ":id_compagnie" => $_SESSION['id_compagnie']
                         ]
                     );
                 }
 
                 if ($Save_ligne_chauffeur == true) {
-                    $this->set_flash('Gare ajouter avec succes', 'info');
+                    $this->set_flash('Car programmer avec succès', 'info');
                 } else {
-                    $this->set_flash('Gare non ajouter');
+                    $this->set_flash('Car non programmer', 'danger');
                 }
             }
         } else {

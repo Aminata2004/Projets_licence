@@ -54,7 +54,7 @@ class Loguin extends Model
             // exit;
 
             header("Location: index.php?url=admin/Homes/home");
-            return;
+            exit;
         } else {
             $this->set_flash("Mot de passe incorrect pour l'utilisateur", 'danger');
             return;

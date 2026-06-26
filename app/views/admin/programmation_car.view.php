@@ -80,7 +80,7 @@
                                                         <div class="dropdown-menu dropdown-menu-end">
                                                             <a class="dropdown-item" href="#">Ajouter</a>
                                                             <a class="dropdown-item" href="#">Supprimer</a>
-                                                            <a class="dropdown-item" href="#">Details</a>
+                                                            <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Programmation_cars/details/<?= $Select_cars->id_car ?>">Details</a>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -116,11 +116,17 @@
                                         <label class="form-label">Trajet a parcourire</label>
                                         <select class="form-control multiple-select" multiple="multiple" placeholder="Choisissez un ou plusieurs escale" name="idTrajet[]">
                                             <option value="" disabled>Choisissez un ou plusieurs trajet</option>
-                                            <?php foreach ($listeTrajet as $listeTrajets): ?>
+                                            <!-- <?php foreach ($listeTrajet as $listeTrajets): ?>
                                                 <option value="<?= htmlspecialchars($listeTrajets->idProgrammer); ?>">
                                                     <?= htmlspecialchars($listeTrajets->idDepart . ' - ' . $listeTrajets->idDestination) ?>
                                                 </option>
+                                            <?php endforeach; ?> -->
+                                            <?php foreach ($listeTrajet as $listeTrajets): ?>
+                                                <option value="<?= htmlspecialchars($listeTrajets->idProgrammer); ?>">
+                                                    <?= htmlspecialchars($listeTrajets->depart . ' → ' . $listeTrajets->destination); ?>
+                                                </option>
                                             <?php endforeach; ?>
+
                                         </select>
 
                                     </div>

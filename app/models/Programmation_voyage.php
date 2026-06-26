@@ -28,7 +28,7 @@ class Programmation_voyage extends Model
     //     if (isset($_SESSION['droit'])) {
     //         if ($_SESSION['droit'] === 'Admin') {
     //             $where = " WHERE car.status_car IS NULL";
-    //         } elseif ($_SESSION['droit'] === 'Admin_regionale' && isset($_SESSION['ville'])) {
+    //         } elseif ($_SESSION['droit'] === 'chef_d_escale' && isset($_SESSION['ville'])) {
     //             $where = " WHERE car.status_car = :ville";
     //             $params[':ville'] = $_SESSION['ville'];
     //         }
@@ -68,7 +68,7 @@ $fromAndWhere = "liaison_car_trajet
                 // Admin : cars dont le status_car est NULL ET appartenant à leur compagnie
                 $where = " WHERE car.status_car IS NULL AND car.id_compagnie = :compagnie";
                 $params[':compagnie'] = $_SESSION['id_compagnie'];
-            } elseif ($_SESSION['droit'] === 'Admin_regionale' && isset($_SESSION['ville'])) {
+            } elseif ($_SESSION['droit'] === 'chef_d_escale' && isset($_SESSION['ville'])) {
                 // Admin régionale : status_car = ville ET id_compagnie = leur compagnie
                 $where = " WHERE car.status_car = :ville AND car.id_compagnie = :compagnie";
                 $params[':ville'] = $_SESSION['ville'];
@@ -139,8 +139,8 @@ $fromAndWhere = "liaison_car_trajet
         $result = $this->insertion_update_simples($insert, $params);
 
         // 2. Réinitialiser le nombre de places réservées à 0 (par sécurité)
-        $update = "UPDATE car SET nbr_place_reserve = 0 WHERE numero_car = :numero_car";
-        $this->insertion_update_simples($update, [':numero_car' => $id_care]);
+        $update = "UPDATE car SET nbr_place_reserve = 0 WHERE id_car = :id_car";
+        $this->insertion_update_simples($update, [':id_car' => $id_care]);
 
         // 3. 🔁 Rechercher dans la table suivis si une réservation pour demain existe déjà
         $stmt = $this->connect()->prepare("
@@ -168,10 +168,10 @@ $fromAndWhere = "liaison_car_trajet
             $placeReserve = (int)$suivi['place_reserve'];
 
             // 5. Mettre à jour le nombre de places réservées du car programmé
-            $stmt = $this->connect()->prepare("UPDATE car SET nbr_place_reserve = :n WHERE numero_car = :num");
+            $stmt = $this->connect()->prepare("UPDATE car SET nbr_place_reserve = :n WHERE id_car = :id_car");
             $stmt->execute([
                 ':n'   => $placeReserve,
-                ':num' => $id_care
+                ':id_car' => $id_care
             ]);
         }
 
@@ -180,14 +180,59 @@ $fromAndWhere = "liaison_car_trajet
 
 
 
-    // Update statut care
-    public function updateCareStatus($numero_care, $id_destination)
+    public function updateCareStatus($id_car, $id_destination)
     {
-        $update = "UPDATE car SET status_car = :id_trajet WHERE numero_car = :numero_car";
+        $update = "UPDATE car SET status_car = :id_trajet WHERE id_car = :id_car";
         $params = [
-            ':id_trajet' => $id_destination,
-            ':numero_car' => $numero_care
+            ':id_trajet' => 'En_transit_' . $id_destination,
+            ':id_car' => $id_car
         ];
         return $this->insertion_update_simples($update, $params);
+    }
+
+    public function getCarsInTransit()
+    {
+        $select = "car.*";
+        $fromAndWhere = "car";
+        $where = " WHERE status_car LIKE 'En_transit_%'";
+        $params = [];
+
+        if (isset($_SESSION['droit'], $_SESSION['id_compagnie'])) {
+            if ($_SESSION['droit'] === 'Admin') {
+                $where .= " AND id_compagnie = :compagnie";
+                $params[':compagnie'] = $_SESSION['id_compagnie'];
+            } elseif ($_SESSION['droit'] === 'chef_d_escale' && isset($_SESSION['ville'])) {
+                $where = " WHERE status_car = :ville AND id_compagnie = :compagnie";
+                $params[':ville'] = 'En_transit_' . $_SESSION['ville'];
+                $params[':compagnie'] = $_SESSION['id_compagnie'];
+            }
+        }
+
+        $fromAndWhere .= $where . " ORDER BY numero_car ASC";
+        return $this->SelectAllDatas($select, $fromAndWhere, $params);
+    }
+
+    public function validerArrivee($id_car)
+    {
+        $car = $this->FetchSelectWheres("status_car", "car", "id_car = :id_car", [":id_car" => $id_car]);
+        if (!empty($car)) {
+            $status = $car[0]->status_car;
+            if (strpos($status, 'En_transit_') === 0) {
+                $ville = substr($status, 11);
+                $update = "UPDATE car SET status_car = :ville WHERE id_car = :id_car";
+                return $this->insertion_update_simples($update, [':ville' => $ville, ':id_car' => $id_car]);
+            }
+        }
+        return false;
+    }
+
+    public function getProgrammationById($id)
+    {
+        return $this->FetchSelectWhereS(
+            "*",
+            "programmation_voyage",
+            "id_programmation = :id_programmation",
+            [":id_programmation" => $id]
+        );
     }
 }

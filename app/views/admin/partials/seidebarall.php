@@ -25,6 +25,7 @@
 
       </li>
 
+      <?php if ($_SESSION['droit'] !== 'super_admin'): ?>
       <?php if ($user->userHasPermission('Billets_creation')) { ?>
         <li class="menu-label">Gestion des reservation</li>
         <li>
@@ -209,6 +210,8 @@
               </a>
             </li> -->
 
+              <?php endif; // Fin du if !== 'super_admin' ?>
+
               <?php if (isset($_SESSION['droit']) && ($_SESSION['droit'] === 'Admin' || $_SESSION['droit'] === 'super_admin')): ?>
 
                 <li class="menu-label">Paramètre</li>
@@ -221,7 +224,7 @@
                       <div class="menu-title">Configuration</div>
                     </a>
                   <?php else: ?>
-                    <a href="<?= BASE_URL ?>/admin/Liste_gares">
+                    <a href="<?= BASE_URL ?>/admin/Configuration">
                       <div class="parent-icon">
                         <i class="fadeIn animated bx bx-shape-polygon"></i>
                       </div>

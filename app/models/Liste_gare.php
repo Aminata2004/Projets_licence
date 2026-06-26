@@ -88,7 +88,9 @@ class Liste_gare extends Model
         $modification = $this->insertion_update_simples($req, $params);
 
         if ($modification == true) {
-            $this->set_flash("modification faite avec ", "primary");
+            $this->set_flash("Modification effectuée avec succès", "primary");
+        } else {
+            $this->set_flash("Echec de la modification", "danger");
             // $this->redirect("compagnies");
         }
     }
@@ -163,9 +165,19 @@ public function saveCaisse()
     );
 
     if ($insertion == true) {
-        $this->set_flash("Caisse ajoutée avec succès ✅", "info");
+        $this->set_swal(
+            "Caisse ouverte !", 
+            "La caisse a été ajoutée avec succès.", 
+            "success", 
+            "#16a34a"
+        );
     } else {
-        $this->set_flash("Erreur lors de l’ajout de la caisse ❌", "danger");
+        $this->set_swal(
+            "Erreur", 
+            "Erreur lors de l’ajout de la caisse.", 
+            "error", 
+            "#dc3545"
+        );
     }
 }
 

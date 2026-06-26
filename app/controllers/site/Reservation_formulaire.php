@@ -104,7 +104,7 @@ class Reservation_formulaire extends Controller
 
                     $idCarProgrammer = $rowProg['id_car_programmer'];
                     $car = $programmeModel->fetchOne(
-                        "SELECT nbr_place, nbr_place_reserve FROM car WHERE numero_car = :num LIMIT 1",
+                        "SELECT nbr_place, nbr_place_reserve FROM car WHERE id_car = :num LIMIT 1",
                         [':num' => $idCarProgrammer]
                     );
                     if (!$car) throw new Exception("Car introuvable.");
@@ -153,7 +153,7 @@ class Reservation_formulaire extends Controller
 
                 // --- 4️⃣ Mise à jour places si voyage aujourd'hui ---
                 if ($jourVoyage == $aujourdhui) {
-                    $stmt = $pdo->prepare("UPDATE car SET nbr_place_reserve = nbr_place_reserve + :n WHERE numero_car = :num");
+                    $stmt = $pdo->prepare("UPDATE car SET nbr_place_reserve = nbr_place_reserve + :n WHERE id_car = :num");
                     $stmt->execute([':n' => $nbPassagers, ':num' => $idCarProgrammer]);
                 }
 

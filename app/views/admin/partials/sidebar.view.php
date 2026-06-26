@@ -1,15 +1,71 @@
   <?php $user = new Configuration($_SESSION['id_utilisateur']) ?>
+  <style>
+    .sidebar-wrapper {
+      background: #0f3b5e !important;
+      border-right: none !important;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    }
+    .sidebar-wrapper .sidebar-header {
+      background: #ffffff !important;
+      border-bottom: 2px solid #e2e8f0 !important;
+      justify-content: center;
+    }
+    .sidebar-wrapper .logo-text {
+      color: #ffffff !important;
+      font-weight: 800;
+      font-size: 1.6rem;
+      margin-left: 0;
+    }
+    .sidebar-wrapper .logo-text span {
+      color: #e67e22 !important;
+    }
+    .metismenu a {
+      color: #e2e8f0 !important;
+      border-radius: 8px !important;
+      margin: 4px 12px !important;
+      transition: all 0.3s ease;
+    }
+    .metismenu a:hover, .metismenu .mm-active > a {
+      background: rgba(255,255,255,0.15) !important;
+      color: #ffffff !important;
+    }
+    .metismenu .menu-label {
+      color: #94a3b8 !important;
+      text-transform: uppercase;
+      font-weight: 600;
+      padding-left: 20px !important;
+    }
+    .sidebar-wrapper .toggle-icon {
+      color: #0f3b5e !important;
+    }
+    .metismenu .parent-icon, .metismenu i {
+      color: #e67e22 !important;
+    }
+    /* Sous-menus (onglets) sans fond blanc */
+    .metismenu ul {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    .metismenu ul a {
+      color: #94a3b8 !important;
+      padding-left: 45px !important;
+      background: transparent !important;
+    }
+    .metismenu ul a:hover, .metismenu ul .mm-active > a {
+      color: #ffffff !important;
+      background: rgba(255,255,255,0.05) !important;
+    }
+    .metismenu li.mm-active, .metismenu li {
+      background: transparent !important;
+    }
+  </style>
   <aside class="sidebar-wrapper" data-simplebar="true">
     <div class="sidebar-header">
       <div>
-        <a href="<?= BASE_URL ?>/admin/Homes/home"><img src="<?= BASE_URL ?>/assets_site/img/reservation.png" class="logo-icon" alt="logo icon"></a>
-
-      </div>
-      <div>
-        <a href="<?= BASE_URL ?>/admin/Homes/home">
-          <h4 class="logo-text">G_compagnie</h4>
+        <a href="<?= BASE_URL ?>/admin/Homes/home" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">
+          <img src="<?= BASE_URL ?>/images/logos/transgest_logo.png" alt="TransGest" style="height:60px; width:auto; object-fit:contain;">
         </a>
-
       </div>
       <div class="toggle-icon ms-auto"><i class="bi bi-chevron-double-left"></i>
       </div>
@@ -25,6 +81,7 @@
 
       </li>
 
+      <?php if ($_SESSION['droit'] !== 'super_admin'): ?>
       <?php if ($user->userHasPermission('Billets_creation')) { ?>
         <li class="menu-label">Gestion des reservation</li>
         <li>
@@ -210,12 +267,14 @@
               </a>
             </li> -->
 
+                <?php endif; // Fin du if !== 'super_admin' ?>
+
                 <?php if (isset($_SESSION['droit']) && ($_SESSION['droit'] === 'Admin' || $_SESSION['droit'] === 'super_admin')): ?>
                 <?php //if ($user->userHasPermission('configuration_aprecue')) {
                 ?>
                   <li class="menu-label">Paramètre</li>
                   <li>
-                    <?php if ($_SESSION['droit'] === 'super_Admin'): ?>
+                    <?php if ($_SESSION['droit'] === 'super_admin'): ?>
                       <a href="<?= BASE_URL ?>/admin/Compagnies">
                         <div class="parent-icon">
                           <i class="fadeIn animated bx bx-shape-polygon"></i>

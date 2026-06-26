@@ -38,12 +38,14 @@ class Homes extends Controller
         $billetsJour    = $this->homeModel->getBilletsJournalier($_SESSION['id_utilisateur']);
         $voyagesJour    = $this->homeModel->getVoyagesProgrammes();
         $colisMensuel   = $this->homeModel->getColisMensuel($session); // fonction unique pour tous les statuts mensuels
+        $topGares       = $this->homeModel->getTopGares();
 
         // Envoyer les données à la vue
         $this->view('admin/home', [
             'billetsJour' => $billetsJour,
             'voyagesJour' => $voyagesJour,
-            'colisMensuel' => $colisMensuel
+            'colisMensuel' => $colisMensuel,
+            'topGares'    => $topGares
         ]);
     }
 }

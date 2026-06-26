@@ -1,268 +1,614 @@
-<!--<< All JS Plugins >>-->
-<?php $this->view('site/partials/header') ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>À propos & Contact - TransGest</title>
+    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>/assets_site/css/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            color: #1a1f2e;
+            overflow-x: hidden;
+        }
+
+        :root {
+            --primary: #0f3b5e;
+            --primary-dark: #0a2a44;
+            --primary-light: #1a5276;
+            --secondary: #e67e22;
+            --secondary-dark: #c0392b;
+            --gray-light: #ecf0f1;
+            --gray: #7f8c8d;
+            --dark: #2c3e50;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 5px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .logo span {
+            color: var(--secondary);
+        }
+        .nav {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        .nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav a:hover, .nav a.active {
+            color: var(--secondary);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 350px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            padding: 80px 30px 30px;
+            transition: right 0.3s ease;
+        }
+        .mobile-nav.active { right: 0; }
+        .mobile-nav a {
+            display: block;
+            padding: 15px 0;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            border-bottom: 1px solid #eee;
+        }
+        .close-menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            display: none;
+        }
+        .overlay.active { display: block; }
+
+        /* ========== PAGE HEADER ========== */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .page-header p {
+            font-size: 1rem;
+            opacity: 0.85;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ========== SECTION À PROPOS ========== */
+        .about-section {
+            padding: 60px 0;
+        }
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        .about-content h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        .about-content p {
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .about-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        .about-image img {
+            width: 100%;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* ========== NOS VALEURS ========== */
+        .values-section {
+            background: #f8fafc;
+            padding: 60px 0;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 50px;
+            color: var(--primary);
+        }
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        .value-card {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+        .value-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        .value-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(230, 126, 34, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+            color: var(--secondary);
+        }
+        .value-card h3 {
+            margin-bottom: 15px;
+        }
+        .value-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* ========== CONTACT SECTION ========== */
+        .contact-section {
+            padding: 60px 0;
+        }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+        }
+        .contact-info {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+        }
+        .contact-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        .contact-details {
+            margin: 30px 0;
+        }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .contact-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(230, 126, 34, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+        .contact-text h4 {
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        .contact-text p {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: var(--gray-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            transition: all 0.3s;
+        }
+        .social-link:hover {
+            background: var(--secondary);
+            color: white;
+        }
+        .contact-form {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .btn-submit {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .btn-submit:hover {
+            background: var(--secondary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ========== MAP SECTION ========== */
+        .map-section {
+            padding: 0 0 60px;
+        }
+        .map-container {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 400px;
+            border: 0;
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            background: #1a1f2e;
+            color: #94a3b8;
+            padding: 48px 0 24px;
+            margin-top: 60px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+        .footer h4 {
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        .footer a {
+            color: #94a3b8;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+        .footer a:hover { color: var(--secondary); }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid #334155;
+            font-size: 0.75rem;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 992px) {
+            .about-grid, .contact-grid, .values-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .nav { display: none; }
+            .menu-toggle { display: block; }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .page-header h1 { font-size: 1.8rem; }
+            .about-stats {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
 <body>
-    <!-- Preloader Start -->
-    <div id="preloader" class="preloader">
-        <div class="animation-preloader">
-            <div class="spinner">
+
+<!-- HEADER -->
+<?php $this->view('site/partials/nav') ?>
+
+<!-- PAGE HEADER -->
+<section class="page-header">
+    <div class="container">
+        <h1 data-aos="fade-up">À propos de TransGest</h1>
+        <p data-aos="fade-up" data-aos-delay="100">Découvrez qui nous sommes et comment nous révolutionnons le transport au Mali</p>
+    </div>
+</section>
+
+<!-- SECTION À PROPOS -->
+<section class="about-section">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-content" data-aos="fade-right">
+                <h2>Votre partenaire de voyage au Mali</h2>
+                <p>TransGest est la première plateforme digitale de réservation de billets de bus et de suivi de colis au Mali. Créée en 2020, notre mission est de simplifier les déplacements des Maliens en offrant une solution fiable, rapide et sécurisée.</p>
+                <p>Nous collaborons avec les meilleures compagnies de transport pour vous garantir confort, ponctualité et sécurité. Grâce à notre technologie, réservez vos trajets en quelques clics et suivez vos colis en temps réel.</p>
+                <div class="about-stats">
+                    <div class="stat">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Destinations</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">Compagnies</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Clients</div>
+                    </div>
+                </div>
             </div>
-            <div class="txt-loading">
-                <span data-text-preloader="T" class="letters-loading">
-                    T
-                </span>
-                <span data-text-preloader="R" class="letters-loading">
-                    R
-                </span>
-                <span data-text-preloader="A" class="letters-loading">
-                    A
-                </span>
-                <span data-text-preloader="V" class="letters-loading">
-                    V
-                </span>
-                <span data-text-preloader="O" class="letters-loading">
-                    O
-                </span>
-            </div>
-            <p class="text-center">Loading</p>
-        </div>
-        <div class="loader">
-            <div class="row">
-                <div class="col-3 loader-section section-left">
-                    <div class="bg"></div>
-                </div>
-                <div class="col-3 loader-section section-left">
-                    <div class="bg"></div>
-                </div>
-                <div class="col-3 loader-section section-right">
-                    <div class="bg"></div>
-                </div>
-                <div class="col-3 loader-section section-right">
-                    <div class="bg"></div>
-                </div>
+            <div class="about-image" data-aos="fade-left">
+                <img src="<?= BASE_URL ?>/assets_site/img/about_unsplash.jpg" alt="Équipe TransGest">
             </div>
         </div>
     </div>
-    <!--<< Mouse Cursor Start >>-->
-    <div class="mouse-cursor cursor-outer"></div>
-    <div class="mouse-cursor cursor-inner"></div>
-    <!--<< Back-Top Start >>-->
-    <button id="back-top" class="back-to-top">
-        <i class="fa-regular fa-arrow-up"></i>
-    </button>
-    <!-- Offcanvas Area Start -->
-    <div class="fix-area">
-        <div class="offcanvas__info">
-            <div class="offcanvas__wrapper">
-                <div class="offcanvas__content">
-                    <div class="offcanvas__top mb-5 d-flex justify-content-between align-items-center">
-                        <div class="offcanvas__logo">
-                            <a href="index.html">
-                                <img src="<?= BASE_URL ?>/<?= BASE_URL ?>/<?=BASE_URL?>/assets_site_site_site/img/logo/black-logo.svg" alt="logo-img">
-                            </a>
-                        </div>
-                        <div class="offcanvas__close">
-                            <button>
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <p class="text d-none d-xl-block">
-                        Nullam dignissim, ante scelerisque the is euismod fermentum odio sem semper the is erat, a
-                        feugiat leo urna eget eros. Duis Aenean a imperdiet risus.
-                    </p>
-                    <div class="mobile-menu fix mb-3"></div>
-                    <div class="offcanvas__contact">
-                        <h4>Contact Info</h4>
-                        <ul>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon">
-                                    <i class="fal fa-map-marker-alt"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a target="_blank" href="#">Main Street, Melbourne, Australia</a>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon mr-15">
-                                    <i class="fal fa-envelope"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a href="mailto:info@example.com"><span
-                                            class="mailto:info@example.com">info@example.com</span></a>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon mr-15">
-                                    <i class="fal fa-clock"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a target="_blank" href="#">Mod-friday, 09am -05pm</a>
-                                </div>
-                            </li>
-                            <li class="d-flex align-items-center">
-                                <div class="offcanvas__contact-icon mr-15">
-                                    <i class="far fa-phone"></i>
-                                </div>
-                                <div class="offcanvas__contact-text">
-                                    <a href="tel:+11002345909">+11002345909</a>
-                                </div>
-                            </li>
-                        </ul>
-                        <div class="header-button mt-4">
-                            <a href="contact.html" class="theme-btn"> Request A Quote <i
-                                    class="fa-sharp fa-regular fa-arrow-right"></i></a>
-                        </div>
-                        <div class="social-icon d-flex align-items-center">
-                            <a href="#"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#"><i class="fab fa-twitter"></i></a>
-                            <a href="#"><i class="fab fa-youtube"></i></a>
-                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                </div>
+</section>
+
+<!-- NOS VALEURS -->
+<section class="values-section">
+    <div class="container">
+        <h2 class="section-title" data-aos="fade-up">Nos valeurs</h2>
+        <div class="values-grid">
+            <div class="value-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="value-icon"><i class="fas fa-handshake"></i></div>
+                <h3>Confiabilité</h3>
+                <p>Des partenaires de confiance et un service client disponible 24h/24 pour vous accompagner.</p>
+            </div>
+            <div class="value-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="value-icon"><i class="fas fa-bolt"></i></div>
+                <h3>Rapidité</h3>
+                <p>Réservation instantanée, suivi en temps réel et paiement sécurisé en quelques secondes.</p>
+            </div>
+            <div class="value-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="value-icon"><i class="fas fa-smile"></i></div>
+                <h3>Satisfaction</h3>
+                <p>Des milliers de voyageurs satisfaits grâce à notre qualité de service et notre écoute.</p>
             </div>
         </div>
     </div>
-    <div class="offcanvas__overlay"></div>
-    <!-- Search Area Start -->
-    <div class="search-wrap">
-        <div class="search-inner">
-            <i class="fas fa-times search-close" id="search-close"></i>
-            <div class="search-cell">
-                <form method="get">
-                    <div class="search-field-holder">
-                        <input type="search" class="main-search-input" placeholder="Search...">
+</section>
+
+<!-- CONTACT SECTION -->
+<section class="contact-section">
+    <div class="container">
+        <div class="contact-grid">
+            <div class="contact-info" data-aos="fade-right">
+                <h3>Contactez-nous</h3>
+                <p>Notre équipe est à votre disposition pour toute question ou assistance.</p>
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="contact-text">
+                            <h4>Adresse</h4>
+                            <p>Quartier du Fleuve, Bamako, Mali</p>
+                        </div>
                     </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                        <div class="contact-text">
+                            <h4>Téléphone</h4>
+                            <p>+223 20 00 00 00</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="contact-text">
+                            <h4>Email</h4>
+                            <p>contact@transgest.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                        <div class="contact-text">
+                            <h4>Horaires</h4>
+                            <p>Lundi - Samedi : 08h - 20h</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="contact-form" data-aos="fade-left">
+                <h3>Envoyez-nous un message</h3>
+                <form>
+                    <div class="form-group">
+                        <label>Nom complet</label>
+                        <input type="text" class="form-control" placeholder="Votre nom">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-control" placeholder="votre@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Téléphone</label>
+                        <input type="tel" class="form-control" placeholder="77 78 88 99">
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea class="form-control" placeholder="Votre message..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Envoyer le message <i class="fas fa-paper-plane"></i></button>
                 </form>
             </div>
         </div>
     </div>
-    <!-- header-top -->
-    <?php $this->view('site/partials/nav') ?>
-     <!-- Breadcrumb-Section Start -->
-    <section class="breadcrumb-wrapper fix bg-cover"
-        style="background-image: url(<?=BASE_URL?>/assets_site/img/breadcrumb/breadcrumb.jpg);">
-        <div class="container">
-            <div class="row">
-                <div class="page-heading">
-                    <h2>Contact Us</h2>
-                    <ul class="breadcrumb-list">
-                        <li>
-                            <a href="index.html">Home</a>
-                        </li>
-                        <li><i class="fa-solid fa-chevrons-right"></i></li>
-                        <li class="active">Contact Us</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- contact-info-section start -->
-    <section class="contact-info-section section-padding fix">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
-                    <div class="info-items">
-                        <div class="icon">
-                            <img src="<?=BASE_URL?>/assets_site/img/icon/19.svg" alt="">
-                        </div>
-                        <h3>Office Address</h3>
-                        <p>Cedar Street, Chicago,60601, USA</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="info-items">
-                        <div class="icon">
-                            <img src="<?=BASE_URL?>/assets_site/img/icon/20.svg" alt="">
-                        </div>
-                        <h3>Call Us For Support:</h3>
-                        <p>+4800 45 678 900</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="info-items">
-                        <div class="icon">
-                            <img src="<?=BASE_URL?>/assets_site/img/icon/21.svg" alt="">
-                        </div>
-                        <h3>Email Us Anytime:</h3>
-                        <p>contact@example.com</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Contact-Section Start -->
-    <section class="contact-section section-padding fix section-bg bg-cover"
-        style="background-image: url(<?=BASE_URL?>/assets_site/img/contact/bg.png);">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-6">
-                    <div class="contact-wrapper">
-                        <div class="section-title">
-                            <span class="sub-title wow fadeInUp" style="visibility: visible; animation-name: fadeInUp;">
-                                Contact Us
-                            </span>
-                            <h2 class="wow fadeInUp" data-wow-delay=".3s">
-                                Let's Build An Awesome Project Together
-                            </h2>
-                        </div>
-                        <div class="contact-thumb">
-                            <img src="<?=BASE_URL?>/assets_site/img/contact/1.jpg" class="ex" alt="img">
-                            <h4><img src="<?=BASE_URL?>/assets_site/img/icon/phone.svg" alt="img"> +12 608 (3456) 789</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="contact-form style-2">
-                        <h3>Fill The Contact Form</h3>
-                        <p>Feel free to contact with us, we don't spam your email</p>
-                        <form action="contact.php" method="post">
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="form-clt">
-                                        <input type="text" name="name" id="name" placeholder="Your name">
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="form-clt">
-                                        <input type="tel" name="phone" id="phone" placeholder="Phone number">
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-clt">
-                                        <input type="email" name="email" id="email" placeholder="Email address">
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-clt">
-                                        <textarea name="message" id="message"
-                                            placeholder="Write your message"></textarea>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <button type="submit" class="theme-btn style-2">
-                                        Send Message
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- map section start -->
-    <div class="map-section">
-        <div class="map-items">
-            <div class="googpemap">
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6678.7619084840835!2d144.9618311901502!3d-37.81450084255415!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642b4758afc1d%3A0x3119cc820fdfc62e!2sEnvato!5e0!3m2!1sen!2sbd!4v1641984054261!5m2!1sen!2sbd"
-                    style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-            </div>
+</section>
+
+<!-- MAP SECTION -->
+<section class="map-section">
+    <div class="container">
+        <div class="map-container" data-aos="fade-up">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3868.382152195884!2d-8.002433!3d12.639465!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xe5c6f8b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sBamako%2C%20Mali!5e0!3m2!1sfr!2sfr!4v1700000000000!5m2!1sfr!2sfr" allowfullscreen="" loading="lazy"></iframe>
         </div>
     </div>
-    <!-- Footer-Section Start -->
-    <?php $this->view('site/partials/footer') ?>
-    <!--<< All JS Plugins >>-->
-    <?php $this->view('site/partials/foot') ?>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div><h4>TransGest</h4><p style="font-size: 0.85rem;">La plateforme N°1 de réservation de billets de bus et suivi de colis au Mali.</p></div>
+            <div><h4>Liens rapides</h4>
+                <a href="<?= BASE_URL ?>/site/Accueil">Accueil</a>
+                <a href="<?= BASE_URL ?>/site/compagnies">Compagnies</a>
+                <a href="<?= BASE_URL ?>/site/Contact">Contact</a>
+            </div>
+            <div><h4>Support</h4><a href="#">FAQ</a><a href="#">Conditions générales</a><a href="#">Politique de confidentialité</a></div>
+            <div><h4>Contact</h4><a href="#"><i class="fas fa-phone"></i> +223 20 00 00 00</a><a href="#"><i class="fas fa-envelope"></i> contact@transgest.com</a><a href="#"><i class="fas fa-map-marker-alt"></i> Bamako, Mali</a></div>
+        </div>
+        <div class="footer-bottom"><p>&copy; 2024 TransGest - Tous droits réservés</p></div>
+    </div>
+</footer>
+
+<script src="<?= BASE_URL ?>/assets_site/js/aos.js"></script>
+<script>
+    AOS.init({ duration: 600, once: true, offset: 50 });
+</script>
+</body>
+</html>

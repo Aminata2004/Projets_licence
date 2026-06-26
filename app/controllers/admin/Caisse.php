@@ -17,11 +17,14 @@ class Caisse extends Controller
             $id = (int)$_POST['id_caisse'];
             $status_caisse = (int)$_POST['newStatut'];
 
+            // Enregistrer la date de fermeture
+            $date_fermeture = date('Y-m-d');
+
             $result = $liste_gare->insertion_update_simple(
-                "UPDATE caisse SET status_caisse = :status_caisse WHERE id_caisse = :id_caisse",
+                "UPDATE caisse SET status_caisse = 0, date_fermeture = :date_fermeture WHERE id_caisse = :id_caisse",
                 [
-                    ":status_caisse" => $status_caisse,
-                    ":id_caisse" => $id
+                    ":date_fermeture"  => $date_fermeture,
+                    ":id_caisse"       => $id
                 ]
             );
 
@@ -120,14 +123,14 @@ class Caisse extends Controller
         $liste_gare = new Liste_gare();
         $id_compagnie = $_SESSION['id_compagnie'];
         $ville        = $_SESSION['ville']; // Agence connectée
-        $role         = $_SESSION['droit'];  // Exemple: 'Admin' ou 'Admin_regionale'
+        $role         = $_SESSION['droit'];  // Exemple: 'Admin' ou 'chef_d_escale'
 
         // Base query
         $condition = 'a.id_compagnie = :id_compagnie';
         $params    = ['id_compagnie' => $id_compagnie];
 
         // Si c’est un Admin régional → filtre par localité
-        if ($role === 'Admin_regionale') {
+        if ($role === 'chef_d_escale') {
             $condition .= ' AND a.localite = :ville';
             $params['ville'] = $ville;
         }
@@ -160,14 +163,14 @@ class Caisse extends Controller
         $liste_gare = new Liste_gare();
         $id_compagnie = $_SESSION['id_compagnie'];
         $ville        = $_SESSION['ville']; // Agence connectée
-        $role         = $_SESSION['droit'];  // Exemple: 'Admin' ou 'Admin_regionale'
+        $role         = $_SESSION['droit'];  // Exemple: 'Admin' ou 'chef_d_escale'
 
         // Base query
         $condition = 'a.id_compagnie = :id_compagnie';
         $params    = ['id_compagnie' => $id_compagnie];
 
         // Si c’est un Admin régional → filtre par localité
-        if ($role === 'Admin_regionale') {
+        if ($role === 'chef_d_escale') {
             $condition .= ' AND a.localite = :ville';
             $params['ville'] = $ville;
         }

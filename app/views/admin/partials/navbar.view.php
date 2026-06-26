@@ -1,5 +1,32 @@
   <?php $user = new Configuration($_SESSION['id_utilisateur']) ?>
+  <style>
+    .top-header {
+      background: #0f3b5e !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    }
+    .top-header .nav-link,
+    .top-header .mobile-toggle-icon i,
+    .top-header .user-name {
+      color: #ffffff !important;
+    }
+    .top-header .notifications i {
+      color: #ffffff !important;
+    }
+    .top-header .search-close-icon i, .top-header .search-toggle-icon i {
+      color: #ffffff !important;
+    }
+    .dropdown-menu {
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15) !important;
+      border: none !important;
+    }
+  </style>
   <header class="top-header">
+    <?php if (isset($_SESSION['super_admin_id'])): ?>
+      <div style="background-color: #dc3545; color: white; text-align: center; padding: 10px; font-weight: bold; z-index: 9999; position: relative;">
+          ⚠️ MODE SUPPORT TECHNIQUE : Vous visualisez actuellement les données avec l'identité : <?= $_SESSION['nom'] ?>.
+          <a href="<?= BASE_URL ?>/admin/Compagnies/leave_impersonate" class="btn btn-sm btn-light ms-3 fw-bold text-danger">Quitter le mode support</a>
+      </div>
+    <?php endif; ?>
     <nav class="navbar navbar-expand">
       <div class="mobile-toggle-icon d-xl-none">
         <i class="bi bi-list"></i>
@@ -22,9 +49,9 @@
           require_once __DIR__ . '/../../../core/database.php';
 
 
-          $_SESSION['droit'];         // 'Admin_global', 'Admin_regionale', 'Utilisateur', 'Admin'
-          $_SESSION['ville'];        // pour Admin_regionale / Utilisateur
-          $_SESSION['numero_gare'];  // pour Admin_regionale / Utilisateur
+          $_SESSION['droit'];         // 'Admin_global', 'chef_d_escale', 'Utilisateur', 'Admin'
+          $_SESSION['ville'];        // pour chef_d_escale / Utilisateur
+          $_SESSION['numero_gare'];  // pour chef_d_escale / Utilisateur
           $_SESSION['id_compagnie']; // pour Admin
 
 
@@ -42,7 +69,7 @@
 
           $params = [];
 
-          if ($_SESSION['droit'] === 'Admin_regionale' || $_SESSION['droit'] === 'Utilisateur') {
+          if ($_SESSION['droit'] === 'chef_d_escale' || $_SESSION['droit'] === 'Utilisateur') {
             // Filtrer par ville et numéro de gare
             $sql .= " AND departId = :ville AND num_gare = :numero_gare";
             $params[':ville'] = $_SESSION['ville'];

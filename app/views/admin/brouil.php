@@ -134,10 +134,10 @@
  $this->set_flash("Erreur SQL : " . $e->getMessage(), "danger");
  return false;
  }
- }
+ }http://localhost:8080/Gestion_compagnie_mcv/index.php?url=admin/loguins/index
 
 
- http://localhost:8080/Gestion_compagnie_mcv/index.php?url=admin/loguins/index
+
 
 
 

@@ -1,505 +1,935 @@
-<!--<< All JS Plugins >>-->
-<?php $this->view('site/partials/header') ?>
-<!-- Bootstrap CSS -->
-<style>
-    /* Animation hover card */
-    .card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .city-block_one {
-        position: relative;
-        overflow: hidden;
-        border-radius: 12px;
-    }
-
-    .city-block_one-image {
-        position: relative;
-    }
-
-    .city-block_one-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: flex-end;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-    }
-
-    .destination-card {
-        position: relative;
-        height: 300px;
-    }
-
-    .destination-card img {
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.4s ease;
-    }
-
-    .destination-card:hover img {
-        transform: scale(1.05);
-    }
-
-    .destination-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
-        color: white;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: end;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .destination-card:hover .destination-overlay {
-        opacity: 1;
-    }
-</style>
-<body>
-    <!-- Preloader Start -->
-    <div id="preloader" class="preloader">
-        <div class="animation-preloader">
-            <div class="spinner">
-            </div>
-            <div class="txt-loading">
-                <span data-text-preloader="T" class="letters-loading">
-                    T
-                </span>
-                <span data-text-preloader="R" class="letters-loading">
-                    R
-                </span>
-                <span data-text-preloader="A" class="letters-loading">
-                    A
-                </span>
-                <span data-text-preloader="V" class="letters-loading">
-                    V
-                </span>
-                <span data-text-preloader="O" class="letters-loading">
-                    O
-                </span>
-            </div>
-            <p class="text-center">Loading</p>
-        </div>
-        <div class="loader">
-            <div class="row">
-                <div class="col-3 loader-section section-left">
-                    <div class="bg"></div>
-                </div>
-                <div class="col-3 loader-section section-left">
-                    <div class="bg"></div>
-                </div>
-                <div class="col-3 loader-section section-right">
-                    <div class="bg"></div>
-                </div>
-                <div class="col-3 loader-section section-right">
-                    <div class="bg"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--<< Mouse Cursor Start >>-->
-    <div class="mouse-cursor cursor-outer"></div>
-    <div class="mouse-cursor cursor-inner"></div>
-    <!--<< Back-Top Start >>-->
-    <button id="back-top" class="back-to-top">
-        <i class="fa-regular fa-arrow-up"></i>
-    </button>
-    <!-- Offcanvas Area Start -->
-    <div class="fix-area">
-        <div class="offcanvas__info">
-            <div class="offcanvas__wrapper">
-                <div class="offcanvas__content">
-                    <div class="offcanvas__top mb-5 d-flex justify-content-between align-items-center">
-                        <div class="offcanvas__logo">
-                            <a href="index.html">
-                                <img src="<?= BASE_URL ?>/assets_site/img/logo/black-logo.svg" alt="logo-img">
-                            </a>
-                        </div>
-                        <div class="offcanvas__close">
-                            <button>
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                 
-                    <div class="mobile-menu fix mb-3"></div>
-                 
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="offcanvas__overlay"></div>
-    <!-- Search Area Start -->
-    <div class="search-wrap">
-        <div class="search-inner">
-            <i class="fas fa-times search-close" id="search-close"></i>
-            <div class="search-cell">
-                <form method="get">
-                    <div class="search-field-holder">
-                        <input type="search" class="main-search-input" placeholder="Search...">
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <!-- header-top -->
-    <?php $this->view('site/partials/nav') ?>
-
-    <!-- Hero-Section Start -->
-    <!-- Hero Slider Start -->
-    <section id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-        <div class="carousel-inner">
-
-            <!-- Slide 1 -->
-            <div class="carousel-item active">
-                <div class="hero-slide" style="background-image: url('<?php echo BASE_URL; ?>/assets_site/img/acc.png');">
-                    <div class="overlay"></div>
-                    <div class="hero-content d-flex flex-column justify-content-center align-items-center text-center">
-                        <span class="sub-title fw-semibold mb-3">
-                            <h3 class="fw-bold text-white">Plateforme de Réservation & Suivi</h3>
-                        </span>
-                        <h1 class="fw-bold mb-4 display-4 text-white">Réservez vos billets facilement</h1>
-                        <p class="lead mb-5" style="max-width: 1000px; font: size 24px;">Une solution simple, rapide et sécurisée pour gérer vos réservations et vos envois.</p>
-                        <div>
-                            <a href="#reservation" class="btn btn-warning btn-lg px-5 me-3 shadow rounded-pill btn-animate">Réserver maintenant</a>
-                            <a href="#colis" class="btn btn-outline-light btn-lg px-5 rounded-pill btn-animate">Suivre un colis</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Slide 2 -->
-            <div class="carousel-item">
-                <div class="hero-slide" style="background-image: url('<?php echo BASE_URL; ?>/assets_site/img/colis.png');">
-                    <div class="overlay"></div>
-                    <div class="hero-content d-flex flex-column justify-content-center align-items-center text-center">
-                        <span class="sub-title fw-semibold mb-3">
-                            <h3 class="fw-bold text-white">Plateforme de Réservation & Suivi</h3>
-                        </span>
-                        <h1 class="fw-bold mb-4 display-4 text-white">Suivez vos colis en temps réel</h1>
-                        <p class="lead mb-5" style="max-width: 700px;">Gardez toujours un œil sur vos envois grâce à notre suivi intelligent.</p>
-                        <div>
-                            <a href="#reservation" class="btn btn-warning btn-lg px-5 me-3 shadow rounded-pill btn-animate">Réserver maintenant</a>
-                            <a href="#colis" class="btn btn-outline-light btn-lg px-5 rounded-pill btn-animate">Suivre un colis</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Controls -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
-    </section>
-
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>TransGest - Réservation & Suivi de colis</title>
+    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets_site/css/all.min.css">
+    <link href="<?= BASE_URL ?>/assets_site/css/aos.css" rel="stylesheet">
     <style>
-        /* Hero Slide */
-        .hero-slide {
-            position: relative;
-            height: 100vh;
-            background-position: center;
-            background-size: cover;
-            background-repeat: no-repeat;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* Overlay très léger */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f6fa;
+            color: #1a1f2e;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* ========== VARIABLES ========== */
+        :root {
+            --primary: #0f3b5e;
+            --primary-dark: #0a2a44;
+            --primary-light: #1a5276;
+            --secondary: #e67e22;
+            --secondary-dark: #c0392b;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --gray-light: #ecf0f1;
+            --gray: #7f8c8d;
+            --dark: #2c3e50;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 5px 20px rgba(0, 0, 0, 0.08);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        /* ========== TYPOGRAPHY ========== */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        /* ========== LAYOUT ========== */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        section {
+            padding: 60px 0;
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: var(--secondary-dark);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-block {
+            width: 100%;
+        }
+
+        /* ========== HEADER RESPONSIVE ========== */
+        .header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .logo span {
+            color: var(--secondary);
+        }
+        
+        /* Desktop Navigation */
+        .nav {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        .nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav a:hover {
+            color: var(--secondary);
+        }
+        
+        /* Mobile Menu Button */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.3s;
+        }
+        .menu-toggle:hover {
+            color: var(--secondary);
+        }
+        
+        /* Mobile Navigation */
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 350px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            padding: 80px 30px 30px;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+        .mobile-nav.active {
+            right: 0;
+        }
+        .mobile-nav a {
+            display: block;
+            padding: 15px 0;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #eee;
+            transition: color 0.3s;
+        }
+        .mobile-nav a:hover {
+            color: var(--secondary);
+        }
+        .mobile-nav .btn-outline {
+            display: inline-block;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .close-menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
         .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            display: none;
+        }
+        .overlay.active {
+            display: block;
+        }
+
+        /* ========== HERO avec IMAGE EN ARRIÈRE-PLAN ========== */
+        .hero {
+            position: relative;
+            color: white;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+        .hero-bg {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.1);
+            object-fit: cover;
+            z-index: 0;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(15, 59, 94, 0.7) 0%, rgba(10, 42, 68, 0.6) 100%);
             z-index: 1;
         }
-
-        /* Contenu centré verticalement */
-        .hero-content {
+        .hero .container {
             position: relative;
             z-index: 2;
-            height: 100%;
-            padding: 0 15px;
-            color: #fff;
-            /* tout le texte en blanc */
+        }
+        .hero-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            min-height: 550px;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .hero h1 span {
+            color: var(--secondary);
+        }
+        .hero p {
+            font-size: 1rem;
+            opacity: 0.95;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.2);
+        }
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        .hero-stat h3 {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+        .hero-stat p {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+        .hero-image {
+            text-align: center;
+        }
+        .hero-image img {
+            max-width: 100%;
+            background: transparent;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
         }
 
-        /* Animation fade-in */
-        .fade-in {
-            animation: fadeInUp 1.2s ease-out forwards;
+        /* ========== SEARCH CARD ========== */
+        .search-section {
+            margin-top: -40px;
+            position: relative;
+            z-index: 10;
+        }
+        .search-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 32px;
+        }
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            align-items: end;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-control, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--secondary);
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
+        /* ========== SECTION HEADER ========== */
+        .section-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .section-header h2 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+        .section-header p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ========== COMPANY GRID ========== */
+        .company-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        .company-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+        }
+        .company-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        .company-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--gray-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+        .company-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        .company-card .badge {
+            display: inline-block;
+            background: #e8f4fd;
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            margin: 12px 0;
+        }
+        .company-card .trajets {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+
+        /* ========== TRACKING SECTION ========== */
+        .tracking-section {
+            background: var(--gray-light);
+            border-radius: var(--radius-lg);
+            padding: 48px;
+        }
+        .tracking-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+        }
+        .tracking-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 16px;
+        }
+        .tracking-features {
+            display: flex;
+            gap: 24px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        .tracking-features span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        .tracking-box {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+        }
+        .input-group {
+            display: flex;
+            gap: 12px;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+        }
+
+        /* ========== DESTINATION GRID ========== */
+        .dest-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .dest-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+        .dest-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        .dest-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .dest-info {
+            padding: 16px;
+        }
+        .dest-info h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        .dest-info p {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        .dest-price {
+            font-weight: 700;
+            color: var(--secondary);
+            margin-top: 8px;
+        }
+
+        /* ========== STATS BAR ========== */
+        .stats-bar {
+            background: var(--primary);
+            color: white;
+            padding: 48px 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            text-align: center;
+            gap: 32px;
+        }
+        .stats-grid h3 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        .stats-grid p {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            background: #1a1f2e;
+            color: #94a3b8;
+            padding: 48px 0 24px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+        .footer h4 {
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        .footer a {
+            color: #94a3b8;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+        .footer a:hover {
+            color: var(--secondary);
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid #334155;
+            font-size: 0.75rem;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 992px) {
+            .hero-inner {
+                grid-template-columns: 1fr;
+                text-align: center;
             }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .hero-stats {
+                justify-content: center;
+            }
+            .search-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .company-grid, .dest-grid, .stats-grid, .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .tracking-grid {
+                grid-template-columns: 1fr;
+            }
+            .tracking-section {
+                padding: 30px;
             }
         }
-
-        /* Boutons animés */
-        .btn-animate {
-            transition: all 0.3s ease;
-        }
-
-        .btn-animate:hover {
-            transform: scale(1.05);
-        }
-
-        /* Responsive */
+        
         @media (max-width: 768px) {
-            .hero-content h1 {
-                font-size: 2rem !important;
+            .search-grid {
+                grid-template-columns: 1fr;
             }
-
-            .hero-content p {
-                font-size: 1rem !important;
+            .company-grid, .dest-grid, .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .input-group {
+                flex-direction: column;
+            }
+            .hero {
+                min-height: 500px;
+            }
+            .hero-stats {
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+            .hero-stat h3 {
+                font-size: 1.4rem;
+            }
+            .tracking-features {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            /* Afficher le bouton menu sur mobile */
+            .nav {
+                display: none;
+            }
+            .menu-toggle {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            .hero p {
+                font-size: 0.85rem;
+            }
+            .search-card {
+                padding: 20px;
+            }
+            .stats-grid h3 {
+                font-size: 1.5rem;
             }
         }
     </style>
+</head>
+<body>
 
-    <!-- Destination Section Start -->
-    <section class="destination-section section-padding fix bg-white" id="compagnies">
-        <div class="container">
-            <div class="section-title text-center mb-5">
-                <span class="sub-title text-primary fw-semibold" style="letter-spacing: 2px;">Réserve une place</span>
-                <h2 class="mt-2">Nos Compagnies partenaires</h2>
-            </div>
+<!-- HEADER -->
+<?php $this->view('site/partials/nav') ?>
 
-            <div class="swiper destination-slider">
-                <div class="swiper-wrapper">
-                    <?php foreach ($listecompagnie as $compagnie): ?>
-                        <div class="swiper-slide">
-                            <div class="card border rounded-4 shadow-sm h-100 overflow-hidden"
-                                style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
+<!-- Mobile Navigation Menu -->
+<div class="mobile-nav" id="mobileNav">
+    <button class="close-menu" id="closeMenu">
+        <i class="fas fa-times"></i>
+    </button>
+    <a href="<?= BASE_URL ?>/site/Accueil">Accueil</a>
+    <a href="<?= BASE_URL ?>/compagnies">Compagnies</a>
+    <a href="#destinations">Destinations</a>
+    <a href="<?= BASE_URL ?>/site/Contact">Contact</a>
+    <a href="<?= BASE_URL ?>/login" class="btn btn-outline btn-block" style="margin-top: 20px; text-decoration: none;">Espace pro</a>
+</div>
+<div class="overlay" id="overlay"></div>
 
-                                <!-- Header image propre et arrondie -->
-                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light rounded-top-4"
-                                    style="height: 200px; padding: 10px;">
-                                    <img src="<?= BASE_URL ?>/images/logos/<?= htmlspecialchars($compagnie->logo) ?>"
-                                        alt="<?= htmlspecialchars($compagnie->nom_compagnie) ?>"
-                                        style="max-height: 90%; max-width: 90%; object-fit: contain;">
-                                </div>
-
-                                <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title"><?= htmlspecialchars($compagnie->nom_compagnie) ?></h5>
-                                    <p class="card-text text-muted mb-3">
-                                        <i class="fa-solid fa-comment-dots me-2"></i>
-                                        <?= htmlspecialchars($compagnie->slogant ?? '') ?>
-                                    </p>
-                                    <a href="<?= BASE_URL ?>/site/Programmer/show/<?= base64_encode($compagnie->id_compagnie) ?>"
-                                        class="btn btn-outline-primary mt-auto">
-                                        Réserver <i class="fa-solid fa-arrow-right ms-1"></i>
-                                    </a>
-                                </div>
-
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+<!-- HERO avec IMAGE EN ARRIÈRE-PLAN -->
+<section class="hero">
+    <img src="<?= BASE_URL ?>/assets_site/img/hero-bg.jpg" alt="Bus dans la gare routière" class="hero-bg">
+    <div class="hero-overlay"></div>
+    <div class="container">
+        <div class="hero-inner">
+            <div data-aos="fade-right">
+                <div class="hero-badge">✓ Transport agréé</div>
+                <h1>Trans<span>Gest</span><br>Réservation & suivi de colis</h1>
+                <p>La plateforme qui simplifie vos déplacements et l'envoi de vos colis au Mali. Comparez les compagnies, réservez en ligne et suivez vos colis en temps réel.</p>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <h3>50+</h3>
+                        <p>Destinations</p>
+                    </div>
+                    <div class="hero-stat">
+                        <h3>15</h3>
+                        <p>Compagnies</p>
+                    </div>
+                    <div class="hero-stat">
+                        <h3>10K+</h3>
+                        <p>Clients</p>
+                    </div>
                 </div>
-
-
-                <!-- Swiper nav -->
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-pagination"></div>
             </div>
+            <div class="hero-image" data-aos="fade-left">
+                <img src="<?= BASE_URL ?>/assets_site/img/bus-icon.png" alt="Bus">
+            </div>
+        </div>
+    </div>
+</section>
 
-            <div class="row mt-5">
-                <div class="col text-center">
-                    <a href="<?= BASE_URL ?>/compagnies" class="btn btn-primary btn-lg rounded-pill shadow">
-                        Voir toutes les compagnies
-                        <i class="fa-solid fa-arrow-right ms-2"></i>
-                    </a>
+<!-- RECHERCHE -->
+<section class="search-section">
+    <div class="container">
+        <div class="search-card" data-aos="fade-up">
+            <form action="<?= BASE_URL ?>/site/Recherche" method="GET" class="search-grid">
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Départ</label>
+                    <select name="depart" class="form-select" required>
+                        <option value="">📍 Choisissez la ville</option>
+                        <option value="bamako">Bamako</option>
+                        <option value="segou">Ségou</option>
+                        <option value="mopti">Mopti</option>
+                        <option value="kayes">Kayes</option>
+                        <option value="sikasso">Sikasso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-flag-checkered"></i> Destination</label>
+                    <select name="destination" class="form-select" required>
+                        <option value="">🏁 Choisissez la destination</option>
+                        <option value="bamako">Bamako</option>
+                        <option value="segou">Ségou</option>
+                        <option value="mopti">Mopti</option>
+                        <option value="kayes">Kayes</option>
+                        <option value="sikasso">Sikasso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Date</label>
+                    <input type="date" name="date" class="form-control" value="<?= date('Y-m-d') ?>" min="<?= date('Y-m-d') ?>">
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-search"></i> Rechercher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- SUIVI COLIS -->
+<section>
+    <div class="container">
+        <div class="tracking-section" data-aos="fade-up">
+            <div class="tracking-grid">
+                <div class="tracking-info">
+                    <div class="hero-badge" style="background: #e8f4fd; color: var(--accent); display: inline-block;">Suivi 24/7</div>
+                    <h3>Suivez vos colis en temps réel</h3>
+                    <p>Entrez votre numéro de suivi et connaissez à tout moment l'emplacement exact de votre colis.</p>
+                    <div class="tracking-features">
+                        <span><i class="fas fa-check-circle" style="color: var(--success);"></i> Livraison garantie</span>
+                        <span><i class="fas fa-shield-alt" style="color: var(--primary);"></i> Colis assurés</span>
+                        <span><i class="fas fa-clock" style="color: var(--warning);"></i> Mise à jour en direct</span>
+                    </div>
+                </div>
+                <div class="tracking-box">
+                    <div class="input-group">
+                        <input type="text" placeholder="Ex: BL-2024-001234">
+                        <button class="btn btn-primary"><i class="fas fa-search"></i> Suivre</button>
+                    </div>
+                    <p style="font-size: 0.7rem; color: var(--gray); margin-top: 16px;">Exemple: BL-2024-001234, BL-2024-567890</p>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Team-Section Start -->
-    <section class="top-destination-section py-5 bg-light">
-        <div class="container">
-            <!-- Section Title -->
-            <div class="text-center mb-5">
-                <span class="text-primary fw-semibold text-uppercase">Top Destination</span>
-                <h2 class="fw-bold display-6">Explorez les destinations populaires</h2>
-                <p class="text-muted">Des lieux incontournables à visiter avec nos compagnies partenaires</p>
+<!-- COMPAGNIES -->
+<section>
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <h2>Nos compagnies partenaires</h2>
+            <p>Des transporteurs fiables et agréés pour vos déplacements</p>
+        </div>
+        <div class="company-grid">
+            <?php $i = 0; if(!empty($listecompagnie)): foreach($listecompagnie as $c): ?>
+            <div class="company-card" data-aos="fade-up" data-aos-delay="<?= ($i + 1) * 100 ?>">
+                <div class="company-icon" style="overflow: hidden;">
+                    <?php if(!empty($c->logo)): ?>
+                        <img src="<?= BASE_URL ?>/images/logos/<?= htmlspecialchars($c->logo) ?>" alt="<?= htmlspecialchars($c->nom_compagnie) ?>" style="width: 100%; height: 100%; object-fit: contain;">
+                    <?php else: ?>
+                        <i class="fas fa-bus"></i>
+                    <?php endif; ?>
+                </div>
+                <h4><?= htmlspecialchars($c->nom_compagnie) ?></h4>
+                <div class="badge">⭐ 4.8</div>
+                <div class="trajets"><?= htmlspecialchars($c->slogant ?? 'Voyagez en sécurité') ?></div>
+                <a href="<?= BASE_URL ?>/site/Programmer/show/<?= base64_encode($c->id_compagnie) ?>" class="btn btn-outline btn-block" style="padding: 8px; text-decoration: none;">Voir les trajets</a>
             </div>
+            <?php $i++; endforeach; else: ?>
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <p style="color: var(--gray);">Aucune compagnie disponible pour le moment.</p>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
 
-            <!-- Grid of Destinations -->
-            <div class="row g-4">
-                <!-- Card 1 -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="destination-card position-relative overflow-hidden rounded-4 shadow">
-                        <img src="<?= BASE_URL ?>/assets_site/img/image12.jpeg" class="w-100 object-fit-cover" style="height: 300px;" alt="Somatra voyage">
-                        <div class="destination-overlay p-3">
-                            <h6 class="text-white mb-1">Somatra Voyage</h6>
-                            <h5 class="fw-bold"><a href="reservation.php" class="text-white text-decoration-none">Une aventure en vacances</a></h5>
-                            <p class="text-white-50 small">Vos meilleures vacances de tous les temps</p>
-                            <a href="reservation.php" class="btn btn-light btn-sm">Réserver</a>
-                        </div>
-                    </div>
+<!-- DESTINATIONS -->
+<section style="background: var(--gray-light);">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <h2>Destinations populaires</h2>
+            <p>Les trajets les plus réservés par nos clients</p>
+        </div>
+        <div class="dest-grid">
+            <div class="dest-card" data-aos="fade-up" data-aos-delay="100">
+                <img src="<?= BASE_URL ?>/assets_site/img/bamako.jpg" alt="Bamako">
+                <div class="dest-info">
+                    <h4>Bamako → Ségou</h4>
+                    <p>Durée: 3h30</p>
+                    <div class="dest-price">3 500 FCFA</div>
                 </div>
-
-                <!-- Card 2 -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="destination-card position-relative overflow-hidden rounded-4 shadow">
-                        <img src="<?= BASE_URL ?>/assets_site/img/image13.jpeg" class="w-100 object-fit-cover" style="height: 300px;" alt="Voyage de rêve">
-                        <div class="destination-overlay p-3">
-                            <h6 class="text-white mb-1">Somatra Voyage</h6>
-                            <h5 class="fw-bold"><a href="reservation.php" class="text-white text-decoration-none">Le voyage de vos rêves</a></h5>
-                            <p class="text-white-50 small">Vue imprenable, confort et sécurité</p>
-                            <a href="reservation.php" class="btn btn-light btn-sm">Réserver</a>
-                        </div>
-                    </div>
+            </div>
+            <div class="dest-card" data-aos="fade-up" data-aos-delay="200">
+                <img src="<?= BASE_URL ?>/assets_site/img/mopti.jpg" alt="Mopti">
+                <div class="dest-info">
+                    <h4>Bamako → Mopti</h4>
+                    <p>Durée: 7h</p>
+                    <div class="dest-price">7 500 FCFA</div>
                 </div>
-
-                <!-- Card 3 -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="destination-card position-relative overflow-hidden rounded-4 shadow">
-                        <img src="<?= BASE_URL ?>/assets_site/img/image14.jpeg" class="w-100 object-fit-cover" style="height: 300px;" alt="Bamako">
-                        <div class="destination-overlay p-3">
-                            <h6 class="text-white mb-1">Somatra Voyage</h6>
-                            <h5 class="fw-bold"><a href="reservation.php" class="text-white text-decoration-none">Bamako, la capitale</a></h5>
-                            <p class="text-white-50 small">Votre aventure vers Bamako commence ici</p>
-                            <a href="reservation.php" class="btn btn-light btn-sm">Réserver</a>
-                        </div>
-                    </div>
+            </div>
+            <div class="dest-card" data-aos="fade-up" data-aos-delay="300">
+                <img src="<?= BASE_URL ?>/assets_site/img/kayes.jpg" alt="Kayes">
+                <div class="dest-info">
+                    <h4>Bamako → Kayes</h4>
+                    <p>Durée: 12h</p>
+                    <div class="dest-price">12 000 FCFA</div>
                 </div>
-
-                <!-- Card 4 -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="destination-card position-relative overflow-hidden rounded-4 shadow">
-                        <img src="<?= BASE_URL ?>/assets_site/img/image15.jpeg" class="w-100 object-fit-cover" style="height: 300px;" alt="Ségou">
-                        <div class="destination-overlay p-3">
-                            <h6 class="text-white mb-1">Somatra Voyage</h6>
-                            <h5 class="fw-bold"><a href="reservation.php" class="text-white text-decoration-none">Ségou, terre d'artisanat</a></h5>
-                            <p class="text-white-50 small">Histoire, culture et hospitalité</p>
-                            <a href="reservation.php" class="btn btn-light btn-sm">Réserver</a>
-                        </div>
-                    </div>
+            </div>
+            <div class="dest-card" data-aos="fade-up" data-aos-delay="400">
+                <img src="<?= BASE_URL ?>/assets_site/img/sikasso.jpg" alt="Sikasso">
+                <div class="dest-info">
+                    <h4>Bamako → Sikasso</h4>
+                    <p>Durée: 5h</p>
+                    <div class="dest-price">5 500 FCFA</div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Service-Section Start -->
-    <!-- Destination Section Start -->
-    <section class="destination-section section-padding fix">
-        <div class="container">
-            <div class="section-title text-center">
-                <span class="sub-title wow fadeInUp text-primary" style="visibility: visible; animation-name: fadeInUp;">
-                    Comment ça marche
-                </span>
+<!-- STATS -->
+<section class="stats-bar">
+    <div class="container">
+        <div class="stats-grid">
+            <div data-aos="zoom-in">
+                <h3>50+</h3>
+                <p>Destinations</p>
             </div>
-
-            <div class="row justify-content-center mt-4">
-                <!-- Étape 1 : Réservation -->
-                <div class="col-lg-3 col-md-6 text-center mb-4 wow fadeInUp" data-wow-delay=".1s">
-                    <div class="card h-100 border-0 shadow rounded p-4">
-                        <div class="mb-3">
-                            <i class="fa-solid fa-ticket fa-3x text-primary"></i>
-                        </div>
-                        <h5 class="fw-bold">Réservez vos billets</h5>
-                        <p class="text-muted">Choisissez votre trajet et réservez votre billet en quelques clics.</p>
-                    </div>
-                </div>
-
-                <!-- Étape 2 : Suivi colis -->
-                <div class="col-lg-3 col-md-6 text-center mb-4 wow fadeInUp" data-wow-delay=".2s">
-                    <div class="card h-100 border-0 shadow rounded p-4">
-                        <div class="mb-3">
-                            <i class="fa-solid fa-box-open fa-3x text-primary"></i>
-                        </div>
-                        <h5 class="fw-bold">Suivez vos colis</h5>
-                        <p class="text-muted">Envoyez et suivez vos colis en toute sécurité et transparence.</p>
-                    </div>
-                </div>
-
-                <!-- Étape 3 : Paiement -->
-                <div class="col-lg-3 col-md-6 text-center mb-4 wow fadeInUp" data-wow-delay=".3s">
-                    <div class="card h-100 border-0 shadow rounded p-4">
-                        <div class="mb-3">
-                            <i class="fa-solid fa-credit-card fa-3x text-primary"></i>
-                        </div>
-                        <h5 class="fw-bold">Payez facilement</h5>
-                        <p class="text-muted">Paiement sécurisé via mobile money ou carte bancaire.</p>
-                    </div>
-                </div>
-
-                <!-- Étape 4 : Voyager -->
-                <div class="col-lg-3 col-md-6 text-center mb-4 wow fadeInUp" data-wow-delay=".4s">
-                    <div class="card h-100 border-0 shadow rounded p-4">
-                        <div class="mb-3">
-                            <i class="fa-solid fa-bus fa-3x text-primary"></i>
-                        </div>
-                        <h5 class="fw-bold">Voyagez tranquille</h5>
-                        <p class="text-muted">Présentez votre billet et embarquez dans le bus de votre choix.</p>
-                    </div>
-                </div>
+            <div data-aos="zoom-in" data-aos-delay="100">
+                <h3>15</h3>
+                <p>Compagnies</p>
+            </div>
+            <div data-aos="zoom-in" data-aos-delay="200">
+                <h3>200+</h3>
+                <p>Trajets quotidiens</p>
+            </div>
+            <div data-aos="zoom-in" data-aos-delay="300">
+                <h3>24/7</h3>
+                <p>Support client</p>
             </div>
         </div>
-    </section>
-    <!-- Team-Section Start -->
-    <!-- Footer-Section Start -->
-    <?php $this->view('site/partials/footer') ?>
-    <!--<< All JS Plugins >>-->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-    <script>
-        const swiper = new Swiper('.destination-slider', {
-            slidesPerView: 4,
-            spaceBetween: 30,
-            loop: true,
-            autoplay: {
-                delay: 3000,
-                disableOnInteraction: false,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            breakpoints: {
-                320: {
-                    slidesPerView: 1,
-                    spaceBetween: 10
-                },
-                576: {
-                    slidesPerView: 2,
-                    spaceBetween: 20
-                },
-                768: {
-                    slidesPerView: 3,
-                    spaceBetween: 25
-                },
-                992: {
-                    slidesPerView: 4,
-                    spaceBetween: 30
-                },
-            },
-        });
-    </script>
-    <!-- Bootstrap JS Bundle (inclut Popper) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <?php $this->view('site/partials/foot') ?>
+    </div>
+</section>
+
+<!-- COMMENT ÇA MARCHE -->
+<section>
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <h2>Comment ça marche ?</h2>
+            <p>Réservez votre billet en 3 étapes simples</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;">
+            <div style="text-align: center;" data-aos="fade-up" data-aos-delay="100">
+                <div style="width: 70px; height: 70px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 20px;">1</div>
+                <h4>Recherchez</h4>
+                <p style="color: var(--gray); font-size: 0.85rem;">Trouvez votre trajet et votre compagnie</p>
+            </div>
+            <div style="text-align: center;" data-aos="fade-up" data-aos-delay="200">
+                <div style="width: 70px; height: 70px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 20px;">2</div>
+                <h4>Réservez & Payez</h4>
+                <p style="color: var(--gray); font-size: 0.85rem;">Choisissez vos places et payez en ligne</p>
+            </div>
+            <div style="text-align: center;" data-aos="fade-up" data-aos-delay="300">
+                <div style="width: 70px; height: 70px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 20px;">3</div>
+                <h4>Voyagez</h4>
+                <p style="color: var(--gray); font-size: 0.85rem;">Présentez votre billet et embarquez</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <h4>TransGest</h4>
+                <p style="font-size: 0.85rem;">La plateforme N°1 de réservation de billets de bus et suivi de colis au Mali.</p>
+            </div>
+            <div>
+                <h4>Liens rapides</h4>
+                <a href="#">Accueil</a>
+                <a href="#">Compagnies</a>
+                <a href="#">Destinations</a>
+                <a href="#">Contact</a>
+            </div>
+            <div>
+                <h4>Support</h4>
+                <a href="#">FAQ</a>
+                <a href="#">Conditions générales</a>
+                <a href="#">Politique de confidentialité</a>
+            </div>
+            <div>
+                <h4>Contact</h4>
+                <a href="#"><i class="fas fa-phone"></i> +223 20 00 00 00</a>
+                <a href="#"><i class="fas fa-envelope"></i> contact@transgest.com</a>
+                <a href="#"><i class="fas fa-map-marker-alt"></i> Bamako, Mali</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 TransGest - Tous droits réservés</p>
+        </div>
+    </div>
+</footer>
+
+<script src="<?= BASE_URL ?>/assets_site/js/aos.js"></script>
+<script>
+    AOS.init({ duration: 600, once: true, offset: 50 });
+    
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileNav = document.getElementById('mobileNav');
+    const closeMenu = document.getElementById('closeMenu');
+    const overlay = document.getElementById('overlay');
+    
+    function openMenu() {
+        mobileNav.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeMenuFunc() {
+        mobileNav.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    menuToggle.addEventListener('click', openMenu);
+    closeMenu.addEventListener('click', closeMenuFunc);
+    overlay.addEventListener('click', closeMenuFunc);
+    
+    // Close menu on window resize if open
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            closeMenuFunc();
+        }
+    });
+</script>
+</body>
+</html>

@@ -86,7 +86,7 @@
             foreach ($rows as $row) {
                 $destNom = $row['destinationLocalite'] ?? $row['idDestination'];
                 $progId  = $row['idProgrammer'];
-                $departnumeroGare= $row['departnumeroGare'] ?? null;
+                $departnumeroGare = $row['departnumeroGare'] ?? null;
 
                 if (!isset($result[$destNom])) {
                     $result[$destNom] = [
@@ -97,7 +97,7 @@
                     ];
                 }
 
-              $escales = $this->fetchAll(
+                $escales = $this->fetchAll(
                     "SELECT e.id_escale, prix_escale, e.escales AS escale_nom
                  FROM ligneTrajet lt
                  JOIN escale e ON e.id_escale = lt.id_escales
@@ -416,7 +416,7 @@
                     $idCarProgrammer = $rowProg['id_car_programmer'];
 
                     $car = $this->fetchOne(
-                        "SELECT nbr_place, nbr_place_reserve FROM car WHERE numero_car = :num LIMIT 1",
+                        "SELECT nbr_place, nbr_place_reserve, id_car FROM car WHERE id_car = :num LIMIT 1",
                         [':num' => $idCarProgrammer]
                     );
 
@@ -550,7 +550,7 @@
 
                 // Màj car pour aujourd'hui
                 if ($jourVoyage == $aujourdhui) {
-                    $stmt = $pdo->prepare("UPDATE car SET nbr_place_reserve = nbr_place_reserve + :n WHERE numero_car = :num");
+                    $stmt = $pdo->prepare("UPDATE car SET nbr_place_reserve = nbr_place_reserve + :n WHERE id_car = :num");
                     $stmt->execute([
                         ':n'   => (int)$nombrePassages,
                         ':num' => $idCarProgrammer
@@ -563,38 +563,38 @@
                     }
                 }
 
-                // === Alimentation de la caisse ===
+                // === Alimentation de la caisse (si une caisse active est ouverte) ===
                 $stmt = $pdo->prepare("
-            SELECT c.id_caisse, c.montant_billets
-            FROM caisse c
-            INNER JOIN agence a ON c.id_agence = a.idAgence
-            WHERE c.id_compagnie = :id_compagnie
-              AND a.localite = :ville
-               AND a.numeroGare = :numeroGare
-           
-            LIMIT 1
-        ");
+                    SELECT c.id_caisse, c.montant_billets
+                    FROM caisse c
+                    INNER JOIN agence a ON c.id_agence = a.idAgence
+                    WHERE c.id_compagnie = :id_compagnie
+                      AND a.localite     = :ville
+                      AND a.numeroGare   = :numeroGare
+                      AND c.status_caisse = 1
+                    LIMIT 1
+                ");
                 $stmt->execute([
                     ':id_compagnie' => $_SESSION['id_compagnie'],
                     ':ville'        => $_SESSION['ville'],
                     ':numeroGare'   => $_SESSION['numero_gare']
-
                 ]);
                 $caisse = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($caisse) {
+                    // Caisse ouverte → alimenter
                     $stmtUpdate = $pdo->prepare("
-                UPDATE caisse
-                SET montant_billets = montant_billets + :montant
-                WHERE id_caisse = :id_caisse
-            ");
+                        UPDATE caisse
+                        SET montant_billets = montant_billets + :montant
+                        WHERE id_caisse = :id_caisse
+                    ");
                     $stmtUpdate->execute([
                         ':montant'   => $prixUtilise,
                         ':id_caisse' => $caisse['id_caisse']
                     ]);
                 } else {
                     $pdo->rollBack();
-                    $this->set_flash("Aucune caisse trouvée correspondant à votre billet.", "danger");
+                    $this->set_flash("Opération bloquée : Aucune caisse ouverte pour cette gare. Veuillez ouvrir une caisse d'abord.", "danger");
                     return false;
                 }
 

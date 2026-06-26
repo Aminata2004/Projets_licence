@@ -75,18 +75,17 @@
             <div class="card">
                 <div class="card-body">
 
-
                     <div class="tab-content py-3 table-responsive">
                         <table id="example" class="table table-striped table-bordered" style="width:100%">
                             <thead>
                                 <tr class="text-center">
                                     <th>Client</th>
                                     <th>Destionation</th>
-                                    <th>Nbr de passages</th>
+                                    <th>Nbr de place</th>
                                     <th>heure de depart</th>
                                     <th>Jour de voyage</th>
                                     <th>Date d'expiration</th>
-                                    <th>Action</th>
+                                    <!-- <th>Action</th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -122,12 +121,12 @@
                                                 ?>
                                                     <tr class="text-center">
                                                         <td><?= $listeClient->Client ?></td>
-                                                        <td><?= $listeClient->localite ?></td>
+                                                        <td><?= $listeClient->destinationId ?></td>
                                                         <td><?= $listeClient->nombrePassages ?></td>
                                                         <td><?= $listeClient->Heur_departs ?></td>
                                                         <td><?= $listeClient->jourVoyage ?></td>
                                                         <td><?= $listeClient->date_expiration ?></td>
-                                                        <td>
+                                                        <!-- <td>
                                                             <div class="dropdown ms-auto text-center">
                                                                 <div class="btn-link" data-bs-toggle="dropdown">
                                                                     <svg width="24px" height="24px" viewBox="0 0 24 24"
@@ -146,14 +145,15 @@
                                                                 </div>
                                                                 <div class="dropdown-menu dropdown-menu-end">
                                                                     <a class="dropdown-item"
-                                                                        href="Imprimer.php?id_client=<?= $listeClient->idClient ?>">Imprimer</a>
+                                                                        href="<?= BASE_URL ?>/admin/Liste_du_jours/recu/<?= $listeClient->idClient ?>">Imprimer</a>
+                                                                        
                                                                     <a class="dropdown-item"
                                                                         href="Detail_client.php?id_client=<?= $listeClient->idClient ?>">Details</a>
                                                                     <a class="dropdown-item"
                                                                         href="Reporter_voyage.php?id_client=<?= $listeClient->idClient ?>">Reporter</a>
                                                                 </div>
                                                             </div>
-                                                        </td>
+                                                        </td> -->
                                                     </tr>
                                                 <?php
                                                 }
