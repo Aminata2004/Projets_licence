@@ -53,10 +53,21 @@ class Chauffeurs_cars extends  Controller
   {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $id = $_POST['id_chauffeur'];
+      
+      $chauffeurs_car = new Chauffeurs_car();
+      
+      // Validation du numéro
+      $numero = trim($_POST['numero']);
+      if (strlen($numero) !== 8 || !preg_match('/^[6789]\d{7}$/', $numero)) {
+          $chauffeurs_car->set_flash('Le numéro de téléphone doit contenir exactement 8 chiffres et commencer par 6, 7, 8 ou 9.', 'danger');
+          header("Location: " . BASE_URL . "/admin/Chauffeurs_cars/index");
+          exit;
+      }
+
       $data = [
         'nom_prenom' => $_POST['nom_prenom'],
         'numero'     => $_POST['numero'],
-        'numero_car' => $_POST['numero_car']
+        'id_car'     => $_POST['id_car']
       ];
 
       $chauffeurs_car = new Chauffeurs_car();

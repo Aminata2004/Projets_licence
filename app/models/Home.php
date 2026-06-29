@@ -219,11 +219,11 @@ public function getColisMensuel($session)
     $debutMois = date('Y-m-01'); // premier jour du mois
     $finMois   = date('Y-m-t');  // dernier jour du mois
 
-    // Base de la requête
-    $sql = "SELECT status, COUNT(*) AS total
+    // Base de la requête — préfixe 'colis.' pour éviter l'ambiguïté avec agence
+    $sql = "SELECT colis.status, COUNT(*) AS total
             FROM colis
             INNER JOIN agence ON colis.id_agence = agence.idAgence
-            WHERE DATE(date_enregistrement) BETWEEN :debut AND :fin";
+            WHERE DATE(colis.date_enregistrement) BETWEEN :debut AND :fin";
 
     $params = [
         ':debut' => $debutMois,
@@ -233,18 +233,18 @@ public function getColisMensuel($session)
     // Ajouter les filtres selon le rôle
     if ($role === 'Utilisateur') {
         // Pour tous les statuts sauf "enregistre", filtre sur gare et utilisateur
-        $sql .= " AND (status <> 'enregistre' AND agence.localite = :ville AND colis.num_gare = :num_gare)";
+        $sql .= " AND (colis.status <> 'enregistre' AND agence.localite = :ville AND colis.num_gare = :num_gare)";
         $params[':ville'] = $ville;
         $params[':num_gare'] = $num_gare;
-        
+
         // Pour le statut "enregistre", filtrer sur provient_de = ville
-        $sql .= " OR (status = 'enregistre' AND provient_de = :ville_prov)";
+        $sql .= " OR (colis.status = 'enregistre' AND colis.provient_de = :ville_prov)";
         $params[':ville_prov'] = $ville;
 
     } elseif ($role === 'chef_d_escale') {
-        $sql .= " AND (status <> 'enregistre' AND agence.localite = :ville)";
+        $sql .= " AND (colis.status <> 'enregistre' AND agence.localite = :ville)";
         $params[':ville'] = $ville;
-        $sql .= " OR (status = 'enregistre' AND provient_de = :ville_prov)";
+        $sql .= " OR (colis.status = 'enregistre' AND colis.provient_de = :ville_prov)";
         $params[':ville_prov'] = $ville;
 
     } elseif ($role === 'Admin') {
@@ -252,8 +252,8 @@ public function getColisMensuel($session)
         $params[':id_compagnie'] = $id_compagnie;
     }
 
-    // Grouper par statut
-    $sql .= " GROUP BY status";
+    // Grouper par statut (préfixé pour éviter l'ambiguïté)
+    $sql .= " GROUP BY colis.status";
 
     $stmt = $this->connect()->prepare($sql);
     $stmt->execute($params);

@@ -26,11 +26,14 @@
                     </nav>
                 </div>
                 <div class="ms-auto">
-                    <div class="btn-group">
-                        <a href="<?= BASE_URL ?>/admin/Liste_gares/add_gares" class="btn btn-primary split-bg-primary">+ Ajouter</a>
-                        &nbsp;
-                        <a href="javascript:history.back()" class="btn btn-primary split-bg-primary"><i
-                                class="fadeIn animated bx bx-left-arrow-alt"></i></a>
+                    <div class="d-flex gap-2">
+                        <a href="<?= BASE_URL ?>/admin/Liste_gares/add_gares" class="btn btn-success d-flex align-items-center gap-2 shadow-sm">
+                            <i class="bx bx-plus-circle fs-5"></i> Ajouter
+                        </a>
+                        <a href="javascript:history.back()"
+                            class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm">
+                            <i class="bx bx-left-arrow-alt fs-5"></i> Retour
+                        </a>
 
                     </div>
                 </div>
@@ -38,7 +41,7 @@
             <!--end breadcrumb-->
 
                         <style>
-        /* TransGest Premium Configuration Theme v2 */
+        /* TransGest Premium Configuration Theme v2 - Orange & Dark Blue */
         .config-card {
             border: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
@@ -47,13 +50,13 @@
             overflow: hidden;
         }
         .config-card .card-header {
-            background: #ffffff !important;
-            border-bottom: 1px solid #f1f5f9 !important;
+            background: #0f3b5e !important;
+            border-bottom: none !important;
             border-radius: 20px 20px 0 0 !important;
             padding: 1.5rem 1.5rem;
         }
         .config-card .card-title, .config-card .card-header h5 {
-            color: #0f172a !important;
+            color: #ffffff !important;
             font-weight: 700;
             margin: 0;
             display: flex;
@@ -61,8 +64,8 @@
             font-size: 1.15rem;
         }
         .config-card .card-header i {
-            color: #ea580c !important;
-            background: rgba(245, 158, 11, 0.1);
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.15);
             padding: 8px;
             border-radius: 10px;
             margin-right: 12px !important;
@@ -97,13 +100,12 @@
             color: inherit !important;
         }
         
-        /* Overrides Bootstrap Blue to TransGest Orange */
-        .bg-primary {
-            background: linear-gradient(135deg, #f59e0b, #ea580c) !important;
-        }
+        /* Typography */
         .text-primary {
             color: #ea580c !important;
         }
+        
+        /* Primary buttons (Orange) */
         .btn-primary, .btn-transgest, .btn-success {
             background: linear-gradient(135deg, #f59e0b, #ea580c) !important;
             color: white !important;
@@ -119,6 +121,59 @@
             box-shadow: 0 12px 25px -5px rgba(234, 88, 12, 0.5) !important;
             color: white !important;
         }
+        
+        /* Outline Primary Buttons (Orange Outline) */
+        .btn-outline-primary {
+            color: #ea580c !important;
+            border-color: #ea580c !important;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .btn-outline-primary:hover {
+            background: #ea580c !important;
+            color: white !important;
+        }
+        
+        /* Secondary/Cancel buttons (Dark Blue) */
+        .btn-secondary, .btn-light, .btn-info, .btn-outline-secondary {
+            background: #0f172a !important; /* Dark Blue */
+            color: white !important;
+            border: none !important;
+            border-radius: 12px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px -5px rgba(15, 23, 42, 0.3) !important;
+        }
+        .btn-secondary:hover, .btn-light:hover, .btn-info:hover, .btn-outline-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px -5px rgba(15, 23, 42, 0.4) !important;
+            background: #1e293b !important;
+            color: white !important;
+        }
+        
+        /* Breadcrumb / Top right back button */
+        .split-bg-primary {
+            background: #0f172a !important;
+            border: none !important;
+            border-radius: 12px;
+        }
+        .split-bg-primary:hover {
+            background: #1e293b !important;
+        }
+        
+        /* Modals - Dark Blue Header */
+        .modal-header {
+            background: #0f172a !important;
+            border-bottom: none !important;
+        }
+        .modal-header .modal-title {
+            color: #ffffff !important;
+        }
+        .modal-header .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        
         .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
             background: linear-gradient(135deg, #f59e0b, #ea580c) !important;
             color: white !important;
@@ -159,101 +214,142 @@
         .table-light {
             --bs-table-bg: rgba(245, 158, 11, 0.02) !important;
         }
+
+        
+        /* Breadcrumb Styling */
+        .page-breadcrumb .breadcrumb-title {
+            color: #0f3b5e !important;
+            font-weight: 800 !important;
+            font-size: 1.4rem;
+            border-right: 2px solid rgba(15, 59, 94, 0.2) !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .page-breadcrumb .breadcrumb-item a {
+            color: #ea580c !important;
+            font-weight: 600;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .page-breadcrumb .breadcrumb-item a:hover {
+            background: #ea580c !important;
+            color: white !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(234, 88, 12, 0.2);
+        }
+        .page-breadcrumb .breadcrumb-item.active {
+            color: #0f3b5e !important;
+            font-weight: 700;
+            background: rgba(15, 59, 94, 0.08);
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+        }
       </style>
 
             <div class="row">
-                <div class="col-xxl-3">
-                    <div class="card config-card">
-                        <div class="card-header">
-                            <div class="card-title">
-                                <i class="bx bx-cog fs-4 me-2"></i> Paramètres Généraux
-                            </div>
-                        </div>
-                        <div class="card-body p-3">
-                            <ul class="nav nav-tabs flex-column vertical-tabs-custom" role="tablist">
-                                <?php if ($_SESSION['droit'] === 'super_admin'): ?>
-                                    <li class="nav-item">
-                                        <a class="nav-link text-break" role="tab"
-                                            aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies"
-                                            aria-selected="true">
-                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Compagnie
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
-                                 <?php if ($user->userHasPermission('utilisateur_apercu')) { ?>
-                                    <li class="nav-item">
-                                        <a class="nav-link  text-break" role="tab"
-                                            aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
-                                            aria-selected="true">
-                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Utilisateur
-                                        </a>
-                                    </li>
-                                <?php } ?>
-                                <?php if ($user->userHasPermission('Configuration_gestion_gare')) { ?>
-                                    <li class="nav-item">
-                                        <a class="nav-link  active text-break" role="tab"
-                                            aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
-                                            aria-selected="true">
-                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Gares
-                                        </a>
-                                    </li>
-                                <?php } ?>
-                               
-                                <?php if ($user->userHasPermission('Configuration_gestion_escale')) { ?>
-                                    <li class="nav-item">
-                                        <a class="nav-link text-break mb-0" role="tab"
-                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
-                                            aria-selected="true">
-                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Escale
-                                        </a>
-                                    </li>
-                                <?php } ?>
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break mb-0" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Trajets
-                                    </a>
-                                </li>
-                                <?php if ($user->userHasPermission('Configuration_gestion_horaire')) { ?>
-                                    <li class="nav-item mt-2">
-                                        <a class="nav-link  text-break mb-0" role="tab"
-                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire"
-                                            aria-selected="true">
-                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Horaire
-                                        </a>
-                                    </li>
-                                <?php } ?>
-                                <?php if ($user->userHasPermission('Configuration_gestion_car/chauffeur')) { ?>
-                                    <li class="nav-item mt-2">
-                                        <a class="nav-link  text-break" role="tab"
-                                            aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
-                                            aria-selected="true">
-                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
-                                        </a>
-                                    </li>
-                                <?php } ?>
-                                <?php if ($_SESSION['droit'] === 'super_admin') { ?>
-                                    <li class="nav-item mt-2">
-                                        <a class="nav-link  text-break mb-0" role="tab"
-                                            aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
-                                            aria-selected="true">
-                                            <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Permission
-                                        </a>
-                                    </li>
-                                <?php } ?>
-
-                                <li class="nav-item mt-2">
-                                    <a class="nav-link  text-break" role="tab"
-                                        aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
-                                        aria-selected="true">
-                                        <i class="bx-shape-polygon me-2 align-middle d-inline-block"></i>Place limite
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                                        <div class="col-xxl-3">
+          <div class="card config-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="bx bx-cog fs-4 me-2"></i> Paramètres Généraux
+              </div>
+            </div>
+            <div class="card-body p-3">
+              <ul class="nav nav-tabs flex-column vertical-tabs-custom" role="tablist">
+                <?php if ($_SESSION['droit'] === 'super_admin'): ?>
+                  <li class="nav-item">
+                    <a class="nav-link  text-break" role="tab"
+                      aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies"
+                      aria-selected="true">
+                      <i class="bx bx-buildings me-2 align-middle d-inline-block"></i>Compagnie
+                    </a>
+                  </li>
+                <?php endif; ?>
+                <?php if ($user->userHasPermission('utilisateur_apercu')) { ?>
+                  <li class="nav-item">
+                    <a class="nav-link  text-break" role="tab"
+                      aria-current="page" href="<?= BASE_URL ?>/admin/Configurations"
+                      aria-selected="true">
+                      <i class="bx bx-user me-2 align-middle d-inline-block"></i>Utilisateur
+                    </a>
+                  </li>
+                <?php } ?>
+                <?php if ($user->userHasPermission('Configuration_gestion_gare')) { ?>
+                  <li class="nav-item">
+                    <a class="nav-link active text-break" role="tab"
+                      aria-current="page" href="<?= BASE_URL ?>/admin/Liste_gares"
+                      aria-selected="true">
+                      <i class="bx bx-home me-2 align-middle d-inline-block"></i>Gares
+                    </a>
+                  </li>
+                <?php } ?>
+                
+                <?php if ($user->userHasPermission('Configuration_gestion_escale')) { ?>
+                  <li class="nav-item">
+                    <a class="nav-link  text-break mb-0" role="tab"
+                      aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_escales"
+                      aria-selected="true">
+                      <i class="bx bx-map-pin me-2 align-middle d-inline-block"></i>Escale
+                    </a>
+                  </li>
+                <?php } ?>
+                <?php if ($user->userHasPermission('Configuration_gestion_trajets')) { ?>
+                  <li class="nav-item mt-2">
+                    <a class="nav-link  text-break mb-0" role="tab"
+                      aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
+                      aria-selected="true">
+                      <i class="bx bx-map-alt me-2 align-middle d-inline-block"></i>Trajets
+                    </a>
+                  </li>
+                <?php } ?>
+                <?php if ($user->userHasPermission('Configuration_gestion_horaire')) { ?>
+                  <li class="nav-item mt-2">
+                    <a class="nav-link  text-break mb-0" role="tab"
+                      aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire"
+                      aria-selected="true">
+                      <i class="bx bx-time me-2 align-middle d-inline-block"></i>Horaire
+                    </a>
+                  </li>
+                <?php } ?>
+                <?php if ($user->userHasPermission('Configuration_gestion_car/chauffeur')) { ?>
+                  <li class="nav-item mt-2">
+                    <a class="nav-link  text-break" role="tab"
+                      aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
+                      aria-selected="true">
+                      <i class="bx bx-car me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
+                    </a>
+                  </li>
+                <?php } ?>
+                
+                <?php if ($_SESSION['droit'] === 'super_admin'): ?>
+                <li class="nav-item mt-2">
+                  <a class="nav-link  text-break mb-0" role="tab"
+                    aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_horaire/add_permission"
+                    aria-selected="true">
+                    <i class="bx bx-shield-quarter me-2 align-middle d-inline-block"></i>Permission
+                  </a>
+                </li>
+                <?php endif; ?>
+                
+                <?php if ($user->userHasPermission('Configuration_place/limite')) { ?>
+                  <li class="nav-item mt-2">
+                    <a class="nav-link  text-break" role="tab"
+                      aria-current="page" href="<?= BASE_URL ?>/admin/Compagnies/place_limite"
+                      aria-selected="true">
+                      <i class="bx bx-chair me-2 align-middle d-inline-block"></i>Place limite
+                    </a>
+                  </li>
+                <?php } ?>
+              </ul>
+            </div>
+          </div>
+        </div>
                 <div class="col-xxl-9">
                     <?php $this->view("admin/set_flash") ?>
                     <div class="card config-card">
@@ -262,13 +358,14 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="example" class="table table-striped table-bordered table-hover-effect  table-light text-center" style="width:100%">
-                                    <thead>
+                                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center" style="width:100%">
+                                    <thead class="table-light text-center">
                                         <tr>
                                             <th>N gare</th>
                                             <th>Localite</th>
                                             <th>Code marchant</th>
                                             <th>Tel</th>
+                                            <th>Statut</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -279,6 +376,13 @@
                                                 <td><?= $liste->localite ?></td>
                                                 <td><?= $liste->code ?></td>
                                                 <td><?= $liste->tel ?></td>
+                                                <td>
+                                                    <?php if(isset($liste->status) && $liste->status == 0): ?>
+                                                        <span class="badge bg-danger">Suspendue</span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-success">Active</span>
+                                                    <?php endif; ?>
+                                                </td>
                                                 <td class=" ">
                                                     <div class="dropup text-center">
                                                         <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
@@ -292,9 +396,11 @@
                                                                 data-localite="<?= htmlspecialchars($liste->localite, ENT_QUOTES) ?>"
                                                                 data-code="<?= htmlspecialchars($liste->code, ENT_QUOTES) ?>"
                                                                 data-tel="<?= htmlspecialchars($liste->tel, ENT_QUOTES) ?>"
-
                                                                 href="">Modifier</a>
-                                                            <a class="dropdown-item" href="#">Désactiver</a>
+                                                            <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Liste_gares/suspend/<?= $liste->idAgence ?>">
+                                                                <?= (isset($liste->status) && $liste->status == 0) ? 'Activer' : 'Suspendre' ?>
+                                                            </a>
+                                                            <a class="dropdown-item text-danger delete-button" href="<?= BASE_URL ?>/admin/Liste_gares/delete/<?= $liste->idAgence ?>">Supprimer</a>
                                                         </div>
                                                     </div>
                                                 </td>

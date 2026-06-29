@@ -115,11 +115,45 @@ class Configurations extends Controller
 
             // Si la mise à jour est réussie, on recharge la page
             if ($result !== false) {
+                $configuration->set_flash("Statut mis à jour avec succès.", "success");
                 header("Location: " . $_SERVER['REQUEST_URI']);
                 exit;
             } else {
                 $configuration->set_flash("Erreur lors de la mise à jour du statut.", "danger");
             }
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editUtilisateur'])) {
+            $idUser = (int)$_POST['idUser'];
+            $utilisateurs = $_POST['utilisateurs'];
+            $emailUser = $_POST['emailUser'];
+            $droit = $_POST['droit'];
+            
+            $updateFields = "utilisateurs = :utilisateurs, emailUser = :emailUser, droit = :droit";
+            $params = [
+                ":utilisateurs" => $utilisateurs,
+                ":emailUser" => $emailUser,
+                ":droit" => $droit,
+                ":id" => $idUser
+            ];
+            
+            if (!empty($_POST['motPasse'])) {
+                $updateFields .= ", motPasse = :motPasse";
+                $params[":motPasse"] = password_hash($_POST['motPasse'], PASSWORD_DEFAULT);
+            }
+            
+            $result = $configuration->insertion_update_simple(
+                "UPDATE utilisateur SET $updateFields WHERE idUser = :id",
+                $params
+            );
+            
+            if ($result !== false) {
+                $configuration->set_flash("Utilisateur modifié avec succès.", "success");
+            } else {
+                $configuration->set_flash("Erreur lors de la modification de l'utilisateur.", "danger");
+            }
+            header("Location: " . $_SERVER['REQUEST_URI']);
+            exit;
         }
 
         // Affichage de la vue

@@ -1,23 +1,138 @@
   <?php $user = new Configuration($_SESSION['id_utilisateur']) ?>
-  <style>
+    <style>
     .top-header {
-      background: #0f3b5e !important;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+      background: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+      padding: 0.5rem 1rem;
     }
+    
     .top-header .nav-link,
-    .top-header .mobile-toggle-icon i,
-    .top-header .user-name {
-      color: #ffffff !important;
+    .top-header .mobile-toggle-icon i {
+      color: #0f172a !important;
+    }
+    
+    /* Notification Bell */
+    .top-header .notifications {
+      position: relative;
+      background: rgba(15, 23, 42, 0.05);
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .top-header .notifications:hover {
+      background: rgba(15, 23, 42, 0.1);
+      transform: scale(1.05);
     }
     .top-header .notifications i {
-      color: #ffffff !important;
+      color: #0f3b5e !important;
+      font-size: 1.3rem;
     }
-    .top-header .search-close-icon i, .top-header .search-toggle-icon i {
-      color: #ffffff !important;
+    .top-header .notify-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .dropdown-menu {
-      box-shadow: 0 5px 20px rgba(0,0,0,0.15) !important;
+    
+    /* User Profile Menu */
+    .top-header .user-setting {
+      padding: 5px 15px 5px 5px;
+      border-radius: 30px;
+      background: rgba(15, 23, 42, 0.03);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(15, 23, 42, 0.05);
+    }
+    .top-header .user-setting:hover {
+      background: rgba(15, 23, 42, 0.08);
+      border-color: rgba(15, 23, 42, 0.1);
+    }
+    .top-header .user-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #ea580c;
+      padding: 2px;
+      background: #ffffff;
+      object-fit: contain;
+    }
+    .top-header .user-name {
+      color: #0f3b5e !important;
+      font-weight: 700;
+      margin-left: 10px;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+    }
+
+    /* Premium Dropdown Menus */
+    .top-header .dropdown-menu {
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
       border: none !important;
+      border-radius: 16px !important;
+      padding: 12px;
+      margin-top: 10px;
+      min-width: 250px;
+    }
+    .top-header .dropdown-item {
+      border-radius: 10px;
+      padding: 10px 15px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      color: #475569;
+      display: flex;
+      align-items: center;
+    }
+    .top-header .dropdown-item:hover {
+      background: rgba(245, 158, 11, 0.08);
+      color: #ea580c;
+      transform: translateX(4px);
+    }
+    .top-header .dropdown-item .setting-icon i,
+    .top-header .dropdown-item i.bi {
+      color: #ea580c;
+      font-size: 1.3rem;
+      margin-right: 10px;
+    }
+    
+    /* Notification Dropdown Items */
+    .header-notifications-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .notification-box {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ea580c;
+      font-size: 1.4rem;
+    }
+    .dropdown-msg-user {
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .dropdown-user-name {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #0f172a;
+    }
+    .dropdown-user-designation {
+      color: #ea580c !important;
+      font-weight: 600;
     }
   </style>
   <header class="top-header">
@@ -94,7 +209,7 @@
               <a class="nav-link" href="#" data-bs-toggle="dropdown">
                 <div class="notifications">
                   <span class="notify-badge"><?= $notifCount; ?></span>
-                  <i class="bi bi-bell-fill"></i>
+                  <i class="bx bxs-bell"></i>
                 </div>
               </a>
             <?php }
@@ -106,7 +221,7 @@
                   <?php foreach ($billets as $billet): ?>
                     <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Liste_ententes/validation/<?= htmlspecialchars($billet['idBillets']); ?>">
                       <div class="d-flex align-items-center">
-                        <div class="notification-box"><i class="bi bi-ticket-perforated-fill"></i></div>
+                        <div class="notification-box"><i class="bx bxs-coupon"></i></div>
                         <div class="ms-3 flex-grow-1">
                           <h6 class="mb-0 dropdown-msg-user">Billet en attente</h6>
                           <small class="mb-0 dropdown-msg-text text-secondary">
@@ -129,37 +244,15 @@
               <a class="nav-link " href="#" data-bs-toggle="dropdown">
                 <div class="user-setting d-flex align-items-center gap-1">
                   <img src="<?= BASE_URL ?>/assets_site/img/reservation.png" class="user-img" alt="">
-                  <div class="user-name d-none d-sm-block"><?= $_SESSION['nom']?></div>
+                  <div class="user-name"><?= $_SESSION['nom']?> <small style="font-size: 0.75rem; color: #f59e0b; display: block; line-height: 1;"><?= $_SESSION["droit"] ?></small></div>
                 </div>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                  <a class="dropdown-item" href="#">
-                    <div class="d-flex align-items-center">
-                      <img src="<?= BASE_URL ?>/assets_site/img/reservation.png" alt="" class="rounded-circle" width="60" height="60">
-                      <div class="ms-3">
-                        <h6 class="mb-0 dropdown-user-name"><?= $_SESSION['nom']?></h6>
-                        <small class="mb-0 dropdown-user-designation text-secondary"><?= $_SESSION["droit"] ?> </small>
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <hr class="dropdown-divider">
-                </li>
-                <li>
                   <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Profils">
                     <div class="d-flex align-items-center">
-                      <div class="setting-icon"><i class="bi bi-person-fill"></i></div>
+                      <div class="setting-icon"><i class="bx bxs-user"></i></div>
                       <div class="setting-text ms-3"><span>Profile</span></div>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">
-                    <div class="d-flex align-items-center">
-                      <!-- <div class="setting-icon"><i class="bi bi-gear-fill"></i></div> -->
-
                     </div>
                   </a>
                 </li>
@@ -170,7 +263,7 @@
                 <li>
                   <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Auth/logout">
                     <div class="d-flex align-items-center">
-                      <div class="setting-icon"><i class="bi bi-box-arrow-right"></i></div>
+                      <div class="setting-icon"><i class="bx bx-log-out-circle"></i></div>
                       <div class="setting-text ms-3">
                         Déconnexion
                       </div>

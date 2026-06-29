@@ -44,14 +44,14 @@ class Liste_gare extends Model
 
         if (count($errors) === 0) {
             $insertion = $this->insertion_update_simples(
-                "INSERT INTO agence(code, localite, numeroGare, tel, libele, id_compagnie) 
-         VALUES(:code, :localite, :numeroGare, :tel, :libele, :id_compagnie)",
+                "INSERT INTO agence(code, localite, numeroGare, tel, id_compagnie) 
+         VALUES(:code, :localite, :numeroGare, :tel,  :id_compagnie)",
                 [
                     ":code" => $code,
                     ":localite" => $localite,
                     ":numeroGare" => $numeroGare,
                     ":tel" => $tel,
-                    ":libele" => $libele,
+                  
                     ":id_compagnie" => $id_compagnie
                 ]
             );
@@ -182,4 +182,59 @@ public function saveCaisse()
 }
 
 
+
+    public function suspendGare($idAgence)
+    {
+        $db = $this->connect();
+        $stmt = $db->prepare("SELECT status FROM agence WHERE idAgence = ?");
+        $stmt->execute([$idAgence]);
+        $agence = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($agence) {
+            $current_status = isset($agence['status']) ? $agence['status'] : 1;
+            $new_status = ($current_status == 1) ? 0 : 1;
+            $update = $db->prepare("UPDATE agence SET status = ? WHERE idAgence = ?");
+            $update->execute([$new_status, $idAgence]);
+            
+            if ($new_status == 1) {
+                $this->set_flash("Gare activée avec succès.", "success");
+            } else {
+                $this->set_flash("Gare suspendue avec succès.", "warning");
+            }
+        }
+    }
+
+    public function deleteGare($idAgence)
+    {
+        $db = $this->connect();
+        $stmt = $db->prepare("SELECT numeroGare FROM agence WHERE idAgence = ?");
+        $stmt->execute([$idAgence]);
+        $agence = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($agence) {
+            $numeroGare = $agence['numeroGare'];
+            
+            $countBillets = $db->prepare("SELECT COUNT(*) FROM billets WHERE num_gare = ?");
+            $countBillets->execute([$numeroGare]);
+            $hasBillets = $countBillets->fetchColumn();
+            
+            $countColis = $db->prepare("SELECT COUNT(*) FROM colis WHERE num_gare = ? OR id_agence = ?");
+            $countColis->execute([$numeroGare, $idAgence]);
+            $hasColis = $countColis->fetchColumn();
+            
+            $countCaisse = $db->prepare("SELECT COUNT(*) FROM caisse WHERE id_agence = ?");
+            $countCaisse->execute([$idAgence]);
+            $hasCaisse = $countCaisse->fetchColumn();
+            
+            if ($hasBillets == 0 && $hasColis == 0 && $hasCaisse == 0) {
+                $del = $db->prepare("DELETE FROM agence WHERE idAgence = ?");
+                $del->execute([$idAgence]);
+                $this->set_flash("Gare supprimée avec succès.", "success");
+            } else {
+                $this->set_flash("Impossible de supprimer cette gare car elle a déjà des actions enregistrées.", "danger");
+            }
+        } else {
+            $this->set_flash("Gare introuvable.", "danger");
+        }
+    }
 }

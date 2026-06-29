@@ -75,5 +75,24 @@ class  Liste_gares extends  Controller
         }
     }
 
-  
+
+    public function suspend($idAgence = null)
+    {
+        if ($idAgence) {
+            $liste_gare = new Liste_gare();
+            $liste_gare->suspendGare($idAgence);
+        }
+        header("Location: " . BASE_URL . "/admin/Liste_gares/index");
+        exit;
+    }
+
+    public function delete($idAgence = null)
+    {
+        if ($idAgence) {
+            $liste_gare = new Liste_gare();
+            $liste_gare->deleteGare($idAgence);
+        }
+        header("Location: " . BASE_URL . "/admin/Liste_gares/index");
+        exit;
+    }
 }

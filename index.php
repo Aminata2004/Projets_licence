@@ -1,15 +1,8 @@
 <?php
-// session_start();
-// ob_start(); // ← autorise les echo dans le contrôleur
-// define('ROOT', __DIR__); // ✅ Ne rien ajouter après __DIR__
-
-// require_once __DIR__ . '/vendor/autoload.php';
-// require_once __DIR__ . '/app/core/autoload.php';
-
-// require_once ("app/core/autoload.php");
-// $app=new App();
-
-//  ob_end_flush(); 
+// --- Activation des erreurs EN PREMIER pour diagnostiquer les 500 ---
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+// --------------------------------------------------------------------
 
 session_start();
 ob_start(); // ← autorise les echo dans le contrôleur
@@ -18,14 +11,9 @@ define('ROOT', __DIR__); // ✅ Ne rien ajouter après __DIR__
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/app/core/autoload.php';
 
-
 $app = new App();
 
 ob_end_flush();
-        
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 // Récupérer le controller et l'action depuis CLI si nécessaire
 if (php_sapi_name() === 'cli') {

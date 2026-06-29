@@ -16,6 +16,13 @@
 
             if (empty($numero)) {
                 $errors[] = "Le numero est obligatoire.";
+            } else {
+                $numero = trim($numero);
+                if (strlen($numero) !== 8) {
+                    $errors[] = "Le numéro de téléphone doit contenir exactement 8 caractères.";
+                } elseif (!preg_match('/^[6789]\d{7}$/', $numero)) {
+                    $errors[] = "Le numéro de téléphone doit commencer par 6, 7, 8 ou 9 et ne contenir que des chiffres.";
+                }
             }
 
             if (empty($id_car)) {
@@ -51,10 +58,10 @@
 
         public function updateChauffeur($id, $data)
         {
-            $stmt = $this->connect()->prepare("UPDATE chauffeur SET nom_prenom = :nom, numero = :numero WHERE id_chauffeur = :id");
+            $stmt = $this->connect()->prepare("UPDATE chauffeur SET nom_prenom = :nom, numero = :numero, id_car = :id_car WHERE id_chauffeur = :id");
             $stmt->bindParam(':nom', $data['nom_prenom']);
             $stmt->bindParam(':numero', $data['numero']);
-            // $stmt->bindParam(':car', $data['numero_car']);
+            $stmt->bindParam(':id_car', $data['id_car']);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             return $stmt->execute();
         }

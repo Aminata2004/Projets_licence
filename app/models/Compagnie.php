@@ -105,8 +105,8 @@
 
             $modification = $this->insertion_update_simples($req, $params);
 
-            if ($modification === true) {
-                $this->set_flash("Modification faite avec succès", "primary");
+            if ($modification) {
+                $this->set_flash("Modification faite avec succès", "info");
             }
         }
 

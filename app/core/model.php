@@ -113,7 +113,7 @@ class Model extends Database
                 return '#f59e0b'; // Orange clair TransGest
             case 'primary':
             default:
-                return '#ea580c'; // Orange principal TransGest
+                return '#0f3b5e'; // Bleu foncé TransGest
         }
     }
 
@@ -270,7 +270,7 @@ class Model extends Database
     }
 
 
-    public function selectWhereCount($select = [], $fields, $whereValue, $value = [])
+    public function selectWhereCount($select, $fields, $whereValue, $value = [])
     {
         $bdd = $this->connect();
         $que = $bdd->prepare("SELECT $select
@@ -283,7 +283,7 @@ class Model extends Database
     }
     /*Partie slect count data
      * */
-    public function selectCount($select = [], $fields)
+    public function selectCount($select, $fields)
     {
         $bdd = $this->connect();
         $que = $bdd->prepare("SELECT $select
@@ -394,7 +394,7 @@ class Model extends Database
     }
 
     /*partie  find all dataavec where */
-    public function SelectData($select = [], $fields)
+    public function SelectData($select, $fields)
     {
         $bdd = $this->connect();
         $que = $bdd->prepare("SELECT $select
@@ -431,7 +431,7 @@ class Model extends Database
 
 
 
-    public function INSER($select = [], $fields)
+    public function INSER($select, $fields)
     {
         $bdd = $this->connect();
         $que = $bdd->prepare("SELECT $select

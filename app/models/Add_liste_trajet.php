@@ -79,4 +79,61 @@ class Add_liste_trajet extends Model
     return $errors;
 }
 
+    public function deleteTrajet($id)
+    {
+        // Supprimer d'abord les liaisons avec les escales
+        $this->insertion_update_simples("DELETE FROM ligneTrajet WHERE id_trajets = :id", [":id" => $id]);
+        
+        // Supprimer ensuite le trajet
+        $stmt = $this->insertion_update_simples("DELETE FROM trajet WHERE idTrajet = :id", [":id" => $id]);
+        return $stmt ? true : false;
+    }
+
+    public function getEscalesByTrajet($id)
+    {
+        $stmt = $this->connect()->prepare("
+            SELECT e.id_escale, e.escales 
+            FROM escale e 
+            INNER JOIN ligneTrajet lt ON e.id_escale = lt.id_escales 
+            WHERE lt.id_trajets = :id
+        ");
+        $stmt->execute([":id" => $id]);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+    
+    public function updateTrajet()
+    {
+        $errors = [];
+        extract($_POST);
+        
+        if ($depart == $destination) {
+            $errors[] = "Départ et destination ne peuvent pas être identiques.";
+            return $errors;
+        }
+        
+        // Mettre à jour le trajet
+        $this->insertion_update_simples("UPDATE trajet SET depart = :depart, destination = :destination WHERE idTrajet = :id", [
+            ":depart" => $depart,
+            ":destination" => $destination,
+            ":id" => $idTrajet
+        ]);
+        
+        // Supprimer les anciennes escales
+        $this->insertion_update_simples("DELETE FROM ligneTrajet WHERE id_trajets = :id", [":id" => $idTrajet]);
+        
+        // Insérer les nouvelles
+        if (!empty($_POST['idEscale']) && is_array($_POST['idEscale'])) {
+            foreach ($_POST['idEscale'] as $escale) {
+                $this->insertion_update_simples(
+                    "INSERT INTO ligneTrajet (id_escales, id_trajets) VALUES(:id_escales, :id_trajets)",
+                    [
+                        ":id_escales" => $escale,
+                        ":id_trajets" => $idTrajet
+                    ]
+                );
+            }
+        }
+        $this->set_flash("Le trajet a été modifié avec succès !", "success");
+        return [];
+    }
 }

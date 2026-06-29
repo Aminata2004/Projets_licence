@@ -14,6 +14,8 @@ class Add_liste_trajets extends  Controller
 
     if (isset($_POST["save"])) {
       $errors = $add_liste_trajet->saveTrajet();
+    } elseif (isset($_POST["update"])) {
+      $errors = $add_liste_trajet->updateTrajet();
     } else {
       $errors = [];
     }
@@ -68,6 +70,20 @@ class Add_liste_trajets extends  Controller
       return;
     }
 
+    if ($liste) {
+      foreach ($liste as $trajet) {
+          $escales = $add_liste_trajet->getEscalesByTrajet($trajet->idTrajet);
+          $noms_escales = [];
+          $ids_escales = [];
+          foreach ($escales as $e) {
+              $noms_escales[] = $e->escales;
+              $ids_escales[] = $e->id_escale;
+          }
+          $trajet->escales_names = implode(" ➔ ", $noms_escales);
+          $trajet->escales_ids = $ids_escales;
+      }
+    }
+
     // Envoi des données à la vue
     $this->view('admin/add_liste_trajet', [
       'errors' => $errors,
@@ -75,6 +91,23 @@ class Add_liste_trajets extends  Controller
       'liste' => $liste,
       'liste_agence' => $liste_agence
     ]);
+  }
+
+  public function delete($id)
+  {
+      $add_liste_trajet = new Add_liste_trajet();
+      
+      // Sécurité : vérifier que l'id n'est pas vide
+      if (!empty($id)) {
+          if ($add_liste_trajet->deleteTrajet($id)) {
+              $add_liste_trajet->set_flash("Le trajet a été supprimé avec succès.", "success");
+          } else {
+              $add_liste_trajet->set_flash("Erreur lors de la suppression du trajet.", "danger");
+          }
+      }
+      
+      header("Location: " . BASE_URL . "/admin/Add_liste_trajets/index");
+      exit;
   }
  
 }
