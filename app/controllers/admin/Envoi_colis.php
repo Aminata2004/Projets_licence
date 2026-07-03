@@ -79,16 +79,64 @@ date_default_timezone_set('Africa/Bamako');
 
 
       $liste_colis = $model->getColisParCarEtDate($id_car, $date_envoi);
+      $liste_cars = $model->getCarsDisponiblesAujourdhui();
 
       $this->view("admin/details_colis_envoyer", [
         "liste_colis" => $liste_colis,
         "id_car" => $id_car,
-        "date_envoi" => $date_envoi
+        "date_envoi" => $date_envoi,
+        "liste_cars" => $liste_cars
       ]);
     } else {
       $model->set_flash("Aucun car sélectionné", "danger");
       $model->redirect("admin/envoi_colis/index");
     }
+  }
+
+  // Déplace un colis déjà envoyé vers un autre car
+  public function changer_car()
+  {
+    $model = new Envoie_colis();
+
+    if (
+      $_SERVER['REQUEST_METHOD'] === 'POST'
+      && isset($_POST['id_colis'], $_POST['ancien_id_car'], $_POST['ancienne_date'], $_POST['nouveau_id_car'])
+    ) {
+      if ($model->changerCarColis(
+        $_POST['id_colis'],
+        $_POST['ancien_id_car'],
+        $_POST['ancienne_date'],
+        $_POST['nouveau_id_car']
+      )) {
+        $model->set_flash("Le car d'envoi du colis a été modifié avec succès.", "success");
+      } else {
+        $model->set_flash("Erreur lors du changement de car.", "danger");
+      }
+    } else {
+      $model->set_flash("Données invalides pour le changement de car.", "danger");
+    }
+
+    header("Location: " . BASE_URL . "/admin/Envoi_colis/liste_colis_envoyer");
+    exit;
+  }
+
+  // Annule un envoi complet : les colis redeviennent disponibles
+  public function annuler_envoi()
+  {
+    $model = new Envoie_colis();
+
+    if (isset($_GET['id_car'], $_GET['date'])) {
+      if ($model->annulerEnvoi($_GET['id_car'], $_GET['date'])) {
+        $model->set_flash("L'envoi a été annulé, les colis sont de nouveau disponibles.", "success");
+      } else {
+        $model->set_flash("Erreur lors de l'annulation de l'envoi.", "danger");
+      }
+    } else {
+      $model->set_flash("Aucun envoi sélectionné.", "danger");
+    }
+
+    header("Location: " . BASE_URL . "/admin/Envoi_colis/liste_colis_envoyer");
+    exit;
   }
 
   // public function envoi_colis()
@@ -141,29 +189,10 @@ date_default_timezone_set('Africa/Bamako');
 
   
 
-    // ✅ Récupérer la liste des cars programmés sans doublons
-    $liste_cars = $envoie_colis->FetchSelectWhere1(
-      "DISTINCT
-        programmation_voyage.id_programmation,
-        programmation_voyage.id_car_programmer,
-        programmation_voyage.id_horaire,
-        programmation_voyage.id_trajet,
-        programmation_voyage.localite_user,
-        programmation_voyage.date_enregistre,
-        programmation_voyage.id_compagnie AS compagnie_prog,
-        horaire.heuredepart,
-        horaire.id_compagnie AS compagnie_horaire",
-      "programmation_voyage
-     INNER JOIN horaire 
-        ON horaire.heuredepart = programmation_voyage.id_horaire
-        AND horaire.id_compagnie = programmation_voyage.id_compagnie",
-      "programmation_voyage.date_enregistre = :today
-     AND programmation_voyage.id_compagnie = :id_compagnie",
-      [
-        ":today" => date('Y-m-d'),
-        ":id_compagnie" => $_SESSION['id_compagnie']
-      ]
-    );
+    // ✅ Récupérer la liste des cars programmés sans doublons.
+    // Un chef d'escale ne doit voir que les cars dont le départ est sa propre ville ;
+    // l'Admin voit tous les cars programmés de la compagnie, toutes villes confondues.
+    $liste_cars = $envoie_colis->getCarsDisponiblesAujourdhui();
 
 
     // Si un car est sélectionné depuis un GET ou POST

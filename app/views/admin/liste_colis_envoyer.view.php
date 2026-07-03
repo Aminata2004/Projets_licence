@@ -77,7 +77,7 @@
                                 <?php foreach ($liste_colis_envoyer as $colis): ?>
                                     <tr>
                                         <td><?= htmlspecialchars($colis->dates) ?></td>
-                                        <td><?= htmlspecialchars($colis->numero_car) ?></td>
+                                        <td>Car n°<?= htmlspecialchars($colis->numero_car) ?></td>
                                         <td>
                                             <div class="dropdown">
                                                 <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
@@ -90,15 +90,15 @@
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a class="dropdown-item" href="#"><i class="bx bx-edit me-2"></i> Modifier</a>
-                                                    </li>
-                                                    <li>
                                                         <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Envoi_colis/details_colis_envoyer?id_car=<?= $colis->numero_car ?>&date=<?= $colis->dates ?>">
-                                                            <i class="bx bx-info-circle me-2"></i> Détails
+                                                            <i class="bx bx-info-circle me-2"></i> Détails / Changer de car
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a class="dropdown-item text-danger" href="#"><i class="bx bx-trash me-2"></i> Supprimer</a>
+                                                        <a class="dropdown-item text-danger annuler-envoi-btn"
+                                                            href="<?= BASE_URL ?>/admin/Envoi_colis/annuler_envoi?id_car=<?= $colis->numero_car ?>&date=<?= $colis->dates ?>">
+                                                            <i class="bx bx-trash me-2"></i> Annuler l'envoi
+                                                        </a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -129,6 +129,31 @@
 
 
     <?php $this->view('admin/partials/foot') ?>
+    <script>
+        document.querySelectorAll('.annuler-envoi-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(event) {
+                event.preventDefault();
+                const url = this.getAttribute('href');
+                Swal.fire({
+                    title: "Annuler cet envoi ?",
+                    text: "Les colis de ce lot redeviendront disponibles pour un nouvel envoi.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oui, annuler',
+                    cancelButtonText: 'Retour',
+                    customClass: {
+                        confirmButton: 'btn btn-danger me-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = url;
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 

@@ -125,8 +125,7 @@ class Mouvements_colis extends  Model
             $params[':numero_gare'] = $numero_gare;
         }
 
-        $sql .= " ORDER BY colis.id_colis DESC
-              LIMIT 10";
+        $sql .= " ORDER BY colis.id_colis DESC";
 
         $stmt = $this->connect()->prepare($sql);
         $stmt->execute($params);

@@ -11,6 +11,7 @@
                 <a href="<?= BASE_URL ?>/site/compagnies" style="text-decoration:none;color:#2c3e50;font-weight:500;transition:color 0.3s;">Compagnies</a>
                 <a href="#destinations" style="text-decoration:none;color:#2c3e50;font-weight:500;transition:color 0.3s;">Destinations</a>
                 <a href="<?= BASE_URL ?>/site/Contact" style="text-decoration:none;color:#2c3e50;font-weight:500;transition:color 0.3s;">Contact</a>
+                <a href="<?= BASE_URL ?>/site/EspaceClient" style="background:transparent;border:2px solid #e67e22;color:#e67e22;padding:8px 20px;border-radius:8px;font-weight:600;text-decoration:none;transition:all 0.3s;"><i class="fas fa-user-circle" style="margin-right:5px;"></i>Espace client</a>
                 <a href="<?= BASE_URL ?>/login" style="background:transparent;border:2px solid #0f3b5e;color:#0f3b5e;padding:8px 20px;border-radius:8px;font-weight:600;text-decoration:none;transition:all 0.3s;">Espace pro</a>
             </div>
             
@@ -29,7 +30,8 @@
     <a href="<?= BASE_URL ?>/site/compagnies" style="display:block;padding:15px 0;text-decoration:none;color:#2c3e50;font-weight:600;border-bottom:1px solid #eee;font-size:1rem;">Compagnies</a>
     <a href="#destinations" style="display:block;padding:15px 0;text-decoration:none;color:#2c3e50;font-weight:600;border-bottom:1px solid #eee;font-size:1rem;">Destinations</a>
     <a href="<?= BASE_URL ?>/site/Contact" style="display:block;padding:15px 0;text-decoration:none;color:#2c3e50;font-weight:600;border-bottom:1px solid #eee;font-size:1rem;">Contact</a>
-    <a href="<?= BASE_URL ?>/login" style="display:block;margin-top:20px;padding:14px 20px;background:linear-gradient(135deg,#0f3b5e,#1a5276);color:white;border-radius:8px;text-decoration:none;font-weight:700;text-align:center;">Espace pro</a>
+    <a href="<?= BASE_URL ?>/site/EspaceClient" style="display:block;margin-top:12px;padding:14px 20px;background:linear-gradient(135deg,#e67e22,#d35400);color:white;border-radius:8px;text-decoration:none;font-weight:700;text-align:center;"><i class="fas fa-user-circle" style="margin-right:6px;"></i>Espace client</a>
+    <a href="<?= BASE_URL ?>/login" style="display:block;margin-top:8px;padding:14px 20px;background:linear-gradient(135deg,#0f3b5e,#1a5276);color:white;border-radius:8px;text-decoration:none;font-weight:700;text-align:center;">Espace pro</a>
 </div>
 <div id="overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1500;display:none;"></div>
 

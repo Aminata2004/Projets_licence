@@ -30,7 +30,7 @@ class Programmer_voyages extends  Controller
         p.prix,
         GROUP_CONCAT(CONCAT(e.escales, ' (', lt.prix_escale, ' FCFA)') SEPARATOR ', ') AS escales
     FROM programmer p
-    LEFT JOIN ligneTrajet lt ON p.idProgrammer = lt.id_trajets
+    LEFT JOIN ligneTrajet lt ON p.idProgrammer = lt.id_trajets AND lt.type_trajet = 'programmer'
     LEFT JOIN escale e ON lt.id_escales = e.id_escale
     LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
     LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
@@ -38,6 +38,18 @@ class Programmer_voyages extends  Controller
     GROUP BY p.idProgrammer
 ", ['id_compagnie' => $id_compagnie]);
 
+        // Détail des escales (id + nom + prix) de chaque programme, utilisé pour le formulaire de modification
+        if ($listeProgrammer) {
+          foreach ($listeProgrammer as $programme) {
+            $programme->escalesDetails = $programmer_voyage->FetchSelectCustom(
+              "SELECT e.id_escale, e.escales, lt.prix_escale
+               FROM ligneTrajet lt
+               INNER JOIN escale e ON lt.id_escales = e.id_escale
+               WHERE lt.id_trajets = :id AND lt.type_trajet = 'programmer'",
+              [':id' => $programme->idProgrammer]
+            );
+          }
+        }
       } else {
         $programmer_voyage->set_flash("Accès refusé ou session invalide", "danger");
         $programmer_voyage->redirect("/admin/Login/index");
@@ -48,7 +60,20 @@ class Programmer_voyages extends  Controller
       $programmer_voyage->redirect("/admin/Login/index");
       return;
     }
-    $this->view('admin/programmer_voyage', ['listeProgrammer' => $listeProgrammer]);
+
+    // Horaires de la compagnie, pour permettre de changer l'heure de départ à la modification
+    // (l'heure de départ de Segou n'est pas la même que celle de Bamako par exemple).
+    $listehoraire = $programmer_voyage->FetchSelectWheres(
+      "*",
+      "horaire",
+      "id_compagnie = :id_compagnie",
+      [":id_compagnie" => $_SESSION['id_compagnie']]
+    );
+
+    $this->view('admin/programmer_voyage', [
+      'listeProgrammer' => $listeProgrammer,
+      'listehoraire' => $listehoraire
+    ]);
   }
 
 
@@ -131,8 +156,33 @@ class Programmer_voyages extends  Controller
       ];
 
       $programmer_voyage->editPrix($data);
+
+      if (!empty($_POST['heureDepart']) && !empty($_POST['rdv'])) {
+        $programmer_voyage->editHoraire($_POST['idProgrammer'], $_POST['heureDepart'], $_POST['rdv']);
+      }
+
+      if (!empty($_POST['prix_escale']) && is_array($_POST['prix_escale'])) {
+        $programmer_voyage->editPrixEscales($_POST['idProgrammer'], $_POST['prix_escale']);
+      }
+
       header("Location: " . BASE_URL . "/admin/Programmer_voyages/index");
       exit;
     }
+  }
+
+  public function delete($id)
+  {
+    $programmer_voyage = new Programmer_voyage();
+
+    if (!empty($id)) {
+      if ($programmer_voyage->deleteProgrammer($id)) {
+        $programmer_voyage->set_flash("Le programme a été supprimé avec succès.", "success");
+      } else {
+        $programmer_voyage->set_flash("Erreur lors de la suppression du programme.", "danger");
+      }
+    }
+
+    header("Location: " . BASE_URL . "/admin/Programmer_voyages/index");
+    exit;
   }
 }

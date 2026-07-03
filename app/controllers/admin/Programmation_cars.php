@@ -28,20 +28,19 @@ class Programmation_cars extends  Controller
       );
 
       // Admin : liste des trajets appartenant à sa compagnie
-      $listeTrajet = $programmation_car->customQuery("
-            SELECT MIN(idProgrammer) AS idProgrammer, idDepart, idDestination
-            FROM programmer
-            WHERE id_compagnie = :id_compagnie
-            GROUP BY idDepart, idDestination
-        ", [':id_compagnie' => $id_compagnie]);
-
-
-      // $listeTrajet = $programmation_car->SelectAllData(
-      //   'MIN(idProgrammer) as idProgrammer, idDestination, idDepart',
-      //   'programmer',
-      //   'id_compagnie = :id_compagnie GROUP BY idDestination, idDepart',
-      //   [':id_compagnie' => $id_compagnie]
-      // );
+      $listeTrajet = $programmation_car->FetchSelectWheres(
+        "programmer.idProgrammer,
+     depart.localite AS depart,
+     depart.numeroGare AS gareDepart,
+     destination.localite AS destination,
+     destination.numeroGare AS gareDestination",
+        "programmer
+     INNER JOIN agence AS depart ON programmer.idDepart = depart.idAgence
+     INNER JOIN agence AS destination ON programmer.idDestination = destination.idAgence",
+        "programmer.id_compagnie = :id_compagnie
+     GROUP BY programmer.idDepart, programmer.idDestination",
+        [':id_compagnie' => $id_compagnie]
+      );
 
       // Admin : référence des cars appartenant à sa compagnie
       $Select_car1 = $programmation_car->FetchSelectWheres(
@@ -65,7 +64,9 @@ class Programmation_cars extends  Controller
       $listeTrajet = $programmation_car->FetchSelectWheres(
         "programmer.idProgrammer,
      depart.localite AS depart,
-     destination.localite AS destination",
+     depart.numeroGare AS gareDepart,
+     destination.localite AS destination,
+     destination.numeroGare AS gareDestination",
         "programmer
      INNER JOIN agence AS depart ON programmer.idDepart = depart.idAgence
      INNER JOIN agence AS destination ON programmer.idDestination = destination.idAgence",
@@ -104,6 +105,36 @@ class Programmation_cars extends  Controller
     );
 
     $this->view('admin/details_programmation_car', ['details' => $details]);
+  }
+
+  // Ajoute un ou plusieurs trajets supplémentaires à un car déjà programmé
+  function ajouter_trajet()
+  {
+    $programmation_car = new Programmation_car();
+
+    if (isset($_POST['ajouter_trajet'])) {
+      $programmation_car->ajouterTrajet();
+    }
+
+    header("Location: " . BASE_URL . "/admin/Programmation_cars/index");
+    exit;
+  }
+
+  // Supprime la programmation d'un car (déprogramme le car et retire ses trajets affectés)
+  function supprimer($id_car)
+  {
+    $programmation_car = new Programmation_car();
+
+    if (!empty($id_car)) {
+      if ($programmation_car->supprimerProgrammation($id_car)) {
+        $programmation_car->set_flash("La programmation du car a été supprimée avec succès.", "success");
+      } else {
+        $programmation_car->set_flash("Erreur lors de la suppression de la programmation.", "danger");
+      }
+    }
+
+    header("Location: " . BASE_URL . "/admin/Programmation_cars/index");
+    exit;
   }
 }
 // End of file Programmation_cars.php

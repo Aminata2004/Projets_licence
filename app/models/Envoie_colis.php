@@ -97,14 +97,24 @@ class Envoie_colis extends Model
    // }
    public function getCarById($id)
 {
+    // programmation_voyage.id_horaire stocke directement l'heure (ex: "04:00:00"),
+    // pas l'id de la table horaire : la jointure doit se faire sur heuredepart, pas id_heure.
     $result = $this->FetchSelectWhere1(
         "*",
-        "programmation_voyage  inner join horaire on horaire.id_heure = programmation_voyage.id_horaire",
-        "id_car_programmer = :id_car_programmer",
-        [":id_car_programmer" => $id]
+        "programmation_voyage
+         INNER JOIN horaire
+            ON horaire.heuredepart = programmation_voyage.id_horaire
+           AND horaire.id_compagnie = programmation_voyage.id_compagnie",
+        "programmation_voyage.id_car_programmer = :id_car_programmer
+         AND programmation_voyage.id_compagnie = :id_compagnie
+         AND programmation_voyage.date_enregistre = :today",
+        [
+            ":id_car_programmer" => $id,
+            ":id_compagnie" => $_SESSION['id_compagnie'] ?? null,
+            ":today" => date('Y-m-d')
+        ]
     );
 
-    var_dump($result); // Ajout pour debug
     return !empty($result) ? $result[0] : null;
 }
 
@@ -113,45 +123,12 @@ class Envoie_colis extends Model
    {
       date_default_timezone_set('Africa/Bamako');
       $id_compagnie = $_SESSION['id_compagnie'];
-      $date_aujourdhui = date('Y-m-d'); // pour la comparaison
+      $date_enregistre = $this->getOuCreerLigneEnvoiDuJour($id_car, $id_compagnie);
 
-      // 1. Vérifier si une ligne existe déjà aujourd'hui pour ce car
-      $stmt = $this->connect()->prepare("
-        SELECT dates 
-        FROM ligne_envoi 
-        WHERE numero_car = :numero_car 
-          AND DATE(dates) = :date_aujourdhui 
-          AND id_compagnie = :id_compagnie 
-        LIMIT 1
-    ");
-      $stmt->execute([
-         ':numero_car' => $id_car,
-         ':date_aujourdhui' => $date_aujourdhui,
-         ':id_compagnie' => $id_compagnie
-      ]);
-      $ligne_existante = $stmt->fetch(PDO::FETCH_ASSOC);
-
-      if ($ligne_existante) {
-         // 2. Si une ligne existe, on utilise la même date
-         $date_enregistre = $ligne_existante['dates'];
-      } else {
-         // 3. Sinon on insère une nouvelle ligne et utilise cette nouvelle date
-         $date_enregistre = date('YmdHis');
-         $this->insertion_update_simples(
-            "INSERT INTO ligne_envoi (numero_car, dates, id_compagnie) 
-             VALUES(:numero_car, :dates, :id_compagnie)",
-            [
-               ':numero_car' => $id_car,
-               ':dates' => $date_enregistre,
-               ':id_compagnie' => $id_compagnie
-            ]
-         );
-      }
-
-      // 4. Insertion dans la table envoi
+      // Insertion dans la table envoi
       foreach ($colis_ids as $id_colis) {
          $this->insertion_update_simples(
-            "INSERT INTO envoi (id_coli, id_car, date_enregistre, id_compagnie) 
+            "INSERT INTO envoi (id_coli, id_car, date_enregistre, id_compagnie)
              VALUES (:id_coli, :id_car, :date_enregistre, :id_compagnie)",
             [
                ':id_coli' => $id_colis,
@@ -162,9 +139,143 @@ class Envoie_colis extends Model
          );
       }
 
-      // 5. Mise à jour du statut des colis
+      // Mise à jour du statut des colis
       $placeholders = implode(',', array_fill(0, count($colis_ids), '?'));
       $sql = "UPDATE colis SET status = 'en_cours' WHERE id_colis IN ($placeholders)";
       $this->connect()->prepare($sql)->execute($colis_ids);
+   }
+
+   // Retourne la date du lot d'envoi du jour pour ce car (le crée s'il n'existe pas encore).
+   private function getOuCreerLigneEnvoiDuJour($id_car, $id_compagnie)
+   {
+      $date_aujourdhui = date('Y-m-d');
+
+      $stmt = $this->connect()->prepare("
+        SELECT dates
+        FROM ligne_envoi
+        WHERE numero_car = :numero_car
+          AND DATE(dates) = :date_aujourdhui
+          AND id_compagnie = :id_compagnie
+        LIMIT 1
+    ");
+      $stmt->execute([
+         ':numero_car' => $id_car,
+         ':date_aujourdhui' => $date_aujourdhui,
+         ':id_compagnie' => $id_compagnie
+      ]);
+      $ligne_existante = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if ($ligne_existante) {
+         return $ligne_existante['dates'];
+      }
+
+      $date_enregistre = date('YmdHis');
+      $this->insertion_update_simples(
+         "INSERT INTO ligne_envoi (numero_car, dates, id_compagnie)
+          VALUES(:numero_car, :dates, :id_compagnie)",
+         [
+            ':numero_car' => $id_car,
+            ':dates' => $date_enregistre,
+            ':id_compagnie' => $id_compagnie
+         ]
+      );
+
+      return $date_enregistre;
+   }
+
+   // Liste des cars programmés aujourd'hui pouvant recevoir des colis :
+   // un chef d'escale ne voit que les cars au départ de sa propre ville, l'Admin voit tout.
+   public function getCarsDisponiblesAujourdhui()
+   {
+      $condition = "programmation_voyage.date_enregistre = :today
+       AND programmation_voyage.id_compagnie = :id_compagnie";
+      $params = [
+         ":today" => date('Y-m-d'),
+         ":id_compagnie" => $_SESSION['id_compagnie']
+      ];
+
+      if (($_SESSION['droit'] ?? null) === 'chef_d_escale') {
+         $condition .= " AND programmation_voyage.localite_user = :ville";
+         $params[":ville"] = $_SESSION['ville'];
+      }
+
+      return $this->FetchSelectWhere1(
+         "DISTINCT
+           programmation_voyage.id_car_programmer,
+           programmation_voyage.id_horaire,
+           programmation_voyage.id_trajet,
+           programmation_voyage.localite_user,
+           programmation_voyage.date_enregistre,
+           programmation_voyage.id_compagnie AS compagnie_prog,
+           horaire.heuredepart,
+           horaire.id_compagnie AS compagnie_horaire",
+         "programmation_voyage
+       INNER JOIN horaire
+          ON horaire.heuredepart = programmation_voyage.id_horaire
+          AND horaire.id_compagnie = programmation_voyage.id_compagnie",
+         $condition,
+         $params
+      );
+   }
+
+   // Déplace un colis déjà envoyé vers un autre car (ex: erreur d'affectation, changement de dernière minute).
+   public function changerCarColis($id_colis, $ancien_id_car, $ancienne_date, $nouveau_id_car)
+   {
+      $id_compagnie = $_SESSION['id_compagnie'];
+      date_default_timezone_set('Africa/Bamako');
+      $nouvelle_date = $this->getOuCreerLigneEnvoiDuJour($nouveau_id_car, $id_compagnie);
+
+      $stmt = $this->insertion_update_simples(
+         "UPDATE envoi
+          SET id_car = :nouveau_id_car, date_enregistre = :nouvelle_date
+          WHERE id_coli = :id_colis
+            AND id_car = :ancien_id_car
+            AND date_enregistre = :ancienne_date
+            AND id_compagnie = :id_compagnie",
+         [
+            ':nouveau_id_car' => $nouveau_id_car,
+            ':nouvelle_date' => $nouvelle_date,
+            ':id_colis' => $id_colis,
+            ':ancien_id_car' => $ancien_id_car,
+            ':ancienne_date' => $ancienne_date,
+            ':id_compagnie' => $id_compagnie
+         ]
+      );
+
+      return $stmt && $stmt->rowCount() > 0;
+   }
+
+   // Annule un envoi complet (tous les colis d'un car pour une date donnée) :
+   // les colis redeviennent disponibles ('enregistre') et le lot d'envoi est supprimé.
+   public function annulerEnvoi($id_car, $date_envoi)
+   {
+      $id_compagnie = $_SESSION['id_compagnie'];
+
+      $stmt = $this->connect()->prepare(
+         "SELECT id_coli FROM envoi WHERE id_car = :id_car AND date_enregistre = :date_envoi AND id_compagnie = :id_compagnie"
+      );
+      $stmt->execute([':id_car' => $id_car, ':date_envoi' => $date_envoi, ':id_compagnie' => $id_compagnie]);
+      $ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+      if (empty($ids)) {
+         return false;
+      }
+
+      $placeholders = implode(',', array_fill(0, count($ids), '?'));
+      $this->connect()
+         ->prepare("UPDATE colis SET status = 'enregistre' WHERE id_colis IN ($placeholders)")
+         ->execute($ids);
+
+      $this->insertion_update_simples(
+         "DELETE FROM envoi WHERE id_car = :id_car AND date_enregistre = :date_envoi AND id_compagnie = :id_compagnie",
+         [':id_car' => $id_car, ':date_envoi' => $date_envoi, ':id_compagnie' => $id_compagnie]
+      );
+
+      $this->insertion_update_simples(
+         "DELETE FROM ligne_envoi WHERE numero_car = :numero_car AND dates = :date_envoi AND id_compagnie = :id_compagnie",
+         [':numero_car' => $id_car, ':date_envoi' => $date_envoi, ':id_compagnie' => $id_compagnie]
+      );
+
+      return true;
    }
 }

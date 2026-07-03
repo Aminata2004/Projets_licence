@@ -17,22 +17,39 @@ class Caisse extends Controller
             $id = (int)$_POST['id_caisse'];
             $status_caisse = (int)$_POST['newStatut'];
 
-            // Enregistrer la date de fermeture
-            $date_fermeture = date('Y-m-d');
+            // 🔒 Un chef d'escale ne peut clôturer qu'une caisse de sa propre agence,
+            // même si la requête est trafiquée pour cibler l'id_caisse d'une autre ville.
+            $autorise = true;
+            if (($_SESSION['droit'] ?? null) === 'chef_d_escale') {
+                $caisseCible = $liste_gare->FetchSelectWhere(
+                    "c.id_caisse",
+                    "caisse c INNER JOIN agence a ON c.id_agence = a.idAgence",
+                    "c.id_caisse = :id_caisse AND a.id_compagnie = :id_compagnie AND a.localite = :ville",
+                    [":id_caisse" => $id, ":id_compagnie" => $id_compagnie, ":ville" => $_SESSION['ville']]
+                );
+                $autorise = (bool) $caisseCible;
+            }
 
-            $result = $liste_gare->insertion_update_simple(
-                "UPDATE caisse SET status_caisse = 0, date_fermeture = :date_fermeture WHERE id_caisse = :id_caisse",
-                [
-                    ":date_fermeture"  => $date_fermeture,
-                    ":id_caisse"       => $id
-                ]
-            );
-
-            if ($result !== false) {
-                header("Location: " . $_SERVER['REQUEST_URI']);
-                exit;
+            if (!$autorise) {
+                $liste_gare->set_flash("Vous ne pouvez clôturer que la caisse de votre propre agence.", "danger");
             } else {
-                $liste_gare->set_flash("Erreur lors de la mise à jour du statut.", "danger");
+                // Enregistrer la date de fermeture
+                $date_fermeture = date('Y-m-d');
+
+                $result = $liste_gare->insertion_update_simple(
+                    "UPDATE caisse SET status_caisse = 0, date_fermeture = :date_fermeture WHERE id_caisse = :id_caisse",
+                    [
+                        ":date_fermeture"  => $date_fermeture,
+                        ":id_caisse"       => $id
+                    ]
+                );
+
+                if ($result !== false) {
+                    header("Location: " . $_SERVER['REQUEST_URI']);
+                    exit;
+                } else {
+                    $liste_gare->set_flash("Erreur lors de la mise à jour du statut.", "danger");
+                }
             }
         }
 
@@ -44,12 +61,23 @@ class Caisse extends Controller
         $liste_gare = new Liste_gare();
         $id_compagnie = $_SESSION['id_compagnie'];
 
-        $listes = $liste_gare->FetchSelectWheres(
-            '*',
-            'agence',
-            'id_compagnie = :id_compagnie',
-            ['id_compagnie' => $id_compagnie]
-        );
+        if (($_SESSION['droit'] ?? null) === 'chef_d_escale') {
+            // Un chef d'escale ne doit voir/choisir que sa propre agence, pas celles des autres
+            $listes = $liste_gare->FetchSelectWheres(
+                '*',
+                'agence',
+                'id_compagnie = :id_compagnie AND localite = :ville',
+                ['id_compagnie' => $id_compagnie, 'ville' => $_SESSION['ville']]
+            );
+        } else {
+            $listes = $liste_gare->FetchSelectWheres(
+                '*',
+                'agence',
+                'id_compagnie = :id_compagnie',
+                ['id_compagnie' => $id_compagnie]
+            );
+        }
+
         if (isset($_POST["saveAgence"])) {
 
             $liste_gare->saveCaisse();

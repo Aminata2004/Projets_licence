@@ -32,6 +32,7 @@
     <link href="<?= BASE_URL ?>/assets/plugins/select2/css/select2-bootstrap4.css" rel="stylesheet" />
     <link href="<?= BASE_URL ?>/assets/plugins/select2/css/bootstrap-custom-colors.css" rel="stylesheet" />
     <link href="<?= BASE_URL ?>/assets/plugins/js/bs-stepper.css" rel="stylesheet" />
+    <link href="<?= BASE_URL ?>/assets/css/transgest-theme.css" rel="stylesheet" />
     <!-- <title>Skodash - Bootstrap 5 Admin Template</title> -->
     <title>TransGest </title>
   <!-- Bootstrap CSS -->

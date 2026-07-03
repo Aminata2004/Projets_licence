@@ -26,7 +26,7 @@ class Programme extends Model
                GROUP_CONCAT(CONCAT(e.escales, ' (', lt.prix_escale, ' FCFA)') 
                             ORDER BY e.id_escale SEPARATOR ', ') AS escales_avec_frais
         FROM programmer p
-        LEFT JOIN ligneTrajet lt ON lt.id_trajets = p.idProgrammer
+        LEFT JOIN ligneTrajet lt ON lt.id_trajets = p.idProgrammer AND lt.type_trajet = 'programmer'
         LEFT JOIN escale e ON e.id_escale = lt.id_escales
         LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
         LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
@@ -58,7 +58,7 @@ class Programme extends Model
                a1.code As codeDepart,
                    GROUP_CONCAT(CONCAT(e.escales, ' (', lt.prix_escale, ' FCFA)') ORDER BY e.id_escale SEPARATOR ' - ') AS escales_avec_frais
             FROM programmer p
-            LEFT JOIN ligneTrajet lt ON lt.id_trajets = p.idProgrammer
+            LEFT JOIN ligneTrajet lt ON lt.id_trajets = p.idProgrammer AND lt.type_trajet = 'programmer'
             LEFT JOIN escale e ON e.id_escale = lt.id_escales
               LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
         LEFT JOIN agence a2 ON p.idDestination = a2.idAgence

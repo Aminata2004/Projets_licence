@@ -101,7 +101,7 @@
                     "SELECT e.id_escale, prix_escale, e.escales AS escale_nom
                  FROM ligneTrajet lt
                  JOIN escale e ON e.id_escale = lt.id_escales
-                 WHERE lt.id_trajets = :progId",
+                 WHERE lt.id_trajets = :progId AND lt.type_trajet = 'programmer'",
                     [':progId' => $progId]
                 );
 

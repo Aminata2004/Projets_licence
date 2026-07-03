@@ -132,6 +132,26 @@ public function saveCaisse()
     $montant_colis   = 0;
     $montant_billets = 0;
 
+    // 🔒 Un chef d'escale ne peut ouvrir une caisse que pour sa propre agence,
+    // même si le formulaire est trafiqué pour soumettre un autre id_agence.
+    if (($_SESSION['droit'] ?? null) === 'chef_d_escale') {
+        $agence = $this->FetchSelectWhere(
+            "idAgence",
+            "agence",
+            "idAgence = :id_agence AND id_compagnie = :id_compagnie AND localite = :ville",
+            [
+                ":id_agence"    => $id_agence,
+                ":id_compagnie" => $id_compagnie,
+                ":ville"        => $_SESSION['ville']
+            ]
+        );
+
+        if (!$agence) {
+            $this->set_flash("Vous ne pouvez ouvrir une caisse que pour votre propre agence.", "danger");
+            return false;
+        }
+    }
+
     // ⚡ Vérifier si une caisse active existe déjà pour cette agence
     $sql = "SELECT COUNT(*) as total 
             FROM caisse 

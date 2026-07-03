@@ -24,7 +24,6 @@ class Programmation_voyages extends Controller
         $cars_destinations = [];
         foreach ($programmations as $ligne) {
             $cars_destinations[$ligne->numero_car][] = $ligne;
-            $cars_destinations[$ligne->numero_car]['id_car'] = $ligne->id_car;
         }
         //         $cars_destinations = [];
 
@@ -166,6 +165,24 @@ class Programmation_voyages extends Controller
     {
         $programmation_voyage = new Programmation_voyage();
 
+        // Traitement de la soumission du formulaire de modification
+        if (isset($_POST['modifier'])) {
+            $id_horaire = $_POST['id_horaire'][0] ?? null;
+            $id_destination = $_POST['id_destination'][0] ?? null;
+            $id_care = $_POST['id_care'][0] ?? null;
+
+            if ($id_horaire && $id_destination && $id_care) {
+                $programmation_voyage->updateProgrammation($id_programmation, $id_horaire, $id_destination);
+                $programmation_voyage->updateCareStatus($id_care, $id_destination);
+                $programmation_voyage->set_flash("La programmation a été modifiée avec succès !", "success");
+            } else {
+                $programmation_voyage->set_flash("Veuillez remplir tous les champs.", "danger");
+            }
+
+            header("Location: " . BASE_URL . "/admin/Programmation_voyages/liste_programmer_voyage");
+            exit;
+        }
+
         // Récupérer la programmation
         $programmation = $programmation_voyage->FetchSelectWheres(
             'pv.*, c.numero_car, c.nbr_place, c.nbr_place_reserve',
@@ -191,9 +208,16 @@ class Programmation_voyages extends Controller
             '1=1'
         );
 
-        // Récupérer toutes les destinations possibles pour ce car
+        // Récupérer les destinations réellement assignées à ce car, au départ de la
+        // localité d'origine de cette programmation (pour proposer un changement cohérent).
+        $destinations = $programmation_voyage->getDestinationsForCar(
+            $programmation[0]->id_car_programmer,
+            $programmation[0]->localite_user,
+            $id_compagnie
+        );
+
         $cars_destinations = [];
-        $cars_destinations[$programmation[0]->numero_car] = [$programmation[0]];
+        $cars_destinations[$programmation[0]->numero_car] = $destinations;
 
 
         $this->view('admin/programmer_voyage_modifier', [

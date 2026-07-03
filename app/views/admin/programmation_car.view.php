@@ -78,8 +78,18 @@
                                                             &#8943; <!-- Trois points horizontaux -->
                                                         </a>
                                                         <div class="dropdown-menu dropdown-menu-end">
-                                                            <a class="dropdown-item" href="#">Ajouter</a>
-                                                            <a class="dropdown-item" href="#">Supprimer</a>
+                                                            <a class="dropdown-item ajouter-trajet-button"
+                                                                href="#"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#modalAjouterTrajet"
+                                                                data-id-car="<?= $Select_cars->id_car ?>"
+                                                                data-numero-car="<?= htmlspecialchars($Select_cars->numero_car) ?>">
+                                                                Ajouter
+                                                            </a>
+                                                            <a class="dropdown-item text-danger supprimer-car-button"
+                                                                href="<?= BASE_URL ?>/admin/Programmation_cars/supprimer/<?= $Select_cars->id_car ?>">
+                                                                Supprimer
+                                                            </a>
                                                             <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Programmation_cars/details/<?= $Select_cars->id_car ?>">Details</a>
                                                         </div>
                                                     </div>
@@ -123,7 +133,7 @@
                                             <?php endforeach; ?> -->
                                             <?php foreach ($listeTrajet as $listeTrajets): ?>
                                                 <option value="<?= htmlspecialchars($listeTrajets->idProgrammer); ?>">
-                                                    <?= htmlspecialchars($listeTrajets->depart . ' → ' . $listeTrajets->destination); ?>
+                                                    <?= htmlspecialchars($listeTrajets->depart . ' (' . $listeTrajets->gareDepart . ') → ' . $listeTrajets->destination . ' (' . $listeTrajets->gareDestination . ')'); ?>
                                                 </option>
                                             <?php endforeach; ?>
 
@@ -142,6 +152,41 @@
                     </div>
                 </div>
             </div>
+            <!-- Modal Ajouter un trajet à un car déjà programmé -->
+            <div class="modal fade" id="modalAjouterTrajet" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary">
+                            <h5 class="modal-title text-white">
+                                Ajouter un trajet <span id="modalAjouterNumeroCar"></span>
+                            </h5>
+                            <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="<?= BASE_URL ?>/admin/Programmation_cars/ajouter_trajet" method="post">
+                            <div class="modal-body">
+                                <input type="hidden" name="id_car" id="modalAjouterIdCar">
+                                <div class="mb-3 col-12">
+                                    <label class="form-label">Trajet à parcourir</label>
+                                    <select class="form-control multiple-select-ajouter" multiple="multiple" placeholder="Choisissez un ou plusieurs trajet" name="idTrajet[]">
+                                        <?php foreach ($listeTrajet as $listeTrajets): ?>
+                                            <option value="<?= htmlspecialchars($listeTrajets->idProgrammer); ?>">
+                                                <?= htmlspecialchars($listeTrajets->depart . ' (' . $listeTrajets->gareDepart . ') → ' . $listeTrajets->destination . ' (' . $listeTrajets->gareDestination . ')'); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
+                                    Annuler
+                                </button>
+                                <button type="submit" class="btn btn-primary" name="ajouter_trajet">Enregistrer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <!--end row-->
         </main>
         <!--end page main-->
@@ -163,6 +208,42 @@
         $(document).ready(function() {
             $('.multiple-select').select2({
                 dropdownParent: $('#exampleDangerModal')
+            });
+            $('.multiple-select-ajouter').select2({
+                dropdownParent: $('#modalAjouterTrajet')
+            });
+
+            // Remplir le modal "Ajouter un trajet" avec le car cliqué
+            $('.ajouter-trajet-button').click(function() {
+                var idCar = $(this).data('id-car');
+                var numeroCar = $(this).data('numero-car');
+
+                $('#modalAjouterIdCar').val(idCar);
+                $('#modalAjouterNumeroCar').text('(Car : ' + numeroCar + ')');
+            });
+
+            // Confirmation avant suppression de la programmation d'un car
+            $('.supprimer-car-button').click(function(event) {
+                event.preventDefault();
+                const deleteUrl = $(this).attr('href');
+
+                Swal.fire({
+                    title: 'Êtes-vous sûr ?',
+                    text: "La programmation de ce car et ses trajets affectés seront supprimés. Cette action est irréversible !",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oui, supprimer',
+                    cancelButtonText: 'Annuler',
+                    customClass: {
+                        confirmButton: 'btn btn-danger me-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = deleteUrl;
+                    }
+                });
             });
         });
     </script>

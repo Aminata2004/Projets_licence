@@ -61,7 +61,7 @@ class Add_liste_trajet extends Model
                 if (isset($_POST['idEscale']) && is_array($_POST['idEscale'])) {
                     foreach ($_POST['idEscale'] as $escale) {
                         $this->insertion_update_simple(
-                            "INSERT INTO ligneTrajet (id_escales, id_trajets) VALUES(:id_escales, :id_trajets)",
+                            "INSERT INTO ligneTrajet (id_escales, id_trajets, type_trajet) VALUES(:id_escales, :id_trajets, 'trajet')",
                             [
                                 ":id_escales" => $escale,
                                 ":id_trajets" => $id_trajet
@@ -76,14 +76,18 @@ class Add_liste_trajet extends Model
         }
     }
 
+    if (count($errors) > 0) {
+        $this->set_flash(implode(" ", $errors), "danger");
+    }
+
     return $errors;
 }
 
     public function deleteTrajet($id)
     {
         // Supprimer d'abord les liaisons avec les escales
-        $this->insertion_update_simples("DELETE FROM ligneTrajet WHERE id_trajets = :id", [":id" => $id]);
-        
+        $this->insertion_update_simples("DELETE FROM ligneTrajet WHERE id_trajets = :id AND type_trajet = 'trajet'", [":id" => $id]);
+
         // Supprimer ensuite le trajet
         $stmt = $this->insertion_update_simples("DELETE FROM trajet WHERE idTrajet = :id", [":id" => $id]);
         return $stmt ? true : false;
@@ -92,10 +96,10 @@ class Add_liste_trajet extends Model
     public function getEscalesByTrajet($id)
     {
         $stmt = $this->connect()->prepare("
-            SELECT e.id_escale, e.escales 
-            FROM escale e 
-            INNER JOIN ligneTrajet lt ON e.id_escale = lt.id_escales 
-            WHERE lt.id_trajets = :id
+            SELECT e.id_escale, e.escales
+            FROM escale e
+            INNER JOIN ligneTrajet lt ON e.id_escale = lt.id_escales
+            WHERE lt.id_trajets = :id AND lt.type_trajet = 'trajet'
         ");
         $stmt->execute([":id" => $id]);
         return $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -108,6 +112,7 @@ class Add_liste_trajet extends Model
         
         if ($depart == $destination) {
             $errors[] = "Départ et destination ne peuvent pas être identiques.";
+            $this->set_flash(implode(" ", $errors), "danger");
             return $errors;
         }
         
@@ -119,13 +124,13 @@ class Add_liste_trajet extends Model
         ]);
         
         // Supprimer les anciennes escales
-        $this->insertion_update_simples("DELETE FROM ligneTrajet WHERE id_trajets = :id", [":id" => $idTrajet]);
-        
+        $this->insertion_update_simples("DELETE FROM ligneTrajet WHERE id_trajets = :id AND type_trajet = 'trajet'", [":id" => $idTrajet]);
+
         // Insérer les nouvelles
         if (!empty($_POST['idEscale']) && is_array($_POST['idEscale'])) {
             foreach ($_POST['idEscale'] as $escale) {
                 $this->insertion_update_simples(
-                    "INSERT INTO ligneTrajet (id_escales, id_trajets) VALUES(:id_escales, :id_trajets)",
+                    "INSERT INTO ligneTrajet (id_escales, id_trajets, type_trajet) VALUES(:id_escales, :id_trajets, 'trajet')",
                     [
                         ":id_escales" => $escale,
                         ":id_trajets" => $idTrajet

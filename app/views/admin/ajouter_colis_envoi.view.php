@@ -44,14 +44,20 @@
                             <label for="id_car_selectionner" class="form-label fw-bold">Sélectionner un car</label>
                             <select id="id_car_selectionner" name="id_car_selectionner" class="form-select shadow-sm">
                                 <option value="">-- Choisir un car --</option>
-                                <?php foreach ($liste_cars as $car_selectionne): ?>
-                                    <option value="<?= $car_selectionne['id_car_programmer'] ?>">
-                                        Car N°<?= $car_selectionne['id_car_programmer'] ?> —
-                                        Départ: <?= $car_selectionne['id_horaire'] ?> —
-                                        Destination: <?= $car_selectionne['id_trajet'] ?>
+                                <?php foreach ($liste_cars as $car): ?>
+                                    <option value="<?= $car['id_car_programmer'] ?>"
+                                        <?= (!empty($car_selectionne) && $car['id_car_programmer'] == $car_selectionne['id_car_programmer']) ? 'selected' : '' ?>>
+                                        Car N°<?= $car['id_car_programmer'] ?> —
+                                        Départ: <?= $car['id_horaire'] ?> —
+                                        Destination: <?= $car['id_trajet'] ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
+                            <?php if (!empty($car_selectionne)): ?>
+                                <div class="form-text text-success">
+                                    <i class="bx bx-check-circle"></i> Car N°<?= htmlspecialchars($car_selectionne['id_car_programmer']) ?> présélectionné (départ <?= htmlspecialchars($car_selectionne['id_horaire']) ?> vers <?= htmlspecialchars($car_selectionne['id_trajet']) ?>).
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <!-- Table des colis -->

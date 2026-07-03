@@ -65,12 +65,14 @@ $fromAndWhere = "liaison_car_trajet
 
         if (isset($_SESSION['droit'], $_SESSION['id_compagnie'])) {
             if ($_SESSION['droit'] === 'Admin') {
-                // Admin : cars dont le status_car est NULL ET appartenant à leur compagnie
+                // Admin : cars dont le status_car est NULL (pas en transit) ET appartenant à leur compagnie
                 $where = " WHERE car.status_car IS NULL AND car.id_compagnie = :compagnie";
                 $params[':compagnie'] = $_SESSION['id_compagnie'];
             } elseif ($_SESSION['droit'] === 'chef_d_escale' && isset($_SESSION['ville'])) {
-                // Admin régionale : status_car = ville ET id_compagnie = leur compagnie
-                $where = " WHERE car.status_car = :ville AND car.id_compagnie = :compagnie";
+                // Chef d'escale : status_car = ville, id_compagnie = leur compagnie,
+                // ET seuls les trajets dont le départ correspond à la ville actuelle du car
+                // sont proposés (le car ne peut pas "partir" d'une ville où il n'est pas).
+                $where = " WHERE car.status_car = :ville AND car.id_compagnie = :compagnie AND a1.localite = car.status_car";
                 $params[':ville'] = $_SESSION['ville'];
                 $params[':compagnie'] = $_SESSION['id_compagnie'];
             }
@@ -234,5 +236,38 @@ $fromAndWhere = "liaison_car_trajet
             "id_programmation = :id_programmation",
             [":id_programmation" => $id]
         );
+    }
+
+    // Destinations valides pour un car donné, au départ d'une localité donnée
+    // (les trajets réellement assignés à ce car via "Affectation des cars").
+    public function getDestinationsForCar($id_car, $localite_depart, $id_compagnie)
+    {
+        $select = "programmer.idProgrammer, a1.localite AS departLocalite, a2.localite AS destinationLocalite";
+        $from = "liaison_car_trajet
+            INNER JOIN programmer ON liaison_car_trajet.id_trajets = programmer.idProgrammer
+            INNER JOIN agence a1 ON programmer.idDepart = a1.idAgence
+            INNER JOIN agence a2 ON programmer.idDestination = a2.idAgence";
+        $where = "liaison_car_trajet.id_car = :id_car
+            AND a1.localite = :localite_depart
+            AND liaison_car_trajet.id_compagnie = :id_compagnie";
+
+        return $this->FetchSelectWheres($select, $from, $where, [
+            ':id_car' => $id_car,
+            ':localite_depart' => $localite_depart,
+            ':id_compagnie' => $id_compagnie
+        ]);
+    }
+
+    public function updateProgrammation($id_programmation, $id_horaire, $id_destination)
+    {
+        $update = "UPDATE programmation_voyage
+            SET id_horaire = :id_horaire, id_trajet = :id_trajet
+            WHERE id_programmation = :id_programmation";
+
+        return $this->insertion_update_simples($update, [
+            ':id_horaire' => $id_horaire,
+            ':id_trajet' => $id_destination,
+            ':id_programmation' => $id_programmation
+        ]);
     }
 }

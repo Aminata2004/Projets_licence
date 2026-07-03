@@ -33,21 +33,10 @@ class Programmation_car extends Model
                 // Exécuter la requête de mise à jour
                 $stmt_update_care->execute();
             }
-            // si la mis a jours est effectue alors enregistre les ligne de trajets 
+            // si la mis a jours est effectue alors enregistre les ligne de trajets
             if ($stmt_update_care !== false) {
 
-                for ($i = 0; $i < count($_POST['idTrajet']); $i++) {
-                    $id_trajets = $_POST['idTrajet'][$i]; // Assumption: les index 
-
-                    $Save_ligne_chauffeur = $this->insertion_update_simples(
-                        "INSERT INTO  liaison_car_trajet(id_car , id_trajets,id_compagnie) VALUES (:id_car,:id_trajets,:id_compagnie)",
-                        [
-                            ":id_car" => $id_car,
-                            ":id_trajets" => $id_trajets,
-                            ":id_compagnie" => $_SESSION['id_compagnie']
-                        ]
-                    );
-                }
+                $Save_ligne_chauffeur = $this->linkTrajetsToCar($id_car, $_POST['idTrajet'], $_SESSION['id_compagnie']);
 
                 if ($Save_ligne_chauffeur == true) {
                     $this->set_flash('Car programmer avec succès', 'info');
@@ -62,10 +51,116 @@ class Programmation_car extends Model
             }
         }
     }
+
+    // Ajoute un ou plusieurs trajets supplémentaires à un car déjà programmé
+    public function ajouterTrajet()
+    {
+        extract($_POST);
+        $errors = [];
+
+        if (empty($id_car)) {
+            $errors[] = "Le numéro du car est obligatoire.";
+        }
+
+        if (empty($idTrajet)) {
+            $errors[] = "Le trajet est obligatoire.";
+        }
+
+        if (count($errors) === 0) {
+            $success = $this->linkTrajetsToCar($id_car, $_POST['idTrajet'], $_SESSION['id_compagnie']);
+
+            if ($success) {
+                $this->set_flash('Trajet ajouté au car avec succès', 'info');
+            } else {
+                $this->set_flash("Erreur lors de l'ajout du trajet", 'danger');
+            }
+        } else {
+            foreach ($errors as $error) {
+                $this->set_flash($error, "danger");
+            }
+        }
+    }
+
+    // Supprime la programmation d'un car : ses trajets affectés, sa référence,
+    // et remet le car en disponible pour une nouvelle programmation.
+    public function supprimerProgrammation($id_car)
+    {
+        $this->insertion_update_simples("DELETE FROM liaison_car_trajet WHERE id_car = :id_car", [":id_car" => $id_car]);
+        $this->insertion_update_simples("DELETE FROM reference_car WHERE id_car = :id_car", [":id_car" => $id_car]);
+        $stmt = $this->insertion_update_simples("UPDATE car SET programmer_car = 'off' WHERE id_car = :id_car", [":id_car" => $id_car]);
+
+        return $stmt ? true : false;
+    }
+
+    // Relie un ou plusieurs trajets (et leur sens inverse) à un car, sans dupliquer les liaisons existantes.
+    private function linkTrajetsToCar($id_car, array $idsTrajet, $id_compagnie)
+    {
+        $success = true;
+
+        foreach ($idsTrajet as $id_trajets) {
+            // On assigne aussi le trajet retour (sens inverse) pour que le car
+            // ait toujours une destination valide une fois arrivé.
+            $idsToLink = [$id_trajets];
+            $reverseId = $this->getReverseTrajetId($id_trajets, $id_compagnie);
+            if ($reverseId && !in_array($reverseId, $idsToLink)) {
+                $idsToLink[] = $reverseId;
+            }
+
+            foreach ($idsToLink as $idToLink) {
+                $dejaAffecte = $this->FetchSelectWhere(
+                    "id_car",
+                    "liaison_car_trajet",
+                    "id_car = :id_car AND id_trajets = :id_trajets",
+                    [":id_car" => $id_car, ":id_trajets" => $idToLink]
+                );
+
+                if (!$dejaAffecte) {
+                    $success = $this->insertion_update_simples(
+                        "INSERT INTO  liaison_car_trajet(id_car , id_trajets,id_compagnie) VALUES (:id_car,:id_trajets,:id_compagnie)",
+                        [
+                            ":id_car" => $id_car,
+                            ":id_trajets" => $idToLink,
+                            ":id_compagnie" => $id_compagnie
+                        ]
+                    );
+                }
+            }
+        }
+
+        return $success ? true : false;
+    }
     public function FetchSelectCustom($query, $params = [])
     {
         $stmt = $this->connect()->prepare($query);
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    // Trouve le trajet-programme qui fait le sens inverse (destination -> depart) d'un trajet donné.
+    private function getReverseTrajetId($id_trajet, $id_compagnie)
+    {
+        $trajet = $this->FetchSelectWhere(
+            "idDepart, idDestination",
+            "programmer",
+            "idProgrammer = :id AND id_compagnie = :id_compagnie",
+            [":id" => $id_trajet, ":id_compagnie" => $id_compagnie]
+        );
+
+        if (!$trajet) {
+            return null;
+        }
+
+        $reverse = $this->FetchSelectWhere(
+            "idProgrammer",
+            "programmer",
+            "idDepart = :idDepart AND idDestination = :idDestination AND id_compagnie = :id_compagnie",
+            [
+                ":idDepart" => $trajet->idDestination,
+                ":idDestination" => $trajet->idDepart,
+                ":id_compagnie" => $id_compagnie
+            ]
+        );
+
+        return $reverse ? $reverse->idProgrammer : null;
     }
 }

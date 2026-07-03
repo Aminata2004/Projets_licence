@@ -97,14 +97,18 @@
                                                                 data-bs-target="#basicModale"
                                                                 data-id="<?= $listeProgrammers->idProgrammer  ?>"
                                                                 data-prix="<?= $listeProgrammers->prix   ?>"
-                                                                data-iddepart="<?= $listeProgrammers->departLocalite ?>"
-                                                                data-iddestination="<?= $listeProgrammers->destinationLocalite ?>"
+                                                                data-heuredepart="<?= htmlspecialchars($listeProgrammers->heureDepart) ?>"
+                                                                data-rdv="<?= htmlspecialchars($listeProgrammers->rdv) ?>"
+                                                                data-iddepart="<?= htmlspecialchars($listeProgrammers->departLocalite) ?>"
+                                                                data-iddestination="<?= htmlspecialchars($listeProgrammers->destinationLocalite) ?>"
+                                                                data-escales="<?= htmlspecialchars(json_encode($listeProgrammers->escalesDetails), ENT_QUOTES) ?>"
                                                                 href="#">
                                                                 <i class="bi bi-pencil-square text-primary me-2"></i>Modifier
                                                             </a>
                                                         </li>
                                                         <li>
-                                                            <a class="dropdown-item text-danger" href="#">
+                                                            <a class="dropdown-item text-danger delete-button"
+                                                                href="<?= BASE_URL ?>/admin/Programmer_voyages/delete/<?= $listeProgrammers->idProgrammer ?>">
                                                                 <i class="bi bi-trash3 me-2"></i>Supprimer
                                                             </a>
                                                         </li>
@@ -141,25 +145,45 @@
     <!-- Modal  pour Ajout-->
     <div class="modal fade" id="basicModale" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
+            <div class="modal-content shadow-lg border-0">
                 <div class="modal-header bg-primary">
-                    <h5 class="modal-title text-white" id="exampleModalLabel1">Modifier le prix du trajet :
-                        <?= $listeProgrammers->idDepart . '     ' . $listeProgrammers->idDestination ?></h5>
+                    <h5 class="modal-title text-white" id="exampleModalLabel1">
+                        <i class="bi bi-pencil-square me-1"></i> Modifier le trajet :
+                        <span id="modalTrajetRoute"></span>
+                    </h5>
                     <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close" style="color: white;"></button>
                 </div>
-                <form action="<?= BASE_URL ?>/Programmer_voyages/edit" method="post">
+                <form action="<?= BASE_URL ?>/admin/Programmer_voyages/edit" method="post">
                     <div class="modal-body">
                         <div class="row">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label class="form-label fw-semibold"><i class="bi bi-clock me-1"></i>Heure de départ</label>
+                                <select class="form-select" name="heureDepart" id="nameheuredepart" onchange="calculerRDVModifier()" required>
+                                    <?php foreach ($listehoraire as $horaire): ?>
+                                        <option value="<?= htmlspecialchars($horaire->heuredepart) ?>">
+                                            <?= htmlspecialchars($horaire->heuredepart) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 mb-3">
+                                <label class="form-label fw-semibold"><i class="bi bi-alarm me-1"></i>RDV</label>
+                                <input type="time" class="form-control" name="rdv" id="namerdv" required>
+                            </div>
                             <div class="col mb-3">
-                                <label class="form-label">Prix</label>
-                                <input type="text" class="form-control" value="" name="prix" id="nameprix">
+                                <label class="form-label fw-semibold"><i class="bi bi-cash-coin me-1"></i>Prix du trajet</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" value="" name="prix" id="nameprix" required>
+                                    <span class="input-group-text">FCFA</span>
+                                </div>
                             </div>
                             <input type="hidden" name="idProgrammer" id="nameidtrajet">
                         </div>
-
+                        <div id="escalePricesContainer"></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary" name="edit">Modifier</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary" name="edit"><i class="bi bi-check-circle me-1"></i>Enregistrer</button>
                     </div>
                 </form>
             </div>
@@ -169,19 +193,90 @@
 
 </body>
 <script>
+    // Recalcule automatiquement le RDV (heure de départ - 45 min) quand l'heure de départ change
+    function calculerRDVModifier() {
+        let heureDepart = document.getElementById("nameheuredepart").value;
+        let rdvInput = document.getElementById("namerdv");
+
+        if (heureDepart) {
+            let [heures, minutes] = heureDepart.split(':').map(Number);
+
+            minutes -= 45;
+            if (minutes < 0) {
+                minutes += 60;
+                heures -= 1;
+            }
+            if (heures < 0) {
+                heures += 24;
+            }
+
+            let heureRDV = (heures < 10 ? "0" : "") + heures + ":" + (minutes < 10 ? "0" : "") + minutes;
+            rdvInput.value = heureRDV;
+        }
+    }
+
     $(document).ready(function() {
-        // Lorsque le bouton "Ajouter" est cliqué
+        // Lorsque le bouton "Modifier" est cliqué
         $('.add-button').click(function() {
             // Récupérer les attributs de données du lien cliqué
             var idtrajet = $(this).data('id');
             var prix = $(this).data('prix');
+            var heuredepart = $(this).data('heuredepart');
+            var rdv = $(this).data('rdv');
+            var iddepart = $(this).data('iddepart');
+            var iddestination = $(this).data('iddestination');
+            var escales = $(this).data('escales'); // tableau d'objets {id_escale, escales, prix_escale}
 
             // Remplir le champ du modal avec les données
             $('#nameidtrajet').val(idtrajet);
             $('#nameprix').val(prix);
+            $('#nameheuredepart').val(heuredepart);
+            $('#namerdv').val(rdv);
+            $('#modalTrajetRoute').text(iddepart + ' → ' + iddestination);
+
+            // Générer les champs de prix pour chaque escale du trajet
+            var container = $('#escalePricesContainer');
+            container.empty();
+            if (Array.isArray(escales) && escales.length > 0) {
+                container.append('<label class="form-label fw-semibold mt-2"><i class="bi bi-signpost-2 me-1"></i>Frais des escales</label>');
+                escales.forEach(function(escale) {
+                    var group = $('<div class="input-group mb-2"></div>');
+                    group.append($('<span class="input-group-text"></span>').text(escale.escales));
+                    group.append($('<input type="number" class="form-control">').attr('name', 'prix_escale[' + escale.id_escale + ']').val(escale.prix_escale ?? 0));
+                    group.append('<span class="input-group-text">FCFA</span>');
+                    container.append(group);
+                });
+            }
 
             // Afficher le modal
             $('#basicModale').modal('show');
+        });
+
+        // Suppression avec SweetAlert
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const deleteUrl = this.getAttribute('href');
+
+                Swal.fire({
+                    title: 'Êtes-vous sûr ?',
+                    text: "Ce programme et ses éventuelles escales/affectations de car seront également supprimés. Cette action est irréversible !",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oui, supprimer',
+                    cancelButtonText: 'Annuler',
+                    customClass: {
+                        confirmButton: 'btn btn-danger me-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = deleteUrl;
+                    }
+                });
+            });
         });
     });
 </script>

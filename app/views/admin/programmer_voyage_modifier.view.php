@@ -68,15 +68,11 @@
                                 <tbody class="text-center">
                                     <?php if (!empty($cars_destinations)) : ?>
                                         <?php foreach ($cars_destinations as $numero_car => $destinations) : ?>
-                                            <?php
-                                            // On prend le premier élément pour récupérer id_car, id_horaire, id_destination
-                                            $car = $destinations[0];
-                                            ?>
                                             <tr>
                                                 <!-- Numéro du car et id caché -->
                                                 <td>
                                                     <input type="text" name="numero_car[]" class="form-control text-center shadow-sm" value="<?= htmlspecialchars($numero_car) ?>" readonly>
-                                                    <input type="hidden" name="id_care[]" value="<?= htmlspecialchars($car->id_car) ?>">
+                                                    <input type="hidden" name="id_care[]" value="<?= htmlspecialchars($programmation->id_car_programmer) ?>">
                                                 </td>
 
                                                 <!-- Sélect Horaire pré-sélectionné -->
@@ -85,7 +81,7 @@
                                                         <option value="" disabled>Choisir un horaire</option>
                                                         <?php foreach ($listehoraire as $horaire): ?>
                                                             <option value="<?= htmlspecialchars($horaire->heuredepart) ?>"
-                                                                <?= ($horaire->heuredepart == $car->id_horaire) ? 'selected' : '' ?>>
+                                                                <?= ($horaire->heuredepart == $programmation->id_horaire) ? 'selected' : '' ?>>
                                                                 <?= date('H:i', strtotime($horaire->heuredepart)) ?>
                                                             </option>
                                                         <?php endforeach; ?>
@@ -110,7 +106,7 @@
                                                             ?>
                                                             <?php if ($afficher): ?>
                                                                 <option value="<?= htmlspecialchars($d->destinationLocalite) ?>"
-                                                                    <?= ($d->destinationLocalite == $car->id_destination) ? 'selected' : '' ?>>
+                                                                    <?= ($d->destinationLocalite == $programmation->id_trajet) ? 'selected' : '' ?>>
                                                                     <?= htmlspecialchars($d->departLocalite . ' -> ' . $d->destinationLocalite) ?>
                                                                 </option>
                                                             <?php endif; ?>
@@ -131,7 +127,7 @@
 
                         <!-- Boutons -->
                         <div class="mt-4 d-flex gap-2">
-                            <button class="btn btn-success shadow-sm" type="submit" name="programmer">
+                            <button class="btn btn-success shadow-sm" type="submit" name="modifier">
                                 <i class="bx bx-save me-1"></i> Enregistrer
                             </button>
                             <a href="<?= BASE_URL ?>/admin/Programmation_voyages/liste_programmer_voyage"

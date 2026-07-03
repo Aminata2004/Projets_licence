@@ -1,4 +1,5 @@
 <?php $this->view('admin/partials/headers') ?>
+<?php $this->view('admin/helpers') ?>
 
 <body>
     <!--start wrapper-->
@@ -34,6 +35,56 @@
                 </div>
             </div>
             <!-- /Breadcrumb -->
+
+            <?php
+            $totalAttente = count($liste_colis);
+            $totalRecu = count($liste_colis_recue);
+            $totalLivre = count($liste_colis_livre);
+            ?>
+
+            <!-- Stat cards -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100 stat-card">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bx bx-time-five"></i>
+                            </div>
+                            <div class="ms-3">
+                                <div class="text-muted small">Colis en attente</div>
+                                <div class="fw-bold fs-4 lh-1"><?= $totalAttente ?></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100 stat-card">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stat-icon bg-success bg-opacity-10 text-success">
+                                <i class="bx bx-inbox"></i>
+                            </div>
+                            <div class="ms-3">
+                                <div class="text-muted small">Colis reçus</div>
+                                <div class="fw-bold fs-4 lh-1"><?= $totalRecu ?></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100 stat-card">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stat-icon bg-info bg-opacity-10 text-info">
+                                <i class="bx bx-check-shield"></i>
+                            </div>
+                            <div class="ms-3">
+                                <div class="text-muted small">Colis livrés</div>
+                                <div class="fw-bold fs-4 lh-1"><?= $totalLivre ?></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-xxl-12">
                     <?php $this->view("admin/set_flash") ?>
@@ -42,20 +93,23 @@
                             <div class="card-body">
 
                                 <!-- Tabs -->
-                                <ul class="nav nav-pills mb-4 justify-content-start" role="tablist">
-                                    <li class="nav-item me-2" role="presentation">
+                                <ul class="nav nav-pills mb-4 justify-content-start flex-wrap" role="tablist">
+                                    <li class="nav-item me-2 mb-2" role="presentation">
                                         <a class="nav-link active d-flex align-items-center px-3 py-2" data-bs-toggle="pill" href="#info-pills-home" role="tab">
                                             <i class='bx bx-time-five me-2'></i> Colis en attente
+                                            <span class="badge rounded-pill bg-warning text-dark ms-2"><?= $totalAttente ?></span>
                                         </a>
                                     </li>
-                                    <li class="nav-item me-2" role="presentation">
+                                    <li class="nav-item me-2 mb-2" role="presentation">
                                         <a class="nav-link d-flex align-items-center px-3 py-2" data-bs-toggle="pill" href="#info-pills-profile" role="tab">
                                             <i class='bx bx-inbox me-2'></i> Colis reçu
+                                            <span class="badge rounded-pill bg-success ms-2"><?= $totalRecu ?></span>
                                         </a>
                                     </li>
-                                    <li class="nav-item me-2" role="presentation">
+                                    <li class="nav-item me-2 mb-2" role="presentation">
                                         <a class="nav-link d-flex align-items-center px-3 py-2" data-bs-toggle="pill" href="#info-pills-contact" role="tab">
                                             <i class='bx bx-check-shield me-2'></i> Colis livré
+                                            <span class="badge rounded-pill bg-info ms-2"><?= $totalLivre ?></span>
                                         </a>
                                     </li>
                                 </ul>
@@ -66,9 +120,17 @@
                                     <!-- Colis en attente -->
                                     <div class="tab-pane fade show active" id="info-pills-home" role="tabpanel">
                                         <form action="" method="post">
+                                            <div class="d-flex justify-content-end mb-3">
+                                                <div class="w-30 position-relative">
+                                                    <div class="position-absolute top-50 translate-middle-y ps-3">
+                                                        <i class="bi bi-search text-secondary"></i>
+                                                    </div>
+                                                    <input class="form-control ps-5 rounded-pill search-input" type="text" data-target="table-attente" placeholder="Rechercher un colis...">
+                                                </div>
+                                            </div>
                                             <div class="table-responsive mb-3">
-                                                <table id="example" class="table table-striped table-hover align-middle  mb-0">
-                                                    <thead class="table-light ">
+                                                <table id="table-attente" class="table table-striped table-hover align-middle mb-0">
+                                                    <thead class="table-light">
                                                         <tr>
                                                             <th><input type="checkbox" id="selectAll"></th>
                                                             <th>Nom colis</th>
@@ -76,62 +138,66 @@
                                                             <th>Valeur</th>
                                                             <th>Frais de transaction</th>
                                                             <th>Destination</th>
-                                                            <th>Status</th>
+                                                            <th>Code colis</th>
                                                             <th>Status</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody class="">
-                                                        <?php $this->view('admin/helpers') ?>
+                                                    <tbody>
                                                         <?php foreach ($liste_colis as $c): ?>
-                                                            <?php if ($c['destination'] === $_SESSION['ville']): ?>
-                                                                <tr class="">
-                                                                    <td><input type="checkbox" name="selected_colis[]" value="<?= (int)$c['id_colis'] ?>" class="form-check-input checkbox-car"></td>
-                                                                    <td class="fw-medium"><?= htmlspecialchars($c['nom_colis']) ?></td>
-                                                                    <td><?= htmlspecialchars($c['nature']) ?></td>
-                                                                    <td><?= number_format($c['valeur'], 0, ',', ' ') ?> FCFA</td>
-                                                                    <td><?= number_format($c['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
-                                                                    <td><?= htmlspecialchars($c['destination']) ?></td>
-                                                                    <td><?= htmlspecialchars($c['code_colis']) ?></td>
-                                                                    <td><?= afficherBadgeStatus($c['status']) ?></td>
-                                                                    <td>
-                                                                        <div class="dropdown">
-                                                                            <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown">
-                                                                                <i class="bx bx-dots-vertical-rounded"></i>
-                                                                            </a>
-                                                                            <ul class="dropdown-menu dropdown-menu-end">
-
-                                                                                <li><a class="dropdown-item" href="#"><i class="bx bx-block me-1"></i> Désactiver</a></li>
-                                                                            </ul>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            <?php endif ?>
+                                                            <tr>
+                                                                <td><input type="checkbox" name="selected_colis[]" value="<?= (int)$c['id_colis'] ?>" class="form-check-input checkbox-car"></td>
+                                                                <td class="fw-medium"><?= htmlspecialchars($c['nom_colis']) ?></td>
+                                                                <td><?= htmlspecialchars($c['nature']) ?></td>
+                                                                <td><?= number_format($c['valeur'], 0, ',', ' ') ?> FCFA</td>
+                                                                <td><?= number_format($c['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
+                                                                <td><?= htmlspecialchars($c['destination']) ?></td>
+                                                                <td><?= htmlspecialchars($c['code_colis']) ?></td>
+                                                                <td><?= afficherBadgeStatus($c['status']) ?></td>
+                                                                <td>
+                                                                    <div class="dropdown">
+                                                                        <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown">
+                                                                            <i class="bx bx-dots-vertical-rounded"></i>
+                                                                        </a>
+                                                                        <ul class="dropdown-menu dropdown-menu-end">
+                                                                            <li><a class="dropdown-item" href="#"><i class="bx bx-block me-1"></i> Désactiver</a></li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         <?php endforeach ?>
                                                     </tbody>
                                                 </table>
+                                                <?php if (empty($liste_colis)): ?>
+                                                    <div class="text-center text-muted py-5">
+                                                        <i class="bx bx-package fs-1 d-block mb-2"></i>
+                                                        Aucun colis en attente pour le moment.
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
-                                            <div class="d-flex justify-content-end mt-3">
-                                                <button class="btn btn-success rounded-pill px-4" type="submit" name="reception">
-                                                    <i class="bx bx-check me-1"></i> Réception
-                                                </button>
-                                            </div>
+                                            <?php if (!empty($liste_colis)): ?>
+                                                <div class="d-flex justify-content-end mt-3">
+                                                    <button class="btn btn-success rounded-pill px-4" type="submit" name="reception">
+                                                        <i class="bx bx-check me-1"></i> Réception
+                                                    </button>
+                                                </div>
+                                            <?php endif; ?>
                                         </form>
                                     </div>
 
                                     <!-- Colis reçu -->
                                     <div class="tab-pane fade" id="info-pills-profile" role="tabpanel">
                                         <div class="d-flex justify-content-end mb-3">
-                                            <form class="w-30 position-relative">
+                                            <div class="w-30 position-relative">
                                                 <div class="position-absolute top-50 translate-middle-y ps-3">
                                                     <i class="bi bi-search text-secondary"></i>
                                                 </div>
-                                                <input class="form-control ps-5 rounded-pill" type="text" placeholder="Rechercher un colis...">
-                                            </form>
+                                                <input class="form-control ps-5 rounded-pill search-input" type="text" data-target="table-recu" placeholder="Rechercher un colis...">
+                                            </div>
                                         </div>
                                         <div class="table-responsive">
-                                            <table id="" class="table table-striped table-hover align-middle text-center mb-0">
-                                                <thead class="table-light ">
+                                            <table id="table-recu" class="table table-striped table-hover align-middle text-center mb-0">
+                                                <thead class="table-light">
                                                     <tr>
                                                         <th>Nom colis</th>
                                                         <th>Nature</th>
@@ -145,47 +211,50 @@
                                                 </thead>
                                                 <tbody>
                                                     <?php foreach ($liste_colis_recue as $colis): ?>
-                                                        <?php if ($colis['destination'] === $_SESSION['ville']): ?>
-                                                            <tr>
-                                                                <td><?= $colis['nom_colis'] ?></td>
-                                                                <td><?= $colis['nature'] ?></td>
-                                                                <td><?= number_format($colis['valeur'], 0, ',', ' ') ?> FCFA</td>
-                                                                <td><?= number_format($colis['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
-                                                                <td><?= $colis['provient_de'] ?></td>
-                                                                <td><?= htmlspecialchars($colis['code_colis']) ?></td>
-                                                                <td><?= afficherBadgeStatus($colis['status']) ?></td>
-                                                                <td>
-                                                                    <div class="dropdown">
-                                                                        <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown">
-                                                                            <i class="bx bx-dots-vertical-rounded"></i>
-                                                                        </a>
-                                                                        <ul class="dropdown-menu dropdown-menu-end">
-
-                                                                            <li><a class="dropdown-item" href="#"> Details</a></li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        <?php endif ?>
+                                                        <tr>
+                                                            <td><?= htmlspecialchars($colis['nom_colis']) ?></td>
+                                                            <td><?= htmlspecialchars($colis['nature']) ?></td>
+                                                            <td><?= number_format($colis['valeur'], 0, ',', ' ') ?> FCFA</td>
+                                                            <td><?= number_format($colis['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
+                                                            <td><?= htmlspecialchars($colis['provient_de']) ?></td>
+                                                            <td><?= htmlspecialchars($colis['code_colis']) ?></td>
+                                                            <td><?= afficherBadgeStatus($colis['status']) ?></td>
+                                                            <td>
+                                                                <div class="dropdown">
+                                                                    <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown">
+                                                                        <i class="bx bx-dots-vertical-rounded"></i>
+                                                                    </a>
+                                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                                        <li><a class="dropdown-item" href="#"> Details</a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
                                                     <?php endforeach ?>
                                                 </tbody>
                                             </table>
+                                            <?php if (empty($liste_colis_recue)): ?>
+                                                <div class="text-center text-muted py-5">
+                                                    <i class="bx bx-inbox fs-1 d-block mb-2"></i>
+                                                    Aucun colis reçu pour le moment.
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
 
                                     <!-- Colis livré -->
                                     <div class="tab-pane fade" id="info-pills-contact" role="tabpanel">
                                         <div class="d-flex justify-content-end mb-3">
-                                            <form class="w-30 position-relative">
+                                            <div class="w-30 position-relative">
                                                 <div class="position-absolute top-50 translate-middle-y ps-3">
                                                     <i class="bi bi-search text-secondary"></i>
                                                 </div>
-                                                <input class="form-control ps-5 rounded-pill" type="text" placeholder="Rechercher un colis...">
-                                            </form>
+                                                <input class="form-control ps-5 rounded-pill search-input" type="text" data-target="table-livre" placeholder="Rechercher un colis...">
+                                            </div>
                                         </div>
                                         <div class="table-responsive">
-                                            <table id="example3" class="table table-striped table-hover align-middle text-center mb-0">
-                                                <thead class="table-light ">
+                                            <table id="table-livre" class="table table-striped table-hover align-middle text-center mb-0">
+                                                <thead class="table-light">
                                                     <tr>
                                                         <th>Nom colis</th>
                                                         <th>Nature</th>
@@ -195,27 +264,29 @@
                                                         <th>Date de livraison</th>
                                                         <th>Code colis</th>
                                                         <th>Status</th>
-
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <?php foreach ($liste_colis_livre as $colis_livre): ?>
-                                                        <?php if ($colis_livre['destination'] === $_SESSION['ville']): ?>
-                                                            <tr>
-                                                                <td><?= $colis_livre['nom_colis'] ?></td>
-                                                                <td><?= $colis_livre['nature'] ?></td>
-                                                                <td><?= number_format($colis_livre['valeur'], 0, ',', ' ') ?> FCFA</td>
-                                                                <td><?= number_format($colis_livre['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
-                                                                <td><?= $colis_livre['destination'] ?></td>
-                                                                <td><?= $colis_livre['date_livraison'] ?></td>
-                                                                <td><?= $colis_livre['code_colis'] ?></td>
-                                                                <td><?= afficherBadgeStatus($colis_livre['status']) ?></td>
-
-                                                            </tr>
-                                                        <?php endif ?>
+                                                        <tr>
+                                                            <td><?= htmlspecialchars($colis_livre['nom_colis']) ?></td>
+                                                            <td><?= htmlspecialchars($colis_livre['nature']) ?></td>
+                                                            <td><?= number_format($colis_livre['valeur'], 0, ',', ' ') ?> FCFA</td>
+                                                            <td><?= number_format($colis_livre['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
+                                                            <td><?= htmlspecialchars($colis_livre['destination']) ?></td>
+                                                            <td><?= htmlspecialchars($colis_livre['date_livraison']) ?></td>
+                                                            <td><?= htmlspecialchars($colis_livre['code_colis']) ?></td>
+                                                            <td><?= afficherBadgeStatus($colis_livre['status']) ?></td>
+                                                        </tr>
                                                     <?php endforeach ?>
                                                 </tbody>
                                             </table>
+                                            <?php if (empty($liste_colis_livre)): ?>
+                                                <div class="text-center text-muted py-5">
+                                                    <i class="bx bx-check-shield fs-1 d-block mb-2"></i>
+                                                    Aucun colis livré pour le moment.
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
 
@@ -241,8 +312,31 @@
     </div>
     <!--end wrapper-->
     <?php $this->view('admin/partials/foot') ?>
+
+    <style>
+        .stat-card .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .nav-pills .nav-link {
+            border-radius: 50px;
+            background-color: #f4f6f9;
+            color: #495057;
+        }
+
+        .nav-pills .nav-link.active {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
+        }
+    </style>
+
     <!-- JS -->
-    <!-- ✅ Script JS pour gérer la sélection de tous les checkboxes -->
     <script>
         document.getElementById('selectAll').addEventListener('change', function() {
             const isChecked = this.checked;
@@ -250,8 +344,52 @@
                 checkbox.checked = isChecked;
             });
         });
+
+        $(document).ready(function() {
+            const tables = {};
+            ['table-attente', 'table-recu', 'table-livre'].forEach(function(id) {
+                if ($('#' + id).find('tbody tr').length > 0) {
+                    tables[id] = $('#' + id).DataTable({
+                        dom: 'lrtip',
+                        order: [],
+                        language: {
+                            emptyTable: "Aucune donnée disponible",
+                            zeroRecords: "Aucun résultat trouvé",
+                            lengthMenu: "Afficher _MENU_ lignes",
+                            info: "Affichage de _START_ à _END_ sur _TOTAL_ lignes",
+                            infoEmpty: "0 ligne",
+                            search: "Rechercher :",
+                            paginate: {
+                                previous: "Précédent",
+                                next: "Suivant"
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Recherche personnalisée reliée aux DataTables
+            $('.search-input').on('keyup', function() {
+                const target = $(this).data('target');
+                if (tables[target]) {
+                    tables[target].search(this.value).draw();
+                }
+            });
+
+            // Recalcule la largeur des colonnes quand un onglet caché devient visible
+            const tableByTab = {
+                '#info-pills-home': 'table-attente',
+                '#info-pills-profile': 'table-recu',
+                '#info-pills-contact': 'table-livre'
+            };
+            $('a[data-bs-toggle="pill"]').on('shown.bs.tab', function(e) {
+                const id = tableByTab[$(e.target).attr('href')];
+                if (id && tables[id]) {
+                    tables[id].columns.adjust();
+                }
+            });
+        });
     </script>
-  
 
 </body>
 
