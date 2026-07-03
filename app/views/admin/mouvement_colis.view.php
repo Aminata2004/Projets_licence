@@ -160,6 +160,28 @@
                                                                             <i class="bx bx-dots-vertical-rounded"></i>
                                                                         </a>
                                                                         <ul class="dropdown-menu dropdown-menu-end">
+                                                                            <li>
+                                                                                <a class="dropdown-item details-colis-btn" href="#"
+                                                                                    data-bs-toggle="modal" data-bs-target="#detailsColisModal"
+                                                                                    data-nom="<?= htmlspecialchars($c['nom_colis'] ?? '') ?>"
+                                                                                    data-nature="<?= htmlspecialchars($c['nature'] ?? '') ?>"
+                                                                                    data-valeur="<?= htmlspecialchars(number_format($c['valeur'], 0, ',', ' ')) ?>"
+                                                                                    data-frais="<?= htmlspecialchars(number_format($c['fraix_transaction'], 0, ',', ' ')) ?>"
+                                                                                    data-lieu-label="Destination"
+                                                                                    data-lieu="<?= htmlspecialchars($c['destination'] ?? '') ?>"
+                                                                                    data-code="<?= htmlspecialchars($c['code_colis'] ?? '') ?>"
+                                                                                    data-status="<?= htmlspecialchars($c['status'] ?? '') ?>"
+                                                                                    data-status-html="<?= htmlspecialchars(afficherBadgeStatus($c['status'] ?? '')) ?>"
+                                                                                    data-date="<?= htmlspecialchars($c['date_enregistrement'] ?? '') ?>"
+                                                                                    data-expediteur="<?= htmlspecialchars($c['expediteur'] ?? '') ?>"
+                                                                                    data-numero-exp="<?= htmlspecialchars($c['numero_exp'] ?? '') ?>"
+                                                                                    data-email-exp="<?= htmlspecialchars($c['email_exp'] ?? '') ?>"
+                                                                                    data-destinataire="<?= htmlspecialchars($c['destinataire'] ?? '') ?>"
+                                                                                    data-numero-dest="<?= htmlspecialchars($c['numero_dest'] ?? '') ?>"
+                                                                                    data-email-dest="<?= htmlspecialchars($c['email_dest'] ?? '') ?>">
+                                                                                    <i class="bx bx-show-alt me-1"></i> Détails
+                                                                                </a>
+                                                                            </li>
                                                                             <li><a class="dropdown-item" href="#"><i class="bx bx-block me-1"></i> Désactiver</a></li>
                                                                         </ul>
                                                                     </div>
@@ -219,13 +241,54 @@
                                                             <td><?= htmlspecialchars($colis['provient_de']) ?></td>
                                                             <td><?= htmlspecialchars($colis['code_colis']) ?></td>
                                                             <td><?= afficherBadgeStatus($colis['status']) ?></td>
-                                                            <td>
+                                            <td>
                                                                 <div class="dropdown">
                                                                     <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown">
                                                                         <i class="bx bx-dots-vertical-rounded"></i>
                                                                     </a>
                                                                     <ul class="dropdown-menu dropdown-menu-end">
-                                                                        <li><a class="dropdown-item" href="#"> Details</a></li>
+                                                                        <li>
+                                                                            <a class="dropdown-item details-colis-btn" href="#"
+                                                                                data-bs-toggle="modal" data-bs-target="#detailsColisModal"
+                                                                                data-nom="<?= htmlspecialchars($colis['nom_colis'] ?? '') ?>"
+                                                                                data-nature="<?= htmlspecialchars($colis['nature'] ?? '') ?>"
+                                                                                data-valeur="<?= htmlspecialchars(number_format($colis['valeur'], 0, ',', ' ')) ?>"
+                                                                                data-frais="<?= htmlspecialchars(number_format($colis['fraix_transaction'], 0, ',', ' ')) ?>"
+                                                                                data-lieu-label="Provenance"
+                                                                                data-lieu="<?= htmlspecialchars($colis['provient_de'] ?? '') ?>"
+                                                                                data-code="<?= htmlspecialchars($colis['code_colis'] ?? '') ?>"
+                                                                                data-status="<?= htmlspecialchars($colis['status'] ?? '') ?>"
+                                                                                data-status-html="<?= htmlspecialchars(afficherBadgeStatus($colis['status'] ?? '')) ?>"
+                                                                                data-date="<?= htmlspecialchars($colis['date_enregistrement'] ?? '') ?>"
+                                                                                data-expediteur="<?= htmlspecialchars($colis['expediteur'] ?? '') ?>"
+                                                                                data-numero-exp="<?= htmlspecialchars($colis['numero_exp'] ?? '') ?>"
+                                                                                data-email-exp="<?= htmlspecialchars($colis['email_exp'] ?? '') ?>"
+                                                                                data-destinataire="<?= htmlspecialchars($colis['destinataire'] ?? '') ?>"
+                                                                                data-numero-dest="<?= htmlspecialchars($colis['numero_dest'] ?? '') ?>"
+                                                                                data-email-dest="<?= htmlspecialchars($colis['email_dest'] ?? '') ?>">
+                                                                                <i class="bx bx-show-alt me-1"></i> Détails
+                                                                            </a>
+                                                                        </li>
+                                                                        <li>
+                                                                            <a class="dropdown-item"
+                                                                                href="<?= BASE_URL ?>/admin/Livraison_colis?code=<?= urlencode($colis['code_colis']) ?>">
+                                                                                <i class="bx bx-truck me-2"></i>Livrer
+                                                                            </a>
+                                                                        </li>
+                                                                        <?php
+                                                                        $msgRecu = "Bonjour " . ($colis['destinataire'] ?? '') . ", votre colis (code "
+                                                                            . ($colis['code_colis'] ?? '') . ") est arrivé à " . ($colis['destination'] ?? '')
+                                                                            . ", gare n° " . ($colis['numero_gare_retrait'] ?? '') . ", et vous y attend."
+                                                                            . " Présentez ce message ou le code du colis pour le retrait.";
+                                                                        $lienWhatsappRecu = whatsapp_link($colis['whatsapp_dest'] ?? $colis['numero_dest'] ?? '', $msgRecu);
+                                                                        ?>
+                                                                        <?php if ($lienWhatsappRecu): ?>
+                                                                            <li>
+                                                                                <a class="dropdown-item" href="<?= htmlspecialchars($lienWhatsappRecu) ?>" target="_blank" rel="noopener">
+                                                                                    <i class="bx bxl-whatsapp me-2 text-success"></i>Notifier par WhatsApp
+                                                                                </a>
+                                                                            </li>
+                                                                        <?php endif; ?>
                                                                     </ul>
                                                                 </div>
                                                             </td>
@@ -264,6 +327,7 @@
                                                         <th>Date de livraison</th>
                                                         <th>Code colis</th>
                                                         <th>Status</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -277,6 +341,22 @@
                                                             <td><?= htmlspecialchars($colis_livre['date_livraison']) ?></td>
                                                             <td><?= htmlspecialchars($colis_livre['code_colis']) ?></td>
                                                             <td><?= afficherBadgeStatus($colis_livre['status']) ?></td>
+                                                            <td>
+                                                                <?php
+                                                                // Message de confirmation de remise : envoyé à l'EXPÉDITEUR (preuve que son colis est bien arrivé),
+                                                                // pas au destinataire (lui est notifié plus tôt, à l'étape "Colis reçu").
+                                                                $msgLivre = "Bonjour " . ($colis_livre['expediteur'] ?? '') . ", votre colis (code "
+                                                                    . ($colis_livre['code_colis'] ?? '') . ") a bien été remis à son destinataire le "
+                                                                    . ($colis_livre['date_livraison'] ?? '') . ". Merci de votre confiance.";
+                                                                $lienWhatsappLivre = whatsapp_link($colis_livre['whatsapp_exp'] ?? $colis_livre['numero_exp'] ?? '', $msgLivre);
+                                                                ?>
+                                                                <?php if ($lienWhatsappLivre): ?>
+                                                                    <a href="<?= htmlspecialchars($lienWhatsappLivre) ?>" target="_blank" rel="noopener"
+                                                                        class="btn btn-sm btn-outline-success" title="Confirmer la remise par WhatsApp (à l'expéditeur)">
+                                                                        <i class="bx bxl-whatsapp"></i>
+                                                                    </a>
+                                                                <?php endif; ?>
+                                                            </td>
                                                         </tr>
                                                     <?php endforeach ?>
                                                 </tbody>
@@ -309,11 +389,117 @@
         <!--Start Back To Top Button-->
         <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
         <!--End Back To Top Button-->
+
+        <!-- Modal Détails Colis -->
+        <div class="modal fade" id="detailsColisModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow colis-modal">
+                    <div class="modal-header colis-modal-header text-white">
+                        <div>
+                            <h5 class="modal-title mb-0"><i class="bx bx-package me-2"></i><span id="dc_nom"></span></h5>
+                            <small class="opacity-75">Code colis : <span id="dc_code"></span></small>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="row g-3 mb-4 text-center">
+                            <div class="col-4">
+                                <div class="colis-stat-icon bg-success bg-opacity-10 text-success"><i class="bx bx-money"></i></div>
+                                <div class="small text-muted">Valeur</div>
+                                <div class="fw-bold"><span id="dc_valeur"></span> FCFA</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="colis-stat-icon bg-warning bg-opacity-10 text-warning"><i class="bx bx-receipt"></i></div>
+                                <div class="small text-muted">Frais</div>
+                                <div class="fw-bold"><span id="dc_frais"></span> FCFA</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="colis-stat-icon bg-info bg-opacity-10 text-info"><i class="bx bx-check-shield"></i></div>
+                                <div class="small text-muted">Statut</div>
+                                <div id="dc_status_badge"></div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="colis-panel">
+                                    <div class="colis-panel-title"><i class="bx bx-upload me-1"></i> Expéditeur</div>
+                                    <div class="colis-info-row"><i class="bx bx-user"></i><span id="dc_expediteur"></span></div>
+                                    <div class="colis-info-row"><i class="bx bx-phone"></i><span id="dc_numero_exp"></span></div>
+                                    <div class="colis-info-row"><i class="bx bx-envelope"></i><span id="dc_email_exp"></span></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="colis-panel">
+                                    <div class="colis-panel-title"><i class="bx bx-download me-1"></i> Destinataire</div>
+                                    <div class="colis-info-row"><i class="bx bx-user"></i><span id="dc_destinataire"></span></div>
+                                    <div class="colis-info-row"><i class="bx bx-phone"></i><span id="dc_numero_dest"></span></div>
+                                    <div class="colis-info-row"><i class="bx bx-envelope"></i><span id="dc_email_dest"></span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="colis-panel mt-3">
+                            <div class="colis-panel-title"><i class="bx bx-box me-1"></i> Colis</div>
+                            <div class="colis-info-row"><i class="bx bx-tag"></i> Nature : <span class="ms-1" id="dc_nature"></span></div>
+                            <div class="colis-info-row"><i class="bx bx-map-pin"></i> <span id="dc_lieu_label">Destination</span> : <span class="ms-1" id="dc_lieu"></span></div>
+                            <div class="colis-info-row"><i class="bx bx-calendar"></i> Enregistré le <span class="ms-1" id="dc_date"></span></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <!--end wrapper-->
     <?php $this->view('admin/partials/foot') ?>
 
     <style>
+        .colis-modal-header {
+            background: linear-gradient(135deg, #0f3b5e, #1d6fa5);
+        }
+
+        .colis-stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin: 0 auto 6px;
+        }
+
+        .colis-panel {
+            background: #f8f9fb;
+            border-radius: 10px;
+            padding: 14px 16px;
+            height: 100%;
+        }
+
+        .colis-panel-title {
+            font-weight: 600;
+            color: #0f3b5e;
+            margin-bottom: 10px;
+            font-size: .95rem;
+        }
+
+        .colis-info-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: .92rem;
+        }
+
+        .colis-info-row i {
+            color: #6c757d;
+            font-size: 1rem;
+            width: 18px;
+        }
+
         .stat-card .stat-icon {
             width: 48px;
             height: 48px;
@@ -342,6 +528,26 @@
             const isChecked = this.checked;
             document.querySelectorAll('.checkbox-car').forEach(function(checkbox) {
                 checkbox.checked = isChecked;
+            });
+        });
+
+        document.querySelectorAll('.details-colis-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.getElementById('dc_expediteur').textContent = this.dataset.expediteur || '-';
+                document.getElementById('dc_numero_exp').textContent = this.dataset.numeroExp || '-';
+                document.getElementById('dc_email_exp').textContent = this.dataset.emailExp || '-';
+                document.getElementById('dc_destinataire').textContent = this.dataset.destinataire || '-';
+                document.getElementById('dc_numero_dest').textContent = this.dataset.numeroDest || '-';
+                document.getElementById('dc_email_dest').textContent = this.dataset.emailDest || '-';
+                document.getElementById('dc_nom').textContent = this.dataset.nom || '-';
+                document.getElementById('dc_nature').textContent = this.dataset.nature || '-';
+                document.getElementById('dc_valeur').textContent = this.dataset.valeur || '0';
+                document.getElementById('dc_frais').textContent = this.dataset.frais || '0';
+                document.getElementById('dc_lieu_label').textContent = this.dataset.lieuLabel || 'Destination';
+                document.getElementById('dc_lieu').textContent = this.dataset.lieu || '-';
+                document.getElementById('dc_code').textContent = this.dataset.code || '-';
+                document.getElementById('dc_date').textContent = this.dataset.date || '-';
+                document.getElementById('dc_status_badge').innerHTML = this.dataset.statusHtml || '-';
             });
         });
 

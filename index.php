@@ -1,7 +1,17 @@
 <?php
-// --- Activation des erreurs EN PREMIER pour diagnostiquer les 500 ---
+define('ROOT', __DIR__); // ✅ Ne rien ajouter après __DIR__
+require_once __DIR__ . '/app/core/env.php';
+
+// --- Erreurs : affichées en local pour déboguer, jamais en production ---
+// (bascule via APP_ENV dans .env — "local" affiche les erreurs, tout le reste les masque et les journalise)
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+if (getenv('APP_ENV') === 'local') {
+    ini_set('display_errors', 1);
+} else {
+    ini_set('display_errors', 0);
+    ini_set('log_errors', 1);
+    ini_set('error_log', ROOT . '/logs/php_errors.log');
+}
 // --------------------------------------------------------------------
 
 // Fuseau horaire de l'application fixé une bonne fois pour toutes (le serveur peut être
@@ -11,7 +21,6 @@ date_default_timezone_set('Africa/Bamako');
 
 session_start();
 ob_start(); // ← autorise les echo dans le contrôleur
-define('ROOT', __DIR__); // ✅ Ne rien ajouter après __DIR__
 
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/app/core/autoload.php';

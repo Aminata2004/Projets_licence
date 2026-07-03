@@ -116,21 +116,24 @@
                                                     </div>
                                                     <div class="col-12 col-lg-6">
                                                         <div class="form-group">
-                                                            <label for="numero_exp" class="form-label">Numéro expéditeur</label>
+                                                            <label for="numero_exp" class="form-label">
+                                                                <i class="bx bxl-whatsapp text-success"></i> Numéro expéditeur (WhatsApp)
+                                                            </label>
                                                             <input type="text" class="form-control" id="numero_exp" name="numero_exp"
                                                                 placeholder="Numéro expéditeur" required oninput="verifierNumero(this, 'erreur_exp')">
                                                             <div id="erreur_exp" class="text-danger small mt-1"></div>
                                                         </div>
                                                     </div>
-
-                                                    <div class="col-12 col-lg-12">
+                                                    <div class="col-12 col-lg-6">
                                                         <div class="form-group">
                                                             <label for="email_exp" class="form-label">Email expéditeur</label>
                                                             <input type="email" class="form-control" id="email_exp" name="email_exp" placeholder="Email expéditeur" required>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12 col-lg-6">
-                                                        <button type="button" class="btn btn-primary px-4" onclick="validateStep1()">Next<i class='bx bx-right-arrow-alt ms-2'></i></button>
+                                                    <div class="col-12">
+                                                        <div class="d-flex align-items-center gap-3">
+                                                            <button type="button" class="btn btn-primary px-4" onclick="validateStep1()">Next<i class='bx bx-right-arrow-alt ms-2'></i></button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -146,13 +149,15 @@
                                                     </div>
                                                     <div class="col-12 col-lg-6">
                                                         <div class="form-group">
-                                                            <label for="numero_dest" class="form-label">Numéro destinataire</label>
+                                                            <label for="numero_dest" class="form-label">
+                                                                <i class="bx bxl-whatsapp text-success"></i> Numéro destinataire (WhatsApp)
+                                                            </label>
                                                             <input type="text" class="form-control" id="numero_dest" name="numero_dest"
                                                                 placeholder="Numéro destinataire" required oninput="verifierNumero(this, 'erreur_dest')">
                                                             <div id="erreur_dest" class="text-danger small mt-1"></div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12 col-lg-12">
+                                                    <div class="col-12 col-lg-6">
                                                         <div class="form-group">
                                                             <label for="email_dest" class="form-label">Email destinataire</label>
                                                             <input type="email" class="form-control" id="email_dest" name="email_dest" placeholder="Email destinataire" required>

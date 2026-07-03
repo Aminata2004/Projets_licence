@@ -20,9 +20,24 @@ class Colis_prise_en_charges extends  Controller
   public  function  index()
   {
     $colis_prise_en_charge =  new Colis_prise_en_charge();
+
+    if (isset($_POST['update_colis'])) {
+      $colis_prise_en_charge->updateColis();
+      header('Location: ' . BASE_URL . '/admin/Colis_prise_en_charges');
+      exit;
+    }
+
     $liste_colis = $colis_prise_en_charge->FetchSelectcolis();
 
-    $this->view('admin/liste_colis_prise', ['liste_colis' => $liste_colis]);
+    $id_compagnie = $_SESSION['id_compagnie'];
+    $listes_agences = $colis_prise_en_charge->FetchSelectWheres(
+      '*',
+      'agence',
+      'id_compagnie = :id_compagnie',
+      ['id_compagnie' => $id_compagnie]
+    );
+
+    $this->view('admin/liste_colis_prise', ['liste_colis' => $liste_colis, 'listes_agences' => $listes_agences]);
   }
   public function ajouter_colis()
   {

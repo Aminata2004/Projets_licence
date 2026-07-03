@@ -96,23 +96,34 @@
                                 <input type="hidden" name="ancien_id_car" value="<?= htmlspecialchars($id_car) ?>">
                                 <input type="hidden" name="ancienne_date" value="<?= htmlspecialchars($date_envoi) ?>">
 
-                                <label class="form-label fw-semibold">Nouveau car</label>
-                                <select class="form-select" name="nouveau_id_car" required>
-                                    <option value="" disabled selected>Choisir un car</option>
-                                    <?php foreach ($liste_cars as $car): ?>
-                                        <?php if ($car['id_car_programmer'] != $id_car): ?>
+                                <?php
+                                $autresCars = array_filter($liste_cars, fn($car) => $car['id_car_programmer'] != $id_car);
+                                ?>
+
+                                <?php if (empty($autresCars)): ?>
+                                    <div class="alert alert-warning mb-0">
+                                        <i class="bx bx-error me-1"></i>
+                                        Aucun autre car programmé aujourd'hui. Activez et programmez un autre car
+                                        (menus <em>Cars &amp; chauffeurs</em> et <em>Programmation des voyages</em>)
+                                        pour pouvoir réaffecter ce colis.
+                                    </div>
+                                <?php else: ?>
+                                    <label class="form-label fw-semibold">Nouveau car</label>
+                                    <select class="form-select" name="nouveau_id_car" required>
+                                        <option value="" disabled selected>Choisir un car</option>
+                                        <?php foreach ($autresCars as $car): ?>
                                             <option value="<?= htmlspecialchars($car['id_car_programmer']) ?>">
                                                 Car N°<?= htmlspecialchars($car['id_car_programmer']) ?> —
                                                 Départ: <?= htmlspecialchars($car['id_horaire']) ?> —
                                                 Destination: <?= htmlspecialchars($car['id_trajet']) ?>
                                             </option>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </select>
+                                        <?php endforeach; ?>
+                                    </select>
+                                <?php endif; ?>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                                <button type="submit" class="btn btn-primary">Confirmer</button>
+                                <button type="submit" class="btn btn-primary" <?= empty($autresCars) ? 'disabled' : '' ?>>Confirmer</button>
                             </div>
                         </form>
                     </div>

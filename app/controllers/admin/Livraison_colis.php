@@ -1,8 +1,5 @@
 <?php
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
 class Livraison_colis extends Controller
 {
     public function __construct()
@@ -20,11 +17,15 @@ class Livraison_colis extends Controller
             $idColis = (int)($_POST['id_colis'] ?? 0);
             if ($idColis <= 0) {
                 $colisModel->set_flash('Colis introuvable.', 'danger');
+                header("Location: " . BASE_URL . "/admin/Livraison_colis");
+                exit();
             }
 
             $colis = $colisModel->getById($idColis);
             if (!$colis) {
                 $colisModel->set_flash('Colis introuvable.', 'danger');
+                header("Location: " . BASE_URL . "/admin/Livraison_colis");
+                exit();
             }
 
             // Vérification des droits
@@ -40,56 +41,44 @@ class Livraison_colis extends Controller
             };
             if (!$peutLivrer) {
                 $colisModel->set_flash("Pas les droits pour livrer.", 'danger');
+                header("Location: " . BASE_URL . "/admin/Livraison_colis");
+                exit();
             }
 
-            // EnvLivraison_colisoi mail avec PHPMailer
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = 'airbarry94@gmail.com';
-                $mail->Password   = 'jzdmiazwxwjqhikg'; // mot de passe d’application
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
-
-                $mail->setFrom('airbarry94@gmail.com', 'Airbarry');
-                $mail->addAddress($colis['email_dest']);  // email destinataire
-                $mail->CharSet = 'UTF-8';
-                $mail->isHTML(true);
-
-                $date = date('d/m/Y');
-                $mail->Subject = "Confirmation de réception de colis";
-                $mail->Body = <<<HTML
-                <p><strong>À CONSERVER</strong></p>
-                <p>Madame, Monsieur,</p>
-                <p>Votre colis <strong>n° {$colis['id_colis']}</strong> a été remis avec succès à
-                <strong>{$colis['localite']}</strong> le <strong>$date</strong>.</p>
-                <p>Merci de votre confiance,<br>L’équipe Airbarry</p>
-                HTML;
-
-                $mail->send();
-            } catch (Exception $e) {
-                error_log("PHPMailer error: " . $mail->ErrorInfo);
-                $colisModel->set_flash("Le colis a été livré mais l'e-mail n'a pas pu être envoyé.", 'warning');
-                // On peut choisir de continuer ou non ici, moi je continue
-            }
-
-            // Mise à jour du statut
+            // Mise à jour du statut de livraison
             $updated = $colisModel->livrer($idColis);
             if (!$updated) {
                 $colisModel->set_flash("Erreur lors de la mise à jour du statut.", 'danger');
+                header("Location: " . BASE_URL . "/admin/Livraison_colis");
+                exit();
             }
 
             $colisModel->set_flash("Colis livré avec succès !", 'primary');
+
+            // On réaffiche la page avec le colis (désormais livré) pour proposer tout de suite
+            // le bouton WhatsApp de confirmation à l'expéditeur (plus d'email automatique).
+            $colis['status'] = 'livre';
+            $this->view('admin/livraison_colis', [
+                'colis' => $colis,
+                'peutLivrer' => false,
+                'codeRecherche' => $colis['code_colis'] ?? '',
+                'livraisonReussie' => true,
+            ]);
+            return;
         }
 
         // 2) Recherche de colis par code
       $colis = null;
 $peutLivrer = false;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['envoi'])) {
-    $code = trim($_POST['code'] ?? '');
+// Recherche déclenchée soit par le formulaire (POST 'envoi'), soit par un lien
+// direct depuis la liste des colis reçus (GET ?code=...)
+$recherche = ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['envoi']))
+    ? ($_POST['code'] ?? '')
+    : ($_GET['code'] ?? null);
+
+if ($recherche !== null) {
+    $code = trim($recherche);
 
     if ($code === '') {
         $colisModel->set_flash("Merci de renseigner un code colis.", 'danger');
@@ -118,7 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['envoi'])) {
 // Toujours passer $colis et $peutLivrer à la vue
 $this->view('admin/livraison_colis', [
     'colis' => $colis,
-    'peutLivrer' => $peutLivrer
+    'peutLivrer' => $peutLivrer,
+    'codeRecherche' => $recherche !== null ? trim($recherche) : ''
 ]);
 
     }

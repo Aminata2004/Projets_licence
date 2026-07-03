@@ -29,7 +29,7 @@
                 </div>
                 <div class="ms-auto">
                     <div class="btn-group">
-                        <a href="<?= BASE_URL ?>/Envoi_colis/liste_colis_envoyer" class="btn btn-primary split-bg-primary text-white"> Voir la liste</a> &nbsp;
+                        <a href="<?= BASE_URL ?>/admin/Envoi_colis/liste_colis_envoyer" class="btn btn-primary split-bg-primary text-white"> Voir la liste</a> &nbsp;
                         <a href="javascript:history.back()" class="btn btn-primary "><i
                                 class="fadeIn animated bx bx-left-arrow-alt"></i></a>
                     </div>
@@ -50,13 +50,14 @@
                                     name="code"
                                     class="form-control"
                                     placeholder="Numéro du code"
-                                    value="<?= htmlspecialchars($_POST['code'] ?? '') ?>"
+                                    value="<?= htmlspecialchars($_POST['code'] ?? $codeRecherche ?? '') ?>"
                                     required
                                     autocomplete="off">
                             </div>
                             <?php
                             $colis = $colis ?? null;
                             $peutLivrer = $peutLivrer ?? false;
+                            $livraisonReussie = $livraisonReussie ?? false;
                             ?>
 
                             <?php if ($colis): ?>
@@ -146,15 +147,32 @@
                             <?php endif; ?>
 
                             <!-- ===== Bouton dynamique ===== -->
-                            <div class="col-12 mt-3">
-                                <button type="submit"
-                                    class="btn <?= $colis ? ($peutLivrer ? 'btn-success' : 'btn-secondary') : 'btn-primary' ?>"
-                                    name="<?= $colis ? ($peutLivrer ? 'livrer' : 'envoi') : 'envoi' ?>"
-                                    <?= $colis && !$peutLivrer ? 'disabled' : '' ?>>
-                                    <?= $colis ? ($peutLivrer ? 'Valider la livraison' : 'Livraison impossible') : 'Valider' ?>
-                                </button>
-
-                            </div>
+                            <?php if ($livraisonReussie && $colis): ?>
+                                <div class="col-12 mt-3">
+                                    <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between gap-2 mb-0">
+                                        <span><i class="bx bx-check-circle me-1"></i> Colis livré avec succès !</span>
+                                        <?php
+                                        $msgLivraison = "Bonjour " . ($colis['expediteur'] ?? '') . ", votre colis (code "
+                                            . ($colis['code_colis'] ?? '') . ") a bien été remis à son destinataire. Merci de votre confiance.";
+                                        $lienWhatsappLivraison = whatsapp_link($colis['whatsapp_exp'] ?? $colis['numero_exp'] ?? '', $msgLivraison);
+                                        ?>
+                                        <?php if ($lienWhatsappLivraison): ?>
+                                            <a href="<?= htmlspecialchars($lienWhatsappLivraison) ?>" target="_blank" rel="noopener" class="btn btn-success">
+                                                <i class="bx bxl-whatsapp me-1"></i> Confirmer la remise à l'expéditeur par WhatsApp
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <div class="col-12 mt-3">
+                                    <button type="submit"
+                                        class="btn <?= $colis ? ($peutLivrer ? 'btn-success' : 'btn-secondary') : 'btn-primary' ?>"
+                                        name="<?= $colis ? ($peutLivrer ? 'livrer' : 'envoi') : 'envoi' ?>"
+                                        <?= $colis && !$peutLivrer ? 'disabled' : '' ?>>
+                                        <?= $colis ? ($peutLivrer ? 'Valider la livraison' : 'Livraison impossible') : 'Valider' ?>
+                                    </button>
+                                </div>
+                            <?php endif; ?>
                         </div> <!-- /row -->
                     </form>
 

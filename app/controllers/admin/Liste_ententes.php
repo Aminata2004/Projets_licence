@@ -96,12 +96,12 @@ class Liste_ententes extends Controller
     //                 $mail->isSMTP();
     //                 $mail->Host       = 'smtp.gmail.com';
     //                 $mail->SMTPAuth   = true;
-    //                 $mail->Username   = 'airbarry94@gmail.com';
-    //                 $mail->Password   = 'jzdmiazwxwjqhikg';
+    //                 $mail->Username   = MAIL_USERNAME;
+    //                 $mail->Password   = MAIL_PASSWORD;
     //                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     //                 $mail->Port       = 587;
 
-    //                 $mail->setFrom('airbarry94@gmail.com', $compagnie->nom); // nom de la compagnie
+    //                 $mail->setFrom(MAIL_USERNAME, $compagnie->nom); // nom de la compagnie
     //                 $mail->addAddress($listeticked_validations->emailClient);
     //                 $mail->isHTML(true);
     //                 $mail->Subject = "Votre billet est validé !";
@@ -239,12 +239,12 @@ class Liste_ententes extends Controller
     //                 $mail->isSMTP();
     //                 $mail->Host       = 'smtp.gmail.com';
     //                 $mail->SMTPAuth   = true;
-    //                 $mail->Username   = 'airbarry94@gmail.com';
-    //                 $mail->Password   = 'jzdmiazwxwjqhikg'; // mot de passe d'application
+    //                 $mail->Username   = MAIL_USERNAME;
+    //                 $mail->Password   = MAIL_PASSWORD; // mot de passe d'application
     //                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     //                 $mail->Port       = 587;
 
-    //                 $mail->setFrom('airbarry94@gmail.com', $billet->compagnie->nom);
+    //                 $mail->setFrom(MAIL_USERNAME, $billet->compagnie->nom);
     //                 $mail->addAddress($billet->emailClient);
     //                 $mail->isHTML(true);
     //                 $mail->Subject = "Votre billet est validé !";
@@ -389,12 +389,12 @@ class Liste_ententes extends Controller
     //                     $mail->isSMTP();
     //                     $mail->Host       = 'smtp.gmail.com';
     //                     $mail->SMTPAuth   = true;
-    //                     $mail->Username   = 'airbarry94@gmail.com';
-    //                     $mail->Password   = 'jzdmiazwxwjqhikg';
+    //                     $mail->Username   = MAIL_USERNAME;
+    //                     $mail->Password   = MAIL_PASSWORD;
     //                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     //                     $mail->Port       = 587;
 
-    //                     $mail->setFrom('airbarry94@gmail.com', $billet->compagnie->nom_compagnie);
+    //                     $mail->setFrom(MAIL_USERNAME, $billet->compagnie->nom_compagnie);
     //                     $mail->addAddress($billet->emailClient);
     //                     $mail->isHTML(true);
     //                     $mail->Subject = "Votre billet est validé !";

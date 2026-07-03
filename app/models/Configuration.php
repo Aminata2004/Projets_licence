@@ -80,14 +80,14 @@
                         // --- Envoi Email ---
                         $mail = new PHPMailer(true);
                         $mail->isSMTP();
-                        $mail->Host       = 'smtp.gmail.com';
+                        $mail->Host       = MAIL_HOST;
                         $mail->SMTPAuth   = true;
-                        $mail->Username   = 'airbarry94@gmail.com';
-                        $mail->Password   = 'jzdmiazwxwjqhikg'; // ⚠️ App Password Gmail recommandé
+                        $mail->Username   = MAIL_USERNAME;
+                        $mail->Password   = MAIL_PASSWORD;
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                        $mail->Port       = 587;
+                        $mail->Port       = MAIL_PORT;
 
-                        $mail->setFrom('airbarry94@gmail.com', 'Airbarry');
+                        $mail->setFrom(MAIL_USERNAME, MAIL_FROM_NAME);
                         $mail->addAddress($emailUser, $utilisateurs);
                         $mail->CharSet = 'UTF-8';
                         $mail->isHTML(true);

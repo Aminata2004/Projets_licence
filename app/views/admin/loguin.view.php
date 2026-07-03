@@ -443,6 +443,7 @@
                 <?php $this->view("admin/set_flash"); ?>
 
                 <form method="post" action="">
+                    <?= csrf_field() ?>
 
                     <div class="form-group">
                         <label>Adresse e-mail</label>

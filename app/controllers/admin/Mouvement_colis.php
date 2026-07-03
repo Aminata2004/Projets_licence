@@ -1,8 +1,5 @@
 <?php
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
 class Mouvement_colis extends Controller
 {
     public function __construct()
@@ -25,43 +22,17 @@ class Mouvement_colis extends Controller
 
             $ids = array_map('intval', $_POST['selected_colis']);
             $model = new Mouvements_colis();
-            $colis = $model->getColisPourReception($ids);
 
-            $mail = new PHPMailer(true);
-
-            try {
-                $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = 'airbarry94@gmail.com';
-                $mail->Password   = 'jzdmiazwxwjqhikg';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
-                $mail->setFrom('airbarry94@gmail.com', 'Airbarry');
-                $mail->CharSet = 'UTF-8';
-                $mail->isHTML(true);
-
-                foreach ($colis as $c) {
-                    $mail->clearAddresses();
-                    $mail->addAddress($c['email_dest']);
-                    $mail->Subject = 'Notification de mise à disposition de colis';
-                    $mail->Body = <<<HTML
-<strong>À CONSERVER</strong><br><br>
-Madame, Monsieur,<br><br>
-Votre colis <strong>n° {$c['id_colis']}</strong> est disponible à la gare <strong>{$c['numeroGare']}</strong> (<em>{$c['localite']}</em>).<br><br>
-Frais : <strong>{$c['fraix_transaction']} FCFA</strong><br>
-Code de retrait : <strong>{$c['code_colis']}</strong><br><br>
-Merci de votre confiance,<br>L’équipe Airbarry
-HTML;
-                    $mail->send();
-                    $model->marquerRecu((int)$c['id_colis']);
-                }
-
-                $mouvement_colis->set_flash("Colis marqués « reçu » et mails envoyés.", 'success');
-            } catch (Exception $e) {
-                error_log("Erreur PHPMailer : " . $mail->ErrorInfo);
-                $mouvement_colis->set_flash("Une erreur est survenue lors de l'envoi des mails.", 'danger');
+            // La notification au destinataire se fait maintenant par WhatsApp (bouton dans
+            // l'onglet "Colis reçu"), plus par email : ici on marque juste les colis comme reçus.
+            foreach ($ids as $id) {
+                $model->marquerRecu($id);
             }
+
+            $mouvement_colis->set_flash(
+                "Colis marqués « reçu ». Utilisez le bouton WhatsApp dans l'onglet « Colis reçu » pour notifier chaque destinataire.",
+                'success'
+            );
 
             // ✅ Redirection après traitement POST
             header('Location: ' . BASE_URL . '/admin/mouvement_colis');

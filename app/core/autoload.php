@@ -33,6 +33,9 @@
  * Time: 12:11
  */
 
+include_once ("env.php");
+include_once ("csrf.php");
+include_once ("whatsapp.php");
 include_once ("config.php");
 include_once ("database.php");
 include_once ("Controller.php");

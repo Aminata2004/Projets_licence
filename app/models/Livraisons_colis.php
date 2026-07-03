@@ -6,9 +6,11 @@ class Livraisons_colis extends Model
         $sql = "SELECT colis.*,
                        expediteurs.expediteur        AS expediteur,
                        expediteurs.numero_exp         AS numero_exp,
+                       expediteurs.whatsapp_exp       AS whatsapp_exp,
                        expediteurs.email_exp          AS email_exp,
                        destinataires.destinataire     AS destinataire,
                        destinataires.numero_dest      AS numero_dest,
+                       destinataires.whatsapp_dest    AS whatsapp_dest,
                        destinataires.email_dest       AS email_dest,
                        agence.localite                AS localite,
                        agence.numeroGare              AS numero_gare
@@ -26,9 +28,11 @@ class Livraisons_colis extends Model
         $sql = "SELECT colis.*,
                        expediteurs.expediteur      AS expediteur,
                        expediteurs.numero_exp      AS numero_exp,
+                       expediteurs.whatsapp_exp    AS whatsapp_exp,
                        expediteurs.email_exp       AS email_exp,
                        destinataires.destinataire  AS destinataire,
                        destinataires.numero_dest   AS numero_dest,
+                       destinataires.whatsapp_dest AS whatsapp_dest,
                        destinataires.email_dest    AS email_dest,
                        agence.localite             AS localite,
                        agence.numeroGare           AS numero_gare

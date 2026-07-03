@@ -2,9 +2,74 @@
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Writer\PngWriter;
 
 class Reservation_formulaire extends Controller
 {
+    // Fiche PDF du billet, accessible publiquement via son numéro (aucune vérification
+    // supplémentaire requise, comme un ticket de cinéma) — utilisé pour le lien envoyé par WhatsApp.
+    public function billet_pdf($numeroBillets = null)
+    {
+        $model = new Programme();
+
+        if (!$numeroBillets) {
+            http_response_code(404);
+            exit('Billet introuvable.');
+        }
+
+        $billet = $model->fetchOne(
+            "SELECT b.*, c.Client, c.montant_payer
+             FROM billets b
+             JOIN client c ON c.idClient = b.id_client
+             WHERE b.numeroBillets = :num
+             LIMIT 1",
+            [':num' => $numeroBillets]
+        );
+
+        if (!$billet) {
+            http_response_code(404);
+            exit('Billet introuvable.');
+        }
+
+        $billet = (object)$billet;
+
+        $compagnie = $model->fetchOne(
+            "SELECT nom_compagnie, slogant, logo FROM compagnie WHERE id_compagnie = :id",
+            [':id' => $billet->id_compagnie]
+        ) ?: [];
+
+        $logoPath = !empty($compagnie['logo']) ? ROOT . '/public/images/logos/' . $compagnie['logo'] : null;
+
+        $qrData = "Nom: {$billet->Client}\n"
+            . "Code: {$billet->numeroBillets}\n"
+            . "Destination: {$billet->destinationId}\n"
+            . "Place: {$billet->numeroPlace}";
+        $qrResult = Builder::create()
+            ->writer(new PngWriter())
+            ->data($qrData)
+            ->size(150)
+            ->margin(6)
+            ->build();
+        $qrPath = "data:image/png;base64," . base64_encode($qrResult->getString());
+
+        ob_start();
+        include ROOT . '/app/views/admin/pdf/billet_client.php';
+        $html = ob_get_clean();
+
+        $options = new Options();
+        $options->setIsRemoteEnabled(true);
+        $options->setChroot(ROOT);
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A6', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("billet_{$billet->numeroBillets}.pdf", ['Attachment' => false]);
+        exit;
+    }
+
     // public function index()
     // {
     //     $id = $_GET['id'] ?? null;
@@ -59,6 +124,22 @@ class Reservation_formulaire extends Controller
         // reservation en ligne 
 
         if (isset($_POST['reserver'])) {
+            if (!csrf_verify()) {
+                echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
+                echo '<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        Swal.fire({
+            title: "⚠️ Session expirée",
+            text: "Merci de réessayer votre réservation.",
+            icon: "warning",
+            confirmButtonText: "OK"
+        });
+    });
+</script>';
+                $this->view('site/formulaire_reservation', ['trajet' => $trajet]);
+                return;
+            }
+
             $pdo = $programmeModel->connect();
             $pdo->beginTransaction(); // Démarrer la transaction
 
@@ -161,16 +242,33 @@ class Reservation_formulaire extends Controller
 
                 // --- 5️⃣ Affichage SweetAlert directement sur la page ---
 
-                $successMessage = "Votre réservation a été enregistrée. Veuillez vérifier votre email pour finaliser et valider votre billet.";
+                // Lien public vers la fiche PDF du billet + message WhatsApp de rappel de paiement.
+                $lienPdf = BASE_URL . "/site/Reservation_formulaire/billet_pdf/" . rawurlencode($numeroBillets);
+                $msgWhatsapp = "Bonjour $nomClient, votre réservation ($numeroBillets) pour "
+                    . $destinationAEnregistrer . " le " . date('d/m/Y', strtotime($jourVoyage)) . " à $heureDepart est enregistrée.\n"
+                    . "Votre billet : $lienPdf\n"
+                    . "Merci de payer via Orange Money dans les 30 minutes, sinon la réservation sera automatiquement annulée.";
+                $lienWhatsapp = whatsapp_link($telephone, $msgWhatsapp);
+
+                $htmlConfirmation = '<b>Votre réservation a été enregistrée.</b><br><br>';
+                if ($lienWhatsapp) {
+                    $htmlConfirmation .= '<a href="' . htmlspecialchars($lienWhatsapp) . '" target="_blank" rel="noopener" '
+                        . 'style="display:inline-block;background:#25D366;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:bold;">'
+                        . '📲 Recevoir mon billet sur WhatsApp</a><br><br>'
+                        . '<small>Vous devez payer via Orange Money dans les 30 minutes, sinon la réservation sera annulée automatiquement.</small>';
+                } else {
+                    $htmlConfirmation .= '<small>Numéro invalide : impossible de générer le lien WhatsApp. '
+                        . 'Merci de payer via Orange Money dans les 30 minutes, sinon la réservation sera annulée automatiquement.</small>';
+                }
 
                 echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
                 echo '<script>
     document.addEventListener("DOMContentLoaded", function () {
         Swal.fire({
             title: "🎉 Réservation réussie !",
-            html: "<b>' . addslashes($successMessage) . '</b>",
+            html: ' . json_encode($htmlConfirmation) . ',
             icon: "success",
-            confirmButtonText: "Super !",
+            confirmButtonText: "Fermer",
             confirmButtonColor: "#3085d6",
             background: "#fefefe",
             color: "#333",

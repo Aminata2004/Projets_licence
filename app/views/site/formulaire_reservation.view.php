@@ -464,6 +464,7 @@ $this->view("admin/helpers");
                 <p class="subtitle">Voyagez confortablement avec TransGest</p>
 
                 <form method="post" action="" id="bookingForm">
+                    <?= csrf_field() ?>
                     <div class="row-grid">
                         <!-- Départ -->
                         <div class="form-group">

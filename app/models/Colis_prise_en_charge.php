@@ -39,25 +39,33 @@
                     $pdo->beginTransaction();
 
                     // Insertion expéditeur
+                    // Si aucun numéro WhatsApp n'est précisé, on suppose que c'est le même que le numéro classique.
+                    $whatsapp_exp = trim($whatsapp_exp ?? '') !== '' ? trim($whatsapp_exp) : $numero_exp;
+
                     $stmt1 = $pdo->prepare("
-                INSERT INTO expediteurs (expediteur, numero_exp, email_exp) 
-                VALUES (:expediteur, :num_exp, :email_exp)
+                INSERT INTO expediteurs (expediteur, numero_exp, whatsapp_exp, email_exp)
+                VALUES (:expediteur, :num_exp, :whatsapp_exp, :email_exp)
             ");
                     $stmt1->execute([
                         ":expediteur" => $expediteur,
                         ":num_exp" => $numero_exp,
+                        ":whatsapp_exp" => $whatsapp_exp,
                         ":email_exp" => $email_exp
                     ]);
                     $id_expediteur = $pdo->lastInsertId();
 
                     // Insertion destinataire
+                    // Si aucun numéro WhatsApp n'est précisé, on suppose que c'est le même que le numéro classique.
+                    $whatsapp_dest = trim($whatsapp_dest ?? '') !== '' ? trim($whatsapp_dest) : $numero_dest;
+
                     $stmt2 = $pdo->prepare("
-                INSERT INTO destinataires (destinataire, numero_dest, email_dest, id_exp) 
-                VALUES (:destinataire, :numero_dest, :email_dest, :id_exp)
+                INSERT INTO destinataires (destinataire, numero_dest, whatsapp_dest, email_dest, id_exp)
+                VALUES (:destinataire, :numero_dest, :whatsapp_dest, :email_dest, :id_exp)
             ");
                     $stmt2->execute([
                         ":destinataire" => $destinataire,
                         ":numero_dest" => $numero_dest,
+                        ":whatsapp_dest" => $whatsapp_dest,
                         ":email_dest" => $email_dest,
                         ":id_exp" => $id_expediteur
                     ]);
@@ -153,6 +161,53 @@
                     "warning",
                     "#ffc107"
                 );
+            }
+        }
+
+        public function updateColis()
+        {
+            $id_colis = (int)($_POST['id_colis'] ?? 0);
+            $id_compagnie = $_SESSION['id_compagnie'] ?? null;
+
+            $nom_colis         = trim($_POST['nom_colis'] ?? '');
+            $nature            = trim($_POST['nature'] ?? '');
+            $destination       = $_POST['destination'] ?? '';
+            $valeur            = $_POST['valeur'] ?? '';
+            $fraix_transaction = $_POST['fraix_transaction'] ?? '';
+
+            $errors = [];
+            if ($id_colis <= 0) $errors[] = "Colis introuvable.";
+            if (empty($nom_colis)) $errors[] = "Le nom du colis est obligatoire.";
+            if (empty($nature)) $errors[] = "La nature du colis est obligatoire.";
+            if (empty($destination)) $errors[] = "La destination est obligatoire.";
+            if ($valeur === '' || !is_numeric($valeur)) $errors[] = "La valeur du colis est obligatoire.";
+            if ($fraix_transaction === '' || !is_numeric($fraix_transaction)) $errors[] = "Les frais de transaction sont obligatoires.";
+
+            if (count($errors) > 0) {
+                $this->set_swal("Erreurs détectées", implode("<br>", array_map('htmlspecialchars', $errors)), "warning", "#ffc107");
+                return;
+            }
+
+            $sql = "UPDATE colis
+                    SET nom_colis = :nom_colis, nature = :nature, id_agence = :destination,
+                        valeur = :valeur, fraix_transaction = :fraix_transaction
+                    WHERE id_colis = :id_colis AND id_compagnie = :id_compagnie";
+
+            $stmt = $this->connect()->prepare($sql);
+            $ok = $stmt->execute([
+                ':nom_colis'         => $nom_colis,
+                ':nature'            => $nature,
+                ':destination'       => $destination,
+                ':valeur'            => $valeur,
+                ':fraix_transaction' => $fraix_transaction,
+                ':id_colis'          => $id_colis,
+                ':id_compagnie'      => $id_compagnie,
+            ]);
+
+            if ($ok && $stmt->rowCount() > 0) {
+                $this->set_swal("Colis modifié !", "Les informations du colis ont été mises à jour.", "success", "#0d6efd");
+            } else {
+                $this->set_swal("Erreur", "Aucune modification effectuée (colis introuvable).", "error", "#dc3545");
             }
         }
     }

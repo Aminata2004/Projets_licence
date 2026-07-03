@@ -14,14 +14,14 @@ class MailController
 
         try {
             $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
+            $mail->Host = MAIL_HOST;
             $mail->SMTPAuth = true;
-            $mail->Username = 'airbarry94@gmail.com';
-            $mail->Password = 'jzdmiazwxwjqhikg'; // Gmail App Password
+            $mail->Username = MAIL_USERNAME;
+            $mail->Password = MAIL_PASSWORD;
             $mail->SMTPSecure = 'tls';
-            $mail->Port = 587;
+            $mail->Port = MAIL_PORT;
 
-            $mail->setFrom('airbarry94@gmail.com', 'Ton Nom');
+            $mail->setFrom(MAIL_USERNAME, MAIL_FROM_NAME);
             $mail->addAddress('amitacompt90@gmail.com');
 
             $mail->isHTML(true);
