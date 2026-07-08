@@ -25,23 +25,26 @@
             <!-- KPI rapides -->
             <?php
                 $garesOuvertes = 0; $garesFermees = 0;
-                $totalBillets  = 0; $totalColis   = 0; $totalRembourse = 0;
+                $totalBillets  = 0; $totalColis   = 0; $totalRembourse = 0; $totalDepense = 0;
                 foreach ($liste_caisse as $c) {
                     $dr = $_SESSION['droit'];
                     $ic = $_SESSION['id_compagnie'] ?? null;
                     $vi = $_SESSION['ville'] ?? null;
+                    $ng = $_SESSION['numero_gare'] ?? null;
                     if ($dr === 'Admin' && $c->id_compagnie != $ic) continue;
-                    if ($dr === 'chef_d_escale' && ($c->id_compagnie != $ic || $c->localite != $vi)) continue;
-                    
+                    // Un chef d'escale ne voit que sa gare précise : une ville peut avoir plusieurs gares.
+                    if ($dr === 'chef_d_escale' && ($c->id_compagnie != $ic || $c->localite != $vi || (string)$c->numeroGare !== (string)$ng)) continue;
+
                     if ($c->status_caisse == 1) $garesOuvertes++; else $garesFermees++;
                     $totalBillets += ($c->montant_billets ?? 0);
                     $totalColis   += ($c->montant_colis ?? 0);
                     $totalRembourse += ($c->montant_rembourse ?? 0);
+                    $totalDepense += ($c->montant_depense ?? 0);
                 }
-                $grandTotal = $totalBillets + $totalColis - $totalRembourse;
+                $grandTotal = $totalBillets + $totalColis - $totalRembourse - $totalDepense;
             ?>
             <div class="row g-3 mb-4">
-                <div class="col-6 col-md-3"><div class="kpi-mini" style="border-left-color: var(--primary);"><div class="text-secondary small">Total gares</div><div class="fs-3 fw-bold"><?= count($liste_caisse) ?></div></div></div>
+                <div class="col-6 col-md-3"><div class="kpi-mini" style="border-left-color: var(--primary);"><div class="text-secondary small">Total des caisses</div><div class="fs-3 fw-bold"><?= count($liste_caisse) ?></div></div></div>
                 <div class="col-6 col-md-3"><div class="kpi-mini" style="border-left-color: var(--success);"><div class="text-secondary small">Caisses ouvertes</div><div class="fs-3 fw-bold text-success"><?= $garesOuvertes ?></div></div></div>
                 <div class="col-6 col-md-3"><div class="kpi-mini" style="border-left-color: var(--danger);"><div class="text-secondary small">Caisses fermées</div><div class="fs-3 fw-bold text-danger"><?= $garesFermees ?></div></div></div>
                 <div class="col-6 col-md-3"><div class="kpi-mini" style="border-left-color: var(--warning);"><div class="text-secondary small">Total encaissé</div><div class="fs-4 fw-bold text-warning"><?= number_format($grandTotal, 0, ',', ' ') ?> FCFA</div></div></div>
@@ -70,9 +73,11 @@
                     $droit        = $_SESSION['droit'];
                     $id_compagnie = $_SESSION['id_compagnie'] ?? null;
                     $ville        = $_SESSION['ville'] ?? null;
+                    $numeroGareSession = $_SESSION['numero_gare'] ?? null;
                     if ($droit === 'Admin' && $caisse->id_compagnie != $id_compagnie) continue;
-                    if ($droit === 'chef_d_escale' && ($caisse->id_compagnie != $id_compagnie || $caisse->localite != $ville)) continue;
-                    
+                    // Un chef d'escale ne voit que sa gare précise : une ville peut avoir plusieurs gares.
+                    if ($droit === 'chef_d_escale' && ($caisse->id_compagnie != $id_compagnie || $caisse->localite != $ville || (string)$caisse->numeroGare !== (string)$numeroGareSession)) continue;
+
                     $isOpen     = $caisse->status_caisse == 1;
                     $total      = ($caisse->montant_billets ?? 0) + ($caisse->montant_colis ?? 0);
                     $searchData = htmlspecialchars(strtolower($caisse->localite . ' ' . $caisse->numeroGare . ' ' . $caisse->reference_caise));
@@ -104,7 +109,11 @@
                             <span class="stat-label text-danger">Remboursements</span>
                             <span class="stat-value">-<?= number_format($caisse->montant_rembourse ?? 0, 0, ',', ' ') ?> F</span>
                         </div>
-                        <?php $total = ($caisse->montant_billets ?? 0) + ($caisse->montant_colis ?? 0) - ($caisse->montant_rembourse ?? 0); ?>
+                        <div class="stat-row text-danger">
+                            <span class="stat-label text-danger">Dépenses</span>
+                            <span class="stat-value">-<?= number_format($caisse->montant_depense ?? 0, 0, ',', ' ') ?> F</span>
+                        </div>
+                        <?php $total = ($caisse->montant_billets ?? 0) + ($caisse->montant_colis ?? 0) - ($caisse->montant_rembourse ?? 0) - ($caisse->montant_depense ?? 0); ?>
                         <div class="stat-row bg-light">
                             <span class="stat-label fw-bold">Total actuel</span>
                             <span class="stat-value total-value fw-bold"><?= number_format($total, 0, ',', ' ') ?> F</span>

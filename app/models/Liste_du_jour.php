@@ -4,11 +4,15 @@
 
     public function getDestinations($idDepart, $idCompagnie)
     {
-      $sql = "SELECT DISTINCT p.idDestination
+      // programmer.idDepart/idDestination sont des idAgence : on les relie à la table agence
+      // pour comparer sur la localité (billets.destinationId est stocké comme un nom de localité).
+      $sql = "SELECT DISTINCT a2.localite AS idDestination
             FROM programmer p
-            WHERE p.idDepart = :idDepart
+            INNER JOIN agence a1 ON p.idDepart = a1.idAgence
+            INNER JOIN agence a2 ON p.idDestination = a2.idAgence
+            WHERE a1.localite = :idDepart
               AND p.id_compagnie = :idCompagnie
-            ORDER BY p.idDestination";
+            ORDER BY a2.localite";
       return $this->fetchAll($sql, [
         ':idDepart' => $idDepart,
         ':idCompagnie' => $idCompagnie
@@ -68,10 +72,21 @@
 
     public  function getHeures($destinationId, $villeDepart)
     {
-      $stmt = $this->connect()->prepare("SELECT heureDepart FROM programmer 
-                          WHERE idDestination = ? 
-                          AND idDepart = ?");
-      $stmt->execute([$destinationId, $villeDepart]);
+      // programmer.idDepart/idDestination sont des idAgence : on les relie à la table agence
+      // pour comparer sur la localité, comme dans getDestinations().
+      $stmt = $this->connect()->prepare("SELECT DISTINCT p.heureDepart
+                          FROM programmer p
+                          INNER JOIN agence a1 ON p.idDepart = a1.idAgence
+                          INNER JOIN agence a2 ON p.idDestination = a2.idAgence
+                          WHERE a2.localite = :destinationId
+                            AND a1.localite = :villeDepart
+                            AND p.id_compagnie = :id_compagnie
+                          ORDER BY p.heureDepart");
+      $stmt->execute([
+        ':destinationId' => $destinationId,
+        ':villeDepart'   => $villeDepart,
+        ':id_compagnie'  => $_SESSION['id_compagnie']
+      ]);
       $results = $stmt->fetchAll(PDO::FETCH_COLUMN); // Un tableau avec toutes les heures
 
       return $results;

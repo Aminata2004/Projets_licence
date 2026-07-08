@@ -65,8 +65,11 @@ $fromAndWhere = "liaison_car_trajet
 
         if (isset($_SESSION['droit'], $_SESSION['id_compagnie'])) {
             if ($_SESSION['droit'] === 'Admin') {
-                // Admin : cars dont le status_car est NULL (pas en transit) ET appartenant à leur compagnie
-                $where = " WHERE car.status_car IS NULL AND car.id_compagnie = :compagnie";
+                // Admin : voit tous les cars disponibles de sa compagnie, quelle que soit la ville
+                // où ils se trouvent actuellement — seuls les cars EN TRANSIT sont exclus.
+                // (status_car vaut soit NULL/vide, soit le nom d'une ville où le car est à l'arrêt,
+                // soit "En_transit_XXX" pendant un trajet ; un car "à Bamako" doit rester proposable.)
+                $where = " WHERE (car.status_car IS NULL OR car.status_car NOT LIKE 'En\\_transit\\_%') AND car.id_compagnie = :compagnie";
                 $params[':compagnie'] = $_SESSION['id_compagnie'];
             } elseif ($_SESSION['droit'] === 'chef_d_escale' && isset($_SESSION['ville'])) {
                 // Chef d'escale : status_car = ville, id_compagnie = leur compagnie,
@@ -112,9 +115,11 @@ $fromAndWhere = "liaison_car_trajet
     //     return $this->insertion_update_simples($insert, $params);
     // }
 
-    public function insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre)
+    public function insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre, $id_depart = null)
     {
-        $localite_user = $_SESSION['ville'];
+        // Admin (plusieurs gares) : départ choisi dans le formulaire.
+        // chef_d_escale (une seule gare) : toujours sa propre localité de session.
+        $localite_user = $id_depart ?: $_SESSION['ville'];
         $id_compagnie = $_SESSION["id_compagnie"];
         $jourVoyage = $_POST['jourVoyage'];
 
@@ -190,6 +195,64 @@ $fromAndWhere = "liaison_car_trajet
             ':id_car' => $id_car
         ];
         return $this->insertion_update_simples($update, $params);
+    }
+
+    // Dernière date (strictement avant $avant_date) où une programmation a été enregistrée.
+    // Permet de reproduire "la dernière programmation" même s'il n'y en a pas eu hier
+    // (jour sans activité, tout début d'utilisation du système, etc.).
+    public function getDerniereDateProgrammation($id_compagnie, $avant_date, $localite_user = null)
+    {
+        $where = "id_compagnie = :id_compagnie AND date_enregistre < :avant_date";
+        $params = [
+            ':id_compagnie' => $id_compagnie,
+            ':avant_date' => $avant_date
+        ];
+
+        if ($localite_user) {
+            $where .= " AND localite_user = :localite_user";
+            $params[':localite_user'] = $localite_user;
+        }
+
+        $sql = "SELECT MAX(date_enregistre) AS derniere_date FROM programmation_voyage WHERE $where";
+
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->fetchColumn() ?: null;
+    }
+
+    // Dernière programmation enregistrée pour une date donnée (typiquement la veille),
+    // utilisée pour pré-remplir le formulaire et éviter de tout ressaisir chaque jour.
+    // Indexé par id_car_programmer pour un accès direct depuis la vue.
+    public function getProgrammationParDate($id_compagnie, $date, $localite_user = null)
+    {
+        $where = "pv.id_compagnie = :id_compagnie AND pv.date_enregistre = :date";
+        $params = [
+            ':id_compagnie' => $id_compagnie,
+            ':date' => $date
+        ];
+
+        if ($localite_user) {
+            $where .= " AND pv.localite_user = :localite_user";
+            $params[':localite_user'] = $localite_user;
+        }
+
+        $sql = "SELECT pv.id_car_programmer, pv.id_horaire, pv.id_trajet, pv.localite_user
+                FROM programmation_voyage pv
+                WHERE $where";
+
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute($params);
+
+        $result = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $result[$row['id_car_programmer']] = [
+                'id_horaire'    => $row['id_horaire'],
+                'id_trajet'     => $row['id_trajet'],
+                'localite_user' => $row['localite_user']
+            ];
+        }
+        return $result;
     }
 
     public function getCarsInTransit()

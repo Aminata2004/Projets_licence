@@ -5,11 +5,11 @@ function afficherBadgeStatus($status)
         case 'enregistre':
             return '<span class="badge bg-primary">Prise en charge</span>';
         case 'en_cours':
-            return '<span class="badge bg-warning">En cours</span>';
+            return '<span class="badge bg-warning">En attente</span>';
         case 'recu':
-            return '<span class="badge bg-success">Colis reçu</span>';
+            return '<span class="badge bg-success">Reçu par la gare de destination</span>';
         case 'livre':
-            return '<span class="badge bg-info">Colis livré</span>';
+            return '<span class="badge bg-info">Livré</span>';
         case null:
         case '':
             return '<span class="badge bg-secondary">En attente</span>';

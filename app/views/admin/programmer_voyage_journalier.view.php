@@ -56,6 +56,9 @@
                             <thead class="table-primary text-center">
                                 <tr>
                                     <th>Numéro de car</th>
+                                    <?php if ($_SESSION['droit'] === 'Admin'): ?>
+                                        <th>Gare</th>
+                                    <?php endif; ?>
                                     <th>Horaire</th>
                                     <th>Destination</th>
                                     <th>Place disponible</th>
@@ -68,7 +71,7 @@
                                 $dateActuelle = new DateTime();
 
                                 foreach ($listeProgrammer as $listeProgrammers):
-                                    if ($listeProgrammers->localite_user !== $_SESSION['ville']) {
+                                    if ($_SESSION['droit'] !== 'Admin' && $listeProgrammers->localite_user !== $_SESSION['ville']) {
                                         continue;
                                     }
                                     $dateEnregistrement = new DateTime($listeProgrammers->date_enregistre);
@@ -80,6 +83,9 @@
                                 ?>
                                     <tr>
                                         <td><?= htmlspecialchars($listeProgrammers->numero_car) ?></td>
+                                        <?php if ($_SESSION['droit'] === 'Admin'): ?>
+                                            <td><?= htmlspecialchars($listeProgrammers->localite_user) ?></td>
+                                        <?php endif; ?>
 
                                         <td><?= htmlspecialchars($listeProgrammers->id_horaire) ?></td>
                                         <td><?= htmlspecialchars($listeProgrammers->id_trajet) ?></td>

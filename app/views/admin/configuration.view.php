@@ -151,6 +151,7 @@
                       <th class="fw-semibold">Email</th>
                       <th class="fw-semibold">Gare</th>
                       <th class="fw-semibold">Droit</th>
+                      <th class="fw-semibold">Service</th>
                       <th class="fw-semibold">Action</th>
                     </tr>
                   </thead>
@@ -161,6 +162,13 @@
                         <td><?= htmlspecialchars($listes->emailUser) ?></td>
                         <td><?= htmlspecialchars($listes->numeroGare) ?></td>
                         <td><?= htmlspecialchars($listes->droit) ?></td>
+                        <td>
+                          <?php if ($listes->droit === 'Utilisateur' && !empty($listes->profile)): ?>
+                            <?= $listes->profile === 'billet' ? 'Billetterie' : ($listes->profile === 'colis' ? 'Colis / Courrier' : htmlspecialchars($listes->profile)) ?>
+                          <?php else: ?>
+                            <span class="text-muted">—</span>
+                          <?php endif; ?>
+                        </td>
                         <!-- <td>
                           <div class="dropdown">
                             <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
@@ -192,7 +200,8 @@
                             data-utilisateurs="<?= $listes->utilisateurs ?>"
                             data-email="<?= $listes->emailUser ?>"
                             data-motpasse="<?= $listes->motPasse ?>"
-                            data-droit="<?= $listes->droit ?>">
+                            data-droit="<?= $listes->droit ?>"
+                            data-profile="<?= htmlspecialchars($listes->profile ?? '') ?>">
                           </i>
 
                           <!-- Activation/Désactivation -->
@@ -307,7 +316,16 @@
                   <?php endif; ?>
               </select>
             </div>
-            
+
+            <div class="mb-3" id="edit_serviceField" style="display: none;">
+              <label for="edit_profile" class="form-label fw-semibold">Service</label>
+              <select class="form-select" id="edit_profile" name="profile">
+                  <option value="" disabled selected>Choisissez un service</option>
+                  <option value="billet">Billetterie</option>
+                  <option value="colis">Colis / Courrier</option>
+              </select>
+            </div>
+
             <div class="mb-3">
               <label for="edit_motPasse" class="form-label fw-semibold">Nouveau mot de passe (laisser vide pour ne pas modifier)</label>
               <input type="password" class="form-control" id="edit_motPasse" name="motPasse">
@@ -325,15 +343,34 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var editButtons = document.querySelectorAll('.bx-edit');
+      var editDroit = document.getElementById('edit_droit');
+      var editServiceField = document.getElementById('edit_serviceField');
+      var editProfile = document.getElementById('edit_profile');
+
+      function toggleServiceField() {
+        if (editDroit.value === 'Utilisateur') {
+          editServiceField.style.display = 'block';
+        } else {
+          editServiceField.style.display = 'none';
+          editProfile.value = '';
+        }
+      }
+
       editButtons.forEach(function(button) {
         button.addEventListener('click', function() {
           document.getElementById('edit_idUser').value = this.dataset.id;
           document.getElementById('edit_utilisateurs').value = this.dataset.utilisateurs;
           document.getElementById('edit_emailUser').value = this.dataset.email;
-          document.getElementById('edit_droit').value = this.dataset.droit;
+          editDroit.value = this.dataset.droit;
           document.getElementById('edit_motPasse').value = '';
+          toggleServiceField();
+          if (this.dataset.profile) {
+            editProfile.value = this.dataset.profile;
+          }
         });
       });
+
+      editDroit.addEventListener('change', toggleServiceField);
     });
   </script>
 </body>

@@ -128,12 +128,14 @@ class Configurations extends Controller
             $utilisateurs = $_POST['utilisateurs'];
             $emailUser = $_POST['emailUser'];
             $droit = $_POST['droit'];
-            
-            $updateFields = "utilisateurs = :utilisateurs, emailUser = :emailUser, droit = :droit";
+            $profile = ($droit === 'Utilisateur') ? ($_POST['profile'] ?? null) : null;
+
+            $updateFields = "utilisateurs = :utilisateurs, emailUser = :emailUser, droit = :droit, profile = :profile";
             $params = [
                 ":utilisateurs" => $utilisateurs,
                 ":emailUser" => $emailUser,
                 ":droit" => $droit,
+                ":profile" => $profile,
                 ":id" => $idUser
             ];
             

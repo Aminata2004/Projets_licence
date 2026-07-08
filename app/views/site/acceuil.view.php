@@ -727,10 +727,10 @@
                     </div>
                 </div>
                 <div class="tracking-box">
-                    <div class="input-group">
-                        <input type="text" placeholder="Ex: BL-2024-001234">
-                        <button class="btn btn-primary"><i class="fas fa-search"></i> Suivre</button>
-                    </div>
+                    <form action="<?= BASE_URL ?>/site/Suivis_colis" method="GET" class="input-group">
+                        <input type="text" name="code_colis" placeholder="Ex: BL-2024-001234">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Suivre</button>
+                    </form>
                     <p style="font-size: 0.7rem; color: var(--gray); margin-top: 16px;">Exemple: BL-2024-001234, BL-2024-567890</p>
                 </div>
             </div>

@@ -119,6 +119,63 @@ class Liste_du_jours extends  Controller
     exit;
   }
 
+  public function imprimerListe()
+  {
+    date_default_timezone_set('Africa/Bamako');
+    $id_compagnie = $_SESSION['id_compagnie'];
+    $destination  = trim($_GET['destination'] ?? '');
+    $heure        = trim($_GET['heure'] ?? '');
+    $aujourdhui   = date('Y-m-d');
+
+    $model = new Liste_du_jour();
+    $colisModel = new Livraisons_colis();
+
+    $where = 'billets.id_compagnie = :id_compagnie AND billets.jourVoyage = :jour';
+    $params = [
+      'id_compagnie' => $id_compagnie,
+      'jour'         => $aujourdhui
+    ];
+
+    if ($destination !== '') {
+      $where .= ' AND billets.destinationId = :destination';
+      $params['destination'] = $destination;
+    }
+    if ($heure !== '') {
+      $where .= ' AND billets.Heur_departs = :heure';
+      $params['heure'] = $heure;
+    }
+
+    $billets = $model->FetchSelectWheres(
+      '*',
+      'billets INNER JOIN client ON billets.id_client = client.idClient',
+      $where,
+      $params
+    );
+
+    $compagnie = $colisModel->infoCompagnie($id_compagnie);
+
+    $logoPath = null;
+    if (!empty($compagnie['logo'])) {
+      $logoPath = ROOT . '/public/images/logos/' . $compagnie['logo'];
+    }
+
+    ob_start();
+    include ROOT . '/app/views/admin/pdf/liste_embarquement.php';
+    $html = ob_get_clean();
+
+    $opt = new \Dompdf\Options();
+    $opt->setChroot(ROOT);
+    $opt->setIsRemoteEnabled(true);
+
+    $dompdf = new \Dompdf\Dompdf($opt);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    $dompdf->stream('liste_embarquement_' . date('Ymd_His') . '.pdf', ['Attachment' => false]);
+    exit;
+  }
+
   public function getHeuresDisponibles()
   {
     $destinationId = $_POST['destination_id'];
@@ -135,10 +192,30 @@ class Liste_du_jours extends  Controller
     $billets = new Liste_du_jour();
 
     if (isset($_POST['edit'])) {
+      date_default_timezone_set('Africa/Bamako');
+      $idBillets = $_POST['idClient'];
+      $billetActuel = $billets->getBilletById($idBillets);
+
+      if (!$billetActuel) {
+        $billets->set_flash("Billet introuvable.", "danger");
+        header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
+        exit;
+      }
+
+      // On se base sur la date/heure de départ actuellement enregistrées (pas sur des valeurs
+      // envoyées par le client) : une fois ce moment passé, le voyage a déjà eu lieu et ne peut
+      // plus être reporté.
+      $departActuel = strtotime($billetActuel->jourVoyage . ' ' . $billetActuel->Heur_departs);
+      if ($departActuel !== false && $departActuel <= time()) {
+        $billets->set_flash("Impossible de reporter ce voyage : l'heure de départ prévue est déjà passée.", "danger");
+        header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
+        exit;
+      }
+
       $data = [
         "jourVoyage" => $_POST['nouvelle_date'],
         "Heur_departs" => $_POST['heure_depart'],
-        "idBillets" => $_POST['idClient'],
+        "idBillets" => $idBillets,
       ];
 
       $billets->reporte_voyage($data);

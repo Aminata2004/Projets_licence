@@ -31,6 +31,8 @@
                 </div>
             </div>
 
+            <?php $this->view("admin/set_flash") ?>
+
             <div class="card">
                 <div class="card-body">
                     <div class="tab-content py-3 table-responsive">

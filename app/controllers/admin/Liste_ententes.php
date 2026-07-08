@@ -501,7 +501,17 @@ class Liste_ententes extends Controller
         $listeticked_validations = $model->getTicketById($id_reservation);
 
         if (!$listeticked_validations) {
-            $model->set_flash("Erreur", "Billet introuvable !", "danger");
+            $model->set_flash("Billet introuvable !", "danger");
+            header('Location: ' . BASE_URL . '/admin/Liste_ententes');
+            exit;
+        }
+
+        // Seule la gare de départ du billet a le droit de le valider (l'argent est encaissé dans sa caisse).
+        if (
+            in_array($_SESSION['droit'] ?? '', ['chef_d_escale', 'Utilisateur'])
+            && ($listeticked_validations->departId !== $_SESSION['ville'] || (string)$listeticked_validations->num_gare !== (string)$_SESSION['numero_gare'])
+        ) {
+            $model->set_flash("Ce billet ne relève pas de votre gare de départ !", "danger");
             header('Location: ' . BASE_URL . '/admin/Liste_ententes');
             exit;
         }
@@ -532,6 +542,8 @@ class Liste_ententes extends Controller
                     // var_dump($listeticked_validations->montant_payer);exit;
 
                     // 4️⃣ Mise à jour de la caisse
+                    // Toujours la caisse de la gare de DEPART du billet (pas celle de la session de l'agent qui valide),
+                    // afin qu'un Admin validant depuis n'importe quelle gare crédite la bonne caisse.
                     $stmtCaisse = $pdo->prepare("
                     SELECT c.id_caisse, c.montant_billets
                     FROM caisse c
@@ -539,17 +551,21 @@ class Liste_ententes extends Controller
                     WHERE c.id_compagnie = :id_compagnie
                       AND a.localite = :ville
                       AND a.numeroGare = :numeroGare
+                      AND c.status_caisse = 1
                     LIMIT 1
                 ");
                     $stmtCaisse->execute([
                         ':id_compagnie' => $_SESSION['id_compagnie'],
-                        ':ville'        => $_SESSION['ville'],
-                        ':numeroGare'   => $_SESSION['numero_gare']
+                        ':ville'        => $listeticked_validations->departId,
+                        ':numeroGare'   => $listeticked_validations->num_gare
                     ]);
                     $caisse = $stmtCaisse->fetch(PDO::FETCH_ASSOC);
 
                     if (!$caisse) {
-                        throw new Exception("Erreur : caisse non trouvée !");
+                        throw new Exception(
+                            "Aucune caisse n'est ouverte pour la gare de départ du billet (" . $listeticked_validations->departId . " - " . $listeticked_validations->num_gare . "). "
+                            . "Merci de créer une caisse pour cette gare avant de valider un billet."
+                        );
                     }
 
                     $stmtUpdate = $pdo->prepare("
@@ -572,28 +588,115 @@ class Liste_ententes extends Controller
                     // ✅ Tout est OK → commit
                     $pdo->commit();
 
-                         echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
-                    echo '<script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            Swal.fire({
-                                title: "La validation a été faite avec succès",
-                                icon: "success",
-                                confirmButtonText: "OK"
-                            }).then(() => {
-                                window.location.href = "' . BASE_URL . '/admin/Liste_ententes.php";
-                            });
-                        });
-                    </script>';
+                    // 5️⃣ Envoi du billet PDF par email au client (si une adresse a été renseignée)
+                    $emailEnvoye = null;
+                    if (!empty($listeticked_validations->emailClient)) {
+                        try {
+                            $stmtCompagnie = $pdo->prepare("
+                                SELECT nom_compagnie, slogant, logo
+                                FROM compagnie
+                                WHERE id_compagnie = :id_compagnie
+                            ");
+                            $stmtCompagnie->bindParam(':id_compagnie', $listeticked_validations->id_compagnie, PDO::PARAM_INT);
+                            $stmtCompagnie->execute();
+                            $compagnie = $stmtCompagnie->fetch(PDO::FETCH_ASSOC) ?: [];
+
+                            $stmtAgent = $pdo->prepare("SELECT utilisateurs FROM utilisateur WHERE idUser = :idUser");
+                            $stmtAgent->bindParam(':idUser', $_SESSION['id_utilisateur'], PDO::PARAM_INT);
+                            $stmtAgent->execute();
+                            $agentRow = $stmtAgent->fetch(PDO::FETCH_ASSOC);
+
+                            $logoPath = !empty($compagnie['logo']) ? ROOT . '/public/images/logos/' . $compagnie['logo'] : null;
+
+                            $qrData = "Nom: {$listeticked_validations->Client}\n"
+                                . "Code: {$listeticked_validations->numeroBillets}\n"
+                                . "Destination: {$listeticked_validations->destinationId}\n"
+                                . "Place: {$listeticked_validations->numeroPlace}";
+                            $qrResult = Builder::create()
+                                ->writer(new PngWriter())
+                                ->data($qrData)
+                                ->size(150)
+                                ->margin(6)
+                                ->build();
+                            $qrPath = "data:image/png;base64," . base64_encode($qrResult->getString());
+
+                            $billet = clone $listeticked_validations;
+                            $billet->agent = $agentRow['utilisateurs'] ?? '-';
+
+                            ob_start();
+                            include ROOT . '/app/views/admin/pdf/billet_client.php';
+                            $html = ob_get_clean();
+
+                            $options = new Options();
+                            $options->setIsRemoteEnabled(true);
+                            $options->setChroot(ROOT);
+                            $dompdf = new Dompdf($options);
+                            $dompdf->loadHtml($html);
+                            $dompdf->setPaper('A6', 'portrait');
+                            $dompdf->render();
+                            $pdfContent = $dompdf->output();
+
+                            $mail = new PHPMailer(true);
+                            $mail->isSMTP();
+                            $mail->Host       = MAIL_HOST;
+                            $mail->SMTPAuth   = true;
+                            $mail->Username   = MAIL_USERNAME;
+                            $mail->Password   = MAIL_PASSWORD;
+                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                            $mail->Port       = MAIL_PORT;
+
+                            $nomCompagnie = $compagnie['nom_compagnie'] ?? 'Billetterie';
+
+                            $mail->setFrom(MAIL_USERNAME, $nomCompagnie);
+                            $mail->addAddress($listeticked_validations->emailClient);
+                            $mail->isHTML(true);
+                            $mail->Subject = "✅ Billet validé - {$listeticked_validations->numeroBillets}";
+                            $mail->Body    = '
+                                <div style="font-family:Segoe UI,Arial,sans-serif;max-width:480px;margin:auto;">
+                                    <div style="background:#10b981;color:#fff;padding:16px 20px;border-radius:10px 10px 0 0;text-align:center;">
+                                        <h2 style="margin:0;font-size:18px;">✅ Billet validé</h2>
+                                    </div>
+                                    <div style="border:1px solid #e5e7eb;border-top:none;border-radius:0 0 10px 10px;padding:20px;">
+                                        <p style="font-size:16px;margin:0 0 14px;">Bonjour <strong>' . htmlspecialchars($listeticked_validations->Client) . '</strong>,</p>
+                                        <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:16px;">
+                                            <tr><td style="padding:6px 0;color:#6b7280;">N° billet</td><td style="padding:6px 0;font-weight:bold;text-align:right;">' . htmlspecialchars($listeticked_validations->numeroBillets) . '</td></tr>
+                                            <tr><td style="padding:6px 0;color:#6b7280;">Destination</td><td style="padding:6px 0;font-weight:bold;text-align:right;">' . htmlspecialchars($listeticked_validations->destinationId) . '</td></tr>
+                                        </table>
+                                        <div style="background:#ecfdf5;border-left:4px solid #10b981;padding:12px 14px;border-radius:6px;font-size:14px;color:#065f46;">
+                                            📎 Votre billet électronique (PDF avec QR code) est en pièce jointe.
+                                        </div>
+                                        <p style="margin-top:16px;font-size:13px;color:#9ca3af;text-align:center;">Merci de voyager avec ' . htmlspecialchars($nomCompagnie) . ' !</p>
+                                    </div>
+                                </div>
+                            ';
+                            $mail->addStringAttachment($pdfContent, "Billet_{$listeticked_validations->numeroBillets}.pdf");
+                            $mail->send();
+
+                            $emailEnvoye = true;
+                        } catch (Exception $e) {
+                            $emailEnvoye = false;
+                        }
+                    }
+
+                    if ($emailEnvoye === true) {
+                        $message = "Validation réussie : le billet PDF a été envoyé par email au client.";
+                    } elseif ($emailEnvoye === false) {
+                        $message = "Validation réussie, mais l'envoi de l'email a échoué.";
+                    } else {
+                        $message = "Validation réussie. Aucune adresse email fournie : le billet n'a pas pu être envoyé.";
+                    }
+                    $model->set_flash($message, 'success');
+                    header('Location: ' . BASE_URL . '/admin/Liste_ententes');
                     exit;
-                 
+
                 } catch (Exception $e) {
                     if ($pdo->inTransaction()) $pdo->rollBack();
-                    $model->set_flash("Erreur", $e->getMessage(), "danger");
+                    $model->set_flash($e->getMessage(), 'danger');
                     header('Location: ' . BASE_URL . '/admin/Liste_ententes');
                     exit;
                 }
             } else {
-                $model->set_flash("Erreur", "Le numéro de paiement ne correspond pas !", "warning");
+                $model->set_flash("Le numéro de paiement ne correspond pas !", 'warning');
                 header('Location: ' . BASE_URL . '/admin/Liste_ententes');
                 exit;
             }

@@ -94,10 +94,8 @@
                                                             data-date="<?= htmlspecialchars($colis['date_enregistrement'] ?? '') ?>"
                                                             data-expediteur="<?= htmlspecialchars($colis['expediteur'] ?? '') ?>"
                                                             data-numero-exp="<?= htmlspecialchars($colis['numero_exp'] ?? '') ?>"
-                                                            data-email-exp="<?= htmlspecialchars($colis['email_exp'] ?? '') ?>"
                                                             data-destinataire="<?= htmlspecialchars($colis['destinataire'] ?? '') ?>"
-                                                            data-numero-dest="<?= htmlspecialchars($colis['numero_dest'] ?? '') ?>"
-                                                            data-email-dest="<?= htmlspecialchars($colis['email_dest'] ?? '') ?>">
+                                                            data-numero-dest="<?= htmlspecialchars($colis['numero_dest'] ?? '') ?>">
                                                             <i class="bx bx-show-alt me-2"></i>Détails
                                                         </a>
                                                     </li>
@@ -179,7 +177,6 @@
                                     <div class="colis-panel-title"><i class="bx bx-upload me-1"></i> Expéditeur</div>
                                     <div class="colis-info-row"><i class="bx bx-user"></i><span id="dc_expediteur"></span></div>
                                     <div class="colis-info-row"><i class="bx bx-phone"></i><span id="dc_numero_exp"></span></div>
-                                    <div class="colis-info-row"><i class="bx bx-envelope"></i><span id="dc_email_exp"></span></div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -187,7 +184,6 @@
                                     <div class="colis-panel-title"><i class="bx bx-download me-1"></i> Destinataire</div>
                                     <div class="colis-info-row"><i class="bx bx-user"></i><span id="dc_destinataire"></span></div>
                                     <div class="colis-info-row"><i class="bx bx-phone"></i><span id="dc_numero_dest"></span></div>
-                                    <div class="colis-info-row"><i class="bx bx-envelope"></i><span id="dc_email_dest"></span></div>
                                 </div>
                             </div>
                         </div>
@@ -270,10 +266,8 @@
             btn.addEventListener('click', function() {
                 document.getElementById('dc_expediteur').textContent = this.dataset.expediteur || '-';
                 document.getElementById('dc_numero_exp').textContent = this.dataset.numeroExp || '-';
-                document.getElementById('dc_email_exp').textContent = this.dataset.emailExp || '-';
                 document.getElementById('dc_destinataire').textContent = this.dataset.destinataire || '-';
                 document.getElementById('dc_numero_dest').textContent = this.dataset.numeroDest || '-';
-                document.getElementById('dc_email_dest').textContent = this.dataset.emailDest || '-';
                 document.getElementById('dc_nom').textContent = this.dataset.nom || '-';
                 document.getElementById('dc_nature').textContent = this.dataset.nature || '-';
                 document.getElementById('dc_valeur').textContent = this.dataset.valeur || '0';

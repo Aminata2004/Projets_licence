@@ -39,7 +39,7 @@
           ?>
 
           <?php if ($user->userHasPermission('Billets_apercue')) { ?>
-            <li> <a href="<?= BASE_URL ?>/admin/Liste_tickets"><i class="bi bi-arrow-right-short"></i>Liste des ticket</a>
+            <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours"><i class="bi bi-arrow-right-short"></i>Liste des ticket</a>
             </li>
           <?php }
           ?>
@@ -154,6 +154,25 @@
                 <?php } ?>
               </ul>
               </li>
+
+              <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)): ?>
+                <li class="menu-label">Finances</li>
+                <li>
+                  <a href="javascript:;" class="has-arrow">
+                    <div class="parent-icon"><i class="bx bx-money-withdraw"></i>
+                    </div>
+                    <div class="menu-title">Dépenses</div>
+                  </a>
+                  <ul>
+                    <li> <a href="<?= BASE_URL ?>/admin/Depenses"><i class="bi bi-arrow-right-short"></i>Gérer les dépenses</a>
+                    </li>
+                    <?php if ($_SESSION['droit'] === 'Admin'): ?>
+                      <li> <a href="<?= BASE_URL ?>/admin/Depenses/benefice"><i class="bi bi-arrow-right-short"></i>Bénéfice de la compagnie</a>
+                      </li>
+                    <?php endif; ?>
+                  </ul>
+                </li>
+              <?php endif; ?>
 
               <?php if ($user->userHasPermission('Programme_Creation')) { ?>
                 <li class="menu-label">Gestion des programmations</li>

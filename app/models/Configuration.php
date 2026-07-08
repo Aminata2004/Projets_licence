@@ -56,6 +56,7 @@
 
                 $id_agence = $_POST['id_agence'] ?? null;
                 $id_compagnie = ($droit === 'Admin') ? ($_POST['id_compagnie'] ?? null) : $id_compagnie_session;
+                $profile = ($droit === 'Utilisateur') ? ($_POST['profile'] ?? null) : null;
 
                 try {
                     // Utilise une seule connexion PDO
@@ -63,8 +64,8 @@
                     $pdo->beginTransaction();
 
                     $insertion = $this->insertion_update_simples(
-                        "INSERT INTO utilisateur (utilisateurs, emailUser, motPasse, status, id_agence, id_compagnie, droit) 
-                        VALUES (:utilisateurs, :emailUser, :motPasse, :status, :id_agence, :id_compagnie, :droit)",
+                        "INSERT INTO utilisateur (utilisateurs, emailUser, motPasse, status, id_agence, id_compagnie, droit, profile)
+                        VALUES (:utilisateurs, :emailUser, :motPasse, :status, :id_agence, :id_compagnie, :droit, :profile)",
                         [
                             ":utilisateurs"  => $utilisateurs,
                             ":emailUser"     => $emailUser,
@@ -72,7 +73,8 @@
                             ":status"        => $status,
                             ":id_agence"     => $id_agence,
                             ":id_compagnie"  => $id_compagnie,
-                            ":droit"         => $droit
+                            ":droit"         => $droit,
+                            ":profile"       => $profile
                         ]
                     );
 

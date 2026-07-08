@@ -165,7 +165,7 @@
                                                 <div class="col-lg-8 ms-auto">
                                                     <button type="submit" name="save" class="btn btn-primary px-4">Enregistre</button>
 
-                                                    <a href="<?= BASE_URL ?>/admin/Liste_tickets"><button type="button"
+                                                    <a href="<?= BASE_URL ?>/admin/Liste_du_jours"><button type="button"
                                                             class="btn btn-primary px-4 split-bg-primary ">
                                                             Liste clients
                                                         </button></a>

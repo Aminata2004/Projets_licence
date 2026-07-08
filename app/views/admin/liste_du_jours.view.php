@@ -36,16 +36,16 @@
             <div class="card">
                 <div class="card-body border-top border-primary border-1">
                     <ul class="nav nav-tabs nav-primary" role="tablist">
-                        <li class="nav-item" role="presentation">
+                        <!-- <li class="nav-item" role="presentation">
                             <a class="nav-link" href="<?= BASE_URL ?>/admin/Liste_tickets" role="tab" aria-selected="true">
                                 <div class="d-flex align-items-center">
                                     <div class="tab-icon">
-                                        <i class="fadeIn animated bx bx-list-check font-20"></i> <!-- Liste avec coches -->
+                                        <i class="fadeIn animated bx bx-list-check font-20"></i> 
                                     </div>
                                     <div class="tab-title">Liste actuelle</div>
                                 </div>
                             </a>
-                        </li>
+                        </li> -->
 
                         <li class="nav-item" role="presentation">
                             <a class="nav-link active" href="<?= BASE_URL ?>/admin/Liste_du_jours" role="tab" aria-selected="true">
@@ -107,6 +107,13 @@
                             </select>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-12 mt-3 d-none" id="printBtnWrapper">
+                            <button type="button" class="btn btn-success" id="btnImprimerListe">
+                                <i class="bx bx-printer"></i> Imprimer la liste filtrée
+                            </button>
+                        </div>
+                    </div>
 
 
                 </div>
@@ -121,7 +128,7 @@
                                 <tr class="text-center">
                                     <th>Client</th>
                                     <th>Destionation</th>
-                                    <th>Nbr de place</th>
+                                    <th>N° de place</th>
                                     <th>heure de depart</th>
                                     <th>Jour de voyage</th>
                                     <th>Date d'expiration</th>
@@ -129,21 +136,21 @@
                                 </tr>
                             </thead>
                             <tbody id="tableClient">
-                                
-                                <?php 
-                                
+
+                                <?php
+
                                 foreach ($liste_du_jour as $item): ?>
-                                    <?php 
+                                    <?php
                                      date_default_timezone_set('Africa/Bamako');
                                     if ($item->jourVoyage == date("Y-m-d")): ?>
                                         <tr class="text-center">
                                             <td><?= $item->Client ?></td>
                                             <td><?= $item->destinationId ?></td>
-                                            <td><?= $item->nombrePassages ?></td>
+                                            <td> Chaisse N°<?= $item->numeroPlace ?></td>
                                             <td><?= $item->Heur_departs ?></td>
                                             <td><?= $item->jourVoyage ?></td>
                                             <td><?= $item->date_expiration ?></td>
-                                            <td class=" ">
+                                            <td>
                                                 <div class="dropup ">
                                                     <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
                                                         &#8943; <!-- Trois points horizontaux -->
@@ -205,7 +212,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-dart">
-                    <form action="<?= BASE_URL ?>/Liste_du_jours/reporter" method="post">
+                    <form action="<?= BASE_URL ?>/admin/Liste_du_jours/reporter" method="post">
                         <div class="row">
                             <div class="col-md-12">
                                 <label for="validationCustom01" class="form-label">Nouveau jour de voyage</label>
@@ -259,15 +266,26 @@
                         success: function(response) {
                             if (response.error) {
                                 Swal.fire('Erreur', response.error, 'error');
+                                $('#printBtnWrapper').addClass('d-none');
                             } else {
                                 $('#tableClient').html(response.tbody);
+                                $('#printBtnWrapper').removeClass('d-none');
                             }
                         },
                         error: function(xhr, status, error) {
                             Swal.fire('Erreur AJAX', xhr.responseText, 'error');
                         }
                     });
+                } else {
+                    $('#printBtnWrapper').addClass('d-none');
                 }
+            });
+
+            $('#btnImprimerListe').click(function() {
+                const selectheure = $('#selectheure').val();
+                const id_destination = $('#id_destination').val();
+                const url = '<?= BASE_URL ?>/admin/Liste_du_jours/imprimerListe?destination=' + encodeURIComponent(id_destination) + '&heure=' + encodeURIComponent(selectheure);
+                window.open(url, '_blank');
             });
         });
         $(document).ready(function() {
@@ -280,15 +298,23 @@
                 let dateExpiration = $(this).data('date_expiration');
                 let heureActuelle = $(this).data('heure_actuelle'); // Heure à présélectionner
 
-                let today = new Date();
+                let now = new Date();
+                let heureIso = heureActuelle && heureActuelle.length === 5 ? heureActuelle + ':00' : heureActuelle;
+                let departDateTime = new Date(jourVoyage + 'T' + heureIso);
                 let expirationDate = new Date(dateExpiration);
                 let voyageDate = new Date(jourVoyage);
 
-                today.setHours(0, 0, 0, 0);
-                expirationDate.setHours(0, 0, 0, 0);
+                expirationDate.setHours(23, 59, 59, 999);
                 voyageDate.setHours(0, 0, 0, 0);
 
-                if (today <= expirationDate) {
+                // Le voyage ne peut être reporté qu'avant son heure de départ prévue : une fois
+                // cette heure passée, le voyage a déjà eu lieu.
+                if (!isNaN(departDateTime.getTime()) && now >= departDateTime) {
+                    alert("Impossible de reporter ce voyage : l'heure de départ prévue est déjà passée.");
+                    return;
+                }
+
+                if (now <= expirationDate) {
                     // Limites de date
                     let minDate = voyageDate.toISOString().split('T')[0];
                     let maxDateObj = new Date(voyageDate);
@@ -307,7 +333,7 @@
 
                     // Charger les heures disponibles
                     $.ajax({
-                        url: '<?= BASE_URL ?>/Liste_du_jours/getHeuresDisponibles',
+                        url: '<?= BASE_URL ?>/admin/Liste_du_jours/getHeuresDisponibles',
                         method: 'POST',
                         data: {
                             destination_id: destinationId

@@ -48,11 +48,18 @@
                     <form action="" method="post">
 
                         <!-- Date du voyage -->
-                        <div class="row mb-4">
+                        <div class="row mb-4 align-items-center">
                             <label for="jourVoyage" class="col-sm-2 col-form-label fw-semibold">Jour du voyage</label>
                             <div class="col-sm-4">
                                 <input type="date" class="form-control shadow-sm" id="jourVoyage" name="jourVoyage" required>
                             </div>
+                            <?php if (!empty($programmation_veille)): ?>
+                                <div class="col-sm-6">
+                                    <button type="button" id="btnReproduireHier" class="btn btn-outline-primary shadow-sm">
+                                        <i class="bx bx-repeat me-1"></i> Reproduire la programmation du <?= date('d/m/Y', strtotime($derniere_date)) ?>
+                                    </button>
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <!-- Tableau -->
@@ -63,6 +70,9 @@
                                         <th><input type="checkbox" id="selectAll"></th>
                                         <th>Numéro Car</th>
                                         <th>Horaire</th>
+                                        <?php if ($_SESSION['droit'] === 'Admin'): ?>
+                                            <th>Départ</th>
+                                        <?php endif; ?>
                                         <th>Destination</th>
                                     </tr>
                                 </thead>
@@ -70,7 +80,7 @@
                                     <?php if (!empty($cars_destinations)) : ?>
                                         <?php $indexRow = 0; ?>
                                         <?php foreach ($cars_destinations as $numero_car => $destinations ) : ?>
-                                            <tr>
+                                            <tr data-id-car="<?= htmlspecialchars($destinations[0]->id_car) ?>">
                                                 <td><input type="checkbox" name="select_car[]" value="<?= $indexRow ?>" class="form-check-input checkbox-car"></td>
                                                 <td>
                                                     <input type="text" name="numero_car[]" class="form-control text-center shadow-sm" value="<?= htmlspecialchars($numero_car) ?>" readonly>
@@ -86,6 +96,11 @@
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </td>
+                                                <?php if ($_SESSION['droit'] === 'Admin'): ?>
+                                                    <td>
+                                                        <input type="text" name="id_depart[]" class="form-control text-center shadow-sm champ-depart" readonly placeholder="—">
+                                                    </td>
+                                                <?php endif; ?>
                                                 <td>
                                                     <select class="form-select shadow-sm" name="id_destination[]">
                                                         <option selected disabled value="">Choisir une destination</option>
@@ -106,7 +121,7 @@
                                                             ?>
 
                                                             <?php if ($afficher): ?>
-                                                                <option value="<?= htmlspecialchars($d->destinationLocalite) ?>">
+                                                                <option value="<?= htmlspecialchars($d->destinationLocalite) ?>" data-depart="<?= htmlspecialchars($d->departLocalite) ?>">
                                                                     <?= htmlspecialchars($d->departLocalite . ' -> ' . $d->destinationLocalite) ?>
                                                                 </option>
                                                             <?php endif; ?>
@@ -220,6 +235,65 @@
                 checkbox.checked = isChecked;
             });
         });
+
+        // Admin uniquement : remplit automatiquement le champ "Départ" selon la
+        // destination choisie (chaque option porte la localité de départ réelle du trajet).
+        document.querySelectorAll('select[name="id_destination[]"]').forEach(function(select) {
+            select.addEventListener('change', function() {
+                const depart = this.options[this.selectedIndex]?.getAttribute('data-depart') || '';
+                const champDepart = this.closest('tr').querySelector('.champ-depart');
+                if (champDepart) {
+                    champDepart.value = depart;
+                }
+            });
+        });
+
+        // Reproduire la programmation de la veille : pré-remplit chaque ligne dont le car
+        // était déjà programmé hier. Les cars indisponibles aujourd'hui (pas dans le tableau)
+        // ou dont l'horaire/destination n'existe plus sont simplement ignorés — l'agent les
+        // programme alors manuellement comme d'habitude.
+        <?php if (!empty($programmation_veille)): ?>
+            const programmationVeille = <?= json_encode($programmation_veille, JSON_HEX_TAG | JSON_HEX_APOS) ?>;
+
+            document.getElementById('btnReproduireHier').addEventListener('click', function() {
+                let appliques = 0;
+                let ignores = 0;
+
+                document.querySelectorAll('tbody tr[data-id-car]').forEach(function(tr) {
+                    const idCar = tr.getAttribute('data-id-car');
+                    const prev = programmationVeille[idCar];
+                    if (!prev) return;
+
+                    const selectHoraire = tr.querySelector('select[name="id_horaire[]"]');
+                    const selectDestination = tr.querySelector('select[name="id_destination[]"]');
+                    const checkbox = tr.querySelector('.checkbox-car');
+
+                    const horaireExiste = selectHoraire && [...selectHoraire.options].some(o => o.value === prev.id_horaire);
+                    const destinationExiste = selectDestination && [...selectDestination.options].some(o => o.value === prev.id_trajet);
+
+                    if (!horaireExiste || !destinationExiste) {
+                        ignores++;
+                        return;
+                    }
+
+                    selectHoraire.value = prev.id_horaire;
+                    selectDestination.value = prev.id_trajet;
+                    selectDestination.dispatchEvent(new Event('change')); // met à jour le champ "Départ" (Admin)
+                    if (checkbox) checkbox.checked = true;
+                    appliques++;
+                });
+
+                let message = appliques + ' car(s) pré-rempli(s) depuis la programmation du <?= date('d/m/Y', strtotime($derniere_date)) ?>.';
+                if (ignores > 0) {
+                    message += ' ' + ignores + ' car(s) non repris (horaire/destination indisponible aujourd\'hui) — à programmer manuellement.';
+                }
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire('Reproduction terminée', message, 'info');
+                } else {
+                    alert(message);
+                }
+            });
+        <?php endif; ?>
     </script>
 </body>
 

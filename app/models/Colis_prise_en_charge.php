@@ -15,12 +15,10 @@
             // Champs obligatoires (expéditeur)
             if (empty($expediteur)) $errors[] = "Le nom de l'expéditeur est obligatoire.";
             if (empty($numero_exp)) $errors[] = "Le numéro de l'expéditeur est obligatoire.";
-            if (empty($email_exp)) $errors[] = "L'email de l'expéditeur est obligatoire.";
 
             // Champs obligatoires (destinataire)
             if (empty($destinataire)) $errors[] = "Le nom du destinataire est obligatoire.";
             if (empty($numero_dest)) $errors[] = "Le numéro du destinataire est obligatoire.";
-            if (empty($email_dest)) $errors[] = "L'email du destinataire est obligatoire.";
 
             // Champs obligatoires (colis)
             if (empty($nom_colis)) $errors[] = "Le nom du colis est obligatoire.";
@@ -43,14 +41,13 @@
                     $whatsapp_exp = trim($whatsapp_exp ?? '') !== '' ? trim($whatsapp_exp) : $numero_exp;
 
                     $stmt1 = $pdo->prepare("
-                INSERT INTO expediteurs (expediteur, numero_exp, whatsapp_exp, email_exp)
-                VALUES (:expediteur, :num_exp, :whatsapp_exp, :email_exp)
+                INSERT INTO expediteurs (expediteur, numero_exp, whatsapp_exp)
+                VALUES (:expediteur, :num_exp, :whatsapp_exp)
             ");
                     $stmt1->execute([
                         ":expediteur" => $expediteur,
                         ":num_exp" => $numero_exp,
-                        ":whatsapp_exp" => $whatsapp_exp,
-                        ":email_exp" => $email_exp
+                        ":whatsapp_exp" => $whatsapp_exp
                     ]);
                     $id_expediteur = $pdo->lastInsertId();
 
@@ -59,14 +56,13 @@
                     $whatsapp_dest = trim($whatsapp_dest ?? '') !== '' ? trim($whatsapp_dest) : $numero_dest;
 
                     $stmt2 = $pdo->prepare("
-                INSERT INTO destinataires (destinataire, numero_dest, whatsapp_dest, email_dest, id_exp)
-                VALUES (:destinataire, :numero_dest, :whatsapp_dest, :email_dest, :id_exp)
+                INSERT INTO destinataires (destinataire, numero_dest, whatsapp_dest, id_exp)
+                VALUES (:destinataire, :numero_dest, :whatsapp_dest, :id_exp)
             ");
                     $stmt2->execute([
                         ":destinataire" => $destinataire,
                         ":numero_dest" => $numero_dest,
                         ":whatsapp_dest" => $whatsapp_dest,
-                        ":email_dest" => $email_dest,
                         ":id_exp" => $id_expediteur
                     ]);
                     $id_destinataire = $pdo->lastInsertId();

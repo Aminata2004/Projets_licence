@@ -37,7 +37,7 @@ class Suivis_colis extends Controller
                 header("Location: " . BASE_URL . "/site/Suivis_colis?show_code=" . urlencode($codeColis));
                 exit();
             } else {
-                $messageErreur = "❌ Ce colis n'appartient pas à la compagnie sélectionnée.";
+                $messageErreur = "Ce colis n'appartient pas à la compagnie sélectionnée.";
             }
         }
 
@@ -45,7 +45,7 @@ class Suivis_colis extends Controller
         if (isset($_GET['show_code'])) {
             $codeColis = $_GET['show_code'];
             $colis = $Compagnie->getColisByCodeAndCompagnie(
-                "SELECT colis.*, expediteurs.*, destinataires.*, a.*
+                "SELECT colis.*, expediteurs.*, destinataires.*, a.*, colis.status AS status
          FROM colis
          JOIN expediteurs ON colis.id_expediteur = expediteurs.id_expediteur
          JOIN destinataires ON colis.id_destinataire = destinataires.id_destinataire

@@ -176,7 +176,7 @@
                                                                                     ?>
                                                                                     <?php if(!empty($caissesFiltered)): ?>
                                                                                         <?php foreach($caissesFiltered as $c):
-                                                                                            $total = ($c->montant_billets ?? 0) + ($c->montant_colis ?? 0) - ($c->montant_rembourse ?? 0);
+                                                                                            $total = ($c->montant_billets ?? 0) + ($c->montant_colis ?? 0) - ($c->montant_rembourse ?? 0) - ($c->montant_depense ?? 0);
                                                                                             $label = ($c->localite === $rec->provient_de) ? 'Départ' : 'Destination';
                                                                                         ?>
                                                                                         <option value="<?= $c->id_caisse ?>">

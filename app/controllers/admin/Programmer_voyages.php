@@ -105,18 +105,32 @@ class Programmer_voyages extends  Controller
         // SuperAdmin : voit tout
 
         $liste_agence = $add_liste_trajet->SelectAllData('*', "agence");
+        $liste_agence_depart = $liste_agence;
         $listeEscale = $add_liste_trajet->SelectAllData("*", "escale");
       } elseif ($role === 'Admin' || $role === 'chef_d_escale' && isset($_SESSION['id_compagnie'])) {
         // Admin : voit seulement ce qui est lié à sa compagnie
         $id_compagnie = $_SESSION['id_compagnie'];
 
-        // Agences liées à cette compagnie
+        // Agences liées à cette compagnie (sert de liste pour la destination)
         $liste_agence = $add_liste_trajet->FetchSelectWheres(
           '*',
           'agence',
           'id_compagnie = :id_compagnie',
           ['id_compagnie' => $id_compagnie]
         );
+
+        // Le chef d'escale ne peut créer un programme qu'au départ de sa propre gare ;
+        // l'Admin, lui, peut choisir n'importe quelle gare de sa compagnie comme départ.
+        if ($role === 'chef_d_escale') {
+          $liste_agence_depart = $add_liste_trajet->FetchSelectWheres(
+            '*',
+            'agence',
+            'idAgence = :id_agence',
+            ['id_agence' => $_SESSION['id_agence']]
+          );
+        } else {
+          $liste_agence_depart = $liste_agence;
+        }
 
         // Escales liées à cette compagnie
         $listeEscale = $add_liste_trajet->FetchSelectWheres(
@@ -141,7 +155,8 @@ class Programmer_voyages extends  Controller
 
       'listeEscale' => $listeEscale,
       'listehoraire' => $listehoraire,
-      'liste_agence' => $liste_agence
+      'liste_agence' => $liste_agence,
+      'liste_agence_depart' => $liste_agence_depart
     ]);
   }
 

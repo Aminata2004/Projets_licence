@@ -108,7 +108,7 @@
                                                         </label>
                                                         <select id="choixAgence" name="idDepart" class="form-select shadow-sm" required>
                                                             <option value=""> Sélectionner le départ</option>
-                                                            <?php foreach ($liste_agence as $liste_agences):?>
+                                                            <?php foreach ($liste_agence_depart as $liste_agences):?>
                                                                 <option value="<?= htmlspecialchars($liste_agences->idAgence); ?>"
                                                                     data-localite="<?= htmlspecialchars($liste_agences->localite); ?>">
                                                                     <?= htmlspecialchars($liste_agences->localite . '  ( ' .    $liste_agences->numeroGare . ' )'); ?>

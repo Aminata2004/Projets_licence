@@ -701,10 +701,409 @@ body {
 }
 
 /* ================================================================
+   DASHBOARD ACCUEIL — REFONTE MODERNE (page d'accueil uniquement)
+   ================================================================ */
+
+/* ── Hero de bienvenue ──────────────────────────────────────── */
+.tg-hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--tg-navy) 0%, var(--tg-dark) 65%, #061019 100%);
+    border-radius: 1.5rem;
+    padding: 2rem 2.25rem;
+    color: #fff;
+    box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.45);
+}
+.tg-hero::before,
+.tg-hero::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(10px);
+    opacity: 0.55;
+    pointer-events: none;
+}
+.tg-hero::before {
+    width: 260px;
+    height: 260px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.55), transparent 70%);
+    top: -110px;
+    right: -60px;
+}
+.tg-hero::after {
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.35), transparent 70%);
+    bottom: -160px;
+    left: -80px;
+}
+.tg-hero__content {
+    position: relative;
+    z-index: 1;
+}
+.tg-hero__icon {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: var(--tg-orange-light);
+}
+.tg-hero__title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: 0.2rem;
+    letter-spacing: -0.02em;
+}
+.tg-hero__subtitle {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.85rem;
+    margin: 0;
+}
+.tg-hero__date-chip {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1rem;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    backdrop-filter: blur(6px);
+}
+.tg-hero__date-chip .tg-date-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.55);
+}
+.tg-hero__date-chip .tg-date-value {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* ── Panneau générique (remplace/étend dashboard-card) ──────── */
+.tg-panel {
+    background: #ffffff;
+    border-radius: 1.25rem;
+    border: 1px solid var(--tg-gray-200);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+    padding: 1.5rem;
+    transition: box-shadow 0.25s ease;
+}
+.tg-panel:hover {
+    box-shadow: 0 12px 30px -10px rgba(15, 23, 42, 0.12);
+}
+.tg-panel__title {
+    font-weight: 800;
+    font-size: 1rem;
+    margin-bottom: 0;
+    color: var(--tg-dark);
+}
+.tg-panel__subtitle {
+    color: var(--tg-gray-600);
+    font-size: 0.8rem;
+    margin: 0;
+}
+.tg-panel__icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.6rem;
+    font-size: 1.1rem;
+}
+
+/* ── Filtre gare (pilule) ────────────────────────────────────── */
+.tg-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    background: #fff;
+    border: 1px solid var(--tg-gray-200);
+    border-radius: 1rem;
+    padding: 0.6rem 1rem;
+}
+.tg-filter-bar select.form-select {
+    border-radius: 0.75rem;
+    border-color: var(--tg-gray-200);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+.tg-reset-pill {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--tg-orange);
+    text-decoration: none;
+    background: rgba(245, 158, 11, 0.1);
+    padding: 0.35rem 0.8rem;
+    border-radius: 1rem;
+}
+.tg-reset-pill:hover { background: rgba(245, 158, 11, 0.18); color: var(--tg-orange); }
+
+/* ── Actions rapides ─────────────────────────────────────────── */
+.tg-quick-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--tg-gray-100);
+    border: 1px solid var(--tg-gray-200);
+    border-radius: 1rem;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--tg-gray-700);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.tg-quick-action:hover {
+    background: linear-gradient(135deg, var(--tg-orange-light), var(--tg-orange));
+    border-color: transparent;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -8px rgba(234, 88, 12, 0.5);
+}
+
+/* ── Cartes KPI modernes ─────────────────────────────────────── */
+.tg-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+}
+.tg-stat-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--tg-gray-200);
+    border-radius: 1.25rem;
+    padding: 1.35rem;
+    overflow: hidden;
+    animation: tgFadeUp 0.4s ease both;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+a.tg-stat-card {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+.tg-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 30px -14px rgba(15, 23, 42, 0.2);
+}
+.tg-stat-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--tg-stat-color, var(--tg-orange)), transparent);
+}
+.tg-stat-card__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+.tg-stat-card__icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    background: rgba(234, 88, 12, 0.12);
+    background: color-mix(in srgb, var(--tg-stat-color, var(--tg-orange)) 14%, white);
+    color: var(--tg-stat-color, var(--tg-orange));
+}
+.tg-stat-card__value {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--tg-dark);
+}
+.tg-stat-card__label {
+    font-size: 0.78rem;
+    color: var(--tg-gray-600);
+    font-weight: 600;
+}
+.tg-stat-card__meta {
+    margin-top: 0.75rem;
+    font-size: 0.72rem;
+    color: var(--tg-gray-600);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.tg-stat-grid .tg-stat-card:nth-child(2) { animation-delay: 0.05s; }
+.tg-stat-grid .tg-stat-card:nth-child(3) { animation-delay: 0.1s; }
+.tg-stat-grid .tg-stat-card:nth-child(4) { animation-delay: 0.15s; }
+.tg-stat-grid .tg-stat-card:nth-child(5) { animation-delay: 0.2s; }
+
+@keyframes tgFadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Section label ───────────────────────────────────────────── */
+.tg-section-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--tg-gray-600);
+    margin: 0 0 0.75rem 0.1rem;
+}
+
+/* ── Donut chart CSS pur (répartition colis) ────────────────── */
+.tg-donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+.tg-donut {
+    width: 140px;
+    height: 140px;
+    min-width: 140px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.tg-donut__hole {
+    width: 78px;
+    height: 78px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 0 1px var(--tg-gray-200);
+}
+.tg-donut__hole strong { font-size: 1.15rem; color: var(--tg-dark); line-height: 1; }
+.tg-donut__hole span { font-size: 0.6rem; color: var(--tg-gray-600); text-transform: uppercase; }
+.tg-donut-legend {
+    flex: 1;
+    min-width: 160px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+.tg-donut-legend__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    gap: 0.5rem;
+}
+.tg-donut-legend__label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--tg-gray-700);
+    font-weight: 600;
+}
+.tg-donut-legend__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex: none;
+}
+.tg-donut-legend__value {
+    font-weight: 700;
+    color: var(--tg-dark);
+}
+
+/* ── Leaderboard (top des gares) ─────────────────────────────── */
+.tg-leaderboard-item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.7rem 0.4rem;
+    border-radius: 0.9rem;
+    transition: background 0.2s;
+}
+.tg-leaderboard-item:hover { background: var(--tg-gray-100); }
+.tg-rank {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.8rem;
+    background: var(--tg-gray-100);
+    color: var(--tg-gray-700);
+}
+.tg-rank--1 { background: linear-gradient(135deg, #fde68a, #f59e0b); color: #7c4a03; }
+.tg-rank--2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #334155; }
+.tg-rank--3 { background: linear-gradient(135deg, #fbcfe8, #ea580c); color: #7c2d12; }
+.tg-leaderboard-body { flex: 1; min-width: 0; }
+
+/* ── Timeline (activités récentes) ──────────────────────────── */
+.tg-timeline {
+    position: relative;
+    padding-left: 1.75rem;
+}
+.tg-timeline::before {
+    content: "";
+    position: absolute;
+    left: 0.55rem;
+    top: 0.35rem;
+    bottom: 0.35rem;
+    width: 2px;
+    background: var(--tg-gray-200);
+}
+.tg-timeline-item {
+    position: relative;
+    padding-bottom: 1.15rem;
+}
+.tg-timeline-item:last-child { padding-bottom: 0; }
+.tg-timeline-dot {
+    position: absolute;
+    left: -1.75rem;
+    top: 0.15rem;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #fff;
+    box-shadow: 0 0 0 4px #fff;
+}
+.tg-timeline-card {
+    background: var(--tg-gray-100);
+    border-radius: 0.9rem;
+    padding: 0.7rem 0.9rem;
+}
+
+/* ── État vide ───────────────────────────────────────────────── */
+.tg-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--tg-gray-600);
+}
+.tg-empty i { font-size: 2rem; color: var(--tg-gray-300); display: block; margin-bottom: 0.5rem; }
+
+/* ================================================================
    RESPONSIVE
    ================================================================ */
 @media (max-width: 768px) {
     .kpi-value     { font-size: 1.5rem; }
     .welcome-header { padding: 1rem; }
     .page-breadcrumb .breadcrumb-title { font-size: 1.1rem; }
+    .tg-hero { padding: 1.5rem; }
+    .tg-stat-card__value { font-size: 1.6rem; }
 }

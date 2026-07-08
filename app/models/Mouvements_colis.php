@@ -11,8 +11,8 @@ class Mouvements_colis extends  Model
         $sql = "SELECT 
                 colis.*, 
                 a.localite AS destination, 
-                expediteurs.expediteur, expediteurs.numero_exp, expediteurs.whatsapp_exp, expediteurs.email_exp, 
-                destinataires.destinataire, destinataires.numero_dest, destinataires.whatsapp_dest, destinataires.email_dest 
+                expediteurs.expediteur, expediteurs.numero_exp, expediteurs.whatsapp_exp, 
+                destinataires.destinataire, destinataires.numero_dest, destinataires.whatsapp_dest 
             FROM colis
             JOIN expediteurs ON colis.id_expediteur = expediteurs.id_expediteur
             JOIN destinataires ON colis.id_destinataire = destinataires.id_destinataire
@@ -57,8 +57,8 @@ class Mouvements_colis extends  Model
                 colis.*,
                 a.localite AS destination,
                 a.numeroGare AS numero_gare_retrait,
-                expediteurs.expediteur, expediteurs.numero_exp, expediteurs.whatsapp_exp, expediteurs.email_exp,
-                destinataires.destinataire, destinataires.numero_dest, destinataires.whatsapp_dest, destinataires.email_dest
+                expediteurs.expediteur, expediteurs.numero_exp, expediteurs.whatsapp_exp,
+                destinataires.destinataire, destinataires.numero_dest, destinataires.whatsapp_dest
             FROM colis
             JOIN expediteurs ON colis.id_expediteur = expediteurs.id_expediteur
             JOIN destinataires ON colis.id_destinataire = destinataires.id_destinataire
@@ -101,8 +101,8 @@ class Mouvements_colis extends  Model
         $sql = "SELECT 
                 colis.*, 
                 a.localite AS destination, 
-                expediteurs.expediteur, expediteurs.numero_exp, expediteurs.whatsapp_exp, expediteurs.email_exp, 
-                destinataires.destinataire, destinataires.numero_dest, destinataires.whatsapp_dest, destinataires.email_dest 
+                expediteurs.expediteur, expediteurs.numero_exp, expediteurs.whatsapp_exp, 
+                destinataires.destinataire, destinataires.numero_dest, destinataires.whatsapp_dest 
             FROM colis
             JOIN expediteurs ON colis.id_expediteur = expediteurs.id_expediteur
             JOIN destinataires ON colis.id_destinataire = destinataires.id_destinataire

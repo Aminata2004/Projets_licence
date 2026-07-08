@@ -84,13 +84,21 @@ class Programmation_voyages extends Controller
                 $id_care = $_POST['id_care'][$index] ?? null;
                 $id_horaire = $_POST['id_horaire'][$index] ?? null;
                 $id_destination = $_POST['id_destination'][$index] ?? null;
+                // Départ choisi dans le formulaire (Admin uniquement) ; pour un chef d'escale,
+                // le modèle retombe sur sa propre gare de session.
+                $id_depart = $_POST['id_depart'][$index] ?? null;
 
                 if (!$id_care || !$id_horaire || !$id_destination) {
                     $errors[] = "Veuillez remplir tous les champs pour la ligne choisie.";
                     continue; // passe à la ligne suivante sans insérer
                 }
 
-                $insert_result = $model->insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre);
+                if ($_SESSION['droit'] === 'Admin' && empty($id_depart)) {
+                    $errors[] = "Veuillez choisir une destination pour renseigner le départ de la ligne choisie.";
+                    continue;
+                }
+
+                $insert_result = $model->insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre, $id_depart);
                 if ($insert_result) {
                     $update_result = $model->updateCareStatus($id_care, $id_destination);
                     if (!$update_result) {
@@ -127,11 +135,28 @@ class Programmation_voyages extends Controller
         // Récupération des cars en transit
         $cars_en_transit = $programmation_voyage->getCarsInTransit();
 
+        // Dernière programmation existante (pour pré-remplissage à la demande, cf. bouton "Reproduire").
+        // Admin : toute la compagnie (le départ varie ligne par ligne). Chef d'escale : sa propre gare.
+        // On reprend la DERNIÈRE date disponible (pas forcément hier) pour couvrir les jours sans
+        // activité ou le tout début d'utilisation du système.
+        $aujourdhui = date('Y-m-d');
+        $localite_filtre = $_SESSION['droit'] === 'chef_d_escale' ? ($_SESSION['ville'] ?? null) : null;
+        $derniere_date = $programmation_voyage->getDerniereDateProgrammation(
+            $_SESSION['id_compagnie'],
+            $aujourdhui,
+            $localite_filtre
+        );
+        $programmation_veille = $derniere_date
+            ? $programmation_voyage->getProgrammationParDate($_SESSION['id_compagnie'], $derniere_date, $localite_filtre)
+            : [];
+
         // Envoi à la vue
         $this->view('admin/programmation_voyage', [
             'listehoraire' => $listehoraire,
             'cars_destinations' => $cars_destinations,
-            'cars_en_transit' => $cars_en_transit
+            'cars_en_transit' => $cars_en_transit,
+            'programmation_veille' => $programmation_veille,
+            'derniere_date' => $derniere_date
         ]);
     }
 

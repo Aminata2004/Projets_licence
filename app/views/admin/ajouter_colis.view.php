@@ -124,12 +124,6 @@
                                                             <div id="erreur_exp" class="text-danger small mt-1"></div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-12 col-lg-6">
-                                                        <div class="form-group">
-                                                            <label for="email_exp" class="form-label">Email expéditeur</label>
-                                                            <input type="email" class="form-control" id="email_exp" name="email_exp" placeholder="Email expéditeur" required>
-                                                        </div>
-                                                    </div>
                                                     <div class="col-12">
                                                         <div class="d-flex align-items-center gap-3">
                                                             <button type="button" class="btn btn-primary px-4" onclick="validateStep1()">Next<i class='bx bx-right-arrow-alt ms-2'></i></button>
@@ -155,12 +149,6 @@
                                                             <input type="text" class="form-control" id="numero_dest" name="numero_dest"
                                                                 placeholder="Numéro destinataire" required oninput="verifierNumero(this, 'erreur_dest')">
                                                             <div id="erreur_dest" class="text-danger small mt-1"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-12 col-lg-6">
-                                                        <div class="form-group">
-                                                            <label for="email_dest" class="form-label">Email destinataire</label>
-                                                            <input type="email" class="form-control" id="email_dest" name="email_dest" placeholder="Email destinataire" required>
                                                         </div>
                                                     </div>
                                                     <div class="col-12">
@@ -270,7 +258,7 @@
         }
     </style>
     <!-- Scripts de validation -->
-    <script src="<?= BASE_URL ?>/assets/js/scrip_validations.js"></script>
+    <script src="<?= BASE_URL ?>/assets/js/scrip_validations.js?v=<?= @filemtime(ROOT . '/public/assets/js/scrip_validations.js') ?: time() ?>"></script>
     <script>
 
     </script>

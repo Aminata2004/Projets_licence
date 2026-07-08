@@ -79,7 +79,6 @@
         function validateStep1() {
             const expediteur = document.getElementById("expediteur");
             const numeroExp = document.getElementById("numero_exp");
-            const emailExp = document.getElementById("email_exp");
 
             let isValid = true;
 
@@ -93,18 +92,12 @@
                 isValid = false;
             } else clearError(numeroExp);
 
-            if (!emailExp.checkValidity()) {
-                showError(emailExp, "Email invalide");
-                isValid = false;
-            } else clearError(emailExp);
-
             if (isValid) stepper1.next();
         }
 
         function validateStep2() {
             const destinataire = document.getElementById("destinataire");
             const numeroDest = document.getElementById("numero_dest");
-            const emailDest = document.getElementById("email_dest");
 
             let isValid = true;
 
@@ -117,11 +110,6 @@
                 showError(numeroDest, "Numéro invalide");
                 isValid = false;
             } else clearError(numeroDest);
-
-            if (!emailDest.checkValidity()) {
-                showError(emailDest, "Email invalide");
-                isValid = false;
-            } else clearError(emailDest);
 
             if (isValid) stepper1.next();
         }

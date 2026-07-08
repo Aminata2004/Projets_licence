@@ -81,8 +81,6 @@
                                                         <label class="form-label">Téléphone</label>
                                                         <input class="form-control" value="<?= $colis['numero_exp'] ?>" readonly>
                                                     </div>
-                                                    <label class="form-label">Email</label>
-                                                    <input class="form-control" value="<?= $colis['email_exp'] ?>" readonly>
                                                 </div>
                                             </div>
                                         </div>
@@ -100,8 +98,6 @@
                                                         <label class="form-label">Téléphone</label>
                                                         <input class="form-control" value="<?= $colis['numero_dest'] ?>" readonly>
                                                     </div>
-                                                    <label class="form-label">Email</label>
-                                                    <input class="form-control" value="<?= $colis['email_dest'] ?>" readonly>
                                                 </div>
                                             </div>
                                         </div>

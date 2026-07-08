@@ -49,8 +49,9 @@
           $params = [];
 
           if ($_SESSION['droit'] === 'chef_d_escale' || $_SESSION['droit'] === 'Utilisateur') {
-            // Filtrer par ville et numéro de gare
-            $sql .= " AND departId = :ville AND num_gare = :numero_gare";
+            // Filtrer par compagnie, puis par ville et numéro de gare
+            $sql .= " AND id_compagnie = :id_compagnie AND departId = :ville AND num_gare = :numero_gare";
+            $params[':id_compagnie'] = $_SESSION['id_compagnie'];
             $params[':ville'] = $_SESSION['ville'];
             $params[':numero_gare'] = $_SESSION['numero_gare'];
           } elseif ($_SESSION['droit'] === 'Admin') {
@@ -72,7 +73,9 @@
             <li class="nav-item dropdown dropdown-large d-none d-sm-block">
               <a class="nav-link" href="#" data-bs-toggle="dropdown">
                 <div class="notifications">
-                  <span class="notify-badge"><?= $notifCount; ?></span>
+                  <?php if ($notifCount > 0): ?>
+                    <span class="notify-badge"><?= $notifCount; ?></span>
+                  <?php endif; ?>
                   <i class="bx bxs-bell"></i>
                 </div>
               </a>
@@ -89,6 +92,9 @@
                         <div class="ms-3 flex-grow-1">
                           <h6 class="mb-0 dropdown-msg-user">Billet en attente</h6>
                           <small class="mb-0 dropdown-msg-text text-secondary">
+                            <?php if ($_SESSION['droit'] === 'Admin'): ?>
+                              <span class="badge bg-secondary me-1"><?= htmlspecialchars($billet['departId']); ?></span>
+                            <?php endif; ?>
                             <?= htmlspecialchars($billet['destinationId']); ?> - <?= htmlspecialchars($billet['Heur_departs']); ?>
                           </small>
                         </div>

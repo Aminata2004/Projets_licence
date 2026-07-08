@@ -197,6 +197,16 @@
                                         </select>
                                     </div>
 
+                                    <!-- Champ Service (uniquement pour un simple Utilisateur) -->
+                                    <div class="col-md-6" id="serviceField" style="display: none;">
+                                        <label for="serviceSelect" class="form-label fw-semibold">Service</label>
+                                        <select class="form-select" id="serviceSelect" name="profile">
+                                            <option value="" disabled selected>Choisissez un service</option>
+                                            <option value="billet">Billetterie</option>
+                                            <option value="colis">Colis / Courrier</option>
+                                        </select>
+                                    </div>
+
                                     <!-- Champ Compagnie -->
                                     <div class="col-md-12" id="compagnieField" style="display: none;">
                                         <label for="compagnieSelect" class="form-label fw-semibold">Compagnie</label>
@@ -245,6 +255,8 @@
             const droit = this.value;
             const compagnieField = document.getElementById('compagnieField');
             const gareField = document.getElementById('gareField');
+            const serviceField = document.getElementById('serviceField');
+            const serviceSelect = document.getElementById('serviceSelect');
 
             if (droit === 'Admin') {
                 compagnieField.style.display = 'block';
@@ -252,6 +264,15 @@
             } else {
                 compagnieField.style.display = 'none';
                 gareField.style.display = 'block';
+            }
+
+            if (droit === 'Utilisateur') {
+                serviceField.style.display = 'block';
+                serviceSelect.setAttribute('required', 'required');
+            } else {
+                serviceField.style.display = 'none';
+                serviceSelect.removeAttribute('required');
+                serviceSelect.value = '';
             }
         });
     </script>

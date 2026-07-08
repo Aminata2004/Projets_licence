@@ -152,6 +152,16 @@ public function saveCaisse()
         }
     }
 
+    // Le montant initial ne peut pas être négatif
+    if (!is_numeric($montant_initial) || (float)$montant_initial < 0) {
+        $this->set_flash("Le montant initial doit être un nombre positif.", "danger");
+        return false;
+    }
+
+    // Référence générée côté serveur (le champ du formulaire n'est qu'un aperçu) pour
+    // garantir l'unicité même si deux caisses sont ouvertes le même jour.
+    $reference_caise = 'RF' . date('md') . '-' . $id_agence . '-' . random_int(100, 999);
+
     // ⚡ Vérifier si une caisse active existe déjà pour cette agence
     $sql = "SELECT COUNT(*) as total 
             FROM caisse 
@@ -185,19 +195,11 @@ public function saveCaisse()
     );
 
     if ($insertion == true) {
-        $this->set_swal(
-            "Caisse ouverte !", 
-            "La caisse a été ajoutée avec succès.", 
-            "success", 
-            "#16a34a"
-        );
+        $this->set_flash("Caisse ouverte avec succès.", "success");
+        return true;
     } else {
-        $this->set_swal(
-            "Erreur", 
-            "Erreur lors de l’ajout de la caisse.", 
-            "error", 
-            "#dc3545"
-        );
+        $this->set_flash("Erreur lors de l'ajout de la caisse.", "danger");
+        return false;
     }
 }
 

@@ -43,7 +43,6 @@
     <table>
         <tr><td>Nom :</td><td><?= htmlspecialchars($colis['expediteur']) ?></td></tr>
         <tr><td>Téléphone :</td><td><?= htmlspecialchars($colis['numero_exp']) ?></td></tr>
-        <tr><td>Email :</td><td><?= htmlspecialchars($colis['email_exp']) ?></td></tr>
     </table>
 </div>
 
@@ -52,7 +51,6 @@
     <table>
         <tr><td>Nom :</td><td><?= htmlspecialchars($colis['destinataire']) ?></td></tr>
         <tr><td>Téléphone :</td><td><?= htmlspecialchars($colis['numero_dest']) ?></td></tr>
-        <tr><td>Email :</td><td><?= htmlspecialchars($colis['email_dest']) ?></td></tr>
     </table>
 </div>
 

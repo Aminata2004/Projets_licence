@@ -17,15 +17,16 @@ class Caisse extends Controller
             $id = (int)$_POST['id_caisse'];
             $status_caisse = (int)$_POST['newStatut'];
 
-            // 🔒 Un chef d'escale ne peut clôturer qu'une caisse de sa propre agence,
-            // même si la requête est trafiquée pour cibler l'id_caisse d'une autre ville.
+            // 🔒 Un chef d'escale ne peut clôturer que la caisse de sa propre gare précise
+            // (idAgence), pas seulement de sa ville — une ville peut avoir plusieurs gares,
+            // et un chef d'escale de Segou (gare 1) ne gère pas les autres gares de Segou.
             $autorise = true;
             if (($_SESSION['droit'] ?? null) === 'chef_d_escale') {
                 $caisseCible = $liste_gare->FetchSelectWhere(
                     "c.id_caisse",
                     "caisse c INNER JOIN agence a ON c.id_agence = a.idAgence",
-                    "c.id_caisse = :id_caisse AND a.id_compagnie = :id_compagnie AND a.localite = :ville",
-                    [":id_caisse" => $id, ":id_compagnie" => $id_compagnie, ":ville" => $_SESSION['ville']]
+                    "c.id_caisse = :id_caisse AND a.id_compagnie = :id_compagnie AND a.idAgence = :id_agence",
+                    [":id_caisse" => $id, ":id_compagnie" => $id_compagnie, ":id_agence" => $_SESSION['id_agence']]
                 );
                 $autorise = (bool) $caisseCible;
             }
@@ -62,12 +63,13 @@ class Caisse extends Controller
         $id_compagnie = $_SESSION['id_compagnie'];
 
         if (($_SESSION['droit'] ?? null) === 'chef_d_escale') {
-            // Un chef d'escale ne doit voir/choisir que sa propre agence, pas celles des autres
+            // Un chef d'escale ne doit voir/choisir que sa propre gare précise (idAgence),
+            // pas toutes les gares de sa ville
             $listes = $liste_gare->FetchSelectWheres(
                 '*',
                 'agence',
-                'id_compagnie = :id_compagnie AND localite = :ville',
-                ['id_compagnie' => $id_compagnie, 'ville' => $_SESSION['ville']]
+                'id_compagnie = :id_compagnie AND idAgence = :id_agence',
+                ['id_compagnie' => $id_compagnie, 'id_agence' => $_SESSION['id_agence']]
             );
         } else {
             $listes = $liste_gare->FetchSelectWheres(
@@ -89,7 +91,9 @@ class Caisse extends Controller
 
     
 
-    public function getSommeBillets($pdo, $compagnieId, $ville, $periode = 'jour')
+    // $numeroGare : quand fourni, restreint la somme à cette gare précise (une ville peut
+    // avoir plusieurs gares) ; sinon, agrège sur toute la ville (vue Admin).
+    public function getSommeBillets($pdo, $compagnieId, $ville, $periode = 'jour', $numeroGare = null)
     {
         $sql = "
     SELECT SUM(CAST(REGEXP_REPLACE(c.montant_payer, '[[:space:]]|FCFA', '') AS UNSIGNED)) as total
@@ -100,6 +104,15 @@ class Caisse extends Controller
       AND b.departId = :ville
 ";
 
+        $params = [
+            'compagnie' => $compagnieId,
+            'ville'     => $ville
+        ];
+
+        if ($numeroGare !== null) {
+            $sql .= " AND b.num_gare = :numero_gare";
+            $params['numero_gare'] = $numeroGare;
+        }
 
         if ($periode === 'jour') {
             $sql .= " AND b.date_reservation = CURDATE()";
@@ -109,16 +122,13 @@ class Caisse extends Controller
         }
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'compagnie' => $compagnieId,
-            'ville'     => $ville
-        ]);
+        $stmt->execute($params);
 
         return $stmt->fetchColumn() ?: 0;
     }
 
 
-   public function getSommeColis($pdo, $compagnieId, $ville, $periode = 'jour')
+   public function getSommeColis($pdo, $compagnieId, $ville, $periode = 'jour', $numeroGare = null)
 {
     $sql = "
         SELECT SUM(fraix_transaction) as total
@@ -126,6 +136,16 @@ class Caisse extends Controller
         WHERE id_compagnie = :compagnie
           AND provient_de = :ville
     ";
+
+    $params = [
+        'compagnie' => $compagnieId,
+        'ville'     => $ville
+    ];
+
+    if ($numeroGare !== null) {
+        $sql .= " AND num_gare = :numero_gare";
+        $params['numero_gare'] = $numeroGare;
+    }
 
     if ($periode === 'jour') {
         $sql .= " AND date_enregistrement = CURDATE()";
@@ -135,10 +155,7 @@ class Caisse extends Controller
     }
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        'compagnie' => $compagnieId,
-        'ville'     => $ville
-    ]);
+    $stmt->execute($params);
 
     return $stmt->fetchColumn() ?: 0;
 }
@@ -157,10 +174,11 @@ class Caisse extends Controller
         $condition = 'a.id_compagnie = :id_compagnie';
         $params    = ['id_compagnie' => $id_compagnie];
 
-        // Si c’est un Admin régional → filtre par localité
+        // Un chef d'escale ne gère que sa gare précise (idAgence), pas toutes les gares
+        // de sa ville — une ville peut avoir plusieurs gares distinctes.
         if ($role === 'chef_d_escale') {
-            $condition .= ' AND a.localite = :ville';
-            $params['ville'] = $ville;
+            $condition .= ' AND a.idAgence = :id_agence';
+            $params['id_agence'] = $_SESSION['id_agence'];
         }
 
         // Récupère toutes les caisses
@@ -170,15 +188,15 @@ class Caisse extends Controller
             $condition,
             $params
         );
-        // Debug: vérifier les données récupérées  
+        // Debug: vérifier les données récupérées
 
         // 🔥 Pour chaque caisse → calcul des montants
         $pdo = $liste_gare->connect();
 
         foreach ($liste_caisse as &$caisse) {
 
-            $caisse->total_jour = $this->getSommeBillets($pdo, $id_compagnie, $caisse->localite, 'jour');
-            $caisse->total_mois = $this->getSommeBillets($pdo, $id_compagnie, $caisse->localite, 'mois');
+            $caisse->total_jour = $this->getSommeBillets($pdo, $id_compagnie, $caisse->localite, 'jour', $caisse->numeroGare);
+            $caisse->total_mois = $this->getSommeBillets($pdo, $id_compagnie, $caisse->localite, 'mois', $caisse->numeroGare);
         }
 
 
@@ -197,10 +215,11 @@ class Caisse extends Controller
         $condition = 'a.id_compagnie = :id_compagnie';
         $params    = ['id_compagnie' => $id_compagnie];
 
-        // Si c’est un Admin régional → filtre par localité
+        // Un chef d'escale ne gère que sa gare précise (idAgence), pas toutes les gares
+        // de sa ville — une ville peut avoir plusieurs gares distinctes.
         if ($role === 'chef_d_escale') {
-            $condition .= ' AND a.localite = :ville';
-            $params['ville'] = $ville;
+            $condition .= ' AND a.idAgence = :id_agence';
+            $params['id_agence'] = $_SESSION['id_agence'];
         }
 
         // Récupère toutes les caisses
@@ -210,15 +229,15 @@ class Caisse extends Controller
             $condition,
             $params
         );
-        // Debug: vérifier les données récupérées  
+        // Debug: vérifier les données récupérées
 
         // 🔥 Pour chaque caisse → calcul des montants
         $pdo = $liste_gare->connect();
 
         foreach ($liste_caisse as &$caisse) {
 
-            $caisse->total_jour = $this->getSommeColis($pdo, $id_compagnie, $caisse->localite, 'jour');
-            $caisse->total_mois = $this->getSommeColis($pdo, $id_compagnie, $caisse->localite, 'mois');
+            $caisse->total_jour = $this->getSommeColis($pdo, $id_compagnie, $caisse->localite, 'jour', $caisse->numeroGare);
+            $caisse->total_mois = $this->getSommeColis($pdo, $id_compagnie, $caisse->localite, 'mois', $caisse->numeroGare);
         }
 
 

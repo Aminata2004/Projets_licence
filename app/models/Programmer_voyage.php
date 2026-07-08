@@ -8,6 +8,12 @@
             extract($_POST);
             $id_compagnie = $_SESSION["id_compagnie"];
 
+            // Le chef d'escale ne peut créer un programme qu'au départ de sa propre gare
+            // (protection côté serveur en plus du filtrage du menu déroulant).
+            if (($_SESSION['droit'] ?? null) === 'chef_d_escale' && (string)$idDepart !== (string)($_SESSION['id_agence'] ?? '')) {
+                $errors[] = "Vous ne pouvez créer un programme qu'au départ de votre propre gare.";
+            }
+
             // Vérification de cohérence départ/destination
             if ($idDepart == $idDestination) {
                 $errors[] = "Impossible d'enregistrer ce trajet : départ et destination identiques.";

@@ -242,23 +242,69 @@ class Reservation_formulaire extends Controller
 
                 // --- 5️⃣ Affichage SweetAlert directement sur la page ---
 
-                // Lien public vers la fiche PDF du billet + message WhatsApp de rappel de paiement.
+                // Lien public vers la fiche PDF du billet + email de rappel de paiement.
                 $lienPdf = BASE_URL . "/site/Reservation_formulaire/billet_pdf/" . rawurlencode($numeroBillets);
-                $msgWhatsapp = "Bonjour $nomClient, votre réservation ($numeroBillets) pour "
-                    . $destinationAEnregistrer . " le " . date('d/m/Y', strtotime($jourVoyage)) . " à $heureDepart est enregistrée.\n"
-                    . "Votre billet : $lienPdf\n"
-                    . "Merci de payer via Orange Money dans les 30 minutes, sinon la réservation sera automatiquement annulée.";
-                $lienWhatsapp = whatsapp_link($telephone, $msgWhatsapp);
+
+                $emailEnvoye = null;
+                if (!empty($emailClient)) {
+                    try {
+                        $compagnie = $programmeModel->fetchOne(
+                            "SELECT nom_compagnie FROM compagnie WHERE id_compagnie = :id",
+                            [':id' => $idCompagnie]
+                        ) ?: [];
+
+                        $mail = new PHPMailer(true);
+                        $mail->isSMTP();
+                        $mail->Host       = MAIL_HOST;
+                        $mail->SMTPAuth   = true;
+                        $mail->Username   = MAIL_USERNAME;
+                        $mail->Password   = MAIL_PASSWORD;
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                        $mail->Port       = MAIL_PORT;
+
+                        $nomCompagnie = $compagnie['nom_compagnie'] ?? 'Billetterie';
+
+                        $mail->setFrom(MAIL_USERNAME, $nomCompagnie);
+                        $mail->addAddress($emailClient);
+                        $mail->isHTML(true);
+                        $mail->Subject = "🎟️ Réservation enregistrée - $numeroBillets";
+                        $mail->Body    = '
+                            <div style="font-family:Segoe UI,Arial,sans-serif;max-width:480px;margin:auto;">
+                                <div style="background:#0f3b5e;color:#fff;padding:16px 20px;border-radius:10px 10px 0 0;text-align:center;">
+                                    <h2 style="margin:0;font-size:18px;">' . htmlspecialchars($nomCompagnie) . '</h2>
+                                </div>
+                                <div style="border:1px solid #e5e7eb;border-top:none;border-radius:0 0 10px 10px;padding:20px;">
+                                    <p style="font-size:16px;margin:0 0 14px;">Bonjour <strong>' . htmlspecialchars($nomClient) . '</strong>, votre réservation est enregistrée ✅</p>
+                                    <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:16px;">
+                                        <tr><td style="padding:6px 0;color:#6b7280;">N° billet</td><td style="padding:6px 0;font-weight:bold;text-align:right;">' . htmlspecialchars($numeroBillets) . '</td></tr>
+                                        <tr><td style="padding:6px 0;color:#6b7280;">Destination</td><td style="padding:6px 0;font-weight:bold;text-align:right;">' . htmlspecialchars($destinationAEnregistrer) . '</td></tr>
+                                        <tr><td style="padding:6px 0;color:#6b7280;">Date</td><td style="padding:6px 0;font-weight:bold;text-align:right;">' . date('d/m/Y', strtotime($jourVoyage)) . '</td></tr>
+                                        <tr><td style="padding:6px 0;color:#6b7280;">Heure</td><td style="padding:6px 0;font-weight:bold;text-align:right;">' . htmlspecialchars($heureDepart) . '</td></tr>
+                                    </table>
+                                    <div style="background:#fff7ed;border-left:4px solid #f59e0b;padding:12px 14px;border-radius:6px;font-size:14px;color:#92400e;">
+                                        ⏱️ <strong>Paiement Orange Money sous 30 minutes</strong><br>Sinon la réservation sera automatiquement annulée.
+                                    </div>
+                                </div>
+                            </div>
+                        ';
+                        $mail->send();
+
+                        $emailEnvoye = true;
+                    } catch (Exception $e) {
+                        $emailEnvoye = false;
+                    }
+                }
 
                 $htmlConfirmation = '<b>Votre réservation a été enregistrée.</b><br><br>';
-                if ($lienWhatsapp) {
-                    $htmlConfirmation .= '<a href="' . htmlspecialchars($lienWhatsapp) . '" target="_blank" rel="noopener" '
-                        . 'style="display:inline-block;background:#25D366;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:bold;">'
-                        . '📲 Recevoir mon billet sur WhatsApp</a><br><br>'
-                        . '<small>Vous devez payer via Orange Money dans les 30 minutes, sinon la réservation sera annulée automatiquement.</small>';
+                if ($emailEnvoye === true) {
+                    $htmlConfirmation .= '<small>📧 Un email de confirmation vous a été envoyé. '
+                        . 'Merci de payer via Orange Money dans les 30 minutes, sinon la réservation sera automatiquement annulée.</small>';
+                } elseif ($emailEnvoye === false) {
+                    $htmlConfirmation .= '<small>⚠️ Impossible d\'envoyer l\'email de confirmation. '
+                        . 'Merci de payer via Orange Money dans les 30 minutes, sinon la réservation sera automatiquement annulée.</small>';
                 } else {
-                    $htmlConfirmation .= '<small>Numéro invalide : impossible de générer le lien WhatsApp. '
-                        . 'Merci de payer via Orange Money dans les 30 minutes, sinon la réservation sera annulée automatiquement.</small>';
+                    $htmlConfirmation .= '<small>Aucune adresse email fournie. '
+                        . 'Merci de payer via Orange Money dans les 30 minutes, sinon la réservation sera automatiquement annulée.</small>';
                 }
 
                 echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>';
