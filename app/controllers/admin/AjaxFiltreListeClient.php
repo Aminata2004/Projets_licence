@@ -7,6 +7,7 @@
                 $heure = $_POST['selectheure'] ?? '';
                 $destination = $_POST['id_destination'] ?? '';
                 $id_compagnie = $_SESSION['id_compagnie'];
+                $idDepart = $_SESSION['ville'];
                 date_default_timezone_set('Africa/Bamako');
                 $aujourd = date('Y-m-d');
 
@@ -16,9 +17,10 @@
                     $resultats = $model->FetchSelectWheres(
                         '*',
                         'billets INNER JOIN client ON billets.id_client = client.idClient',
-                        'billets.id_compagnie = :id_compagnie AND billets.destinationId = :destination AND billets.Heur_departs = :heure AND billets.jourVoyage = :jour',
+                        'billets.id_compagnie = :id_compagnie AND billets.departId = :depart AND billets.destinationId = :destination AND billets.Heur_departs = :heure AND billets.jourVoyage = :jour',
                         [
                             'id_compagnie' => $id_compagnie,
+                            'depart' => $idDepart,
                             'destination' => $destination,
                             'heure' => $heure,
                             'jour' => $aujourd // ici, la clé doit correspondre au token SQL
@@ -30,13 +32,13 @@
                         $jourVoyageIso = date('Y-m-d', strtotime($item->jourVoyage));
                         $dateExpirationIso = date('Y-m-d', strtotime($item->date_expiration));
                         echo '<tr class="text-center">';
-                        echo '<td>' . htmlspecialchars($item->Client) . '</td>';
-                        echo '<td>' . htmlspecialchars($item->destinationId) . '</td>';
-                        echo '<td>Chaisse N°' . htmlspecialchars($item->numeroPlace) . '</td>';
-                        echo '<td>' . htmlspecialchars($item->Heur_departs) . '</td>';
-                        echo '<td>' . htmlspecialchars($item->jourVoyage) . '</td>';
-                        echo '<td>' . htmlspecialchars($item->date_expiration) . '</td>';
-                        echo '<td>
+                        echo '<td data-label="Client">' . htmlspecialchars($item->Client) . '</td>';
+                        echo '<td data-label="Destination">' . htmlspecialchars($item->destinationId) . '</td>';
+                        echo '<td data-label="N° de place">Chaisse N°' . htmlspecialchars($item->numeroPlace) . '</td>';
+                        echo '<td data-label="Heure de départ">' . htmlspecialchars($item->Heur_departs) . '</td>';
+                        echo '<td data-label="Jour de voyage">' . htmlspecialchars($item->jourVoyage) . '</td>';
+                        echo '<td data-label="Date d\'expiration">' . htmlspecialchars($item->date_expiration) . '</td>';
+                        echo '<td data-label="Action">
                             <div class="dropup">
                                 <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">&#8943;</a>
                                 <div class="dropdown-menu dropdown-menu-end">

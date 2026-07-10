@@ -234,6 +234,11 @@
             height: 100%;
             object-fit: cover;
             z-index: 0;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+        }
+        .hero-bg.active {
+            opacity: 1;
         }
         .hero-overlay {
             position: absolute;
@@ -249,11 +254,13 @@
             z-index: 2;
         }
         .hero-inner {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
+            display: flex;
+            justify-content: center;
             min-height: 550px;
+        }
+        .hero-inner > div {
+            max-width: 720px;
+            text-align: center;
         }
         .hero-badge {
             display: inline-block;
@@ -273,14 +280,16 @@
             color: var(--secondary);
         }
         .hero p {
-            font-size: 1rem;
+            font-size: 1.05rem;
             opacity: 0.95;
-            margin-bottom: 32px;
+            margin: 0 auto 32px;
             line-height: 1.6;
             text-shadow: 0 1px 5px rgba(0,0,0,0.2);
+            max-width: 560px;
         }
         .hero-stats {
             display: flex;
+            justify-content: center;
             gap: 40px;
             margin-top: 40px;
         }
@@ -292,14 +301,6 @@
             font-size: 0.75rem;
             opacity: 0.8;
             margin: 0;
-        }
-        .hero-image {
-            text-align: center;
-        }
-        .hero-image img {
-            max-width: 100%;
-            background: transparent;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
         }
 
         /* ========== SEARCH CARD ========== */
@@ -316,7 +317,7 @@
         }
         .search-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 20px;
             align-items: end;
         }
@@ -336,6 +337,16 @@
             border-radius: var(--radius);
             font-size: 0.9rem;
             transition: all 0.3s;
+        }
+        .form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%237f8c8d'><path d='M5.5 7.5l4.5 5 4.5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 14px;
+            padding-right: 40px;
+            cursor: pointer;
         }
         .form-control:focus, .form-select:focus {
             outline: none;
@@ -359,8 +370,9 @@
 
         /* ========== COMPANY GRID ========== */
         .company-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 24px;
         }
         .company-card {
@@ -370,6 +382,8 @@
             text-align: center;
             transition: all 0.3s;
             box-shadow: var(--shadow);
+            flex: 1 1 250px;
+            max-width: 270px;
         }
         .company-card:hover {
             transform: translateY(-5px);
@@ -390,15 +404,6 @@
         .company-card h4 {
             font-size: 1.1rem;
             margin-bottom: 8px;
-        }
-        .company-card .badge {
-            display: inline-block;
-            background: #e8f4fd;
-            color: var(--accent);
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            margin: 12px 0;
         }
         .company-card .trajets {
             font-size: 0.8rem;
@@ -440,6 +445,11 @@
             border-radius: var(--radius-lg);
             padding: 32px;
         }
+        .tracking-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
         .input-group {
             display: flex;
             gap: 12px;
@@ -461,34 +471,164 @@
         .dest-card {
             background: white;
             border-radius: var(--radius-lg);
-            overflow: hidden;
+            border-left: 4px solid var(--primary);
             box-shadow: var(--shadow);
+            padding: 20px 22px;
             transition: all 0.3s;
         }
         .dest-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-4px);
             box-shadow: var(--shadow-md);
+            border-left-color: var(--secondary);
         }
-        .dest-card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
+        .dest-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
         }
-        .dest-info {
-            padding: 16px;
+        .dest-route-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--gray-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
         }
         .dest-info h4 {
-            font-size: 1rem;
-            margin-bottom: 4px;
+            font-size: 1.05rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--dark);
+        }
+        .dest-info h4 i {
+            color: var(--gray);
+            font-size: 0.8rem;
         }
         .dest-info p {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+        }
+        .dest-heures-label {
+            margin-bottom: 8px !important;
+        }
+        .dest-heures {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .heure-badge {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: var(--gray-light);
+            padding: 4px 10px;
+            border-radius: 20px;
         }
         .dest-price {
             font-weight: 700;
-            color: var(--secondary);
-            margin-top: 8px;
+            font-size: 0.8rem;
+            color: white;
+            background: var(--secondary);
+            padding: 5px 14px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        /* ========== TABS COMPAGNIES (Destinations populaires) ========== */
+        .dest-tabs-wrapper {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+        .dest-tab-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 0 0 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .dest-tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            text-align: left;
+            background: white;
+            border: 1px solid #e2e6ea;
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dest-tab-btn:hover {
+            border-color: var(--primary-light);
+        }
+        .dest-tab-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        .dest-tab-btn img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            border-radius: 4px;
+            background: white;
+        }
+        .dest-tab-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .dest-tab-panel {
+            display: none;
+        }
+        .dest-tab-panel.active {
+            display: block;
+        }
+        .dest-tab-empty {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+        .dest-panel-empty {
+            text-align: center;
+            padding: 48px 20px;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            color: var(--gray);
+        }
+        .dest-panel-empty i {
+            font-size: 2rem;
+            color: var(--gray-light);
+            margin-bottom: 12px;
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .dest-tabs-wrapper {
+                flex-direction: column;
+            }
+            .dest-tab-list {
+                flex-direction: row;
+                flex-wrap: wrap;
+                flex: 1 1 auto;
+                width: 100%;
+            }
         }
 
         /* ========== STATS BAR ========== */
@@ -548,17 +688,10 @@
 
         /* ========== RESPONSIVE ========== */
         @media (max-width: 992px) {
-            .hero-inner {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            .hero-stats {
-                justify-content: center;
-            }
             .search-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
             }
-            .company-grid, .dest-grid, .stats-grid, .footer-grid {
+            .dest-grid, .stats-grid, .footer-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
             .tracking-grid {
@@ -573,8 +706,12 @@
             .search-grid {
                 grid-template-columns: 1fr;
             }
-            .company-grid, .dest-grid, .stats-grid {
+            .dest-grid, .stats-grid {
                 grid-template-columns: 1fr;
+            }
+            .company-card {
+                flex: 1 1 100%;
+                max-width: 320px;
             }
             .hero h1 {
                 font-size: 2rem;
@@ -642,31 +779,32 @@
 
 <!-- HERO avec IMAGE EN ARRIÈRE-PLAN -->
 <section class="hero">
-    <img src="<?= BASE_URL ?>/assets_site/img/hero-bg.jpg" alt="Bus dans la gare routière" class="hero-bg">
+    <?php if (!empty($heroSlides)): ?>
+        <?php foreach ($heroSlides as $i => $slide): ?>
+            <img src="<?= htmlspecialchars($slide) ?>" alt="TransGest" class="hero-bg<?= $i === 0 ? ' active' : '' ?>">
+        <?php endforeach; ?>
+    <?php endif; ?>
     <div class="hero-overlay"></div>
     <div class="container">
         <div class="hero-inner">
-            <div data-aos="fade-right">
+            <div data-aos="fade-up">
                 <div class="hero-badge">✓ Transport agréé</div>
                 <h1>Trans<span>Gest</span><br>Réservation & suivi de colis</h1>
                 <p>La plateforme qui simplifie vos déplacements et l'envoi de vos colis au Mali. Comparez les compagnies, réservez en ligne et suivez vos colis en temps réel.</p>
                 <div class="hero-stats">
                     <div class="hero-stat">
-                        <h3>50+</h3>
+                        <h3><?= $heroStats['destinations'] ?></h3>
                         <p>Destinations</p>
                     </div>
                     <div class="hero-stat">
-                        <h3>15</h3>
+                        <h3><?= $heroStats['compagnies'] ?></h3>
                         <p>Compagnies</p>
                     </div>
                     <div class="hero-stat">
-                        <h3>10K+</h3>
+                        <h3><?= $heroStats['clients'] ?></h3>
                         <p>Clients</p>
                     </div>
                 </div>
-            </div>
-            <div class="hero-image" data-aos="fade-left">
-                <img src="<?= BASE_URL ?>/assets_site/img/bus-icon.png" alt="Bus">
             </div>
         </div>
     </div>
@@ -678,25 +816,30 @@
         <div class="search-card" data-aos="fade-up">
             <form action="<?= BASE_URL ?>/site/Recherche" method="GET" class="search-grid">
                 <div class="form-group">
-                    <label><i class="fas fa-map-marker-alt"></i> Départ</label>
+                    <label>Départ</label>
                     <select name="depart" class="form-select" required>
-                        <option value="">📍 Choisissez la ville</option>
-                        <option value="bamako">Bamako</option>
-                        <option value="segou">Ségou</option>
-                        <option value="mopti">Mopti</option>
-                        <option value="kayes">Kayes</option>
-                        <option value="sikasso">Sikasso</option>
+                        <option value="">Choisissez la ville</option>
+                        <?php if (!empty($villes)): foreach ($villes as $ville): ?>
+                            <option value="<?= htmlspecialchars($ville) ?>"><?= htmlspecialchars($ville) ?></option>
+                        <?php endforeach; endif; ?>
                     </select>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-flag-checkered"></i> Destination</label>
                     <select name="destination" class="form-select" required>
-                        <option value="">🏁 Choisissez la destination</option>
-                        <option value="bamako">Bamako</option>
-                        <option value="segou">Ségou</option>
-                        <option value="mopti">Mopti</option>
-                        <option value="kayes">Kayes</option>
-                        <option value="sikasso">Sikasso</option>
+                        <option value="">Choisissez la destination</option>
+                        <?php if (!empty($villes)): foreach ($villes as $ville): ?>
+                            <option value="<?= htmlspecialchars($ville) ?>"><?= htmlspecialchars($ville) ?></option>
+                        <?php endforeach; endif; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-building"></i> Compagnie</label>
+                    <select name="compagnie" class="form-select">
+                        <option value="">Toutes les compagnies</option>
+                        <?php if (!empty($listecompagnie)): foreach ($listecompagnie as $c): ?>
+                            <option value="<?= $c->id_compagnie ?>"><?= htmlspecialchars($c->nom_compagnie) ?></option>
+                        <?php endforeach; endif; ?>
                     </select>
                 </div>
                 <div class="form-group">
@@ -727,9 +870,20 @@
                     </div>
                 </div>
                 <div class="tracking-box">
-                    <form action="<?= BASE_URL ?>/site/Suivis_colis" method="GET" class="input-group">
-                        <input type="text" name="code_colis" placeholder="Ex: BL-2024-001234">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Suivre</button>
+                    <form action="<?= BASE_URL ?>/site/Suivis_colis" method="GET" class="tracking-form">
+                        <div class="form-group">
+                            <label><i class="fas fa-building"></i> Compagnie</label>
+                            <select name="id_compagnie" class="form-select" required>
+                                <option value="">Choisissez la compagnie</option>
+                                <?php if (!empty($listecompagnie)): foreach ($listecompagnie as $c): ?>
+                                    <option value="<?= $c->id_compagnie ?>"><?= htmlspecialchars($c->nom_compagnie) ?></option>
+                                <?php endforeach; endif; ?>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" name="code_colis" placeholder="Ex: BL-2024-001234" required>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Suivre</button>
+                        </div>
                     </form>
                     <p style="font-size: 0.7rem; color: var(--gray); margin-top: 16px;">Exemple: BL-2024-001234, BL-2024-567890</p>
                 </div>
@@ -756,7 +910,6 @@
                     <?php endif; ?>
                 </div>
                 <h4><?= htmlspecialchars($c->nom_compagnie) ?></h4>
-                <div class="badge">⭐ 4.8</div>
                 <div class="trajets"><?= htmlspecialchars($c->slogant ?? 'Voyagez en sécurité') ?></div>
                 <a href="<?= BASE_URL ?>/site/Programmer/show/<?= base64_encode($c->id_compagnie) ?>" class="btn btn-outline btn-block" style="padding: 8px; text-decoration: none;">Voir les trajets</a>
             </div>
@@ -774,42 +927,68 @@
     <div class="container">
         <div class="section-header" data-aos="fade-up">
             <h2>Destinations populaires</h2>
-            <p>Les trajets les plus réservés par nos clients</p>
+            <p>Tous les trajets programmés, par compagnie</p>
         </div>
-        <div class="dest-grid">
-            <div class="dest-card" data-aos="fade-up" data-aos-delay="100">
-                <img src="<?= BASE_URL ?>/assets_site/img/bamako.jpg" alt="Bamako">
-                <div class="dest-info">
-                    <h4>Bamako → Ségou</h4>
-                    <p>Durée: 3h30</p>
-                    <div class="dest-price">3 500 FCFA</div>
+
+        <?php if (!empty($programmesParCompagnie)): ?>
+            <div class="dest-tabs-wrapper" data-aos="fade-up">
+                <ul class="dest-tab-list" role="tablist">
+                    <?php $first = true; foreach ($programmesParCompagnie as $id_compagnie => $programmes): ?>
+                        <?php
+                            $compagnie = null;
+                            foreach ($listecompagnie as $c) {
+                                if ($c->id_compagnie == $id_compagnie) { $compagnie = $c; break; }
+                            }
+                        ?>
+                        <li>
+                            <button type="button" class="dest-tab-btn<?= $first ? ' active' : '' ?>" data-tab-target="dest-tab-<?= $id_compagnie ?>">
+                                <?php if (!empty($compagnie->logo)): ?>
+                                    <img src="<?= BASE_URL ?>/images/logos/<?= htmlspecialchars($compagnie->logo) ?>" alt="">
+                                <?php endif; ?>
+                                <?= htmlspecialchars($compagnie->nom_compagnie ?? 'Compagnie') ?>
+                            </button>
+                        </li>
+                        <?php $first = false; ?>
+                    <?php endforeach; ?>
+                </ul>
+
+                <div class="dest-tab-content">
+                    <?php $first = true; foreach ($programmesParCompagnie as $id_compagnie => $programmes): ?>
+                        <div class="dest-tab-panel<?= $first ? ' active' : '' ?>" id="dest-tab-<?= $id_compagnie ?>">
+                            <?php if (!empty($programmes)): ?>
+                                <div class="dest-grid">
+                                    <?php foreach ($programmes as $i => $p): ?>
+                                        <div class="dest-card" data-aos="fade-up" data-aos-delay="<?= ($i % 4 + 1) * 100 ?>">
+                                            <div class="dest-card-top">
+                                                <span class="dest-route-icon"><i class="fas fa-bus"></i></span>
+                                                <span class="dest-price"><?= number_format((float)$p->prix, 0, ',', ' ') ?> FCFA</span>
+                                            </div>
+                                            <div class="dest-info">
+                                                <h4><?= htmlspecialchars($p->departLocalite) ?> <i class="fas fa-long-arrow-alt-right"></i> <?= htmlspecialchars($p->destinationLocalite) ?></h4>
+                                                <p class="dest-heures-label"><i class="far fa-clock"></i> Départs</p>
+                                                <div class="dest-heures">
+                                                    <?php foreach ($p->heures as $h): ?>
+                                                        <span class="heure-badge"><?= htmlspecialchars(substr($h, 0, 5)) ?></span>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="dest-panel-empty">
+                                    <i class="fas fa-route"></i>
+                                    Aucun trajet disponible pour le moment.
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php $first = false; ?>
+                    <?php endforeach; ?>
                 </div>
             </div>
-            <div class="dest-card" data-aos="fade-up" data-aos-delay="200">
-                <img src="<?= BASE_URL ?>/assets_site/img/mopti.jpg" alt="Mopti">
-                <div class="dest-info">
-                    <h4>Bamako → Mopti</h4>
-                    <p>Durée: 7h</p>
-                    <div class="dest-price">7 500 FCFA</div>
-                </div>
-            </div>
-            <div class="dest-card" data-aos="fade-up" data-aos-delay="300">
-                <img src="<?= BASE_URL ?>/assets_site/img/kayes.jpg" alt="Kayes">
-                <div class="dest-info">
-                    <h4>Bamako → Kayes</h4>
-                    <p>Durée: 12h</p>
-                    <div class="dest-price">12 000 FCFA</div>
-                </div>
-            </div>
-            <div class="dest-card" data-aos="fade-up" data-aos-delay="400">
-                <img src="<?= BASE_URL ?>/assets_site/img/sikasso.jpg" alt="Sikasso">
-                <div class="dest-info">
-                    <h4>Bamako → Sikasso</h4>
-                    <p>Durée: 5h</p>
-                    <div class="dest-price">5 500 FCFA</div>
-                </div>
-            </div>
-        </div>
+        <?php else: ?>
+            <div class="dest-tab-empty">Aucun trajet programmé pour le moment.</div>
+        <?php endif; ?>
     </div>
 </section>
 
@@ -818,15 +997,15 @@
     <div class="container">
         <div class="stats-grid">
             <div data-aos="zoom-in">
-                <h3>50+</h3>
+                <h3><?= $heroStats['destinations'] ?></h3>
                 <p>Destinations</p>
             </div>
             <div data-aos="zoom-in" data-aos-delay="100">
-                <h3>15</h3>
+                <h3><?= $heroStats['compagnies'] ?></h3>
                 <p>Compagnies</p>
             </div>
             <div data-aos="zoom-in" data-aos-delay="200">
-                <h3>200+</h3>
+                <h3><?= $heroStats['trajets'] ?></h3>
                 <p>Trajets quotidiens</p>
             </div>
             <div data-aos="zoom-in" data-aos-delay="300">
@@ -930,6 +1109,28 @@
             closeMenuFunc();
         }
     });
+
+    // Onglets "Destinations populaires" par compagnie
+    document.querySelectorAll('.dest-tab-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.dest-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.dest-tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.getAttribute('data-tab-target')).classList.add('active');
+        });
+    });
+
+    // Slider du hero : fondu enchaîné entre les images de public/assets_site/img/hero-slides/.
+    // Ne fait rien s'il n'y a qu'une seule image (ou aucune).
+    const heroSlides = document.querySelectorAll('.hero-bg');
+    if (heroSlides.length > 1) {
+        let heroIndex = 0;
+        setInterval(function() {
+            heroSlides[heroIndex].classList.remove('active');
+            heroIndex = (heroIndex + 1) % heroSlides.length;
+            heroSlides[heroIndex].classList.add('active');
+        }, 5000);
+    }
 </script>
 </body>
 </html>

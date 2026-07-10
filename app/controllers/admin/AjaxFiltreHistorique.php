@@ -27,13 +27,13 @@
                 ob_start();
                 foreach ($resultats as $item) {
                     echo '<tr class="text-center">';
-                    echo '<td>' . htmlspecialchars($item->Client) . '</td>';
-                    echo '<td>' . htmlspecialchars($item->destinationId) . '</td>';
-                    echo '<td>' . htmlspecialchars($item->nombrePassages) . '</td>';
-                    echo '<td>' . htmlspecialchars($item->Heur_departs) . '</td>';
-                    echo '<td>' . htmlspecialchars($item->jourVoyage) . '</td>';
-                    echo '<td>' . htmlspecialchars($item->date_expiration) . '</td>';
-                   
+                    echo '<td data-label="Client">' . htmlspecialchars($item->Client) . '</td>';
+                    echo '<td data-label="Destination">' . htmlspecialchars($item->destinationId) . '</td>';
+                    echo '<td data-label="Nbr de passage">' . htmlspecialchars($item->nombrePassages) . '</td>';
+                    echo '<td data-label="Jour de voyage">' . htmlspecialchars($item->jourVoyage) . '</td>';
+                    echo '<td data-label="Heure de départ">' . htmlspecialchars($item->Heur_departs) . '</td>';
+                    echo '<td data-label="Date expiration">' . htmlspecialchars($item->date_expiration) . '</td>';
+
                     echo '</tr>';
                 }
                 $tbody = ob_get_clean();

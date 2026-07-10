@@ -184,8 +184,11 @@
                                             ?>
                                         </td>
                                         <td>
-                                            <form action="" method="post" class="d-inline">
+                                            <form action="" method="post" class="d-inline form-valider-arrivee"
+                                                data-depart-datetime="<?= htmlspecialchars($car->depart_datetime ?? '') ?>"
+                                                data-id-programmation="<?= htmlspecialchars($car->id_programmation ?? '') ?>">
                                                 <input type="hidden" name="id_car_arrivee" value="<?= $car->id_car ?>">
+                                                <input type="hidden" name="force_arrivee" value="0" class="champ-force-arrivee">
                                                 <button type="submit" name="valider_arrivee" class="btn btn-sm btn-success shadow-sm rounded-pill px-3">
                                                     <i class="bx bx-check-double me-1"></i> Valider l'arrivée
                                                 </button>
@@ -294,6 +297,41 @@
                 }
             });
         <?php endif; ?>
+
+        // Règle des 3h avant de pouvoir valider l'arrivée d'un car : si le départ prévu
+        // date de moins de 3h, on avertit le chef avant de valider (au lieu de bloquer sec),
+        // avec la possibilité de reprogrammer ce car si ce n'est pas une vraie arrivée.
+        document.querySelectorAll('.form-valider-arrivee').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                const departDatetime = form.getAttribute('data-depart-datetime');
+                const idProgrammation = form.getAttribute('data-id-programmation');
+                if (!departDatetime) return; // pas de programmation retrouvée : on laisse passer
+
+                const departTime = new Date(departDatetime.replace(' ', 'T')).getTime();
+                const delaiAtteint = !isNaN(departTime) && (Date.now() - departTime) >= 3 * 60 * 60 * 1000;
+
+                if (delaiAtteint) return; // 3h écoulées : soumission normale
+
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Arrivée déjà réelle ?',
+                    text: "Ce car est parti il y a moins de 3h : es-tu sûr que ce soit une réelle arrivée ?",
+                    icon: 'warning',
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Oui, valider quand même',
+                    denyButtonText: 'Reprogrammer ce car',
+                    cancelButtonText: 'Annuler'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        form.querySelector('.champ-force-arrivee').value = '1';
+                        form.submit();
+                    } else if (result.isDenied && idProgrammation) {
+                        window.location.href = '<?= BASE_URL ?>/admin/Programmation_voyages/edit/' + idProgrammation;
+                    }
+                });
+            });
+        });
     </script>
 </body>
 

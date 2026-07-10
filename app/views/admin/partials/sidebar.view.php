@@ -248,6 +248,22 @@
                       </a>
                     <?php endif; ?>
                   </li>
+                  <?php if ($_SESSION['droit'] === 'super_admin'): ?>
+                  <?php $partenaireModel = new Partenaire(); $nbEnAttente = $partenaireModel->countEnAttenteReponse(); ?>
+                  <li>
+                      <a href="<?= BASE_URL ?>/admin/Partenariats">
+                        <div class="parent-icon">
+                          <i class="fadeIn animated bx bx-handshake"></i>
+                        </div>
+                        <div class="menu-title">
+                          Demandes de partenariat
+                          <?php if ($nbEnAttente > 0): ?>
+                            <span class="badge bg-danger rounded-pill ms-1"><?= $nbEnAttente ?></span>
+                          <?php endif; ?>
+                        </div>
+                      </a>
+                  </li>
+                  <?php endif; ?>
    <?php // } ?>
                 <?php endif; ?>
                 

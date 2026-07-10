@@ -13,9 +13,9 @@
         <!--start content-->
         <main class="page-content ">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
                 <div class="breadcrumb-title pe-3">G-reservation</div>
-                <div class="ps-3">
+                <div class="ps-3 d-none d-sm-block">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
@@ -24,7 +24,7 @@
                         </ol>
                     </nav>
                 </div>
-                <div class="ms-auto">
+                <div class="ms-sm-auto mt-2 mt-sm-0">
                     <div class="btn-group">
                         <a href="<?= BASE_URL ?>/admin/Add_billets" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
                         <a href="javascript:history.back()" class="btn btn-primary "><i
@@ -123,7 +123,7 @@
                 <div class="card-body">
 
                     <div class="tab-content py-3 table-responsive">
-                        <table id="example" class="table table-striped table-bordered" style="width:100%">
+                        <table id="example" class="table table-striped table-bordered mobile-card-table" style="width:100%">
                             <thead>
                                 <tr class="text-center">
                                     <th>Client</th>
@@ -144,13 +144,13 @@
                                      date_default_timezone_set('Africa/Bamako');
                                     if ($item->jourVoyage == date("Y-m-d")): ?>
                                         <tr class="text-center">
-                                            <td><?= $item->Client ?></td>
-                                            <td><?= $item->destinationId ?></td>
-                                            <td> Chaisse N°<?= $item->numeroPlace ?></td>
-                                            <td><?= $item->Heur_departs ?></td>
-                                            <td><?= $item->jourVoyage ?></td>
-                                            <td><?= $item->date_expiration ?></td>
-                                            <td>
+                                            <td data-label="Client"><?= $item->Client ?></td>
+                                            <td data-label="Destination"><?= $item->destinationId ?></td>
+                                            <td data-label="N° de place"> Chaisse N°<?= $item->numeroPlace ?></td>
+                                            <td data-label="Heure de départ"><?= $item->Heur_departs ?></td>
+                                            <td data-label="Jour de voyage"><?= $item->jourVoyage ?></td>
+                                            <td data-label="Date d'expiration"><?= $item->date_expiration ?></td>
+                                            <td data-label="Action">
                                                 <div class="dropup ">
                                                     <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
                                                         &#8943; <!-- Trois points horizontaux -->
@@ -221,7 +221,7 @@
                             </div>
                             <div class="col-md-12 mt-1">
                                 <label for="validationCustom02" class="form-label">Nouveau heure de depart</label>
-                                <select class="form-select" name="heure_depart" id="heureDepartSelect">
+                                <select class="form-select" name="heure_depart" id="heureDepartSelect" required>
 
                                 </select>
 
@@ -307,71 +307,89 @@
                 expirationDate.setHours(23, 59, 59, 999);
                 voyageDate.setHours(0, 0, 0, 0);
 
-                // Le voyage ne peut être reporté qu'avant son heure de départ prévue : une fois
-                // cette heure passée, le voyage a déjà eu lieu.
-                if (!isNaN(departDateTime.getTime()) && now >= departDateTime) {
-                    alert("Impossible de reporter ce voyage : l'heure de départ prévue est déjà passée.");
-                    return;
+                function ouvrirModalReport() {
+                    if (now <= expirationDate) {
+                        // Limites de date : jamais avant aujourd'hui, même si le voyage initial est déjà passé.
+                        let today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        let minDateObj = voyageDate > today ? voyageDate : today;
+                        let minDate = minDateObj.toISOString().split('T')[0];
+                        let maxDateObj = new Date(voyageDate);
+                        maxDateObj.setDate(maxDateObj.getDate() + 7);
+                        let maxDate = maxDateObj.toISOString().split('T')[0];
+
+                        // Appliquer limites au champ de date
+                        $('#nouvelleDate').attr('min', minDate);
+                        $('#nouvelleDate').attr('max', maxDate);
+                        $('#nouvelleDate').val(minDate);
+
+                        // Champs cachés
+                        $('#dateExpiration').val(dateExpiration);
+                        $('#destination').val(destinationId);
+                        $('input[name="idClient"]').val(idClient);
+
+                        // Charger les heures disponibles
+                        $.ajax({
+                            url: '<?= BASE_URL ?>/admin/Liste_du_jours/getHeuresDisponibles',
+                            method: 'POST',
+                            data: {
+                                destination_id: destinationId
+                            },
+                            success: function(response) {
+                                let heures = JSON.parse(response);
+                                let heureSelect = $('#heureDepartSelect');
+                                heureSelect.empty();
+                                heureSelect.append('<option value="" disabled selected>Choisissez une heure de départ</option>');
+
+                                if (heures.length === 0) {
+                                    heureSelect.append('<option value="" disabled>Aucune heure disponible</option>');
+                                } else {
+                                    let ancienneHeureDansListe = false;
+
+                                    heures.forEach(function(h) {
+                                        let selected = '';
+                                        if (h === heureActuelle) {
+                                            selected = 'selected';
+                                            ancienneHeureDansListe = true;
+                                        }
+                                        heureSelect.append('<option value="' + h + '" ' + selected + '>' + h + '</option>');
+                                    });
+
+                                    // Si l’ancienne heure n’est plus dans la base, on l’affiche quand même
+                                    if (!ancienneHeureDansListe && heureActuelle) {
+                                        heureSelect.prepend('<option value="' + heureActuelle + '" selected disabled>' + heureActuelle + ' (ancienne)</option>');
+                                    }
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Erreur', 'Erreur lors du chargement des heures.', 'error');
+                            }
+                        });
+
+                        $('#exampleDangerModal').modal('show');
+                    } else {
+                        Swal.fire('Reporter impossible', 'La période de modification de ce voyage est expirée !', 'warning');
+                    }
                 }
 
-                if (now <= expirationDate) {
-                    // Limites de date
-                    let minDate = voyageDate.toISOString().split('T')[0];
-                    let maxDateObj = new Date(voyageDate);
-                    maxDateObj.setDate(maxDateObj.getDate() + 7);
-                    let maxDate = maxDateObj.toISOString().split('T')[0];
-
-                    // Appliquer limites au champ de date
-                    $('#nouvelleDate').attr('min', minDate);
-                    $('#nouvelleDate').attr('max', maxDate);
-                    $('#nouvelleDate').val(minDate);
-
-                    // Champs cachés
-                    $('#dateExpiration').val(dateExpiration);
-                    $('#destination').val(destinationId);
-                    $('input[name="idClient"]').val(idClient);
-
-                    // Charger les heures disponibles
-                    $.ajax({
-                        url: '<?= BASE_URL ?>/admin/Liste_du_jours/getHeuresDisponibles',
-                        method: 'POST',
-                        data: {
-                            destination_id: destinationId
-                        },
-                        success: function(response) {
-                            let heures = JSON.parse(response);
-                            let heureSelect = $('#heureDepartSelect');
-                            heureSelect.empty();
-                            heureSelect.append('<option value="">Choisissez une heure de départ</option>');
-
-                            if (heures.length === 0) {
-                                heureSelect.append('<option disabled>Aucune heure disponible</option>');
-                            } else {
-                                let ancienneHeureDansListe = false;
-
-                                heures.forEach(function(h) {
-                                    let selected = '';
-                                    if (h === heureActuelle) {
-                                        selected = 'selected';
-                                        ancienneHeureDansListe = true;
-                                    }
-                                    heureSelect.append('<option value="' + h + '" ' + selected + '>' + h + '</option>');
-                                });
-
-                                // Si l’ancienne heure n’est plus dans la base, on l’affiche quand même
-                                if (!ancienneHeureDansListe && heureActuelle) {
-                                    heureSelect.prepend('<option value="' + heureActuelle + '" selected disabled>' + heureActuelle + ' (ancienne)</option>');
-                                }
-                            }
-                        },
-                        error: function() {
-                            alert("Erreur lors du chargement des heures.");
+                // Si l'heure de départ prévue est déjà passée, le voyage a déjà eu lieu :
+                // on prévient l'agent mais on le laisse quand même reporter (client qui a
+                // raté son départ), tant que le billet n'est pas expiré.
+                if (!isNaN(departDateTime.getTime()) && now >= departDateTime) {
+                    Swal.fire({
+                        title: 'Voyage déjà parti ?',
+                        text: "Ce voyage devait partir à " + heureActuelle + ", l'heure est déjà passée. Voulez-vous quand même le reporter ?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Oui, reporter',
+                        cancelButtonText: 'Annuler'
+                    }).then(function(result) {
+                        if (result.isConfirmed) {
+                            ouvrirModalReport();
                         }
                     });
-
-                    $('#exampleDangerModal').modal('show');
                 } else {
-                    alert("La période de modification de ce voyage est expirée !");
+                    ouvrirModalReport();
                 }
             });
         });

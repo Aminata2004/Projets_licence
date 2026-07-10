@@ -51,7 +51,7 @@
                 <div class="card-body">
                     <div class="table-responsive">
                         <table id="example"
-                            class="table table-hover align-middle mb-0 table-striped table-bordered rounded-3">
+                            class="table table-hover align-middle mb-0 table-striped table-bordered rounded-3 mobile-card-table">
                             <thead class="table-primary text-center">
                                 <tr>
                                     <th>Nom colis</th>
@@ -67,13 +67,13 @@
                                 <?php $this->view('admin/helpers') ?>
                                 <?php foreach ($liste_colis as $colis) : ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($colis['nom_colis']) ?></td>
-                                        <td><?= htmlspecialchars($colis['nature']) ?></td>
-                                        <td><span class="badge bg-light text-dark"><?= htmlspecialchars($colis['valeur']) ?></span></td>
-                                        <td><span class="badge bg-secondary"><?= htmlspecialchars($colis['fraix_transaction']) ?></span></td>
-                                        <td><?= htmlspecialchars($colis['destination']) ?></td>
-                                        <td><?= afficherBadgeStatus($colis['status']) ?></td>
-                                        <td>
+                                        <td data-label="Nom colis"><?= htmlspecialchars($colis['nom_colis']) ?></td>
+                                        <td data-label="Nature"><?= htmlspecialchars($colis['nature']) ?></td>
+                                        <td data-label="Valeur"><span class="badge bg-light text-dark"><?= htmlspecialchars($colis['valeur']) ?></span></td>
+                                        <td data-label="Frais de transaction"><span class="badge bg-secondary"><?= htmlspecialchars($colis['fraix_transaction']) ?></span></td>
+                                        <td data-label="Destination"><?= htmlspecialchars($colis['destination']) ?></td>
+                                        <td data-label="Status"><?= afficherBadgeStatus($colis['status']) ?></td>
+                                        <td data-label="Action">
                                             <div class="dropdown">
                                                 <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="bx bx-dots-vertical-rounded"></i>

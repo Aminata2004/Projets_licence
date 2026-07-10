@@ -245,25 +245,6 @@
             align-items: center;
             justify-content: space-between;
         }
-        .filter-buttons {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .filter-btn {
-            padding: 8px 20px;
-            border-radius: 50px;
-            background: var(--gray-light);
-            color: var(--gray);
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-        .filter-btn.active, .filter-btn:hover {
-            background: var(--secondary);
-            color: white;
-        }
         .search-box {
             display: flex;
             gap: 10px;
@@ -271,6 +252,8 @@
             background: var(--gray-light);
             padding: 5px 15px;
             border-radius: 50px;
+            width: 100%;
+            max-width: 360px;
         }
         .search-box input {
             border: none;
@@ -332,20 +315,6 @@
             font-weight: 800;
             margin-bottom: 8px;
         }
-        .company-rating {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .stars {
-            color: var(--warning);
-        }
-        .rating-count {
-            font-size: 0.75rem;
-            color: var(--gray);
-        }
         .company-desc {
             font-size: 0.85rem;
             color: var(--gray);
@@ -380,97 +349,6 @@
             flex: 1;
             padding: 10px;
             font-size: 0.8rem;
-        }
-
-        /* ========== FEATURED COMPANY ========== */
-        .featured-section {
-            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
-        }
-        .featured-card {
-            background: white;
-            border-radius: var(--radius-xl);
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-        .featured-image {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            padding: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .featured-image img {
-            max-width: 80%;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
-        }
-        .featured-content {
-            padding: 40px;
-        }
-        .featured-badge {
-            display: inline-block;
-            background: rgba(230, 126, 34, 0.1);
-            color: var(--secondary);
-            padding: 5px 15px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-        .featured-content h2 {
-            font-size: 1.8rem;
-            margin-bottom: 16px;
-        }
-        .featured-content p {
-            color: var(--gray);
-            margin-bottom: 24px;
-            line-height: 1.6;
-        }
-        .featured-stats {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 24px;
-        }
-        .featured-stat h4 {
-            font-size: 1.5rem;
-            margin-bottom: 4px;
-            color: var(--primary);
-        }
-        .featured-stat p {
-            margin: 0;
-            font-size: 0.75rem;
-        }
-
-        /* ========== TESTIMONIALS ========== */
-        .testimonial-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 30px;
-            text-align: center;
-            box-shadow: var(--shadow);
-            transition: all 0.3s;
-        }
-        .testimonial-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-md);
-        }
-        .testimonial-avatar {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 16px;
-        }
-        .testimonial-text {
-            font-style: italic;
-            color: var(--gray);
-            margin-bottom: 16px;
-            line-height: 1.6;
-        }
-        .testimonial-name {
-            font-weight: 700;
-            margin-bottom: 4px;
         }
 
         /* ========== CTA SECTION ========== */
@@ -540,9 +418,6 @@
 
         /* ========== RESPONSIVE ========== */
         @media (max-width: 992px) {
-            .featured-card {
-                grid-template-columns: 1fr;
-            }
             .footer-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -558,11 +433,8 @@
                 flex-direction: column;
                 align-items: stretch;
             }
-            .filter-buttons {
-                justify-content: center;
-            }
             .search-box {
-                justify-content: center;
+                max-width: none;
             }
             .company-stats {
                 flex-wrap: wrap;
@@ -578,29 +450,13 @@
             .cta-section h2 {
                 font-size: 1.5rem;
             }
-            .featured-content {
-                padding: 30px;
-            }
-            .featured-content h2 {
-                font-size: 1.3rem;
-            }
-            .featured-stats {
-                flex-wrap: wrap;
-                gap: 15px;
-            }
         }
         @media (max-width: 480px) {
             .company-footer {
                 flex-direction: column;
             }
-            .filter-buttons {
-                gap: 8px;
-            }
-            .filter-btn {
-                padding: 6px 14px;
-                font-size: 0.75rem;
-            }
         }
+
     </style>
 </head>
 <body>
@@ -621,16 +477,10 @@
     <div class="container">
         <div class="filter-card" data-aos="fade-up">
             <div class="filter-group">
-                <div class="filter-buttons">
-                    <div class="filter-btn active">Toutes</div>
-                    <div class="filter-btn">⭐ 4.5+</div>
-                    <div class="filter-btn">Premium</div>
-                    <div class="filter-btn">Économique</div>
-                    <div class="filter-btn">Colis express</div>
-                </div>
+                <span style="font-weight: 600; color: var(--dark);"><?= count($listecompagnie ?? []) ?> compagnie(s) partenaire(s)</span>
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Rechercher une compagnie...">
+                    <input type="text" id="rechercheCompagnie" placeholder="Rechercher une compagnie...">
                 </div>
             </div>
         </div>
@@ -640,9 +490,9 @@
 <!-- COMPAGNIES GRID -->
 <section>
     <div class="container">
-        <div class="row" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px;">
+        <div class="row" id="grilleCompagnies" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px;">
             <?php $i = 0; if(!empty($listecompagnie)): foreach($listecompagnie as $c): ?>
-            <div class="company-card" data-aos="fade-up" data-aos-delay="<?= ($i + 1) * 100 ?>">
+            <div class="company-card" data-nom="<?= htmlspecialchars(strtolower($c->nom_compagnie)) ?>" data-aos="fade-up" data-aos-delay="<?= ($i + 1) * 100 ?>">
                 <div class="company-cover" style="background: linear-gradient(135deg, #0f3b5e, #1a5276);"></div>
                 <div class="company-logo">
                     <?php if(!empty($c->logo)): ?>
@@ -653,17 +503,10 @@
                 </div>
                 <div class="company-content">
                     <h3 class="company-name"><?= htmlspecialchars($c->nom_compagnie) ?></h3>
-                    <div class="company-rating">
-                        <div class="stars">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                        </div>
-                        <span class="rating-count">(<?= rand(100, 2000) ?> avis)</span>
-                    </div>
                     <p class="company-desc"><?= htmlspecialchars($c->slogant ?? 'Transport sécurisé et fiable au Mali.') ?></p>
                     <div class="company-stats">
-                        <div class="stat"><div class="stat-value"><?= rand(5, 30) ?></div><div class="stat-label">Trajets/jour</div></div>
-                        <div class="stat"><div class="stat-value"><?= rand(3, 15) ?></div><div class="stat-label">Destinations</div></div>
-                        <div class="stat"><div class="stat-value">9<?= rand(0, 9) ?>%</div><div class="stat-label">Satisfaction</div></div>
+                        <div class="stat"><div class="stat-value"><?= $statsParCompagnie[$c->id_compagnie]['trajets'] ?? 0 ?></div><div class="stat-label">Trajets</div></div>
+                        <div class="stat"><div class="stat-value"><?= $statsParCompagnie[$c->id_compagnie]['destinations'] ?? 0 ?></div><div class="stat-label">Destinations</div></div>
                     </div>
                     <div class="company-footer">
                         <a href="<?= BASE_URL ?>/site/Programmer/show/<?= base64_encode($c->id_compagnie) ?>" class="btn btn-primary" style="flex: 1; text-decoration: none; padding: 10px; font-size: 0.8rem; text-align: center;">Voir les trajets</a>
@@ -676,67 +519,7 @@
             </div>
             <?php endif; ?>
         </div>
-    </div>
-</section>
-
-<!-- FEATURED COMPANY -->
-<section class="featured-section">
-    <div class="container">
-        <div class="featured-card" data-aos="fade-up">
-            <div class="featured-image">
-                <img src="<?= BASE_URL ?>/assets_site/img/bus-icon.png" alt="Featured Company">
-            </div>
-            <div class="featured-content">
-                <div class="featured-badge">⭐ Compagnie recommandée</div>
-                <h2>Trans Mali Express</h2>
-                <p>Leader du transport interurbain au Mali avec plus de 10 ans d'expérience. Des bus modernes, climatisés, avec WiFi gratuit et prise USB à chaque siège.</p>
-                <div class="featured-stats">
-                    <div class="featured-stat">
-                        <h4>15+</h4>
-                        <p>Trajets quotidiens</p>
-                    </div>
-                    <div class="featured-stat">
-                        <h4>50K+</h4>
-                        <p>Passagers/an</p>
-                    </div>
-                    <div class="featured-stat">
-                        <h4>98%</h4>
-                        <p>Satisfaction</p>
-                    </div>
-                </div>
-                <button class="btn btn-primary">Découvrir cette compagnie <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- AVIS CLIENTS -->
-<section>
-    <div class="container">
-        <div class="section-header" style="text-align: center; margin-bottom: 48px;" data-aos="fade-up">
-            <h2 style="font-size: 2rem;">Ce que nos clients disent</h2>
-            <p style="color: var(--gray);">Plus de 10 000 voyageurs satisfaits</p>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
-            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
-                <img src="<?= BASE_URL ?>/assets_site/img/avatar-women-68.jpg" alt="Client" class="testimonial-avatar">
-                <p class="testimonial-text">"Service impeccable, bus confortables et ponctuels. Je recommande vivement Trans Mali Express !"</p>
-                <h5 class="testimonial-name">Aminata Diallo</h5>
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-            </div>
-            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
-                <img src="<?= BASE_URL ?>/assets_site/img/avatar-men-32.jpg" alt="Client" class="testimonial-avatar">
-                <p class="testimonial-text">"La réservation en ligne est simple et rapide. Le suivi des colis est un vrai plus pour mon business."</p>
-                <h5 class="testimonial-name">Moussa Traoré</h5>
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-            </div>
-            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
-                <img src="<?= BASE_URL ?>/assets_site/img/avatar-women-45.jpg" alt="Client" class="testimonial-avatar">
-                <p class="testimonial-text">"Excellent service client, toujours disponible. Les prix sont abordables et les bus sont très propres."</p>
-                <h5 class="testimonial-name">Fatoumata Keïta</h5>
-                <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-            </div>
-        </div>
+        <p id="aucunResultat" style="display:none; text-align:center; padding: 40px; color: var(--gray);">Aucune compagnie ne correspond à votre recherche.</p>
     </div>
 </section>
 
@@ -746,7 +529,7 @@
         <div class="cta-section" data-aos="fade-up">
             <h2>Vous êtes une compagnie de transport ?</h2>
             <p>Rejoignez TransGest et développez votre clientèle</p>
-            <button class="btn btn-outline-light btn-lg">Devenir partenaire <i class="fas fa-arrow-right"></i></button>
+            <a href="<?= BASE_URL ?>/site/EspacePartenaire/login" class="btn btn-outline-light btn-lg" style="text-decoration:none;">Devenir partenaire <i class="fas fa-arrow-right"></i></a>
         </div>
     </div>
 </section>
@@ -808,15 +591,38 @@
     menuToggle.addEventListener('click', openMenu);
     closeMenu.addEventListener('click', closeMenuFunc);
     overlay.addEventListener('click', closeMenuFunc);
-    
-    // Filter buttons animation
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            filterBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
+
+    // Recherche en direct parmi les compagnies affichées
+    const rechercheInput = document.getElementById('rechercheCompagnie');
+    const cartesCompagnies = document.querySelectorAll('#grilleCompagnies .company-card');
+    const aucunResultat = document.getElementById('aucunResultat');
+    if (rechercheInput) {
+        rechercheInput.addEventListener('input', function() {
+            const terme = this.value.trim().toLowerCase();
+            let visibles = 0;
+            cartesCompagnies.forEach(function(carte) {
+                const correspond = carte.getAttribute('data-nom').includes(terme);
+                carte.style.display = correspond ? '' : 'none';
+                if (correspond) visibles++;
+            });
+            if (aucunResultat) {
+                aucunResultat.style.display = visibles === 0 ? 'block' : 'none';
+            }
         });
-    });
+    }
+
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php if (isset($_SESSION['toast'])): ?>
+    <script>
+        Swal.fire({
+            icon: "<?= addslashes($_SESSION['toast']['icon'] ?? 'info') ?>",
+            title: "<?= addslashes($_SESSION['toast']['title']); ?>",
+            text: "<?= addslashes($_SESSION['toast']['text']); ?>",
+            confirmButtonText: "OK"
+        });
+    </script>
+    <?php unset($_SESSION['toast']); ?>
+<?php endif; ?>
 </body>
 </html>

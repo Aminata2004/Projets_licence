@@ -16,9 +16,9 @@
         <!--start content-->
         <main class="page-content ">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
                 <div class="breadcrumb-title pe-3">G-reservation</div>
-                <div class="ps-3">
+                <div class="ps-3 d-none d-sm-block">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
@@ -27,7 +27,7 @@
                         </ol>
                     </nav>
                 </div>
-                <div class="ms-auto">
+                <div class="ms-sm-auto mt-2 mt-sm-0">
                     <div class="btn-group">
                         <a href="<?= BASE_URL ?>/admin/Add_billets" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
                         <a href="javascript:history.back()" class="btn btn-primary "><i
@@ -115,7 +115,7 @@
                 <div class="card-body">
 
                     <div class="tab-content py-3 table-responsive">
-                        <table id="example" class="table table-striped table-bordered" style="width:100%">
+                        <table id="example" class="table table-striped table-bordered mobile-card-table" style="width:100%">
                             <thead>
                                 <tr class="text-center">
                                     <th>Client</th>
@@ -131,13 +131,13 @@
                                 <?php foreach ($liste_demain as $item): ?>
                                     <?php if ($item->jourVoyage == date('Y-m-d', strtotime('+1 day'))): ?>
                                         <tr class="text-center">
-                                            <td><?= $item->Client ?></td>
-                                            <td><?= $item->destinationId ?></td>
-                                            <td>Chaisse N° <?= $item->numeroPlace ?></td>
-                                            <td><?= $item->Heur_departs ?></td>
-                                            <td><?= $item->jourVoyage ?></td>
-                                            <td><?= $item->date_expiration ?></td>
-                                            <td class=" ">
+                                            <td data-label="Client"><?= $item->Client ?></td>
+                                            <td data-label="Destination"><?= $item->destinationId ?></td>
+                                            <td data-label="N° de place">Chaisse N° <?= $item->numeroPlace ?></td>
+                                            <td data-label="Heure de départ"><?= $item->Heur_departs ?></td>
+                                            <td data-label="Jour de voyage"><?= $item->jourVoyage ?></td>
+                                            <td data-label="Date d'expiration"><?= $item->date_expiration ?></td>
+                                            <td data-label="Action">
                                                 <div class="dropup ">
                                                     <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
                                                         &#8943; <!-- Trois points horizontaux -->
@@ -193,7 +193,7 @@
                                 </div>
                                 <div class="col-md-12 mt-1">
                                     <label for="validationCustom02" class="form-label">Nouveau heure de depart</label>
-                                    <select class="form-select" name="heure_depart" id="heureDepartSelect">
+                                    <select class="form-select" name="heure_depart" id="heureDepartSelect" required>
 
                                     </select>
 
@@ -303,10 +303,10 @@
                             let heures = JSON.parse(response);
                             let heureSelect = $('#heureDepartSelect');
                             heureSelect.empty();
-                            heureSelect.append('<option value="">Choisissez une heure de départ</option>');
+                            heureSelect.append('<option value="" disabled selected>Choisissez une heure de départ</option>');
 
                             if (heures.length === 0) {
-                                heureSelect.append('<option disabled>Aucune heure disponible</option>');
+                                heureSelect.append('<option value="" disabled>Aucune heure disponible</option>');
                             } else {
                                 let ancienneHeureDansListe = false;
 
@@ -326,13 +326,13 @@
                             }
                         },
                         error: function() {
-                            alert("Erreur lors du chargement des heures.");
+                            Swal.fire('Erreur', 'Erreur lors du chargement des heures.', 'error');
                         }
                     });
 
                     $('#exampleDangerModal').modal('show');
                 } else {
-                    alert("La période de modification de ce voyage est expirée !");
+                    Swal.fire('Reporter impossible', 'La période de modification de ce voyage est expirée !', 'warning');
                 }
             });
         });

@@ -291,6 +291,21 @@ $fromAndWhere = "liaison_car_trajet
         return false;
     }
 
+    // Dernière programmation enregistrée pour ce car vers cette destination : sert à retrouver
+    // l'heure de départ réelle du trajet en cours (pour la règle des 3h avant validation d'arrivée)
+    // et l'id_programmation à proposer en reprogrammation si l'arrivée n'est pas jugée réelle.
+    public function getProgrammationActivePourCar($id_car, $destination)
+    {
+        $sql = "SELECT id_programmation, date_enregistre, id_horaire
+                FROM programmation_voyage
+                WHERE id_car_programmer = :id_car AND id_trajet = :destination
+                ORDER BY date_enregistre DESC, id_programmation DESC
+                LIMIT 1";
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute([':id_car' => $id_car, ':destination' => $destination]);
+        return $stmt->fetch(PDO::FETCH_OBJ) ?: null;
+    }
+
     public function getProgrammationById($id)
     {
         return $this->FetchSelectWhereS(

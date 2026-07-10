@@ -12,9 +12,9 @@
         <!--start content-->
         <main class="page-content ">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
                 <div class="breadcrumb-title pe-3">G-reservation</div>
-                <div class="ps-3">
+                <div class="ps-3 d-none d-sm-block">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
@@ -23,7 +23,7 @@
                         </ol>
                     </nav>
                 </div>
-                <div class="ms-auto">
+                <div class="ms-sm-auto mt-2 mt-sm-0">
                     <div class="btn-group">
                         <a href="javascript:history.back()" class="btn btn-primary "><i
                                 class="fadeIn animated bx bx-left-arrow-alt"></i></a>
@@ -36,7 +36,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="tab-content py-3 table-responsive">
-                        <table id="example" class="table table-striped table-bordered" style="width:100%">
+                        <table id="example" class="table table-striped table-bordered mobile-card-table" style="width:100%">
                             <thead>
                                 <tr class="text-center">
                                     <th>Client</th>
@@ -52,13 +52,13 @@
                             <tbody>
                                 <?php foreach ($liste_entente as $item): ?>
                                     <tr class="text-center">
-                                        <td><?= htmlspecialchars($item->Client) ?></td>
-                                        <td><?= htmlspecialchars($item->destinationId) ?></td>
-                                        <td><?= htmlspecialchars($item->nombrePassages) ?></td>
-                                        <td><?= htmlspecialchars($item->Heur_departs) ?></td>
-                                        <td><?= htmlspecialchars($item->jourVoyage) ?></td>
-                                        <td><?= htmlspecialchars($item->date_expiration) ?></td>
-                                        <td class=" ">
+                                        <td data-label="Client"><?= htmlspecialchars($item->Client) ?></td>
+                                        <td data-label="Destination"><?= htmlspecialchars($item->destinationId) ?></td>
+                                        <td data-label="Nbr de passages"><?= htmlspecialchars($item->nombrePassages) ?></td>
+                                        <td data-label="Heure de départ"><?= htmlspecialchars($item->Heur_departs) ?></td>
+                                        <td data-label="Jour de voyage"><?= htmlspecialchars($item->jourVoyage) ?></td>
+                                        <td data-label="Date d'expiration"><?= htmlspecialchars($item->date_expiration) ?></td>
+                                        <td data-label="Action">
                                             <div class="dropup ">
                                                 <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
                                                     &#8943; <!-- Trois points horizontaux -->

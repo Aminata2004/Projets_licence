@@ -22,7 +22,7 @@ class Liste_du_jours extends  Controller
     $idDepart = $_SESSION['ville'];
     $model = new Liste_du_jour();
 
-    $resultats = $model->listeBillets();
+    $resultats = $model->listeBillets($idDepart);
     $liste_horaires = $model->FetchSelectWheres(
       '*',
       'horaire',
@@ -123,6 +123,7 @@ class Liste_du_jours extends  Controller
   {
     date_default_timezone_set('Africa/Bamako');
     $id_compagnie = $_SESSION['id_compagnie'];
+    $idDepart     = $_SESSION['ville'];
     $destination  = trim($_GET['destination'] ?? '');
     $heure        = trim($_GET['heure'] ?? '');
     $aujourdhui   = date('Y-m-d');
@@ -130,9 +131,10 @@ class Liste_du_jours extends  Controller
     $model = new Liste_du_jour();
     $colisModel = new Livraisons_colis();
 
-    $where = 'billets.id_compagnie = :id_compagnie AND billets.jourVoyage = :jour';
+    $where = 'billets.id_compagnie = :id_compagnie AND billets.departId = :depart AND billets.jourVoyage = :jour';
     $params = [
       'id_compagnie' => $id_compagnie,
+      'depart'       => $idDepart,
       'jour'         => $aujourdhui
     ];
 
@@ -202,12 +204,29 @@ class Liste_du_jours extends  Controller
         exit;
       }
 
-      // On se base sur la date/heure de départ actuellement enregistrées (pas sur des valeurs
-      // envoyées par le client) : une fois ce moment passé, le voyage a déjà eu lieu et ne peut
-      // plus être reporté.
-      $departActuel = strtotime($billetActuel->jourVoyage . ' ' . $billetActuel->Heur_departs);
-      if ($departActuel !== false && $departActuel <= time()) {
-        $billets->set_flash("Impossible de reporter ce voyage : l'heure de départ prévue est déjà passée.", "danger");
+      // Le client peut avoir raté son départ initial : on autorise quand même le report
+      // (l'agent est prévenu côté interface), tant que le billet n'est pas expiré et que
+      // la nouvelle date n'est pas elle-même dans le passé.
+
+      // Sans heure de départ valide, l'UPDATE plante (colonne TIME "" invalide en SQL strict).
+      if (empty($_POST['nouvelle_date']) || empty($_POST['heure_depart'])) {
+        $billets->set_flash("Veuillez choisir une nouvelle date et une heure de départ valides.", "danger");
+        header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
+        exit;
+      }
+
+      // Le billet a une date de validité : au-delà, il ne peut plus être reporté.
+      $expiration = strtotime($billetActuel->date_expiration . ' 23:59:59');
+      if ($expiration !== false && $expiration < time()) {
+        $billets->set_flash("Ce billet a expiré, impossible de le reporter.", "danger");
+        header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
+        exit;
+      }
+
+      // La nouvelle date/heure de départ ne peut pas être dans le passé.
+      $nouveauDepart = strtotime($_POST['nouvelle_date'] . ' ' . $_POST['heure_depart']);
+      if ($nouveauDepart === false || $nouveauDepart <= time()) {
+        $billets->set_flash("La nouvelle date/heure de départ doit être dans le futur.", "danger");
         header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
         exit;
       }

@@ -57,13 +57,13 @@ class Historiques extends Controller
                 ob_start();
                 foreach ($resultats as $item) {
                     echo '<tr class="text-center">';
-                    echo '<td>' . htmlspecialchars($item->expediteur) . '</td>';
-                    echo '<td>' . htmlspecialchars($item->destinataire) . '</td>';
-                    echo '<td>' . htmlspecialchars($item->nom_colis) . '</td>';
-                    echo '<td>' . number_format($item->valeur, 0, ',', ' ') . ' FCFA</td>';
-                    echo '<td>' . number_format($item->fraix_transaction, 0, ',', ' ') . ' FCFA</td>';
-                    echo '<td>' . htmlspecialchars($item->code_colis) . '</td>';
-                    echo '<td>' . htmlspecialchars($item->status) . '</td>';
+                    echo '<td data-label="Expéditeur">' . htmlspecialchars($item->expediteur) . '</td>';
+                    echo '<td data-label="Destinataire">' . htmlspecialchars($item->destinataire) . '</td>';
+                    echo '<td data-label="Nom colis">' . htmlspecialchars($item->nom_colis) . '</td>';
+                    echo '<td data-label="Valeur">' . number_format($item->valeur, 0, ',', ' ') . ' FCFA</td>';
+                    echo '<td data-label="Frais de transaction">' . number_format($item->fraix_transaction, 0, ',', ' ') . ' FCFA</td>';
+                    echo '<td data-label="Code colis">' . htmlspecialchars($item->code_colis) . '</td>';
+                    echo '<td data-label="Status">' . htmlspecialchars($item->status) . '</td>';
                     echo '</tr>';
                 }
                 $tbody = ob_get_clean();
@@ -114,13 +114,13 @@ class Historiques extends Controller
                 ob_start();
                 foreach ($resultats as $item) {
                     echo '<tr class="text-center">';
-                    echo '<td>' . htmlspecialchars($item->expediteur) . '</td>';
-                    echo '<td>' . htmlspecialchars($item->destinataire) . '</td>';
-                    echo '<td>' . htmlspecialchars($item->nom_colis) . '</td>';
-                    echo '<td>' . number_format($item->valeur, 0, ',', ' ') . ' FCFA</td>';
-                    echo '<td>' . number_format($item->fraix_transaction, 0, ',', ' ') . ' FCFA</td>';
-                    echo '<td>' . htmlspecialchars($item->code_colis) . '</td>';
-                    echo '<td><span class="badge bg-success">Livré</span></td>';
+                    echo '<td data-label="Expéditeur">' . htmlspecialchars($item->expediteur) . '</td>';
+                    echo '<td data-label="Destinataire">' . htmlspecialchars($item->destinataire) . '</td>';
+                    echo '<td data-label="Nom colis">' . htmlspecialchars($item->nom_colis) . '</td>';
+                    echo '<td data-label="Valeur">' . number_format($item->valeur, 0, ',', ' ') . ' FCFA</td>';
+                    echo '<td data-label="Frais de transaction">' . number_format($item->fraix_transaction, 0, ',', ' ') . ' FCFA</td>';
+                    echo '<td data-label="Code colis">' . htmlspecialchars($item->code_colis) . '</td>';
+                    echo '<td data-label="Status"><span class="badge bg-success">Livré</span></td>';
                     echo '</tr>';
                 }
                 $tbody = ob_get_clean();

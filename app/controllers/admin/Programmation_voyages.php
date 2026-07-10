@@ -123,6 +123,30 @@ class Programmation_voyages extends Controller
         // Gestion de la validation d'arrivée
         if (isset($_POST['valider_arrivee']) && !empty($_POST['id_car_arrivee'])) {
             $id_car = $_POST['id_car_arrivee'];
+            $force = !empty($_POST['force_arrivee']);
+
+            // Règle métier : un car ne peut pas être "arrivé" moins de 3h après son heure de
+            // départ prévue (trajet trop court pour être réel). Le formulaire affiche déjà un
+            // avertissement côté client avant ce délai ; ce contrôle serveur est le filet de
+            // sécurité si quelqu'un poste directement sans passer par cette confirmation.
+            $carStatus = $programmation_voyage->FetchSelectWheres("status_car", "car", "id_car = :id_car", [":id_car" => $id_car]);
+            $destination = (!empty($carStatus) && strpos($carStatus[0]->status_car, 'En_transit_') === 0)
+                ? substr($carStatus[0]->status_car, 11)
+                : null;
+            $prog = $destination ? $programmation_voyage->getProgrammationActivePourCar($id_car, $destination) : null;
+
+            if (!$force && $prog) {
+                $departDatetime = strtotime($prog->date_enregistre . ' ' . $prog->id_horaire);
+                if ($departDatetime !== false && time() < $departDatetime + 3 * 3600) {
+                    $programmation_voyage->set_flash(
+                        "Ce car est parti il y a moins de 3h : l'arrivée ne peut pas encore être validée. Confirmez malgré tout depuis la liste, ou reprogrammez ce car.",
+                        "danger"
+                    );
+                    header("Location: " . BASE_URL . "/admin/Programmation_voyages/index");
+                    exit;
+                }
+            }
+
             if ($programmation_voyage->validerArrivee($id_car)) {
                 $programmation_voyage->set_flash("L'arrivée du car a été validée avec succès !", "success");
             } else {
@@ -134,6 +158,15 @@ class Programmation_voyages extends Controller
 
         // Récupération des cars en transit
         $cars_en_transit = $programmation_voyage->getCarsInTransit();
+
+        // Pour chaque car en approche : heure de départ réelle (règle des 3h) et
+        // id_programmation associé (pour proposer une reprogrammation directe si besoin).
+        foreach ($cars_en_transit as $car) {
+            $destination = substr($car->status_car, 11);
+            $prog = $programmation_voyage->getProgrammationActivePourCar($car->id_car, $destination);
+            $car->id_programmation = $prog->id_programmation ?? null;
+            $car->depart_datetime = $prog ? $prog->date_enregistre . ' ' . $prog->id_horaire : null;
+        }
 
         // Dernière programmation existante (pour pré-remplissage à la demande, cf. bouton "Reproduire").
         // Admin : toute la compagnie (le départ varie ligne par ligne). Chef d'escale : sa propre gare.

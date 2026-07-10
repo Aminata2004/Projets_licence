@@ -129,7 +129,7 @@
                                                 </div>
                                             </div>
                                             <div class="table-responsive mb-3">
-                                                <table id="table-attente" class="table table-striped table-hover align-middle mb-0">
+                                                <table id="table-attente" class="table table-striped table-hover align-middle mb-0 mobile-card-table">
                                                     <thead class="table-light">
                                                         <tr>
                                                             <th><input type="checkbox" id="selectAll"></th>
@@ -146,15 +146,15 @@
                                                     <tbody>
                                                         <?php foreach ($liste_colis as $c): ?>
                                                             <tr>
-                                                                <td><input type="checkbox" name="selected_colis[]" value="<?= (int)$c['id_colis'] ?>" class="form-check-input checkbox-car"></td>
-                                                                <td class="fw-medium"><?= htmlspecialchars($c['nom_colis']) ?></td>
-                                                                <td><?= htmlspecialchars($c['nature']) ?></td>
-                                                                <td><?= number_format($c['valeur'], 0, ',', ' ') ?> FCFA</td>
-                                                                <td><?= number_format($c['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
-                                                                <td><?= htmlspecialchars($c['destination']) ?></td>
-                                                                <td><?= htmlspecialchars($c['code_colis']) ?></td>
-                                                                <td><?= afficherBadgeStatus($c['status']) ?></td>
-                                                                <td>
+                                                                <td data-label="Sélection"><input type="checkbox" name="selected_colis[]" value="<?= (int)$c['id_colis'] ?>" class="form-check-input checkbox-car"></td>
+                                                                <td data-label="Nom colis" class="fw-medium"><?= htmlspecialchars($c['nom_colis']) ?></td>
+                                                                <td data-label="Nature"><?= htmlspecialchars($c['nature']) ?></td>
+                                                                <td data-label="Valeur"><?= number_format($c['valeur'], 0, ',', ' ') ?> FCFA</td>
+                                                                <td data-label="Frais de transaction"><?= number_format($c['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
+                                                                <td data-label="Destination"><?= htmlspecialchars($c['destination']) ?></td>
+                                                                <td data-label="Code colis"><?= htmlspecialchars($c['code_colis']) ?></td>
+                                                                <td data-label="Status"><?= afficherBadgeStatus($c['status']) ?></td>
+                                                                <td data-label="Action">
                                                                     <div class="dropdown">
                                                                         <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown">
                                                                             <i class="bx bx-dots-vertical-rounded"></i>
@@ -216,7 +216,7 @@
                                             </div>
                                         </div>
                                         <div class="table-responsive">
-                                            <table id="table-recu" class="table table-striped table-hover align-middle text-center mb-0">
+                                            <table id="table-recu" class="table table-striped table-hover align-middle text-center mb-0 mobile-card-table">
                                                 <thead class="table-light">
                                                     <tr>
                                                         <th>Nom colis</th>
@@ -232,14 +232,14 @@
                                                 <tbody>
                                                     <?php foreach ($liste_colis_recue as $colis): ?>
                                                         <tr>
-                                                            <td><?= htmlspecialchars($colis['nom_colis']) ?></td>
-                                                            <td><?= htmlspecialchars($colis['nature']) ?></td>
-                                                            <td><?= number_format($colis['valeur'], 0, ',', ' ') ?> FCFA</td>
-                                                            <td><?= number_format($colis['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
-                                                            <td><?= htmlspecialchars($colis['provient_de']) ?></td>
-                                                            <td><?= htmlspecialchars($colis['code_colis']) ?></td>
-                                                            <td><?= afficherBadgeStatus($colis['status']) ?></td>
-                                            <td>
+                                                            <td data-label="Nom colis"><?= htmlspecialchars($colis['nom_colis']) ?></td>
+                                                            <td data-label="Nature"><?= htmlspecialchars($colis['nature']) ?></td>
+                                                            <td data-label="Valeur"><?= number_format($colis['valeur'], 0, ',', ' ') ?> FCFA</td>
+                                                            <td data-label="Frais de transaction"><?= number_format($colis['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
+                                                            <td data-label="Provenance"><?= htmlspecialchars($colis['provient_de']) ?></td>
+                                                            <td data-label="Code colis"><?= htmlspecialchars($colis['code_colis']) ?></td>
+                                                            <td data-label="Status"><?= afficherBadgeStatus($colis['status']) ?></td>
+                                            <td data-label="Action">
                                                                 <div class="dropdown">
                                                                     <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown">
                                                                         <i class="bx bx-dots-vertical-rounded"></i>
@@ -312,7 +312,7 @@
                                             </div>
                                         </div>
                                         <div class="table-responsive">
-                                            <table id="table-livre" class="table table-striped table-hover align-middle text-center mb-0">
+                                            <table id="table-livre" class="table table-striped table-hover align-middle text-center mb-0 mobile-card-table">
                                                 <thead class="table-light">
                                                     <tr>
                                                         <th>Nom colis</th>
@@ -329,15 +329,15 @@
                                                 <tbody>
                                                     <?php foreach ($liste_colis_livre as $colis_livre): ?>
                                                         <tr>
-                                                            <td><?= htmlspecialchars($colis_livre['nom_colis']) ?></td>
-                                                            <td><?= htmlspecialchars($colis_livre['nature']) ?></td>
-                                                            <td><?= number_format($colis_livre['valeur'], 0, ',', ' ') ?> FCFA</td>
-                                                            <td><?= number_format($colis_livre['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
-                                                            <td><?= htmlspecialchars($colis_livre['destination']) ?></td>
-                                                            <td><?= htmlspecialchars($colis_livre['date_livraison']) ?></td>
-                                                            <td><?= htmlspecialchars($colis_livre['code_colis']) ?></td>
-                                                            <td><?= afficherBadgeStatus($colis_livre['status']) ?></td>
-                                                            <td>
+                                                            <td data-label="Nom colis"><?= htmlspecialchars($colis_livre['nom_colis']) ?></td>
+                                                            <td data-label="Nature"><?= htmlspecialchars($colis_livre['nature']) ?></td>
+                                                            <td data-label="Valeur"><?= number_format($colis_livre['valeur'], 0, ',', ' ') ?> FCFA</td>
+                                                            <td data-label="Frais de transaction"><?= number_format($colis_livre['fraix_transaction'], 0, ',', ' ') ?> FCFA</td>
+                                                            <td data-label="Destination"><?= htmlspecialchars($colis_livre['destination']) ?></td>
+                                                            <td data-label="Date de livraison"><?= htmlspecialchars($colis_livre['date_livraison']) ?></td>
+                                                            <td data-label="Code colis"><?= htmlspecialchars($colis_livre['code_colis']) ?></td>
+                                                            <td data-label="Status"><?= afficherBadgeStatus($colis_livre['status']) ?></td>
+                                                            <td data-label="Action">
                                                                 <?php
                                                                 // Message de confirmation de remise : envoyé à l'EXPÉDITEUR (preuve que son colis est bien arrivé),
                                                                 // pas au destinataire (lui est notifié plus tôt, à l'étape "Colis reçu").

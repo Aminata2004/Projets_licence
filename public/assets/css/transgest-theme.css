@@ -1106,4 +1106,54 @@ a.tg-stat-card {
     .page-breadcrumb .breadcrumb-title { font-size: 1.1rem; }
     .tg-hero { padding: 1.5rem; }
     .tg-stat-card__value { font-size: 1.6rem; }
+
+    /* Tableaux larges (liste billets, colis, ententes...) : sur téléphone, chaque ligne
+       devient une carte empilée verticalement plutôt qu'un tableau qui défile
+       horizontalement, illisible au comptoir. S'applique à toute table portant la classe
+       "mobile-card-table" et dont les <td> portent un attribut data-label. */
+    .table-responsive:has(table.mobile-card-table) {
+        overflow-x: visible;
+    }
+
+    table.mobile-card-table thead {
+        display: none;
+    }
+
+    table.mobile-card-table,
+    table.mobile-card-table tbody,
+    table.mobile-card-table tr,
+    table.mobile-card-table td {
+        display: block;
+        width: 100% !important;
+    }
+
+    table.mobile-card-table tr {
+        margin-bottom: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 4px 0;
+    }
+
+    table.mobile-card-table td {
+        box-sizing: border-box;
+        text-align: right;
+        position: relative;
+        padding: 8px 10px 8px 45%;
+        border: none;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    table.mobile-card-table td:last-child {
+        border-bottom: none;
+    }
+
+    table.mobile-card-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        width: 40%;
+        text-align: left;
+        font-weight: 600;
+        color: #555;
+    }
 }

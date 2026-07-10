@@ -13,9 +13,9 @@
         <!--start content-->
         <main class="page-content ">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
                 <div class="breadcrumb-title pe-3">Colis </div>
-                <div class="ps-3">
+                <div class="ps-3 d-none d-sm-block">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
@@ -24,7 +24,7 @@
                         </ol>
                     </nav>
                 </div>
-               <div class="ms-auto mt-2 mt-sm-0">
+               <div class="ms-sm-auto mt-2 mt-sm-0">
                     <a href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/ajouter_colis" class="btn btn-sm btn-primary rounded-pill shadow-sm me-2">
                          + Ajouter
                     </a>
@@ -91,7 +91,7 @@
                 <div class="card-body">
 
                     <div class="tab-content py-3 table-responsive">
-                        <table id="example" class="table table-striped table-bordered" style="width:100%">
+                        <table id="example" class="table table-striped table-bordered mobile-card-table" style="width:100%">
                             <thead>
                                 <tr class="text-center">
                                     <th>Expediteur</th>

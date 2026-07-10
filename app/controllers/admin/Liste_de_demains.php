@@ -22,8 +22,10 @@ class Liste_de_demains extends  Controller
     $resultats = $model->FetchSelectWheres(
       '*',
       'billets inner join client on billets.id_client = client.idClient',
-      'billets.id_compagnie = :id_compagnie',
-      ['id_compagnie' => $id_compagnie
+      'billets.id_compagnie = :id_compagnie AND billets.departId = :depart',
+      [
+        'id_compagnie' => $id_compagnie,
+        'depart'       => $idDepart
       ]
     );
 

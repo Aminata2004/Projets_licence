@@ -14,9 +14,9 @@
         <!--start content-->
         <main class="page-content ">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
                 <div class="breadcrumb-title pe-3">G-reservation</div>
-                <div class="ps-3">
+                <div class="ps-3 d-none d-sm-block">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
@@ -25,7 +25,7 @@
                         </ol>
                     </nav>
                 </div>
-                <div class="ms-auto">
+                <div class="ms-sm-auto mt-2 mt-sm-0">
                     <div class="btn-group">
                         <a href="<?= BASE_URL ?>/Envoi_colis/liste_colis_envoyer" class="btn btn-primary split-bg-primary text-white"> Voir la liste</a> &nbsp;
                         <a href="javascript:history.back()" class="btn btn-primary "><i
@@ -82,7 +82,7 @@
                     <div class="card-body">
 
                         <div class="tab-content py-3 table-responsive">
-                            <table id="example" class="table table-striped table-bordered" style="width:100%">
+                            <table id="example" class="table table-striped table-bordered mobile-card-table" style="width:100%">
                                 <thead>
                                     <tr class="text-center">
                                         <th>Client</th>

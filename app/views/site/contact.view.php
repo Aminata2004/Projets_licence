@@ -466,15 +466,15 @@
                 <p>Nous collaborons avec les meilleures compagnies de transport pour vous garantir confort, ponctualité et sécurité. Grâce à notre technologie, réservez vos trajets en quelques clics et suivez vos colis en temps réel.</p>
                 <div class="about-stats">
                     <div class="stat">
-                        <div class="stat-number">50+</div>
+                        <div class="stat-number"><?= $stats['destinations'] ?></div>
                         <div class="stat-label">Destinations</div>
                     </div>
                     <div class="stat">
-                        <div class="stat-number">15</div>
+                        <div class="stat-number"><?= $stats['compagnies'] ?></div>
                         <div class="stat-label">Compagnies</div>
                     </div>
                     <div class="stat">
-                        <div class="stat-number">10K+</div>
+                        <div class="stat-number"><?= $stats['clients'] ?></div>
                         <div class="stat-label">Clients</div>
                     </div>
                 </div>

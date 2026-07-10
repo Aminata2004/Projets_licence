@@ -19,16 +19,16 @@
       ]);
     }
 
-    public function listeBillets()
+    public function listeBillets($villeDepart)
     {
       $id_compagnie = $_SESSION['id_compagnie'];
       $liste = $this->FetchSelectWheres(
         '*',
         'billets inner join client on billets.id_client = client.idClient',
-        'billets.id_compagnie = :id_compagnie AND billets.validation_billets = :validation ORDER BY billets.idBillets DESC LIMIT 10',
+        'billets.id_compagnie = :id_compagnie AND billets.departId = :depart AND billets.validation_billets = :validation ORDER BY billets.idBillets DESC LIMIT 10',
         [
           'id_compagnie' => $id_compagnie,
-        
+          'depart'       => $villeDepart,
           'validation'   => 'valider'
         ]
       );
@@ -93,9 +93,10 @@
     }
     public function reporte_voyage($data)
     {
-      $req = "UPDATE billets 
+      $req = "UPDATE billets
             SET jourVoyage = :jourVoyage,
-                Heur_departs = :Heur_departs
+                Heur_departs = :Heur_departs,
+                date_repporte = CURDATE()
             WHERE idBillets = :idBillets";
 
       $params = [

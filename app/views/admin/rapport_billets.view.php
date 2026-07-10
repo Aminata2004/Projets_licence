@@ -41,7 +41,6 @@
                             <div>
                                 <p class="mb-1 text-muted fw-medium">Présentiel</p>
                                 <h3 class="mb-0 text-primary"><?= $data['totalPresentiel'] ?? 0 ?></h3>
-                                <small class="text-success"><i class="bi bi-caret-up-fill"></i> +5% vs semaine dernière</small>
                             </div>
                             <i class="bi bi-box-seam fs-1 text-primary"></i>
                         </div>
@@ -55,7 +54,6 @@
                             <div>
                                 <p class="mb-1 text-muted fw-medium">En ligne</p>
                                 <h3 class="mb-0 text-success"><?= $data['totalEnLigne'] ?? 0 ?></h3>
-                                <small class="text-success"><i class="bi bi-caret-up-fill"></i> +4.6% vs semaine dernière</small>
                             </div>
                             <i class="bi bi-send-check fs-1 text-success"></i>
                         </div>
@@ -69,7 +67,6 @@
                             <div>
                                 <p class="mb-1 text-muted fw-medium">Reportés</p>
                                 <h3 class="mb-0 text-warning"><?= $data['totalRepporte'] ?? 0 ?></h3>
-                                <small class="text-danger"><i class="bi bi-caret-down-fill"></i> -2.7% vs semaine dernière</small>
                             </div>
                             <i class="bi bi-hourglass-split fs-1 text-warning"></i>
                         </div>
