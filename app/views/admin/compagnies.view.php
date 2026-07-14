@@ -17,7 +17,7 @@
         <!--start content-->
         <main class="page-content ">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
                 <div class="breadcrumb-title pe-3">Configuration</div>
                 <div class="ps-3">
                     <nav aria-label="breadcrumb">
@@ -100,7 +100,7 @@
             <!--end breadcrumb-->
 
             <div class="row">
-                                        <div class="col-xxl-3">
+                                        <div class="col-12 col-xxl-3">
           <div class="card config-card">
             <div class="card-header">
               <div class="card-title">
@@ -197,7 +197,7 @@
             </div>
           </div>
         </div>
-                <div class="col-xxl-9">
+                <div class="col-12 col-xxl-9">
                     <?php $this->view("admin/set_flash") ?>
                     <div class="card config-card">
                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -205,7 +205,7 @@
                         </div>
                         <div class="card-body p-4">
                             <div class="table-responsive">
-                                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center" style="width:100%">
+                                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center mobile-card-table" style="width:100%">
                                     <thead class="table-light text-center">
                                         <tr>
                                             <th class="fw-semibold">Logo</th>
@@ -218,7 +218,7 @@
                                     <tbody>
                                         <?php foreach ($liste as $listes): ?>
                                             <tr class="hover-shadow">
-                                                <td class="text-center">
+                                                <td class="text-center" data-label="Logo">
                                                     <?php if (!empty($listes->logo)): ?>
                                                         <img src="<?= BASE_URL ?>/images/logos/<?= htmlspecialchars($listes->logo) ?>" alt="Logo" style="width: 45px; height: 45px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: #fff; padding: 2px;">
                                                     <?php else: ?>
@@ -227,10 +227,10 @@
                                                         </div>
                                                     <?php endif; ?>
                                                 </td>
-                                                <td class="fw-semibold"><?= htmlspecialchars($listes->nom_compagnie) ?></td>
-                                                <td><?= htmlspecialchars($listes->libele) ?></td>
-                                                <td><?= htmlspecialchars($listes->slogant) ?></td>
-                                                <td>
+                                                <td class="fw-semibold" data-label="Nom compagnie"><?= htmlspecialchars($listes->nom_compagnie) ?></td>
+                                                <td data-label="Libellé"><?= htmlspecialchars($listes->libele) ?></td>
+                                                <td data-label="Slogan"><?= htmlspecialchars($listes->slogant) ?></td>
+                                                <td data-label="Action">
                                                     <div class="dropdown">
                                                         <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
                                                             &#8943;

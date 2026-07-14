@@ -1107,6 +1107,29 @@ a.tg-stat-card {
     .tg-hero { padding: 1.5rem; }
     .tg-stat-card__value { font-size: 1.6rem; }
 
+    /* Barre d'actions (breadcrumb + boutons "Ajouter"/"Retour") : sur téléphone elle
+       passait en display:none (d-none d-sm-flex), rendant le bouton "Ajouter"
+       inaccessible. Elle est maintenant toujours affichée (d-flex flex-wrap) ;
+       ici on l'empile proprement et on cache le fil d'Ariane décoratif pour
+       laisser toute la largeur aux boutons d'action. */
+    .page-breadcrumb {
+        row-gap: 0.5rem;
+    }
+    .page-breadcrumb nav[aria-label="breadcrumb"] {
+        display: none;
+    }
+    .page-breadcrumb > .ms-auto {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+    .page-breadcrumb > .ms-auto .d-flex {
+        flex-wrap: wrap;
+    }
+    .page-breadcrumb > .ms-auto .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+
     /* Tableaux larges (liste billets, colis, ententes...) : sur téléphone, chaque ligne
        devient une carte empilée verticalement plutôt qu'un tableau qui défile
        horizontalement, illisible au comptoir. S'applique à toute table portant la classe
@@ -1135,7 +1158,12 @@ a.tg-stat-card {
     }
 
     table.mobile-card-table td {
-        box-sizing: border-box;
+        /* DataTables (dataTables.bootstrap5.min.css) force box-sizing: content-box
+           sur table.dataTable td, avec la même spécificité et chargé après ce
+           fichier : il gagnait la cascade et faisait déborder les <td> (padding-left
+           45% s'ajoutait à la largeur au lieu d'en faire partie), poussant la valeur
+           réelle hors de l'écran mobile — seul le libellé (::before) restait visible. */
+        box-sizing: border-box !important;
         text-align: right;
         position: relative;
         padding: 8px 10px 8px 45%;

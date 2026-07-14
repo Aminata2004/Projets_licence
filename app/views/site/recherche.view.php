@@ -250,11 +250,11 @@
             </div>
             <div>
                 <h4>Contact</h4>
-                <a href="#"><i class="fas fa-map-marker-alt"></i> Bamako, Mali</a>
+                <a href="#"><i class="fas fa-map-marker-alt"></i> Pelegana, Segou, Mali</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 TransGest - Tous droits réservés</p>
+            <p>Copyright &copy; 2026 digitafrika.io. All rights reserved.</p>
         </div>
     </div>
 </footer>

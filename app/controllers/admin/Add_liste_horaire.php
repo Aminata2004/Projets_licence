@@ -37,6 +37,29 @@ class Add_liste_horaire extends  Controller
 
     $this->view('admin/add_liste_horaire', ['liste' => $liste]);
   }
+  public function edit()
+  {
+    $add_liste_horaire = new Add_liste_horaires();
+    if (isset($_POST['edit'])) {
+      $add_liste_horaire->editHoraire([
+        'id_heure' => $_POST['id_heure'],
+        'heuredepart' => $_POST['heuredepart'],
+      ]);
+    }
+    header("Location: " . BASE_URL . "/admin/Add_liste_horaire");
+    exit;
+  }
+
+  public function delete($id_heure = null)
+  {
+    if ($id_heure) {
+      $add_liste_horaire = new Add_liste_horaires();
+      $add_liste_horaire->deleteHoraire($id_heure);
+    }
+    header("Location: " . BASE_URL . "/admin/Add_liste_horaire");
+    exit;
+  }
+
   public function add_permission()
   {
      // instanciation 

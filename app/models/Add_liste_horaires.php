@@ -49,6 +49,37 @@
                 }
             }
         }
+        public function editHoraire($data)
+        {
+            $req = "UPDATE horaire SET heuredepart = :heuredepart WHERE id_heure = :id_heure";
+            $params = [
+                ":heuredepart" => $data['heuredepart'],
+                ":id_heure" => $data['id_heure'],
+            ];
+
+            $modification = $this->insertion_update_simples($req, $params);
+
+            if ($modification == true) {
+                $this->set_flash("Heure modifiée avec succès", "success");
+            } else {
+                $this->set_flash("Échec de la modification de l'heure", "danger");
+            }
+        }
+
+        public function deleteHoraire($id_heure)
+        {
+            $suppression = $this->insertion_update_simples(
+                "DELETE FROM horaire WHERE id_heure = :id_heure",
+                [":id_heure" => $id_heure]
+            );
+
+            if ($suppression == true) {
+                $this->set_flash("Heure supprimée avec succès", "success");
+            } else {
+                $this->set_flash("Échec de la suppression de l'heure", "danger");
+            }
+        }
+
         public function savePermission()
         {
             // Récupération sécurisée des données du formulaire

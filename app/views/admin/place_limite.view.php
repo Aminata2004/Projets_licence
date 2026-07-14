@@ -17,7 +17,7 @@
         <!--start content-->
         <main class="page-content">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
                 <div class="breadcrumb-title pe-3">Configuration</div>
                 <div class="ps-3">
                     <nav aria-label="breadcrumb">
@@ -42,7 +42,7 @@
             <!--end breadcrumb-->
 
             <div class="row">
-                                          <div class="col-xxl-3">
+                                          <div class="col-12 col-xxl-3">
           <div class="card config-card">
             <div class="card-header">
               <div class="card-title">
@@ -139,15 +139,15 @@
             </div>
           </div>
         </div>
-                <div class="col-xxl-9">
+                <div class="col-12 col-xxl-9">
                     <?php $this->view("admin/set_flash") ?>
                     <div class="card config-card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0 fw-bold"><i class="bx bx-chair me-2"></i>Limites des places</h5>
                         </div>
                         <div class="card-body p-4">
-                            <div class="d-flex align-items-center">
-                                <div>
+                            <div class="d-flex align-items-center flex-wrap gap-3">
+                                <div class="flex-grow-1">
                                     <p class="mb-0 text-secondary">Le nombre de place </p>
                                     <?php foreach ($liste_place as $liste_places):
                                     ?>
@@ -155,12 +155,12 @@
                                     <?php endforeach
                                     ?>
                                 </div>
-                                <div class=" add-button position-fixed  end-0 me-5  " data-bs-toggle="modal"
+                                <button type="button" class="add-button btn btn-link ms-auto p-0" data-bs-toggle="modal"
                                     data-bs-target="#staticBackdrop"
                                     data-place_minumale="<?= $liste_places->place_minumale ?>"
-                                    data-id_place_minumale="<?= $liste_places->id_place_minumale ?>"><i
-                                        class=' bx bx-message-square-edit fs-1'></i>
-                                </div>
+                                    data-id_place_minumale="<?= $liste_places->id_place_minumale ?>" title="Modifier">
+                                    <i class='bx bx-message-square-edit fs-1'></i>
+                                </button>
 
                             </div>
                         </div>

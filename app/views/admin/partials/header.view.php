@@ -37,7 +37,7 @@
   <link href="<?=BASE_URL?>/assets/plugins/select2/css/bootstrap-custom-colors.css" rel="stylesheet" />
   <link href="<?=BASE_URL?>/assets/css/table_styles.css" rel="stylesheet" />
   <link href="<?=BASE_URL?>/assets/plugins/js/bs-stepper.css" rel="stylesheet" />
-  <link href="<?=BASE_URL?>/assets/css/transgest-theme.css" rel="stylesheet" />
+  <link href="<?=BASE_URL?>/assets/css/transgest-theme.css?v=<?= @filemtime(dirname(__DIR__, 4) . '/public/assets/css/transgest-theme.css') ?>" rel="stylesheet" />
     
   <link href="<?=BASE_URL?>/assets/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4/animate.min.css">

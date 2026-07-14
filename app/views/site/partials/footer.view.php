@@ -10,15 +10,15 @@
             <div class="contact-info d-flex flex-column flex-md-row gap-4">
                 <div class="contact-items d-flex align-items-center">
                     <div class="icon me-2"><i class="fa-solid fa-phone"></i></div>
-                    <div class="content"><a href="tel:+256214203216">+256 214 203 216</a></div>
+                    <div class="content"><a href="tel:+22390259438">+223 90 25 94 38</a></div>
                 </div>
                 <div class="contact-items d-flex align-items-center">
                     <div class="icon me-2"><i class="fa-regular fa-envelope"></i></div>
-                    <div class="content"><a href="mailto:info-help@travo.com">info-help@travo.com</a></div>
+                    <div class="content"><a href="mailto:transgest@gmail.com">transgest@gmail.com</a></div>
                 </div>
                 <div class="contact-items d-flex align-items-center">
                     <div class="icon me-2"><i class="fa-regular fa-location-dot"></i></div>
-                    <div class="content"><span>Niagara Falls, Banff et Jasper <br> Parc National</span></div>
+                    <div class="content"><span>Pelegana, Segou, Mali</span></div>
                 </div>
             </div>
         </div>
@@ -76,7 +76,7 @@
 
         <!-- Footer Bas -->
         <div class="footer-bottom style-2 mt-4 pt-3 border-top d-flex flex-column flex-md-row justify-content-between align-items-center">
-            <p>© <span class="style-3">G-compagnie</span> 2025. Tous droits réservés</p>
+            <p>Copyright © 2026 digitafrika.io. All rights reserved.</p>
             <ul class="bottom-list d-flex gap-3">
                 <li>Conditions d'utilisation</li>
                 <li>Politique de confidentialité et environnementale</li>

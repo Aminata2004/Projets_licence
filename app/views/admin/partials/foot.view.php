@@ -1,4 +1,8 @@
 
+  <footer class="text-center py-3" style="border-top:1px solid #e9ecef; background:#fff;">
+    <p class="mb-0 text-muted small">Copyright © 2026 digitafrika.io. All rights reserved.</p>
+  </footer>
+
    <!-- Bootstrap bundle JS -->
   <script src="<?=BASE_URL?>/assets/js/bootstrap.bundle.min.js"></script>
   <!--plugins-->

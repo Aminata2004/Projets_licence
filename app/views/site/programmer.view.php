@@ -883,9 +883,9 @@ $nbAgences = count(array_unique(array_merge($villesDepart, $villesDestination)))
                 <a href="<?= BASE_URL ?>/site/Contact">Contact</a>
             </div>
             <div><h4>Support</h4><a href="#">FAQ</a><a href="#">Conditions générales</a><a href="#">Politique de confidentialité</a></div>
-            <div><h4>Contact</h4><a href="#"><i class="fas fa-phone"></i> +223 20 00 00 00</a><a href="#"><i class="fas fa-envelope"></i> contact@transgest.com</a><a href="#"><i class="fas fa-map-marker-alt"></i> Bamako, Mali</a></div>
+            <div><h4>Contact</h4><a href="tel:+22390259438"><i class="fas fa-phone"></i> +223 90 25 94 38</a><a href="mailto:transgest@gmail.com"><i class="fas fa-envelope"></i> transgest@gmail.com</a><a href="#"><i class="fas fa-map-marker-alt"></i> Pelegana, Segou, Mali</a></div>
         </div>
-        <div class="footer-bottom"><p>&copy; 2024 TransGest - Tous droits réservés</p></div>
+        <div class="footer-bottom"><p>Copyright &copy; 2026 digitafrika.io. All rights reserved.</p></div>
     </div>
 </footer>
 

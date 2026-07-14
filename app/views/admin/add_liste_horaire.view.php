@@ -16,7 +16,7 @@
         <!--start content-->
         <main class="page-content">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
                 <div class="breadcrumb-title pe-3">Configuration</div>
                 <div class="ps-3">
                     <nav aria-label="breadcrumb">
@@ -47,7 +47,7 @@
             <!--end breadcrumb-->
 
             <div class="row">
-                                        <div class="col-xxl-3">
+                                        <div class="col-12 col-xxl-3">
           <div class="card config-card">
             <div class="card-header">
               <div class="card-title">
@@ -144,7 +144,7 @@
             </div>
           </div>
         </div>
-                <div class="col-xxl-9">
+                <div class="col-12 col-xxl-9">
                     <?php $this->view("admin/set_flash") ?>
                     <div class="card config-card">
                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -152,7 +152,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center" style="width:100%">
+                                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center mobile-card-table" style="width:100%">
                                     <thead class="table-light text-center">
                                         <tr>
                                             <th>Heure </th>
@@ -163,15 +163,19 @@
 
                                         <?php foreach ($liste as $listes): ?>
                                             <tr>
-                                                <td><?= $listes->heuredepart ?></td>
-                                                <td class=" ">
+                                                <td data-label="Heure"><?= $listes->heuredepart ?></td>
+                                                <td class=" " data-label="Action">
                                                     <div class="dropup text-center">
                                                         <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
                                                             &#8943; <!-- Trois points horizontaux -->
                                                         </a>
                                                         <div class="dropdown-menu dropdown-menu-end">
-                                                            <a class="dropdown-item" href="#">Modifier</a>
-                                                            <a class="dropdown-item" href="#">Désactiver</a>
+                                                            <a class="dropdown-item edit-horaire-btn" href="#"
+                                                                data-bs-toggle="modal" data-bs-target="#modalModificationHoraire"
+                                                                data-id="<?= htmlspecialchars($listes->id_heure, ENT_QUOTES) ?>"
+                                                                data-heuredepart="<?= htmlspecialchars($listes->heuredepart, ENT_QUOTES) ?>">Modifier</a>
+                                                            <a class="dropdown-item text-danger delete-button"
+                                                                href="<?= BASE_URL ?>/admin/Add_liste_horaire/delete/<?= $listes->id_heure ?>">Supprimer</a>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -212,6 +216,31 @@
                 </div>
             </div>
             <!-- fin de modals -->
+            <!-- modal pour la modification de l'heure -->
+            <div class="modal fade" id="modalModificationHoraire" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary">
+                            <h5 class="modal-title text-white">Modifier l'heure de départ</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                        </div>
+                        <form method="post" action="<?= BASE_URL ?>/admin/Add_liste_horaire/edit">
+                            <div class="modal-body">
+                                <input type="hidden" name="id_heure" id="edit_id_heure">
+                                <div class="col-md-12">
+                                    <label for="edit_heuredepart" class="form-label">Heure<span class="text-danger scale5 ms-2">*</span></label>
+                                    <input type="time" class="form-control solid" id="edit_heuredepart" name="heuredepart" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-primary" name="edit">Enregistrer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- fin modal modification -->
             <!--end row-->
         </main>
         <!--end page main-->
@@ -230,6 +259,17 @@
 
 
     <?php $this->view('admin/partials/foot') ?>
+    <script src="<?= BASE_URL ?>/mon_js/alert_delete.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.edit-horaire-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    document.getElementById('edit_id_heure').value = this.dataset.id;
+                    document.getElementById('edit_heuredepart').value = this.dataset.heuredepart;
+                });
+            });
+        });
+    </script>
 
 </body>
 

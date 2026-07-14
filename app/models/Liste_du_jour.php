@@ -91,6 +91,25 @@
 
       return $results;
     }
+    public function updateBillet($data)
+    {
+      $pdo = $this->connect();
+
+      $stmtClient = $pdo->prepare("UPDATE client SET Client = :client WHERE idClient = :id_client");
+      $stmtClient->execute([
+        ':client'    => $data['Client'],
+        ':id_client' => $data['id_client'],
+      ]);
+
+      $stmtBillet = $pdo->prepare("UPDATE billets SET date_expiration = :date_expiration WHERE idBillets = :idBillets");
+      $stmtBillet->execute([
+        ':date_expiration' => $data['date_expiration'],
+        ':idBillets'       => $data['idBillets'],
+      ]);
+
+      $this->set_flash("Billet modifié avec succès", "success");
+    }
+
     public function reporte_voyage($data)
     {
       $req = "UPDATE billets

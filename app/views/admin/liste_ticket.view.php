@@ -13,7 +13,7 @@
         <!--start content-->
         <main class="page-content ">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
                 <div class="breadcrumb-title pe-3">G-reservation</div>
                 <div class="ps-3">
                     <nav aria-label="breadcrumb">
@@ -76,7 +76,7 @@
                 <div class="card-body">
 
                     <div class="tab-content py-3 table-responsive">
-                        <table id="example" class="table table-striped table-bordered" style="width:100%">
+                        <table id="example" class="table table-striped table-bordered mobile-card-table" style="width:100%">
                             <thead>
                                 <tr class="text-center">
                                     <th>Client</th>
@@ -85,7 +85,7 @@
                                     <th>heure de depart</th>
                                     <th>Jour de voyage</th>
                                     <th>Date d'expiration</th>
-                                    <!-- <th>Action</th> -->
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -120,40 +120,23 @@
 
                                                 ?>
                                                     <tr class="text-center">
-                                                        <td><?= $listeClient->Client ?></td>
-                                                        <td><?= $listeClient->destinationId ?></td>
-                                                        <td><?= $listeClient->nombrePassages ?></td>
-                                                        <td><?= $listeClient->Heur_departs ?></td>
-                                                        <td><?= $listeClient->jourVoyage ?></td>
-                                                        <td><?= $listeClient->date_expiration ?></td>
-                                                        <!-- <td>
-                                                            <div class="dropdown ms-auto text-center">
-                                                                <div class="btn-link" data-bs-toggle="dropdown">
-                                                                    <svg width="24px" height="24px" viewBox="0 0 24 24"
-                                                                        version="1.1">
-                                                                        <g stroke="none" stroke-width="1" fill="none"
-                                                                            fill-rule="evenodd">
-                                                                            <rect x="0" y="0" width="24" height="24"></rect>
-                                                                            <circle fill="#000000" cx="5" cy="12" r="2">
-                                                                            </circle>
-                                                                            <circle fill="#000000" cx="12" cy="12" r="2">
-                                                                            </circle>
-                                                                            <circle fill="#000000" cx="19" cy="12" r="2">
-                                                                            </circle>
-                                                                        </g>
-                                                                    </svg>
-                                                                </div>
-                                                                <div class="dropdown-menu dropdown-menu-end">
-                                                                    <a class="dropdown-item"
-                                                                        href="<?= BASE_URL ?>/admin/Liste_du_jours/recu/<?= $listeClient->idClient ?>">Imprimer</a>
-                                                                        
-                                                                    <a class="dropdown-item"
-                                                                        href="Detail_client.php?id_client=<?= $listeClient->idClient ?>">Details</a>
-                                                                    <a class="dropdown-item"
-                                                                        href="Reporter_voyage.php?id_client=<?= $listeClient->idClient ?>">Reporter</a>
-                                                                </div>
-                                                            </div>
-                                                        </td> -->
+                                                        <td data-label="Client"><?= $listeClient->Client ?></td>
+                                                        <td data-label="Destionation"><?= $listeClient->destinationId ?></td>
+                                                        <td data-label="Nbr de place"><?= $listeClient->nombrePassages ?></td>
+                                                        <td data-label="Heure de depart"><?= $listeClient->Heur_departs ?></td>
+                                                        <td data-label="Jour de voyage"><?= $listeClient->jourVoyage ?></td>
+                                                        <td data-label="Date d'expiration"><?= $listeClient->date_expiration ?></td>
+                                                        <td data-label="Action">
+                                                            <i class="bx bx-edit text-primary fs-4 cursor-pointer edit-billet-btn"
+                                                                title="Modifier"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#modalModificationBillet"
+                                                                data-idbillets="<?= htmlspecialchars($listeClient->idBillets, ENT_QUOTES) ?>"
+                                                                data-idclient="<?= htmlspecialchars($listeClient->id_client, ENT_QUOTES) ?>"
+                                                                data-client="<?= htmlspecialchars($listeClient->Client, ENT_QUOTES) ?>"
+                                                                data-expiration="<?= htmlspecialchars($listeClient->date_expiration, ENT_QUOTES) ?>">
+                                                            </i>
+                                                        </td>
                                                     </tr>
                                                 <?php
                                                 }
@@ -186,7 +169,50 @@
     <!--end wrapper-->
 
 
+    <!-- modal pour la modification du billet -->
+    <div class="modal fade" id="modalModificationBillet" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title text-white">Modifier le billet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                </div>
+                <form method="post" action="<?= BASE_URL ?>/admin/Liste_tickets/edit">
+                    <div class="modal-body">
+                        <input type="hidden" name="idBillets" id="edit_idBillets">
+                        <input type="hidden" name="id_client" id="edit_id_client">
+                        <div class="mb-3">
+                            <label for="edit_Client" class="form-label">Nom du client<span class="text-danger ms-2">*</span></label>
+                            <input type="text" class="form-control" id="edit_Client" name="Client" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_date_expiration" class="form-label">Date d'expiration<span class="text-danger ms-2">*</span></label>
+                            <input type="date" class="form-control" id="edit_date_expiration" name="date_expiration" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary" name="edit">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- fin modal modification -->
+
     <?php $this->view('admin/partials/foot') ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.edit-billet-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    document.getElementById('edit_idBillets').value = this.dataset.idbillets;
+                    document.getElementById('edit_id_client').value = this.dataset.idclient;
+                    document.getElementById('edit_Client').value = this.dataset.client;
+                    document.getElementById('edit_date_expiration').value = this.dataset.expiration;
+                });
+            });
+        });
+    </script>
 
 </body>
 

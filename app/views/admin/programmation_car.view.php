@@ -59,7 +59,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header" style="width:100%">
+                                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header mobile-card-table" style="width:100%">
                                     <thead>
                                         <tr>
                                             <th>Numero de car</th>
@@ -70,9 +70,9 @@
                                     <tbody>
                                         <?php foreach ($Select_car1 as $Select_cars) : ?>
                                             <tr>
-                                                <td> Car : <?= $Select_cars->numero_car ?></td>
-                                                <td> <?= $Select_cars->nbr_place ?></td>
-                                                <td class=" ">
+                                                <td data-label="Numero de car"> Car : <?= $Select_cars->numero_car ?></td>
+                                                <td data-label="Nbr de place"> <?= $Select_cars->nbr_place ?></td>
+                                                <td class=" " data-label="Action">
                                                     <div class="dropup ">
                                                         <a href="#" class="-toggle text-dark text-decoration-none fs-4" data-bs-toggle="dropdown" aria-expanded="false">
                                                             &#8943; <!-- Trois points horizontaux -->

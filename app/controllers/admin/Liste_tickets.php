@@ -23,5 +23,18 @@ class Liste_tickets extends  Controller
         $this->view('admin/liste_ticket', ['listeClients' => $listeClients]);
     }
 
-    
+    public function edit()
+    {
+        $model = new Liste_du_jour();
+        if (isset($_POST['edit'])) {
+            $model->updateBillet([
+                'idBillets'       => $_POST['idBillets'],
+                'id_client'       => $_POST['id_client'],
+                'Client'          => $_POST['Client'],
+                'date_expiration' => $_POST['date_expiration'],
+            ]);
+        }
+        header("Location: " . BASE_URL . "/admin/Liste_tickets");
+        exit;
+    }
 }

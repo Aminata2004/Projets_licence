@@ -15,7 +15,7 @@
         <!--start content-->
         <main class="page-content">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
                 <div class="breadcrumb-title pe-3">Configuration</div>
                 <div class="ps-3">
                     <nav aria-label="breadcrumb">
@@ -88,7 +88,7 @@
             <!--end breadcrumb-->
 
             <div class="row">
-                                        <div class="col-xxl-3">
+                                        <div class="col-12 col-xxl-3">
           <div class="card config-card">
             <div class="card-header">
               <div class="card-title">
@@ -185,7 +185,7 @@
             </div>
           </div>
         </div>
-                <div class="col-xxl-9">
+                <div class="col-12 col-xxl-9">
                     <?php $this->view("admin/set_flash") ?>
                     <div class="card config-card">
                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -216,7 +216,7 @@
                             <div class="tab-content">
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center" style="width:100%">
+                                        <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center mobile-card-table" style="width:100%">
                                             <thead class="table-light text-center">
                                                 <tr>
                                                     <th class="fw-semibold">Nom & prénom</th>
@@ -229,10 +229,10 @@
 
                                                 <?php foreach ($listeChaufeur as $listeChaufeurs) : ?>
                                                     <tr>
-                                                        <td><?= $listeChaufeurs->nom_prenom ?></td>
-                                                        <td><?= $listeChaufeurs->numero ?></td>
-                                                        <td><?= $listeChaufeurs->numero_car ?></td>
-                                                        <td>
+                                                        <td data-label="Nom & prénom"><?= $listeChaufeurs->nom_prenom ?></td>
+                                                        <td data-label="Numéro"><?= $listeChaufeurs->numero ?></td>
+                                                        <td data-label="Numéro du car"><?= $listeChaufeurs->numero_car ?></td>
+                                                        <td data-label="Action">
                                                             <div class="dropdown">
                                                                 <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
                                                                     &#8943;

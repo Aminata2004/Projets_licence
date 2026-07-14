@@ -17,7 +17,7 @@
         <!--start content-->
         <main class="page-content">
             <!--breadcrumb-->
-            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
                 <div class="breadcrumb-title pe-3">Configuration</div>
                 <div class="ps-3">
                     <nav aria-label="breadcrumb">
@@ -44,7 +44,7 @@
             </div>
             <!--end breadcrumb-->
             <div class="row">
-                                        <div class="col-xxl-3">
+                                        <div class="col-12 col-xxl-3">
           <div class="card config-card">
             <div class="card-header">
               <div class="card-title">

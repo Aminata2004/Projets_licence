@@ -12,7 +12,7 @@
     <!--start content-->
     <main class="page-content ">
       <!--breadcrumb-->
-      <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+      <div class="page-breadcrumb d-flex flex-wrap align-items-center mb-3">
         <div class="breadcrumb-title pe-3">Configuration</div>
         <div class="ps-3">
           <nav aria-label="breadcrumb">
@@ -39,7 +39,7 @@
       <!--end breadcrumb-->
 
       <div class="row">
-                                <div class="col-xxl-3">
+                                <div class="col-12 col-xxl-3">
           <div class="card config-card">
             <div class="card-header">
               <div class="card-title">
@@ -136,7 +136,7 @@
             </div>
           </div>
         </div>
-        <div class="col-xxl-9">
+        <div class="col-12 col-xxl-9">
           <?php $this->view("admin/set_flash") ?>
           <div class="card config-card">
             <div class="card-header">
@@ -144,7 +144,7 @@
             </div>
             <div class="card-body p-4">
               <div class="table-responsive">
-                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center" style="width:100%">
+                <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center mobile-card-table" style="width:100%">
                   <thead class="table-light text-center">
                     <tr>
                       <th class="fw-semibold">Utilisateur</th>
@@ -158,11 +158,11 @@
                   <tbody class="text-center">
                     <?php foreach ($liste as $listes): ?>
                       <tr class="align-middle text-center">
-                        <td><?= htmlspecialchars($listes->utilisateurs) ?></td>
-                        <td><?= htmlspecialchars($listes->emailUser) ?></td>
-                        <td><?= htmlspecialchars($listes->numeroGare) ?></td>
-                        <td><?= htmlspecialchars($listes->droit) ?></td>
-                        <td>
+                        <td data-label="Utilisateur"><?= htmlspecialchars($listes->utilisateurs) ?></td>
+                        <td data-label="Email"><?= htmlspecialchars($listes->emailUser) ?></td>
+                        <td data-label="Gare"><?= htmlspecialchars($listes->numeroGare) ?></td>
+                        <td data-label="Droit"><?= htmlspecialchars($listes->droit) ?></td>
+                        <td data-label="Service">
                           <?php if ($listes->droit === 'Utilisateur' && !empty($listes->profile)): ?>
                             <?= $listes->profile === 'billet' ? 'Billetterie' : ($listes->profile === 'colis' ? 'Colis / Courrier' : htmlspecialchars($listes->profile)) ?>
                           <?php else: ?>
@@ -184,7 +184,7 @@
                             </ul>
                           </div>
                         </td> -->
-                        <td class="text-center">
+                        <td class="text-center" data-label="Action">
                           <a href="<?= BASE_URL ?>/admin/Permissions/assigner/<?= htmlspecialchars($listes->idUser) ?>"
                             title="Permission">
                             <i class="bx bx-lock-open text-primary fs-4 cursor-pointer"></i>

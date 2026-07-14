@@ -73,20 +73,23 @@ class Configurations extends Controller
         if (isset($_SESSION['droit'])) {
             $role = $_SESSION['droit'];
 
+            $userColumns = 'utilisateur.idUser, utilisateur.utilisateurs, utilisateur.emailUser, utilisateur.motPasse,
+                utilisateur.droit, utilisateur.profile, utilisateur.status, agence.numeroGare';
+
             if ($role === 'super_admin') {
                 $listes = $configuration->SelectAllData(
-                    '*',
-                    'utilisateur 
-                LEFT JOIN agence ON agence.idAgence = utilisateur.id_agence 
+                    $userColumns,
+                    'utilisateur
+                LEFT JOIN agence ON agence.idAgence = utilisateur.id_agence
                 LEFT JOIN compagnie ON compagnie.id_compagnie = agence.id_compagnie'
                 );
             } elseif ($role === 'Admin' && isset($_SESSION['id_compagnie'])) {
                 $id_compagnie = $_SESSION['id_compagnie'];
 
                 $listes = $configuration->FetchSelectWheres(
-                    '*',
-                    'utilisateur 
-                INNER JOIN agence ON agence.idAgence = utilisateur.id_agence 
+                    $userColumns,
+                    'utilisateur
+                INNER JOIN agence ON agence.idAgence = utilisateur.id_agence
                 INNER JOIN compagnie ON compagnie.id_compagnie = agence.id_compagnie',
                     'agence.id_compagnie = :id_compagnie',
                     ['id_compagnie' => $id_compagnie]
