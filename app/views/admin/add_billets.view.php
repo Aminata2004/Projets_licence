@@ -48,6 +48,7 @@
                         <div class="card-body">
                             <div class="form-validation">
                                 <form class="needs-validation" method="POST">
+                                    <?= csrf_field() ?>
                                     <div class="row">
                                         <div class="col-xl-12">
                                             <div class="mb-3 row">

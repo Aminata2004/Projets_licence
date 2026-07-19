@@ -120,6 +120,74 @@
         }
 
 
+        // Recalcule le prix de référence côté serveur (ne jamais faire confiance au prix posté par le client)
+        private function getPrixReference($heureDepart, $destinationLocalite, $escaleNom)
+        {
+            $idDepart    = $_SESSION['ville'] ?? null;
+            $idCompagnie = $_SESSION['id_compagnie'] ?? null;
+
+            $row = $this->fetchOne(
+                "SELECT p.idProgrammer, p.prix
+                 FROM programmer p
+                 LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
+                 LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
+                 WHERE a1.localite = :departLocalite
+                   AND a2.localite = :destLocalite
+                   AND p.heureDepart = :heure
+                   AND p.id_compagnie = :idCompagnie
+                 LIMIT 1",
+                [
+                    ':departLocalite' => $idDepart,
+                    ':destLocalite'   => $destinationLocalite,
+                    ':heure'          => $heureDepart,
+                    ':idCompagnie'    => $idCompagnie
+                ]
+            );
+
+            if (!$row) {
+                return null;
+            }
+
+            $prixUnitaire = (float)$row['prix'];
+
+            if (!empty($escaleNom)) {
+                $escaleRow = $this->fetchOne(
+                    "SELECT prix_escale FROM ligneTrajet lt
+                     JOIN escale e ON e.id_escale = lt.id_escales
+                     WHERE lt.id_trajets = :progId AND lt.type_trajet = 'programmer' AND e.escales = :escaleNom
+                     LIMIT 1",
+                    [':progId' => $row['idProgrammer'], ':escaleNom' => $escaleNom]
+                );
+                if ($escaleRow) {
+                    $prixUnitaire = (float)$escaleRow['prix_escale'];
+                }
+            }
+
+            return $prixUnitaire;
+        }
+
+        // Génère un numeroBillets et vérifie son unicité en base avant de le retenir : le
+        // numéro affiché dans le formulaire (genererNumeroBillet() côté vue) n'est qu'un
+        // aperçu — on ne lui fait jamais confiance côté serveur, car il est modifiable
+        // côté client et deux ventes dans la même seconde peuvent produire la même valeur
+        // (timestamp + rand(100,999), 1 chance sur ~900 de collision).
+        private function genererNumeroBilletUnique(): string
+        {
+            for ($i = 0; $i < 5; $i++) {
+                $numero = 'SMT' . date('Hismd') . random_int(100, 999);
+                $existe = $this->fetchOne(
+                    "SELECT 1 FROM billets WHERE numeroBillets = :num LIMIT 1",
+                    [':num' => $numero]
+                );
+                if (!$existe) {
+                    return $numero;
+                }
+            }
+            // Filet de sécurité si les 5 tentatives collisionnent toutes (extrêmement improbable) :
+            // uniqid garantit l'unicité par construction.
+            return 'SMT' . uniqid();
+        }
+
         // public function saveBillets(): bool
         // {
         //     extract($_POST);
@@ -347,6 +415,11 @@
         // }
         public function saveBillets(): bool
         {
+            if (!csrf_verify()) {
+                $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+                return false;
+            }
+
             extract($_POST);
             $pdo = $this->connect();
 
@@ -366,16 +439,26 @@
                 return false;
             }
 
+            $nombrePassages = (int)$nombrePassages;
+            if ($nombrePassages <= 0) {
+                $this->set_flash("Le nombre de places doit être supérieur à zéro.", "danger");
+                return false;
+            }
+
             $car             = null;
             $idCarProgrammer = null;
             $numPlace        = '-';
             $escaleNom       = $_POST['escale'] ?? '';
             $destinationId   = $_POST['destinationId'] ?? '';
             $destFinale      = !empty($escaleNom) ? $escaleNom : $destinationId;
-            $prixUtilise = $_POST['montant_payer'] ?? '';
-            // Supprimer les espaces, espaces insécables et "FCFA"
-            $prixUtilise = str_replace([' ', ' ', 'FCFA'], '', $prixUtilise);
-            $prixUtilise = floatval($prixUtilise); // Convertir en nombre
+
+            // Le prix ne vient jamais du client : il est recalculé côté serveur à partir du trajet programmé.
+            $prixUnitaireServeur = $this->getPrixReference($programme, $destinationId, $escaleNom);
+            if ($prixUnitaireServeur === null) {
+                $this->set_flash("Trajet ou tarif introuvable pour cette destination/heure.", "danger");
+                return false;
+            }
+            $prixUtilise = $prixUnitaireServeur * $nombrePassages;
 
 
             try {
@@ -409,24 +492,30 @@
                     );
 
                     if (!$rowProg) {
+                        $pdo->rollBack();
                         $this->set_flash("Aucun car programmé pour cette heure et ce trajet.", "danger");
                         return false;
                     }
 
                     $idCarProgrammer = $rowProg['id_car_programmer'];
 
-                    $car = $this->fetchOne(
-                        "SELECT nbr_place, nbr_place_reserve, id_car FROM car WHERE id_car = :num LIMIT 1",
-                        [':num' => $idCarProgrammer]
+                    // SELECT ... FOR UPDATE sur la connexion transactionnelle : verrouille la ligne
+                    // jusqu'au commit/rollback pour empêcher deux ventes simultanées de survendre les places.
+                    $stmt = $pdo->prepare(
+                        "SELECT nbr_place, nbr_place_reserve, id_car FROM car WHERE id_car = :num LIMIT 1 FOR UPDATE"
                     );
+                    $stmt->execute([':num' => $idCarProgrammer]);
+                    $car = $stmt->fetch(PDO::FETCH_ASSOC);
 
                     if (!$car) {
+                        $pdo->rollBack();
                         $this->set_flash("Car introuvable.", "danger");
                         return false;
                     }
 
                     $placesDispo = $car['nbr_place'] - $car['nbr_place_reserve'];
                     if ($nombrePassages > $placesDispo) {
+                        $pdo->rollBack();
                         $this->set_flash("Places insuffisantes : $placesDispo restantes.", "danger");
                         return false;
                     }
@@ -447,10 +536,12 @@
                         return false;
                     }
 
+                    // FOR UPDATE : verrouille la ligne de suivi jusqu'au commit/rollback pour éviter
+                    // que deux ventes simultanées ne dépassent le quota de places de demain.
                     $stmt = $pdo->prepare(
                         "SELECT idSuivis, place_totals, place_reserve FROM suivis
                  WHERE depart = :dep AND destination = :dest AND heur_depart = :h
-                 AND date_reservation = :jr AND id_compagnie = :id_compagnie LIMIT 1"
+                 AND date_reservation = :jr AND id_compagnie = :id_compagnie LIMIT 1 FOR UPDATE"
                     );
                     $stmt->execute([
                         ':dep'          => $_SESSION['ville'],
@@ -524,6 +615,10 @@
 
                     $numPlace = implode('-', $numPlacesAttribues);
                 }
+
+                // Le numéro de billet ne vient jamais du client : régénéré et vérifié côté
+                // serveur (cf. genererNumeroBilletUnique) pour éviter tout doublon.
+                $numeroBillets = $this->genererNumeroBilletUnique();
 
                 // Insertion du billet
                 $stmt = $pdo->prepare("INSERT INTO billets (id_client,idUser, numeroBillets, jourVoyage, Heur_departs,

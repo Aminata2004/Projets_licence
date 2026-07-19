@@ -136,9 +136,7 @@
               </li>
             <?php } ?>
 
-            <?php //if ($user->userHasPermission('Caisse_Creation')) { 
-            ?>
-
+            <?php if ($user->userHasPermission('Caisse_apercue')) { ?>
 
             <li class="menu-label">Gestion de caisse</li>
             <li>
@@ -158,6 +156,7 @@
 
               </ul>
             </li>
+            <?php } ?>
 
             <?php if ($user->userHasPermission('Programmer_Creation')) { ?>
               <li class="menu-label">Gestion des programmations</li>

@@ -223,6 +223,14 @@ class Programmation_voyages extends Controller
     {
         $programmation_voyage = new Programmation_voyage();
 
+        // index() restreint déjà cette section à Admin/chef_d_escale : edit() (modification
+        // d'une programmation de voyage) doit avoir le même contrôle.
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)) {
+            $programmation_voyage->set_flash("Accès refusé ou session invalide", "danger");
+            header("Location: " . BASE_URL . "/admin/Programmation_voyages/index");
+            exit;
+        }
+
         // Traitement de la soumission du formulaire de modification
         if (isset($_POST['modifier'])) {
             $id_horaire = $_POST['id_horaire'][0] ?? null;
@@ -241,13 +249,14 @@ class Programmation_voyages extends Controller
             exit;
         }
 
-        // Récupérer la programmation
+        // Récupérer la programmation (filtrée par compagnie de session : empêche de modifier
+        // la programmation d'une autre compagnie en changeant l'ID dans l'URL)
         $programmation = $programmation_voyage->FetchSelectWheres(
             'pv.*, c.numero_car, c.nbr_place, c.nbr_place_reserve',
             'programmation_voyage pv
          INNER JOIN car c ON pv.id_car_programmer = c.id_car',
-            'pv.id_programmation = :id_programmation',
-            ['id_programmation' => $id_programmation]
+            'pv.id_programmation = :id_programmation AND pv.id_compagnie = :id_compagnie',
+            ['id_programmation' => $id_programmation, 'id_compagnie' => $_SESSION['id_compagnie'] ?? null]
         );
 
         if (empty($programmation)) {

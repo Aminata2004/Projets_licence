@@ -1,6 +1,11 @@
   <?php
     class AjaxFiltreListeClient extends Controller
     {
+        public function __construct()
+        {
+            $this->requireLogin();
+        }
+
         public function index()
         {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {

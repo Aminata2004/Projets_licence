@@ -90,58 +90,32 @@
                             </thead>
                             <tbody>
                                 <?php
-                                // Configurer le fuseau horaire à l'UTC (Mali)
-                                date_default_timezone_set('UTC');
-
-                                // Obtenir l'heure actuelle au Mali
-                                $current_time = date("H:i");
-
-
-                                // Définir les créneaux horaires et leurs plages correspondantes
-                                $time_slots = [
-                                    '00:00' => ['start' => '00:00', 'end' => '05:30', 'depart' => ['05:00:00']],
-                                    '05:30' => ['start' => '05:30', 'end' => '07:00', 'depart' => ['06:00:00']],
-                                    '07:00' => ['start' => '07:00', 'end' => '09:00', 'depart' => ['08:00:00']],
-                                    '09:00' => ['start' => '09:00', 'end' => '11:00', 'depart' => ['10:00:00']],
-                                    '11:00' => ['start' => '11:00', 'end' => '14:30', 'depart' => ['14:00:00']],
-                                    '14:30' => ['start' => '14:30', 'end' => '15:30', 'depart' => ['16:00:00']],
-                                    '15:30' => ['start' => '15:30', 'end' => '16:20', 'depart' => ['16:00:00']],
-                                    '16:20' => ['start' => '16:20', 'end' => '23:59', 'depart' => ['16:30:00']]
-                                ];
-
-                                // Parcourir les billets pour vérifier si l'heure de départ correspond à l'heure actuelle et au créneau
+                                // Affiche uniquement les billets du jour dont l'heure de départ correspond
+                                // au créneau "en cours" (calculé côté contrôleur à partir des heures réellement
+                                // programmées par la compagnie, cf. Liste_du_jour::getHeureDepartCourante()).
                                 foreach ($listeClients as $listeClient) {
-                                    if ($listeClient->jourVoyage == date("Y-m-d")) { // Vérifie si c'est aujourd'hui
-                                        foreach ($time_slots as $slot) {
-                                            // Vérifier si l'heure actuelle se situe dans ce créneau
-                                            if ($current_time >= $slot['start'] &&  $current_time <= $slot['end']) {
-                                                // Vérifier si l'heure de départ du billet correspond aux heures de départ du créneau
-                                                if (in_array($listeClient->Heur_departs, $slot['depart'])) {
-
-                                                ?>
-                                                    <tr class="text-center">
-                                                        <td data-label="Client"><?= $listeClient->Client ?></td>
-                                                        <td data-label="Destionation"><?= $listeClient->destinationId ?></td>
-                                                        <td data-label="Nbr de place"><?= $listeClient->nombrePassages ?></td>
-                                                        <td data-label="Heure de depart"><?= $listeClient->Heur_departs ?></td>
-                                                        <td data-label="Jour de voyage"><?= $listeClient->jourVoyage ?></td>
-                                                        <td data-label="Date d'expiration"><?= $listeClient->date_expiration ?></td>
-                                                        <td data-label="Action">
-                                                            <i class="bx bx-edit text-primary fs-4 cursor-pointer edit-billet-btn"
-                                                                title="Modifier"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#modalModificationBillet"
-                                                                data-idbillets="<?= htmlspecialchars($listeClient->idBillets, ENT_QUOTES) ?>"
-                                                                data-idclient="<?= htmlspecialchars($listeClient->id_client, ENT_QUOTES) ?>"
-                                                                data-client="<?= htmlspecialchars($listeClient->Client, ENT_QUOTES) ?>"
-                                                                data-expiration="<?= htmlspecialchars($listeClient->date_expiration, ENT_QUOTES) ?>">
-                                                            </i>
-                                                        </td>
-                                                    </tr>
-                                                <?php
-                                                }
-                                            }
-                                        }
+                                    if ($listeClient->jourVoyage == date("Y-m-d") && $heureCourante !== null && $listeClient->Heur_departs == $heureCourante) {
+                                ?>
+                                        <tr class="text-center">
+                                            <td data-label="Client"><?= $listeClient->Client ?></td>
+                                            <td data-label="Destionation"><?= $listeClient->destinationId ?></td>
+                                            <td data-label="Nbr de place"><?= $listeClient->nombrePassages ?></td>
+                                            <td data-label="Heure de depart"><?= $listeClient->Heur_departs ?></td>
+                                            <td data-label="Jour de voyage"><?= $listeClient->jourVoyage ?></td>
+                                            <td data-label="Date d'expiration"><?= $listeClient->date_expiration ?></td>
+                                            <td data-label="Action">
+                                                <i class="bx bx-edit text-primary fs-4 cursor-pointer edit-billet-btn"
+                                                    title="Modifier"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalModificationBillet"
+                                                    data-idbillets="<?= htmlspecialchars($listeClient->idBillets, ENT_QUOTES) ?>"
+                                                    data-idclient="<?= htmlspecialchars($listeClient->id_client, ENT_QUOTES) ?>"
+                                                    data-client="<?= htmlspecialchars($listeClient->Client, ENT_QUOTES) ?>"
+                                                    data-expiration="<?= htmlspecialchars($listeClient->date_expiration, ENT_QUOTES) ?>">
+                                                </i>
+                                            </td>
+                                        </tr>
+                                <?php
                                     }
                                 }
                                 ?>

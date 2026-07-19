@@ -145,44 +145,58 @@ $fromAndWhere = "liaison_car_trajet
 
         $result = $this->insertion_update_simples($insert, $params);
 
-        // 2. Réinitialiser le nombre de places réservées à 0 (par sécurité)
-        $update = "UPDATE car SET nbr_place_reserve = 0 WHERE id_car = :id_car";
-        $this->insertion_update_simples($update, [':id_car' => $id_care]);
+        // 2. Recalculer (jamais remettre à 0 aveuglément) le nombre de places déjà réservées
+        //    sur ce créneau exact : une reprogrammation ne doit jamais faire "disparaître" des
+        //    billets déjà vendus (aujourd'hui ou demain), sinon les places redeviennent
+        //    disponibles alors que des tickets existent déjà dessus (risque de survente).
+        $placesDejaVendues = $this->countPlacesVendues($id_horaire, $id_destination, $localite_user, $jourVoyage, $id_compagnie);
 
-        // 3. 🔁 Rechercher dans la table suivis si une réservation pour demain existe déjà
-        $stmt = $this->connect()->prepare("
-        SELECT place_reserve
-        FROM suivis
-        WHERE depart = :dep
-          AND destination = :dest
-          AND heur_depart = :h
-          AND date_reservation = :jr
-          AND id_compagnie = :id_compagnie
-        LIMIT 1
-    ");
-        $stmt->execute([
-            ':dep'           => $localite_user,
-            ':dest'          => $id_destination,
-            ':h'             => $id_horaire,
-            ':jr'            => $jourVoyage,
-            ':id_compagnie'  => $id_compagnie
-        ]);
-
-        $suivi = $stmt->fetch();
-
-        // 4. Si on a une ligne de réservation pour ce jour et cette destination
-        if ($suivi && $suivi['place_reserve'] > 0) {
-            $placeReserve = (int)$suivi['place_reserve'];
-
-            // 5. Mettre à jour le nombre de places réservées du car programmé
-            $stmt = $this->connect()->prepare("UPDATE car SET nbr_place_reserve = :n WHERE id_car = :id_car");
-            $stmt->execute([
-                ':n'   => $placeReserve,
-                ':id_car' => $id_care
-            ]);
-        }
+        $update = "UPDATE car SET nbr_place_reserve = :n WHERE id_car = :id_car";
+        $this->insertion_update_simples($update, [':n' => $placesDejaVendues, ':id_car' => $id_care]);
 
         return $result;
+    }
+
+    // Compte les places déjà vendues (billets) pour un créneau exact (départ/destination/heure/date/compagnie).
+    // Inclut les billets vendus vers une escale du trajet, car ceux-ci sont enregistrés avec le nom
+    // de l'escale comme destinationId plutôt que la destination finale.
+    private function countPlacesVendues($id_horaire, $id_destination, $localite_user, $jourVoyage, $id_compagnie)
+    {
+        $destinations = [$id_destination];
+
+        $prog = $this->fetchOne(
+            "SELECT p.idProgrammer
+             FROM programmer p
+             LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
+             LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
+             WHERE a1.localite = :dep AND a2.localite = :dest AND p.heureDepart = :heure AND p.id_compagnie = :id_compagnie
+             LIMIT 1",
+            [':dep' => $localite_user, ':dest' => $id_destination, ':heure' => $id_horaire, ':id_compagnie' => $id_compagnie]
+        );
+
+        if ($prog) {
+            $escales = $this->fetchAll(
+                "SELECT e.escales FROM ligneTrajet lt
+                 JOIN escale e ON e.id_escale = lt.id_escales
+                 WHERE lt.id_trajets = :progId AND lt.type_trajet = 'programmer'",
+                [':progId' => $prog['idProgrammer']]
+            );
+            foreach ($escales as $e) {
+                $destinations[] = $e['escales'];
+            }
+        }
+
+        $placeholders = implode(',', array_fill(0, count($destinations), '?'));
+        $sql = "SELECT COALESCE(SUM(nombrePassages), 0) AS total
+                FROM billets
+                WHERE jourVoyage = ? AND Heur_departs = ? AND departId = ? AND id_compagnie = ?
+                  AND destinationId IN ($placeholders)";
+
+        $params = array_merge([$jourVoyage, $id_horaire, $localite_user, $id_compagnie], $destinations);
+
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute($params);
+        return (int)$stmt->fetchColumn();
     }
 
 

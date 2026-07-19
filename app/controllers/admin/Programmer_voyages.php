@@ -164,6 +164,14 @@ class Programmer_voyages extends  Controller
   {
     $programmer_voyage = new Programmer_voyage();
 
+    // index() et add_programmer() restreignent déjà cette section à Admin/chef_d_escale :
+    // edit() (modification du prix d'un trajet programmé) doit avoir le même contrôle.
+    if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)) {
+      $programmer_voyage->set_flash("Accès refusé ou session invalide", "danger");
+      header("Location: " . BASE_URL . "/admin/Programmer_voyages/index");
+      exit;
+    }
+
     if (isset($_POST['edit'])) {
       $data = [
         "prix" => $_POST['prix'],
@@ -188,6 +196,12 @@ class Programmer_voyages extends  Controller
   public function delete($id)
   {
     $programmer_voyage = new Programmer_voyage();
+
+    if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)) {
+      $programmer_voyage->set_flash("Accès refusé ou session invalide", "danger");
+      header("Location: " . BASE_URL . "/admin/Programmer_voyages/index");
+      exit;
+    }
 
     if (!empty($id)) {
       if ($programmer_voyage->deleteProgrammer($id)) {

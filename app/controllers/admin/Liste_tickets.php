@@ -20,16 +20,29 @@ class Liste_tickets extends  Controller
             ['id_compagnie' => $id_compagnie]
         );
 
-        $this->view('admin/liste_ticket', ['listeClients' => $listeClients]);
+        $heureCourante = $model->getHeureDepartCourante($_SESSION['ville'] ?? '', $id_compagnie);
+
+        $this->view('admin/liste_ticket', ['listeClients' => $listeClients, 'heureCourante' => $heureCourante]);
     }
 
     public function edit()
     {
         $model = new Liste_du_jour();
         if (isset($_POST['edit'])) {
+            $idBillets = $_POST['idBillets'] ?? null;
+            // getBilletById() est filtré par compagnie de session : confirme que ce billet
+            // appartient bien à l'utilisateur avant toute modification (protection IDOR).
+            $billet = $idBillets ? $model->getBilletById($idBillets) : null;
+
+            if (!$billet) {
+                $model->set_flash("Billet introuvable.", "danger");
+                header("Location: " . BASE_URL . "/admin/Liste_tickets");
+                exit;
+            }
+
             $model->updateBillet([
-                'idBillets'       => $_POST['idBillets'],
-                'id_client'       => $_POST['id_client'],
+                'idBillets'       => $idBillets,
+                'id_client'       => $billet->id_client, // dérivé du billet vérifié, jamais du POST
                 'Client'          => $_POST['Client'],
                 'date_expiration' => $_POST['date_expiration'],
             ]);

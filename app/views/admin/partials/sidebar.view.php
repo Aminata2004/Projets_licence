@@ -155,7 +155,7 @@
               </ul>
               </li>
 
-              <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)): ?>
+              <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true) && $user->userHasPermission('Depenses_gestion')): ?>
                 <li class="menu-label">Finances</li>
                 <li>
                   <a href="javascript:;" class="has-arrow">
@@ -228,8 +228,7 @@
                 <?php endif; // Fin du if !== 'super_admin' ?>
 
                 <?php if (isset($_SESSION['droit']) && ($_SESSION['droit'] === 'Admin' || $_SESSION['droit'] === 'super_admin')): ?>
-                <?php //if ($user->userHasPermission('configuration_aprecue')) {
-                ?>
+                <?php if ($user->userHasPermission('Configuration_apercu')) { ?>
                   <li class="menu-label">Paramètre</li>
                   <li>
                     <?php if ($_SESSION['droit'] === 'super_admin'): ?>
@@ -264,7 +263,7 @@
                       </a>
                   </li>
                   <?php endif; ?>
-   <?php // } ?>
+   <?php } ?>
                 <?php endif; ?>
                 
     </ul>

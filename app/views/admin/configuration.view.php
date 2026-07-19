@@ -85,6 +85,7 @@
                     </a>
                   </li>
                 <?php } ?>
+                <?php /* Trajets masqué : ne doit pas apparaître dans Configuration
                 <?php if ($user->userHasPermission('Configuration_gestion_trajets')) { ?>
                   <li class="nav-item mt-2">
                     <a class="nav-link  text-break mb-0" role="tab"
@@ -94,6 +95,7 @@
                     </a>
                   </li>
                 <?php } ?>
+                */ ?>
                 <?php if ($user->userHasPermission('Configuration_gestion_horaire')) { ?>
                   <li class="nav-item mt-2">
                     <a class="nav-link  text-break mb-0" role="tab"
