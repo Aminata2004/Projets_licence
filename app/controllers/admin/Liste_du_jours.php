@@ -242,4 +242,20 @@ class Liste_du_jours extends  Controller
       exit;
     }
   }
+
+  public function annuler()
+  {
+    if (isset($_POST['annuler_billet'])) {
+      $billets = new Liste_du_jour();
+      $idBillets = $_POST['idBillets'] ?? null;
+      $motif = trim($_POST['motif_annulation'] ?? '');
+
+      if ($idBillets) {
+        $billets->annulerBillet($idBillets, $motif);
+      }
+    }
+
+    header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
+    exit;
+  }
 }

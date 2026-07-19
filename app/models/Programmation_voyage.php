@@ -121,9 +121,35 @@ $fromAndWhere = "liaison_car_trajet
         // chef_d_escale (une seule gare) : toujours sa propre localité de session.
         $localite_user = $id_depart ?: $_SESSION['ville'];
         $id_compagnie = $_SESSION["id_compagnie"];
-        $jourVoyage = $_POST['jourVoyage'];
 
         if ($id_destination == $localite_user) {
+            return false;
+        }
+
+        // Le formulaire ne propose déjà que les cars disponibles (getProgrammationCars()),
+        // mais rien ne revérifiait côté serveur qu'un id_care soumis directement l'est
+        // toujours : un car déjà "En_transit_*" (parti sur un trajet en cours) pouvait être
+        // reprogrammé une seconde fois, écrasant le compteur de places du trajet en cours.
+        // Un car peut légitimement faire plusieurs tournées par jour, mais seulement après
+        // que son arrivée ait été validée (validerArrivee() le rend de nouveau disponible).
+        $car = $this->fetchOne(
+            "SELECT status_car FROM car WHERE id_car = :id_car AND id_compagnie = :id_compagnie",
+            [':id_car' => $id_care, ':id_compagnie' => $id_compagnie]
+        );
+
+        if (!$car) {
+            return false;
+        }
+
+        $statusCar = $car['status_car'];
+        if ($statusCar !== null && strpos($statusCar, 'En_transit_') === 0) {
+            return false;
+        }
+
+        // chef_d_escale (pas d'id_depart fourni) : le car doit être physiquement dans sa gare.
+        // Admin (id_depart fourni) : peut réaffecter un car présent ailleurs dans sa compagnie
+        // (choix déjà assumé dans getProgrammationCars() pour ce rôle).
+        if ($id_depart === null && $statusCar !== $localite_user) {
             return false;
         }
 
@@ -139,7 +165,7 @@ $fromAndWhere = "liaison_car_trajet
             ':id_horaire' => $id_horaire,
             ':id_trajet' => $id_destination,
             ':localite_user' => $localite_user,
-            ':date_enregistre' => $jourVoyage,
+            ':date_enregistre' => $date_enregistre,
             ':id_compagnie' => $id_compagnie
         ];
 
@@ -149,7 +175,7 @@ $fromAndWhere = "liaison_car_trajet
         //    sur ce créneau exact : une reprogrammation ne doit jamais faire "disparaître" des
         //    billets déjà vendus (aujourd'hui ou demain), sinon les places redeviennent
         //    disponibles alors que des tickets existent déjà dessus (risque de survente).
-        $placesDejaVendues = $this->countPlacesVendues($id_horaire, $id_destination, $localite_user, $jourVoyage, $id_compagnie);
+        $placesDejaVendues = $this->countPlacesVendues($id_horaire, $id_destination, $localite_user, $date_enregistre, $id_compagnie);
 
         $update = "UPDATE car SET nbr_place_reserve = :n WHERE id_car = :id_car";
         $this->insertion_update_simples($update, [':n' => $placesDejaVendues, ':id_car' => $id_care]);

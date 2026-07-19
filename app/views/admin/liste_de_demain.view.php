@@ -157,6 +157,11 @@
                                                             Imprimer le reçu
                                                         </a>
 
+                                                        <a href="#" class="dropdown-item cancel-btn text-danger"
+                                                            data-idbillets="<?= $item->idBillets ?>">
+                                                            Annuler le billet
+                                                        </a>
+
                                                     </div>
                                                 </div>
                                             </td>
@@ -215,6 +220,35 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal annulation de billet -->
+        <div class="modal fade" id="modalAnnulerBillet" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger">
+                        <h5 class="modal-title text-white">Annuler le billet</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                    </div>
+                    <form action="<?= BASE_URL ?>/admin/Liste_du_jours/annuler" method="post">
+                        <?= csrf_field() ?>
+                        <div class="modal-body">
+                            <p>Cette action est définitive : la place sera restituée et la caisse ajustée si une caisse est ouverte pour cette gare.</p>
+                            <input type="hidden" name="idBillets" id="annulerIdBillets">
+                            <div class="mb-3">
+                                <label for="motifAnnulation" class="form-label">Motif (optionnel)</label>
+                                <textarea class="form-control" id="motifAnnulation" name="motif_annulation" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+                            <button type="submit" class="btn btn-danger" name="annuler_billet">Confirmer l'annulation</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- fin modal annulation -->
+
         <!--start overlay-->
         <div class="overlay nav-toggle-icon"></div>
         <!--end overlay-->
@@ -255,6 +289,13 @@
                         }
                     });
                 }
+            });
+        });
+        $(document).ready(function() {
+            $('.cancel-btn').click(function(e) {
+                e.preventDefault();
+                $('#annulerIdBillets').val($(this).data('idbillets'));
+                $('#modalAnnulerBillet').modal('show');
             });
         });
         $(document).ready(function() {
