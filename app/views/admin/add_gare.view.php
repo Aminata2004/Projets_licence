@@ -86,15 +86,8 @@
                     </a>
                   </li>
                 <?php } ?>
-                <?php if ($user->userHasPermission('Configuration_gestion_trajets')) { ?>
-                  <li class="nav-item mt-2">
-                    <a class="nav-link  text-break mb-0" role="tab"
-                      aria-current="page" href="<?= BASE_URL ?>/admin/Add_liste_trajets"
-                      aria-selected="true">
-                      <i class="bx bx-map-alt me-2 align-middle d-inline-block"></i>Trajets
-                    </a>
-                  </li>
-                <?php } ?>
+              
+                
                 <?php if ($user->userHasPermission('Configuration_gestion_horaire')) { ?>
                   <li class="nav-item mt-2">
                     <a class="nav-link  text-break mb-0" role="tab"
