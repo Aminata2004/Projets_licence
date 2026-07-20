@@ -1,12 +1,25 @@
 <?php
 class Permissions extends Controller
 {
+    // Cette classe n'appelait jamais requireLogin() : la page d'assignation de permissions
+    // (et la modification elle-même via assigner()) était accessible sans être connecté.
+    public function __construct()
+    {
+        $this->requireLogin();
+
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+            (new Configuration())->set_flash("Accès refusé.", "danger");
+            header("Location: " . BASE_URL . "/admin/Homes/home");
+            exit;
+        }
+    }
+
     public function index()
     {
 
         $this->view("asignerPermission");
     }
-    
+
     // public function modifier_permission($id)
     // {
     //     $permissionModel = new Permission();
@@ -83,6 +96,19 @@ class Permissions extends Controller
         $permissionModel = new Permission();
 
          $utilisateur = $utilisateurModel->findById($idUtilisateur);
+
+        // L'utilisateur ciblé doit appartenir à la même compagnie que l'Admin connecté
+        // (super_admin excepté) : sans ce contrôle, un Admin pouvait modifier les permissions
+        // d'un utilisateur d'une autre compagnie en changeant l'ID dans l'URL.
+        if (
+            $_SESSION['droit'] !== 'super_admin'
+            && (!$utilisateur || (string)($utilisateur->id_compagnie ?? '') !== (string)($_SESSION['id_compagnie'] ?? ''))
+        ) {
+            (new Configuration())->set_flash("Utilisateur introuvable.", "danger");
+            header("Location: " . BASE_URL . "/admin/Configurations");
+            exit;
+        }
+
         $allPermissions = $permissionModel->getAll(); // À créer si besoin
         $userPermissions = $permissionModel->getUserPermissions($idUtilisateur); // À créer si besoin
 

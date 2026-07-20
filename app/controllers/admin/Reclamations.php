@@ -32,22 +32,46 @@ class Reclamations extends  Controller
 
       // 2. Traitement d'une nouvelle réclamation
       if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_reclamation'])) {
-          $id_colis = $_POST['id_colis'];
-          $motif = trim($_POST['motif_reclamation']);
-          $montant = (int)$_POST['montant_remboursement'];
+          $id_colis = $_POST['id_colis'] ?? null;
+          $motif = trim($_POST['motif_reclamation'] ?? '');
+          $montant = (int)($_POST['montant_remboursement'] ?? 0);
+          $id_compagnie = $_SESSION['id_compagnie'];
+
+          if (!$id_colis || $montant <= 0) {
+              $db->set_flash("Montant de remboursement invalide.", "danger");
+              header("Location: " . BASE_URL . "/admin/Reclamations");
+              exit;
+          }
+
+          // Le colis ciblé doit appartenir à la compagnie de l'utilisateur connecté :
+          // sans ce filtre, n'importe quel id_colis posté (même d'une autre compagnie)
+          // était accepté, permettant de réclamer/rembourser un colis qui n'est pas le sien.
+          $colisExiste = $db->FetchSelectWhere(
+              'id_colis',
+              'colis',
+              'id_colis = :id_colis AND id_compagnie = :id_compagnie',
+              [':id_colis' => $id_colis, ':id_compagnie' => $id_compagnie]
+          );
+
+          if (!$colisExiste) {
+              $db->set_flash("Colis introuvable.", "danger");
+              header("Location: " . BASE_URL . "/admin/Reclamations");
+              exit;
+          }
 
           $update = $db->insertion_update_simple(
-              "UPDATE colis SET 
-                  reclamer = 1, 
-                  date_reclamer = NOW(), 
-                  motif_reclamation = :motif, 
-                  montant_remboursement = :montant, 
+              "UPDATE colis SET
+                  reclamer = 1,
+                  date_reclamer = NOW(),
+                  motif_reclamation = :motif,
+                  montant_remboursement = :montant,
                   status_reclamation = 'En attente'
-               WHERE id_colis = :id_colis",
+               WHERE id_colis = :id_colis AND id_compagnie = :id_compagnie",
               [
                   ':motif' => $motif,
                   ':montant' => $montant,
-                  ':id_colis' => $id_colis
+                  ':id_colis' => $id_colis,
+                  ':id_compagnie' => $id_compagnie
               ]
           );
 
@@ -55,73 +79,120 @@ class Reclamations extends  Controller
           header("Location: " . BASE_URL . "/admin/Reclamations");
           exit;
       }
-      
+
       // 3. Mise à jour du statut
       if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
-          
+
           if (!isset($_SESSION['droit']) || !in_array($_SESSION['droit'], ['Admin', 'chef_d_escale'])) {
               $db->set_flash("Vous n'avez pas l'autorisation d'approuver ou gérer les réclamations.", "danger");
               header("Location: " . BASE_URL . "/admin/Reclamations");
               exit;
           }
 
-          $id_colis = $_POST['id_colis_status'];
-          $status = $_POST['status_reclamation'];
-          
-          // On récupère les infos de ce colis pour vérifier son état actuel et le montant
-          $colis = $db->FetchSelectWhere('montant_remboursement, status_reclamation', 'colis', 'id_colis = :id_colis', [':id_colis' => $id_colis]);
-          
-          // Si on veut rembourser, on doit vérifier la CAISSE !
-          if ($status === 'Remboursé' && $colis && $colis->status_reclamation !== 'Remboursé') {
-              $id_caisse_a_debiter = null;
-              $id_compagnie = $_SESSION['id_compagnie'];
-              
-              if (isset($_SESSION['droit']) && $_SESSION['droit'] === 'Admin') {
-                  // Logique Admin : on prend l'ID de la caisse envoyée par le select
-                  $id_caisse_a_debiter = $_POST['admin_id_caisse'] ?? null;
-                  if (empty($id_caisse_a_debiter)) {
-                      $db->set_flash("Erreur : Veuillez sélectionner une caisse pour effectuer le remboursement.", "danger");
-                      header("Location: " . BASE_URL . "/admin/Reclamations");
-                      exit;
-                  }
-              } else {
-                  // Logique Chef d'escale : on prend automatiquement sa ville
-                  $ville = $_SESSION['ville'] ?? null;
-                  if (empty($ville)) {
-                      $db->set_flash("Opération bloquée : Vous n'êtes pas affecté à une gare.", "danger");
-                      header("Location: " . BASE_URL . "/admin/Reclamations");
-                      exit;
-                  }
-                  
-                  $caisseOuverte = $db->FetchSelectWhere(
-                      'c.id_caisse', 
-                      'caisse c LEFT JOIN agence a ON c.id_agence = a.idAgence', 
-                      'a.localite = :ville AND c.id_compagnie = :id_compagnie AND c.status_caisse = 1', 
-                      [':ville' => $ville, ':id_compagnie' => $id_compagnie]
-                  );
-                  
-                  if (!$caisseOuverte) {
-                      $db->set_flash("Impossible de rembourser ! Aucune caisse n'est actuellement ouverte pour votre gare ($ville).", "danger");
-                      header("Location: " . BASE_URL . "/admin/Reclamations");
-                      exit;
-                  }
-                  $id_caisse_a_debiter = $caisseOuverte->id_caisse;
-              }
+          $id_colis = $_POST['id_colis_status'] ?? null;
+          $status = $_POST['status_reclamation'] ?? null;
+          $id_compagnie = $_SESSION['id_compagnie'];
 
-              // On débite la caisse (en augmentant le montant_rembourse)
-              $db->insertion_update_simple(
-                  "UPDATE caisse SET montant_rembourse = montant_rembourse + :montant WHERE id_caisse = :id_caisse",
-                  [':montant' => $colis->montant_remboursement, ':id_caisse' => $id_caisse_a_debiter]
-              );
+          if (!$id_colis || !$status) {
+              $db->set_flash("Requête invalide.", "danger");
+              header("Location: " . BASE_URL . "/admin/Reclamations");
+              exit;
           }
 
-          // Mise à jour du colis
-          $db->insertion_update_simple(
-              "UPDATE colis SET status_reclamation = :status WHERE id_colis = :id_colis",
-              [':status' => $status, ':id_colis' => $id_colis]
-          );
-          
-          $db->set_flash("Le statut de la réclamation a été modifié avec succès.", "success");
+          $pdo = $db->connect();
+
+          try {
+              $pdo->beginTransaction();
+
+              // Verrouille la ligne colis le temps de la transaction : empêche deux requêtes
+              // concurrentes (double clic, deux agents) de rembourser deux fois la même
+              // réclamation. Le filtre id_compagnie garantit aussi qu'on ne peut agir que sur
+              // un colis de sa propre compagnie (avant, id_colis était accepté sans ce filtre).
+              $stmt = $pdo->prepare(
+                  "SELECT montant_remboursement, status_reclamation FROM colis
+                   WHERE id_colis = :id_colis AND id_compagnie = :id_compagnie LIMIT 1 FOR UPDATE"
+              );
+              $stmt->execute([':id_colis' => $id_colis, ':id_compagnie' => $id_compagnie]);
+              $colis = $stmt->fetch(PDO::FETCH_OBJ);
+
+              if (!$colis) {
+                  $pdo->rollBack();
+                  $db->set_flash("Colis introuvable.", "danger");
+                  header("Location: " . BASE_URL . "/admin/Reclamations");
+                  exit;
+              }
+
+              // Si on veut rembourser, on doit vérifier la CAISSE !
+              if ($status === 'Remboursé' && $colis->status_reclamation !== 'Remboursé') {
+                  $id_caisse_a_debiter = null;
+
+                  if ($_SESSION['droit'] === 'Admin') {
+                      // Logique Admin : on prend l'ID de la caisse envoyée par le select,
+                      // en vérifiant qu'elle appartient bien à sa compagnie.
+                      $id_caisse_a_debiter = $_POST['admin_id_caisse'] ?? null;
+                      if (empty($id_caisse_a_debiter)) {
+                          $pdo->rollBack();
+                          $db->set_flash("Erreur : Veuillez sélectionner une caisse pour effectuer le remboursement.", "danger");
+                          header("Location: " . BASE_URL . "/admin/Reclamations");
+                          exit;
+                      }
+
+                      $stmtCaisse = $pdo->prepare(
+                          "SELECT id_caisse FROM caisse WHERE id_caisse = :id_caisse AND id_compagnie = :id_compagnie LIMIT 1"
+                      );
+                      $stmtCaisse->execute([':id_caisse' => $id_caisse_a_debiter, ':id_compagnie' => $id_compagnie]);
+                      if (!$stmtCaisse->fetch()) {
+                          $pdo->rollBack();
+                          $db->set_flash("Caisse invalide.", "danger");
+                          header("Location: " . BASE_URL . "/admin/Reclamations");
+                          exit;
+                      }
+                  } else {
+                      // Logique Chef d'escale : on prend automatiquement sa ville
+                      $ville = $_SESSION['ville'] ?? null;
+                      if (empty($ville)) {
+                          $pdo->rollBack();
+                          $db->set_flash("Opération bloquée : Vous n'êtes pas affecté à une gare.", "danger");
+                          header("Location: " . BASE_URL . "/admin/Reclamations");
+                          exit;
+                      }
+
+                      $stmtCaisse = $pdo->prepare(
+                          "SELECT c.id_caisse FROM caisse c
+                           LEFT JOIN agence a ON c.id_agence = a.idAgence
+                           WHERE a.localite = :ville AND c.id_compagnie = :id_compagnie AND c.status_caisse = 1
+                           LIMIT 1"
+                      );
+                      $stmtCaisse->execute([':ville' => $ville, ':id_compagnie' => $id_compagnie]);
+                      $caisseOuverte = $stmtCaisse->fetch(PDO::FETCH_OBJ);
+
+                      if (!$caisseOuverte) {
+                          $pdo->rollBack();
+                          $db->set_flash("Impossible de rembourser ! Aucune caisse n'est actuellement ouverte pour votre gare ($ville).", "danger");
+                          header("Location: " . BASE_URL . "/admin/Reclamations");
+                          exit;
+                      }
+                      $id_caisse_a_debiter = $caisseOuverte->id_caisse;
+                  }
+
+                  // On débite la caisse (en augmentant le montant_rembourse)
+                  $pdo->prepare(
+                      "UPDATE caisse SET montant_rembourse = montant_rembourse + :montant WHERE id_caisse = :id_caisse"
+                  )->execute([':montant' => $colis->montant_remboursement, ':id_caisse' => $id_caisse_a_debiter]);
+              }
+
+              // Mise à jour du colis
+              $pdo->prepare(
+                  "UPDATE colis SET status_reclamation = :status WHERE id_colis = :id_colis AND id_compagnie = :id_compagnie"
+              )->execute([':status' => $status, ':id_colis' => $id_colis, ':id_compagnie' => $id_compagnie]);
+
+              $pdo->commit();
+              $db->set_flash("Le statut de la réclamation a été modifié avec succès.", "success");
+          } catch (Throwable $e) {
+              $pdo->rollBack();
+              $db->set_flash("Erreur lors de la mise à jour : " . $e->getMessage(), "danger");
+          }
+
           header("Location: " . BASE_URL . "/admin/Reclamations");
           exit;
       }

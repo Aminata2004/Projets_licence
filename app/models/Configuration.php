@@ -199,4 +199,46 @@
             $stmt->bindParam(':emailUser', $email, PDO::PARAM_STR);
             return $stmt->execute();
         }
+
+        // Génère un jeton de réinitialisation à usage unique, valable 30 minutes, et renvoie
+        // le jeton EN CLAIR (à mettre dans le lien envoyé par email) : seul son hash est stocké.
+        // Sans ce jeton, "mot de passe oublié" ne prouvait jamais que le demandeur possède
+        // réellement l'email visé.
+        public function creerTokenReset($email)
+        {
+            $pdo = $this->connect();
+            $pdo->prepare("DELETE FROM password_resets WHERE email = :email")->execute([':email' => $email]);
+
+            $token = bin2hex(random_bytes(32));
+            $pdo->prepare(
+                "INSERT INTO password_resets (email, token_hash, expires_at) VALUES (:email, :token_hash, :expires_at)"
+            )->execute([
+                ':email' => $email,
+                ':token_hash' => hash('sha256', $token),
+                ':expires_at' => date('Y-m-d H:i:s', time() + 1800),
+            ]);
+
+            return $token;
+        }
+
+        // Vérifie qu'un jeton correspond bien à cet email et n'a pas expiré.
+        public function verifierTokenReset($email, $token)
+        {
+            if (empty($token)) {
+                return false;
+            }
+
+            $stmt = $this->connect()->prepare(
+                "SELECT id FROM password_resets WHERE email = :email AND token_hash = :token_hash AND expires_at >= NOW() LIMIT 1"
+            );
+            $stmt->execute([':email' => $email, ':token_hash' => hash('sha256', $token)]);
+
+            return (bool) $stmt->fetch();
+        }
+
+        // Jeton à usage unique : supprimé après un reset réussi (ou une nouvelle demande).
+        public function supprimerTokenReset($email)
+        {
+            $this->connect()->prepare("DELETE FROM password_resets WHERE email = :email")->execute([':email' => $email]);
+        }
     }

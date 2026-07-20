@@ -195,8 +195,11 @@
         </div>
 
         <?php $this->view("admin/set_flash"); ?>
-        <?php if (!empty($data['error'])): ?>
-            <div class="alert alert-danger"><?= $data['error'] ?></div>
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+        <?php if (!empty($success)): ?>
+            <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
         <?php endif; ?>
 
         <form method="post" action="">
