@@ -105,7 +105,7 @@ class Caisse extends Controller
     public function getSommeBillets($pdo, $compagnieId, $ville, $periode = 'jour', $numeroGare = null)
     {
         $sql = "
-    SELECT SUM(CAST(REGEXP_REPLACE(c.montant_payer, '[[:space:]]|FCFA', '') AS UNSIGNED)) as total
+    SELECT SUM(CAST(REPLACE(REPLACE(c.montant_payer, ' ', ''), 'FCFA', '') AS DECIMAL(12,2))) as total
     FROM billets b
     INNER JOIN client c ON b.id_client = c.idClient
     WHERE b.id_compagnie = :compagnie

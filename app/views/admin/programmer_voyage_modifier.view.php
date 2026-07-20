@@ -55,6 +55,38 @@
                             </div>
                         </div>
 
+                        <?php if (!empty($besoin_choix)): ?>
+                            <div class="alert alert-warning shadow-sm">
+                                <strong><?= (int)$besoin_choix['count'] ?> réservation(s)</strong> existent déjà sur le
+                                créneau actuel de ce car
+                                (<?= htmlspecialchars($programmation->localite_user . ' → ' . $programmation->id_trajet) ?>
+                                à <?= htmlspecialchars(date('H:i', strtotime($programmation->id_horaire))) ?>).
+                                Que voulez-vous faire de ces réservations ?
+                                <div class="mt-2">
+                                    <?php if (empty($besoin_choix['destination_change'])): ?>
+                                        <label class="d-block">
+                                            <input type="radio" name="action_reservations" value="suivre" required>
+                                            Faire suivre ces billets vers le nouveau créneau (mêmes clients, même car, nouvelle heure)
+                                        </label>
+                                    <?php endif; ?>
+                                    <label class="d-block">
+                                        <input type="radio" name="action_reservations" value="nouveau_car"
+                                            <?= !empty($besoin_choix['destination_change']) ? 'checked' : '' ?> required>
+                                        Garder ces clients sur le créneau actuel : un autre car le reprend
+                                    </label>
+                                </div>
+                                <div class="mt-2" id="carRemplacementBox" style="display:none;">
+                                    <label class="form-label mb-1">Car de remplacement pour l'ancien créneau</label>
+                                    <select class="form-select" name="id_car_remplacement" style="max-width:280px;">
+                                        <option value="">Choisir un car</option>
+                                        <?php foreach (($cars_remplacement ?? []) as $c): ?>
+                                            <option value="<?= $c['id_car'] ?>"><?= htmlspecialchars($c['numero_car']) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
                         <!-- Tableau -->
                         <div class="table-responsive">
                             <table class="table table-hover table-bordered align-middle shadow-sm rounded">
@@ -75,23 +107,23 @@
                                                     <input type="hidden" name="id_care[]" value="<?= htmlspecialchars($programmation->id_car_programmer) ?>">
                                                 </td>
 
-                                                <!-- Sélect Horaire pré-sélectionné -->
+                                                <!-- Horaire : rempli en JS depuis le trajet choisi (jamais une saisie
+                                                     libre) : évite de programmer un car à une heure qui n'existe pas
+                                                     pour ce trajet. -->
                                                 <td>
-                                                    <select class="form-select shadow-sm" name="id_horaire[]" required>
-                                                        <option value="" disabled>Choisir un horaire</option>
-                                                        <?php foreach ($listehoraire as $horaire): ?>
-                                                            <option value="<?= htmlspecialchars($horaire->heuredepart) ?>"
-                                                                <?= ($horaire->heuredepart == $programmation->id_horaire) ? 'selected' : '' ?>>
-                                                                <?= date('H:i', strtotime($horaire->heuredepart)) ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
+                                                    <select class="form-select shadow-sm" name="id_horaire[]" id="selectHoraireEdit" required>
+                                                        <option value="" disabled selected>—</option>
                                                     </select>
                                                 </td>
 
                                                 <!-- Sélect Destination pré-sélectionné -->
                                                 <td>
-                                                    <select class="form-select shadow-sm" name="id_destination[]" required>
+                                                    <select class="form-select shadow-sm" name="id_destination[]" id="selectDestinationEdit" required>
                                                         <option value="" disabled>Choisir une destination</option>
+                                                        <?php
+                                                            $destinationActuelle = $destination_soumise ?? $programmation->id_trajet;
+                                                            $horaireActuel = $horaire_soumis ?? $programmation->id_horaire;
+                                                        ?>
                                                         <?php foreach ($destinations as $d): ?>
                                                             <?php
                                                             // Vérification des droits pour afficher
@@ -106,8 +138,10 @@
                                                             ?>
                                                             <?php if ($afficher): ?>
                                                                 <option value="<?= htmlspecialchars($d->destinationLocalite) ?>"
-                                                                    <?= ($d->destinationLocalite == $programmation->id_trajet) ? 'selected' : '' ?>>
+                                                                    data-heure="<?= htmlspecialchars($d->heureDepart) ?>"
+                                                                    <?= ($d->destinationLocalite == $destinationActuelle && $d->heureDepart == $horaireActuel) ? 'selected' : '' ?>>
                                                                     <?= htmlspecialchars($d->departLocalite . ' -> ' . $d->destinationLocalite) ?>
+                                                                    (<?= htmlspecialchars(date('H:i', strtotime($d->heureDepart))) ?>)
                                                                 </option>
                                                             <?php endif; ?>
                                                         <?php endforeach; ?>
@@ -150,7 +184,41 @@
     </div>
     <!--end wrapper-->
     <?php $this->view('admin/partials/foot') ?>
-    <!-- ✅ Script JS pour gérer la sélection de tous les checkboxes -->
+    <script>
+        // Horaire dérivé du trajet choisi : jamais une saisie libre (évite de programmer
+        // un car à une heure qui n'existe pas pour ce trajet précis).
+        (function() {
+            const selectDestination = document.getElementById('selectDestinationEdit');
+            const selectHoraire = document.getElementById('selectHoraireEdit');
+            if (!selectDestination || !selectHoraire) return;
+
+            function majHoraire() {
+                const selectedOption = selectDestination.options[selectDestination.selectedIndex];
+                const heure = selectedOption?.getAttribute('data-heure') || '';
+                selectHoraire.innerHTML = heure
+                    ? `<option value="${heure}" selected>${heure.slice(0, 5)}</option>`
+                    : '<option value="" disabled selected>—</option>';
+            }
+
+            selectDestination.addEventListener('change', majHoraire);
+            majHoraire(); // applique tout de suite la sélection déjà pré-remplie côté serveur
+        })();
+
+        // Affiche le select "car de remplacement" seulement si cette option est choisie.
+        (function() {
+            const radios = document.querySelectorAll('input[name="action_reservations"]');
+            const box = document.getElementById('carRemplacementBox');
+            if (!radios.length || !box) return;
+
+            function majAffichage() {
+                const choisi = document.querySelector('input[name="action_reservations"]:checked');
+                box.style.display = (choisi && choisi.value === 'nouveau_car') ? 'block' : 'none';
+            }
+
+            radios.forEach(r => r.addEventListener('change', majAffichage));
+            majAffichage();
+        })();
+    </script>
 
 </body>
 

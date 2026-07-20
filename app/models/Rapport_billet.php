@@ -109,7 +109,7 @@ class Rapport_billet extends Model
         $sql = "SELECT b.departId AS localite,
                    b.num_gare,
                    b.status_reservation,
-                   SUM(CAST(REPLACE(c.montant_payer, ' ', '') AS UNSIGNED)) AS total
+                   SUM(CAST(REPLACE(REPLACE(c.montant_payer, ' ', ''), 'FCFA', '') AS DECIMAL(12,2))) AS total
             FROM billets b
             INNER JOIN client c ON b.id_client = c.idClient
             WHERE b.id_compagnie = :compagnie
@@ -143,7 +143,7 @@ class Rapport_billet extends Model
         $sql = "SELECT b.departId AS localite,
                    b.num_gare,
                    b.status_reservation,
-                   SUM(CAST(REPLACE(c.montant_payer, ' ', '') AS UNSIGNED)) AS total
+                   SUM(CAST(REPLACE(REPLACE(c.montant_payer, ' ', ''), 'FCFA', '') AS DECIMAL(12,2))) AS total
             FROM billets b
             INNER JOIN client c ON b.id_client = c.idClient
             WHERE b.id_compagnie = :compagnie

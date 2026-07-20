@@ -12,24 +12,38 @@
                 $heure = $_POST['selectheure'] ?? '';
                 $destination = $_POST['id_destination'] ?? '';
                 $id_compagnie = $_SESSION['id_compagnie'];
-                $idDepart = $_SESSION['ville'];
+                // Admin n'a pas de gare fixe en session : il voit les billets de toute la compagnie.
+                // numeroGare précise la gare exacte (une ville peut avoir plusieurs gares).
+                $isAdmin = ($_SESSION['droit'] ?? null) === 'Admin';
+                $idDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
+                $numeroGare = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
                 date_default_timezone_set('Africa/Bamako');
                 $aujourd = date('Y-m-d');
 
                 if ($heure && $destination) {
                     $model = new Liste_du_jour();
 
+                    $where = 'billets.id_compagnie = :id_compagnie AND billets.destinationId = :destination AND billets.Heur_departs = :heure AND billets.jourVoyage = :jour';
+                    $params = [
+                        'id_compagnie' => $id_compagnie,
+                        'destination' => $destination,
+                        'heure' => $heure,
+                        'jour' => $aujourd // ici, la clé doit correspondre au token SQL
+                    ];
+                    if ($idDepart !== null) {
+                        $where .= ' AND billets.departId = :depart';
+                        $params['depart'] = $idDepart;
+                    }
+                    if ($numeroGare !== null) {
+                        $where .= ' AND billets.num_gare = :numeroGare';
+                        $params['numeroGare'] = $numeroGare;
+                    }
+
                     $resultats = $model->FetchSelectWheres(
                         '*',
                         'billets INNER JOIN client ON billets.id_client = client.idClient',
-                        'billets.id_compagnie = :id_compagnie AND billets.departId = :depart AND billets.destinationId = :destination AND billets.Heur_departs = :heure AND billets.jourVoyage = :jour',
-                        [
-                            'id_compagnie' => $id_compagnie,
-                            'depart' => $idDepart,
-                            'destination' => $destination,
-                            'heure' => $heure,
-                            'jour' => $aujourd // ici, la clé doit correspondre au token SQL
-                        ]
+                        $where,
+                        $params
                     );
                     // Générer le HTML du tbody
                     ob_start();

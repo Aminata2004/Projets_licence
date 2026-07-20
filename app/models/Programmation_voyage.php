@@ -200,10 +200,10 @@ $fromAndWhere = "liaison_car_trajet
         return $result;
     }
 
-    // Compte les places déjà vendues (billets) pour un créneau exact (départ/destination/heure/date/compagnie).
-    // Inclut les billets vendus vers une escale du trajet, car ceux-ci sont enregistrés avec le nom
-    // de l'escale comme destinationId plutôt que la destination finale.
-    private function countPlacesVendues($id_horaire, $id_destination, $localite_user, $jourVoyage, $id_compagnie)
+    // Toutes les valeurs de destinationId qui correspondent à un créneau donné : la destination
+    // finale du trajet, plus le nom de chaque escale (les billets vendus vers une escale sont
+    // enregistrés avec le nom de l'escale comme destinationId, pas la destination finale).
+    private function getDestinationsPourCreneau($id_horaire, $id_destination, $localite_user, $id_compagnie)
     {
         $destinations = [$id_destination];
 
@@ -228,6 +228,16 @@ $fromAndWhere = "liaison_car_trajet
                 $destinations[] = $e['escales'];
             }
         }
+
+        return $destinations;
+    }
+
+    // Compte les places déjà vendues (billets) pour un créneau exact (départ/destination/heure/date/compagnie).
+    // Inclut les billets vendus vers une escale du trajet, car ceux-ci sont enregistrés avec le nom
+    // de l'escale comme destinationId plutôt que la destination finale.
+    public function countPlacesVendues($id_horaire, $id_destination, $localite_user, $jourVoyage, $id_compagnie)
+    {
+        $destinations = $this->getDestinationsPourCreneau($id_horaire, $id_destination, $localite_user, $id_compagnie);
 
         $placeholders = implode(',', array_fill(0, count($destinations), '?'));
         $sql = "SELECT COALESCE(SUM(nombrePassages), 0) AS total
@@ -377,7 +387,7 @@ $fromAndWhere = "liaison_car_trajet
     // (les trajets réellement assignés à ce car via "Affectation des cars").
     public function getDestinationsForCar($id_car, $localite_depart, $id_compagnie)
     {
-        $select = "programmer.idProgrammer, a1.localite AS departLocalite, a2.localite AS destinationLocalite";
+        $select = "programmer.idProgrammer, programmer.heureDepart, a1.localite AS departLocalite, a2.localite AS destinationLocalite";
         $from = "liaison_car_trajet
             INNER JOIN programmer ON liaison_car_trajet.id_trajets = programmer.idProgrammer
             INNER JOIN agence a1 ON programmer.idDepart = a1.idAgence
@@ -393,16 +403,140 @@ $fromAndWhere = "liaison_car_trajet
         ]);
     }
 
-    public function updateProgrammation($id_programmation, $id_horaire, $id_destination)
+    // Cars de la compagnie utilisables comme remplacement sur un créneau libéré : pas en
+    // transit (un car déjà parti ne peut pas être affecté à un second trajet en même temps).
+    public function getCarsDisponiblesPourRemplacement($id_compagnie, $id_car_a_exclure)
     {
+        return $this->fetchAll(
+            "SELECT id_car, numero_car FROM car
+             WHERE id_compagnie = :id_compagnie
+               AND id_car != :id_car_a_exclure
+               AND (status_car IS NULL OR status_car NOT LIKE 'En\\_transit\\_%')
+             ORDER BY numero_car",
+            [':id_compagnie' => $id_compagnie, ':id_car_a_exclure' => $id_car_a_exclure]
+        );
+    }
+
+    // Modifie l'heure/destination d'une programmation existante.
+    //
+    // S'il existe déjà des billets vendus sur l'ancien créneau (ancienne heure/destination),
+    // la modification ne peut pas se faire silencieusement : ces clients ont acheté un billet
+    // pour un départ précis, et changer le créneau du car sans rien faire les abandonnerait.
+    // Deux issues possibles, au choix de l'utilisateur (résolu par $action) :
+    //   - 'suivre'     : les billets déjà vendus suivent le car vers la nouvelle heure (uniquement
+    //                    si la destination ne change pas : on ne réachemine jamais silencieusement
+    //                    des clients vers une autre ville).
+    //   - 'nouveau_car': l'ancien créneau (heure/destination d'origine) est repris par un autre
+    //                    car choisi par l'utilisateur, pendant que celui-ci part sur le nouveau créneau.
+    // Sans $action, si des réservations existent, on retourne ce qu'il faut pour proposer le choix
+    // à l'utilisateur au lieu d'enregistrer quoi que ce soit.
+    public function updateProgrammation($id_programmation, $id_horaire, $id_destination, $action = null, $id_car_remplacement = null)
+    {
+        $prog = $this->fetchOne(
+            "SELECT id_car_programmer, id_horaire, id_trajet, localite_user, date_enregistre, id_compagnie
+             FROM programmation_voyage WHERE id_programmation = :id",
+            [':id' => $id_programmation]
+        );
+        if (!$prog) {
+            return ['error' => 'introuvable'];
+        }
+
+        $id_compagnie   = $prog['id_compagnie'];
+        $localite_user  = $prog['localite_user'];
+
+        // La nouvelle heure doit correspondre à un trajet réellement programmé (même règle que pour
+        // une nouvelle programmation) : jamais une heure qui n'existe pas pour ce départ/cette destination.
+        $trajetValide = $this->fetchOne(
+            "SELECT p.idProgrammer
+             FROM programmer p
+             LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
+             LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
+             WHERE a1.localite = :dep AND a2.localite = :dest AND p.heureDepart = :heure AND p.id_compagnie = :id_compagnie
+             LIMIT 1",
+            [':dep' => $localite_user, ':dest' => $id_destination, ':heure' => $id_horaire, ':id_compagnie' => $id_compagnie]
+        );
+        if (!$trajetValide) {
+            return ['error' => 'horaire_invalide'];
+        }
+
+        $memeCreneau = ($id_horaire === $prog['id_horaire'] && $id_destination === $prog['id_trajet']);
+
+        if (!$memeCreneau) {
+            $dejaReserve = $this->countPlacesVendues(
+                $prog['id_horaire'],
+                $prog['id_trajet'],
+                $localite_user,
+                $prog['date_enregistre'],
+                $id_compagnie
+            );
+
+            if ($dejaReserve > 0) {
+                $destinationChange = $id_destination !== $prog['id_trajet'];
+
+                if ($action === null || ($destinationChange && $action !== 'nouveau_car')) {
+                    return ['needs_choice' => true, 'count' => $dejaReserve, 'destination_change' => $destinationChange];
+                }
+
+                if ($action === 'nouveau_car') {
+                    if (!$id_car_remplacement) {
+                        return ['error' => 'car_remplacement_requis'];
+                    }
+                    // Réutilise la logique d'insertion existante (vérifie que le car est libre,
+                    // recalcule les places déjà vendues) pour faire reprendre l'ancien créneau
+                    // par le car de remplacement choisi.
+                    $ok = $this->insertProgrammation(
+                        $id_car_remplacement,
+                        $prog['id_horaire'],
+                        $prog['id_trajet'],
+                        null,
+                        $prog['date_enregistre'],
+                        $localite_user
+                    );
+                    if (!$ok) {
+                        return ['error' => 'car_remplacement_invalide'];
+                    }
+                } elseif ($action === 'suivre') {
+                    // Les billets déjà vendus (destination finale + escales de l'ancien trajet)
+                    // suivent le car vers la nouvelle heure.
+                    $destinationsAncien = $this->getDestinationsPourCreneau(
+                        $prog['id_horaire'],
+                        $prog['id_trajet'],
+                        $localite_user,
+                        $id_compagnie
+                    );
+                    $placeholders = implode(',', array_fill(0, count($destinationsAncien), '?'));
+                    $stmt = $this->connect()->prepare(
+                        "UPDATE billets SET Heur_departs = ?
+                         WHERE departId = ? AND Heur_departs = ? AND jourVoyage = ? AND id_compagnie = ?
+                           AND destinationId IN ($placeholders)"
+                    );
+                    $stmt->execute(array_merge(
+                        [$id_horaire, $localite_user, $prog['id_horaire'], $prog['date_enregistre'], $id_compagnie],
+                        $destinationsAncien
+                    ));
+                }
+            }
+        }
+
         $update = "UPDATE programmation_voyage
             SET id_horaire = :id_horaire, id_trajet = :id_trajet
             WHERE id_programmation = :id_programmation";
 
-        return $this->insertion_update_simples($update, [
+        $result = $this->insertion_update_simples($update, [
             ':id_horaire' => $id_horaire,
             ':id_trajet' => $id_destination,
             ':id_programmation' => $id_programmation
         ]);
+
+        // Le car d'origine sert maintenant le NOUVEAU créneau : son compteur de places réservées
+        // doit refléter ce nouveau créneau, pas l'ancien (sinon il resterait avec un décompte qui
+        // ne correspond plus à rien, faussant la capacité disponible affichée).
+        $placesActuelles = $this->countPlacesVendues($id_horaire, $id_destination, $localite_user, $prog['date_enregistre'], $id_compagnie);
+        $this->insertion_update_simples(
+            "UPDATE car SET nbr_place_reserve = :n WHERE id_car = :id_car",
+            [':n' => $placesActuelles, ':id_car' => $prog['id_car_programmer']]
+        );
+
+        return $result;
     }
 }

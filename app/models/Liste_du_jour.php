@@ -32,7 +32,11 @@
       return end($heures)['heureDepart'];
     }
 
-    public function getDestinations($idDepart, $idCompagnie)
+    // $idDepart à null : Admin (pas de gare fixe en session) voit les destinations de
+    // toute la compagnie, plutôt qu'une liste vide. $numeroGare : précise la gare exacte
+    // quand une ville a plusieurs gares (ex. "Segou" Gare I et Gare II) ; sans ça, un chef
+    // d'escale verrait aussi les destinations de l'autre gare partageant le même nom de ville.
+    public function getDestinations($idDepart, $idCompagnie, $numeroGare = null)
     {
       // programmer.idDepart/idDestination sont des idAgence : on les relie à la table agence
       // pour comparer sur la localité (billets.destinationId est stocké comme un nom de localité).
@@ -40,29 +44,54 @@
             FROM programmer p
             INNER JOIN agence a1 ON p.idDepart = a1.idAgence
             INNER JOIN agence a2 ON p.idDestination = a2.idAgence
-            WHERE a1.localite = :idDepart
-              AND p.id_compagnie = :idCompagnie
-            ORDER BY a2.localite";
-      return $this->fetchAll($sql, [
-        ':idDepart' => $idDepart,
-        ':idCompagnie' => $idCompagnie
-      ]);
+            WHERE p.id_compagnie = :idCompagnie";
+      $params = [':idCompagnie' => $idCompagnie];
+
+      if ($idDepart !== null) {
+        $sql .= " AND a1.localite = :idDepart";
+        $params[':idDepart'] = $idDepart;
+      }
+
+      if ($numeroGare !== null) {
+        $sql .= " AND a1.numeroGare = :numeroGare";
+        $params[':numeroGare'] = $numeroGare;
+      }
+
+      $sql .= " ORDER BY a2.localite";
+      return $this->fetchAll($sql, $params);
     }
 
-    public function listeBillets($villeDepart)
+    // $villeDepart à null : Admin voit les billets de toute la compagnie (toutes gares),
+    // les autres rôles restent filtrés sur leur propre gare de session. $numeroGare : précise
+    // la gare exacte quand une ville a plusieurs gares (le nom de ville seul ne suffit pas
+    // à distinguer "Segou" Gare I de "Segou" Gare II).
+    public function listeBillets($villeDepart = null, $numeroGare = null)
     {
       $id_compagnie = $_SESSION['id_compagnie'];
-      $liste = $this->FetchSelectWheres(
+      $where = 'billets.id_compagnie = :id_compagnie AND billets.validation_billets = :validation';
+      $params = [
+        'id_compagnie' => $id_compagnie,
+        'validation'   => 'valider'
+      ];
+
+      if ($villeDepart !== null) {
+        $where .= ' AND billets.departId = :depart';
+        $params['depart'] = $villeDepart;
+      }
+
+      if ($numeroGare !== null) {
+        $where .= ' AND billets.num_gare = :numeroGare';
+        $params['numeroGare'] = $numeroGare;
+      }
+
+      $where .= ' ORDER BY billets.idBillets DESC LIMIT 10';
+
+      return $this->FetchSelectWheres(
         '*',
         'billets inner join client on billets.id_client = client.idClient',
-        'billets.id_compagnie = :id_compagnie AND billets.departId = :depart AND billets.validation_billets = :validation ORDER BY billets.idBillets DESC LIMIT 10',
-        [
-          'id_compagnie' => $id_compagnie,
-          'depart'       => $villeDepart,
-          'validation'   => 'valider'
-        ]
+        $where,
+        $params
       );
-      return $liste;
     }
 
     public function getBilletById($idBillets)
@@ -105,23 +134,37 @@
     // }
 
 
-    public  function getHeures($destinationId, $villeDepart)
+    // $villeDepart à null/vide : Admin voit les heures de toute la compagnie pour cette destination.
+    // $numeroGare : précise la gare exacte quand une ville a plusieurs gares.
+    public  function getHeures($destinationId, $villeDepart = null, $numeroGare = null)
     {
       // programmer.idDepart/idDestination sont des idAgence : on les relie à la table agence
       // pour comparer sur la localité, comme dans getDestinations().
-      $stmt = $this->connect()->prepare("SELECT DISTINCT p.heureDepart
-                          FROM programmer p
-                          INNER JOIN agence a1 ON p.idDepart = a1.idAgence
-                          INNER JOIN agence a2 ON p.idDestination = a2.idAgence
-                          WHERE a2.localite = :destinationId
-                            AND a1.localite = :villeDepart
-                            AND p.id_compagnie = :id_compagnie
-                          ORDER BY p.heureDepart");
-      $stmt->execute([
+      $sql = "SELECT DISTINCT p.heureDepart
+              FROM programmer p
+              INNER JOIN agence a1 ON p.idDepart = a1.idAgence
+              INNER JOIN agence a2 ON p.idDestination = a2.idAgence
+              WHERE a2.localite = :destinationId
+                AND p.id_compagnie = :id_compagnie";
+      $params = [
         ':destinationId' => $destinationId,
-        ':villeDepart'   => $villeDepart,
         ':id_compagnie'  => $_SESSION['id_compagnie']
-      ]);
+      ];
+
+      if (!empty($villeDepart)) {
+        $sql .= " AND a1.localite = :villeDepart";
+        $params[':villeDepart'] = $villeDepart;
+      }
+
+      if (!empty($numeroGare)) {
+        $sql .= " AND a1.numeroGare = :numeroGare";
+        $params[':numeroGare'] = $numeroGare;
+      }
+
+      $sql .= " ORDER BY p.heureDepart";
+
+      $stmt = $this->connect()->prepare($sql);
+      $stmt->execute($params);
       $results = $stmt->fetchAll(PDO::FETCH_COLUMN); // Un tableau avec toutes les heures
 
       return $results;

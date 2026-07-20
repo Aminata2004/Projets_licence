@@ -166,7 +166,7 @@ class Depense extends Model
         }
 
         $stmtBillets = $pdo->prepare(
-            "SELECT SUM(CAST(REGEXP_REPLACE(c.montant_payer, '[[:space:]]|FCFA', '') AS UNSIGNED)) AS total
+            "SELECT SUM(CAST(REPLACE(REPLACE(c.montant_payer, ' ', ''), 'FCFA', '') AS DECIMAL(12,2))) AS total
              FROM billets b
              INNER JOIN client c ON b.id_client = c.idClient
              WHERE b.id_compagnie = :id_compagnie AND b.validation_billets = 'valider'

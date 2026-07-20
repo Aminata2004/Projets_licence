@@ -231,23 +231,7 @@ class Programmation_voyages extends Controller
             exit;
         }
 
-        // Traitement de la soumission du formulaire de modification
-        if (isset($_POST['modifier'])) {
-            $id_horaire = $_POST['id_horaire'][0] ?? null;
-            $id_destination = $_POST['id_destination'][0] ?? null;
-            $id_care = $_POST['id_care'][0] ?? null;
-
-            if ($id_horaire && $id_destination && $id_care) {
-                $programmation_voyage->updateProgrammation($id_programmation, $id_horaire, $id_destination);
-                $programmation_voyage->updateCareStatus($id_care, $id_destination);
-                $programmation_voyage->set_flash("La programmation a été modifiée avec succès !", "success");
-            } else {
-                $programmation_voyage->set_flash("Veuillez remplir tous les champs.", "danger");
-            }
-
-            header("Location: " . BASE_URL . "/admin/Programmation_voyages/liste_programmer_voyage");
-            exit;
-        }
+        $id_compagnie = $_SESSION['id_compagnie'];
 
         // Récupérer la programmation (filtrée par compagnie de session : empêche de modifier
         // la programmation d'une autre compagnie en changeant l'ID dans l'URL)
@@ -256,7 +240,7 @@ class Programmation_voyages extends Controller
             'programmation_voyage pv
          INNER JOIN car c ON pv.id_car_programmer = c.id_car',
             'pv.id_programmation = :id_programmation AND pv.id_compagnie = :id_compagnie',
-            ['id_programmation' => $id_programmation, 'id_compagnie' => $_SESSION['id_compagnie'] ?? null]
+            ['id_programmation' => $id_programmation, 'id_compagnie' => $id_compagnie]
         );
 
         if (empty($programmation)) {
@@ -266,7 +250,6 @@ class Programmation_voyages extends Controller
         }
 
         // Récupérer les horaires disponibles
-        $id_compagnie= $_SESSION['id_compagnie'] ;
         $listehoraire = $programmation_voyage->FetchSelectWheres(
             '*',
             'horaire',
@@ -286,6 +269,70 @@ class Programmation_voyages extends Controller
         $cars_destinations = [];
         $cars_destinations[$programmation[0]->numero_car] = $destinations;
 
+        // Traitement de la soumission du formulaire de modification
+        if (isset($_POST['modifier'])) {
+            $id_horaire = $_POST['id_horaire'][0] ?? null;
+            $id_destination = $_POST['id_destination'][0] ?? null;
+            $id_care = $_POST['id_care'][0] ?? null;
+            $action = $_POST['action_reservations'] ?? null;
+            $id_car_remplacement = $_POST['id_car_remplacement'] ?? null;
+
+            if (!$id_horaire || !$id_destination || !$id_care) {
+                $programmation_voyage->set_flash("Veuillez remplir tous les champs.", "danger");
+                header("Location: " . BASE_URL . "/admin/Programmation_voyages/liste_programmer_voyage");
+                exit;
+            }
+
+            $resultat = $programmation_voyage->updateProgrammation(
+                $id_programmation,
+                $id_horaire,
+                $id_destination,
+                $action,
+                $id_car_remplacement ?: null
+            );
+
+            // Des billets existent déjà sur l'ancien créneau : on redemande le formulaire avec
+            // le choix à faire (suivre / autre car), sans rien enregistrer pour l'instant.
+            if (is_array($resultat) && !empty($resultat['needs_choice'])) {
+                $carsRemplacement = $programmation_voyage->getCarsDisponiblesPourRemplacement(
+                    $id_compagnie,
+                    $programmation[0]->id_car_programmer
+                );
+
+                $this->view('admin/programmer_voyage_modifier', [
+                    'programmation' => $programmation[0],
+                    'cars_destinations' => $cars_destinations,
+                    'listehoraire' => $listehoraire,
+                    'besoin_choix' => $resultat,
+                    'cars_remplacement' => $carsRemplacement,
+                    'horaire_soumis' => $id_horaire,
+                    'destination_soumise' => $id_destination
+                ]);
+                return;
+            }
+
+            if (is_array($resultat) && !empty($resultat['error'])) {
+                $messages = [
+                    'introuvable' => "Programmation introuvable.",
+                    'horaire_invalide' => "Cette heure n'existe pas pour ce trajet (départ/destination).",
+                    'car_remplacement_requis' => "Veuillez choisir un car de remplacement pour l'ancien créneau.",
+                    'car_remplacement_invalide' => "Ce car de remplacement n'est pas disponible."
+                ];
+                $programmation_voyage->set_flash($messages[$resultat['error']] ?? "Erreur lors de la modification.", "danger");
+                header("Location: " . BASE_URL . "/admin/Programmation_voyages/edit/" . $id_programmation);
+                exit;
+            }
+
+            if ($resultat) {
+                $programmation_voyage->updateCareStatus($id_care, $id_destination);
+                $programmation_voyage->set_flash("La programmation a été modifiée avec succès !", "success");
+            } else {
+                $programmation_voyage->set_flash("Erreur lors de la modification de la programmation.", "danger");
+            }
+
+            header("Location: " . BASE_URL . "/admin/Programmation_voyages/liste_programmer_voyage");
+            exit;
+        }
 
         $this->view('admin/programmer_voyage_modifier', [
             'programmation' => $programmation[0],

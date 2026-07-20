@@ -190,6 +190,7 @@
                     </div>
                     <div class="modal-body text-dart">
                         <form action="<?= BASE_URL ?>/admin/Liste_du_jours/reporter" method="post">
+                            <?= csrf_field() ?>
                             <div class="row">
                                 <div class="col-md-12">
                                     <label for="validationCustom01" class="form-label">Nouveau jour de voyage</label>

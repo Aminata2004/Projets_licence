@@ -19,17 +19,22 @@ class Liste_du_jours extends  Controller
   {
     date_default_timezone_set('Africa/Bamako');
     $id_compagnie = $_SESSION['id_compagnie'];
-    $idDepart = $_SESSION['ville'];
+    // Admin n'a pas de gare fixe en session : il voit les billets de toute la compagnie.
+    // Pour les autres rôles, numeroGare précise la gare exacte : une ville peut avoir
+    // plusieurs gares (ex. "Segou" Gare I et Gare II), le nom de ville seul ne suffit pas.
+    $isAdmin = ($_SESSION['droit'] ?? null) === 'Admin';
+    $idDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
+    $numeroGare = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $model = new Liste_du_jour();
 
-    $resultats = $model->listeBillets($idDepart);
+    $resultats = $model->listeBillets($idDepart, $numeroGare);
     $liste_horaires = $model->FetchSelectWheres(
       '*',
       'horaire',
       'id_compagnie = :id_compagnie',
       ['id_compagnie' => $id_compagnie]
     );
-    $destinations = $model->getDestinations($idDepart, $id_compagnie);
+    $destinations = $model->getDestinations($idDepart, $id_compagnie, $numeroGare);
 
     $this->view('admin/liste_du_jours', [
       'liste_du_jour' => $resultats,
@@ -113,7 +118,10 @@ class Liste_du_jours extends  Controller
   {
     date_default_timezone_set('Africa/Bamako');
     $id_compagnie = $_SESSION['id_compagnie'];
-    $idDepart     = $_SESSION['ville'];
+    // Admin n'a pas de gare fixe en session : il voit les billets de toute la compagnie.
+    $isAdmin      = ($_SESSION['droit'] ?? null) === 'Admin';
+    $idDepart     = $isAdmin ? null : ($_SESSION['ville'] ?? null);
+    $numeroGare   = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $destination  = trim($_GET['destination'] ?? '');
     $heure        = trim($_GET['heure'] ?? '');
     $aujourdhui   = date('Y-m-d');
@@ -121,12 +129,21 @@ class Liste_du_jours extends  Controller
     $model = new Liste_du_jour();
     $colisModel = new Livraisons_colis();
 
-    $where = 'billets.id_compagnie = :id_compagnie AND billets.departId = :depart AND billets.jourVoyage = :jour';
+    $where = 'billets.id_compagnie = :id_compagnie AND billets.jourVoyage = :jour';
     $params = [
       'id_compagnie' => $id_compagnie,
-      'depart'       => $idDepart,
       'jour'         => $aujourdhui
     ];
+
+    if ($idDepart !== null) {
+      $where .= ' AND billets.departId = :depart';
+      $params['depart'] = $idDepart;
+    }
+
+    if ($numeroGare !== null) {
+      $where .= ' AND billets.num_gare = :numeroGare';
+      $params['numeroGare'] = $numeroGare;
+    }
 
     if ($destination !== '') {
       $where .= ' AND billets.destinationId = :destination';
@@ -171,10 +188,13 @@ class Liste_du_jours extends  Controller
   public function getHeuresDisponibles()
   {
     $destinationId = $_POST['destination_id'];
-    $villeDepart = $_SESSION['ville']; // Session de l’utilisateur
+    // Admin n'a pas de gare fixe en session : il voit les heures de toute la compagnie.
+    $isAdmin = ($_SESSION['droit'] ?? null) === 'Admin';
+    $villeDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
+    $numeroGare  = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $billets = new Liste_du_jour();
 
-    $heures = $billets->getHeures($destinationId, $villeDepart);
+    $heures = $billets->getHeures($destinationId, $villeDepart, $numeroGare);
 
     echo json_encode($heures);
   }
@@ -184,6 +204,12 @@ class Liste_du_jours extends  Controller
     $billets = new Liste_du_jour();
 
     if (isset($_POST['edit'])) {
+      if (!csrf_verify()) {
+        $billets->set_flash("Session expirée, veuillez réessayer.", "danger");
+        header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
+        exit;
+      }
+
       date_default_timezone_set('Africa/Bamako');
       $idBillets = $_POST['idClient'];
       $billetActuel = $billets->getBilletById($idBillets);
@@ -209,6 +235,19 @@ class Liste_du_jours extends  Controller
       $expiration = strtotime($billetActuel->date_expiration . ' 23:59:59');
       if ($expiration !== false && $expiration < time()) {
         $billets->set_flash("Ce billet a expiré, impossible de le reporter.", "danger");
+        header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
+        exit;
+      }
+
+      // Un report ne peut viser qu'aujourd'hui ou demain, exactement comme une vente initiale
+      // (Add_billet::saveBillets) : au-delà, reporte_voyage() ne sait pas réserver de place
+      // (ni sur un car programmé, ni dans "suivis"), ce qui rendrait le billet invisible pour
+      // le contrôle de capacité au jour venu.
+      $nouveauJour = date('Y-m-d', strtotime($_POST['nouvelle_date']));
+      $aujourdhui  = date('Y-m-d');
+      $demain      = date('Y-m-d', strtotime('+1 day'));
+      if (!in_array($nouveauJour, [$aujourdhui, $demain], true)) {
+        $billets->set_flash("Le report n'est possible que vers aujourd'hui ou demain.", "danger");
         header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
         exit;
       }

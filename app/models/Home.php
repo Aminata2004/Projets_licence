@@ -42,7 +42,7 @@ class Home extends Model
 
         $sql = "SELECT
                     DATE_FORMAT(b.date_reservation, '%Y-%m')               AS mois,
-                    SUM(CAST(REPLACE(REPLACE(c.montant_payer,' ',''),'FCFA','') AS UNSIGNED)) AS total_fcfa
+                    SUM(CAST(REPLACE(REPLACE(c.montant_payer,' ',''),'FCFA','') AS DECIMAL(12,2))) AS total_fcfa
                 FROM billets b
                 INNER JOIN client c ON b.id_client = c.idClient
                 WHERE b.id_compagnie = :id_compagnie
@@ -115,7 +115,7 @@ class Home extends Model
         $totalGares = (int)$s->fetchColumn();
 
         // Revenus du mois en cours
-        $s = $pdo->prepare("SELECT SUM(CAST(REPLACE(REPLACE(c.montant_payer,' ',''),'FCFA','') AS UNSIGNED))
+        $s = $pdo->prepare("SELECT SUM(CAST(REPLACE(REPLACE(c.montant_payer,' ',''),'FCFA','') AS DECIMAL(12,2)))
                              FROM billets b INNER JOIN client c ON b.id_client = c.idClient
                              WHERE b.id_compagnie = :c AND b.status_reservation IN ('presentiel','en_ligne')
                                AND DATE_FORMAT(b.date_reservation,'%Y-%m') = DATE_FORMAT(CURDATE(),'%Y-%m')");
