@@ -71,7 +71,7 @@ class Homes extends Controller
         }
 
         if ($showColis) {
-            $data['colisMensuel'] = $this->homeModel->getColisMensuel($gareLabel);
+            $data['colisJour'] = $this->homeModel->getColisJournalier($gareLabel);
         }
 
         if ($showTopGares) {

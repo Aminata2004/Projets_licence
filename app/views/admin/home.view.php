@@ -244,12 +244,12 @@
 
       <!-- KPI COLIS -->
       <?php if ($showColis): ?>
-        <div class="tg-section-label"><i class="bi bi-box-seam me-1"></i>Colis & courrier — Ce mois</div>
+        <div class="tg-section-label"><i class="bi bi-box-seam me-1"></i>Colis & courrier — Aujourd'hui</div>
         <div class="tg-stat-grid mb-4">
           <a href="<?= BASE_URL ?>/admin/Colis_prise_en_charges" class="tg-stat-card" style="--tg-stat-color: var(--accent);">
             <div class="tg-stat-card__top">
               <div>
-                <div class="tg-stat-card__value"><?= htmlspecialchars($colisMensuel['prise_en_charge']); ?></div>
+                <div class="tg-stat-card__value"><?= htmlspecialchars($colisJour['prise_en_charge']); ?></div>
                 <div class="tg-stat-card__label">Colis pris en charge</div>
               </div>
               <div class="tg-stat-card__icon"><i class="bi bi-box-seam"></i></div>
@@ -258,7 +258,7 @@
           <a href="<?= BASE_URL ?>/admin/Mouvement_colis" class="tg-stat-card" style="--tg-stat-color: var(--warning);">
             <div class="tg-stat-card__top">
               <div>
-                <div class="tg-stat-card__value"><?= htmlspecialchars($colisMensuel['en_cours']); ?></div>
+                <div class="tg-stat-card__value"><?= htmlspecialchars($colisJour['en_cours']); ?></div>
                 <div class="tg-stat-card__label">Colis en cours</div>
               </div>
               <div class="tg-stat-card__icon"><i class="bi bi-truck"></i></div>
@@ -267,7 +267,7 @@
           <a href="<?= BASE_URL ?>/admin/Mouvement_colis" class="tg-stat-card" style="--tg-stat-color: var(--success);">
             <div class="tg-stat-card__top">
               <div>
-                <div class="tg-stat-card__value"><?= htmlspecialchars($colisMensuel['recu'] ?? 0); ?></div>
+                <div class="tg-stat-card__value"><?= htmlspecialchars($colisJour['recu'] ?? 0); ?></div>
                 <div class="tg-stat-card__label">Colis reçus</div>
               </div>
               <div class="tg-stat-card__icon"><i class="bi bi-inbox"></i></div>
@@ -276,7 +276,7 @@
           <a href="<?= BASE_URL ?>/admin/Livraison_colis" class="tg-stat-card" style="--tg-stat-color: var(--info);">
             <div class="tg-stat-card__top">
               <div>
-                <div class="tg-stat-card__value"><?= htmlspecialchars($colisMensuel['livre']); ?></div>
+                <div class="tg-stat-card__value"><?= htmlspecialchars($colisJour['livre']); ?></div>
                 <div class="tg-stat-card__label">Colis livrés</div>
               </div>
               <div class="tg-stat-card__icon"><i class="bi bi-check2-circle"></i></div>
@@ -387,11 +387,11 @@
         <!-- RÉPARTITION COLIS (données réelles, donut CSS) -->
         <?php if ($showColis):
           $segments = [
-            ['label' => 'Pris en charge', 'valeur' => (int)$colisMensuel['prise_en_charge'], 'color' => '#3b82f6'],
-            ['label' => 'En cours',       'valeur' => (int)$colisMensuel['en_cours'],       'color' => '#f59e0b'],
-            ['label' => 'Reçus',          'valeur' => (int)$colisMensuel['recu'],           'color' => '#06b6d4'],
-            ['label' => 'Livrés',         'valeur' => (int)$colisMensuel['livre'],          'color' => '#10b981'],
-            ['label' => 'En attente',     'valeur' => (int)$colisMensuel['attente'],        'color' => '#ef4444'],
+            ['label' => 'Pris en charge', 'valeur' => (int)$colisJour['prise_en_charge'], 'color' => '#3b82f6'],
+            ['label' => 'En cours',       'valeur' => (int)$colisJour['en_cours'],       'color' => '#f59e0b'],
+            ['label' => 'Reçus',          'valeur' => (int)$colisJour['recu'],           'color' => '#06b6d4'],
+            ['label' => 'Livrés',         'valeur' => (int)$colisJour['livre'],          'color' => '#10b981'],
+            ['label' => 'En attente',     'valeur' => (int)$colisJour['attente'],        'color' => '#ef4444'],
           ];
           $totalColis = array_sum(array_column($segments, 'valeur'));
           $stops = [];
@@ -410,13 +410,13 @@
                 <span class="tg-panel__icon" style="background: rgba(16,185,129,0.14); color: var(--tg-success);"><i class="bi bi-pie-chart-fill"></i></span>
                 <div>
                   <h5 class="tg-panel__title">Répartition colis</h5>
-                  <p class="tg-panel__subtitle">Ce mois-ci</p>
+                  <p class="tg-panel__subtitle">Aujourd'hui</p>
                 </div>
               </div>
               <?php if ($totalColis === 0): ?>
                 <div class="tg-empty">
                   <i class="bi bi-inbox"></i>
-                  Aucun colis enregistré ce mois.
+                  Aucun colis enregistré aujourd'hui.
                 </div>
               <?php else: ?>
                 <div class="tg-donut-wrap">

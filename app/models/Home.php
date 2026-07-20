@@ -256,29 +256,27 @@ class Home extends Model
     }
 
     /**
-     * Statistiques colis du mois en cours, scopées par compagnie systématiquement
+     * Statistiques colis du jour en cours, scopées par compagnie systématiquement
      * (avant, le filtre compagnie manquait pour chef_d_escale/Utilisateur : fuite
      * possible entre compagnies partageant une même ville).
      */
-    public function getColisMensuel($gareVille = null)
+    public function getColisJournalier($gareVille = null)
     {
         $role     = $_SESSION['droit'];
         $ville    = $_SESSION['ville'] ?? null;
         $num_gare = $_SESSION['numero_gare'] ?? null;
 
-        $debutMois = date('Y-m-01');
-        $finMois   = date('Y-m-t');
+        $today = date('Y-m-d');
 
         $sql = "SELECT colis.status, COUNT(*) AS total
                 FROM colis
                 INNER JOIN agence ON colis.id_agence = agence.idAgence
                 WHERE colis.id_compagnie = :id_compagnie
-                  AND DATE(colis.date_enregistrement) BETWEEN :debut AND :fin";
+                  AND DATE(colis.date_enregistrement) = :today";
 
         $params = [
             ':id_compagnie' => $_SESSION['id_compagnie'],
-            ':debut' => $debutMois,
-            ':fin'   => $finMois
+            ':today' => $today
         ];
 
         if ($role === 'Utilisateur') {
@@ -412,7 +410,7 @@ class Home extends Model
                 $params[':ville'] = $gareVille;
             }
 
-            $sql .= " ORDER BY date_reservation DESC, idBillets DESC LIMIT 6";
+            $sql .= " ORDER BY date_reservation DESC, idBillets DESC LIMIT 3";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
@@ -445,7 +443,7 @@ class Home extends Model
                 $params[':ville'] = $gareVille;
             }
 
-            $sql .= " ORDER BY colis.date_enregistrement DESC, colis.id_colis DESC LIMIT 6";
+            $sql .= " ORDER BY colis.date_enregistrement DESC, colis.id_colis DESC LIMIT 3";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
