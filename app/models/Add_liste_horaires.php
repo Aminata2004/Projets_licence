@@ -56,6 +56,11 @@
                 ":heuredepart" => $data['heuredepart'],
                 ":id_heure" => $data['id_heure'],
             ];
+            // Un Admin ne peut modifier que les horaires de sa propre compagnie (IDOR sinon)
+            if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+                $req .= " AND id_compagnie = :id_compagnie";
+                $params[":id_compagnie"] = $_SESSION['id_compagnie'] ?? null;
+            }
 
             $modification = $this->insertion_update_simples($req, $params);
 
@@ -68,10 +73,14 @@
 
         public function deleteHoraire($id_heure)
         {
-            $suppression = $this->insertion_update_simples(
-                "DELETE FROM horaire WHERE id_heure = :id_heure",
-                [":id_heure" => $id_heure]
-            );
+            $req = "DELETE FROM horaire WHERE id_heure = :id_heure";
+            $params = [":id_heure" => $id_heure];
+            // Un Admin ne peut supprimer que les horaires de sa propre compagnie (IDOR sinon)
+            if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+                $req .= " AND id_compagnie = :id_compagnie";
+                $params[":id_compagnie"] = $_SESSION['id_compagnie'] ?? null;
+            }
+            $suppression = $this->insertion_update_simples($req, $params);
 
             if ($suppression == true) {
                 $this->set_flash("Heure supprimée avec succès", "success");

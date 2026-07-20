@@ -528,16 +528,21 @@ class Liste_ententes extends Controller
 
                 try {
                     // 3️⃣ Mise à jour du billet
-                    $sql = "UPDATE billets 
-                        SET validation_billets = 'valider', idUser = :idUser 
-                        WHERE idBillets = :id";
+                    // La condition "validation_billets != 'valider'" empêche de créditer la
+                    // caisse deux fois si le formulaire est soumis deux fois (double clic, ou
+                    // deux requêtes concurrentes) : InnoDB verrouille la ligne pendant l'UPDATE,
+                    // donc la seconde requête ne peut affecter 0 ligne qu'une fois la première
+                    // validée (rowCount() === 0 ci-dessous détecte alors le cas et bloque la suite).
+                    $sql = "UPDATE billets
+                        SET validation_billets = 'valider', idUser = :idUser
+                        WHERE idBillets = :id AND validation_billets != 'valider'";
                     $stmt = $pdo->prepare($sql);
                     $stmt->bindParam(':idUser', $_SESSION['id_utilisateur'], PDO::PARAM_INT);
                     $stmt->bindParam(':id', $id_reservation, PDO::PARAM_INT);
                     $stmt->execute();
 
                     if ($stmt->rowCount() === 0) {
-                        throw new Exception("Erreur : billet non mis à jour !");
+                        throw new Exception("Ce billet a déjà été validé.");
                     }
                     // var_dump($listeticked_validations->montant_payer);exit;
 

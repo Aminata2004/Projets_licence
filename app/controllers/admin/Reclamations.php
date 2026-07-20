@@ -32,6 +32,12 @@ class Reclamations extends  Controller
 
       // 2. Traitement d'une nouvelle réclamation
       if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_reclamation'])) {
+          if (!csrf_verify()) {
+              $db->set_flash("Session expirée, merci de réessayer.", "danger");
+              header("Location: " . BASE_URL . "/admin/Reclamations");
+              exit;
+          }
+
           $id_colis = $_POST['id_colis'] ?? null;
           $motif = trim($_POST['motif_reclamation'] ?? '');
           $montant = (int)($_POST['montant_remboursement'] ?? 0);
@@ -82,6 +88,11 @@ class Reclamations extends  Controller
 
       // 3. Mise à jour du statut
       if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+          if (!csrf_verify()) {
+              $db->set_flash("Session expirée, merci de réessayer.", "danger");
+              header("Location: " . BASE_URL . "/admin/Reclamations");
+              exit;
+          }
 
           if (!isset($_SESSION['droit']) || !in_array($_SESSION['droit'], ['Admin', 'chef_d_escale'])) {
               $db->set_flash("Vous n'avez pas l'autorisation d'approuver ou gérer les réclamations.", "danger");

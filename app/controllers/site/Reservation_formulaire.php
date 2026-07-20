@@ -158,7 +158,6 @@ class Reservation_formulaire extends Controller
                 $telephone       = $_POST['numeroClient'];
                 $numeroPaiement  = $_POST['numeroPaiement'];
                 $emailClient     = $_POST['emailClient'];
-                $prixTotal       = $_POST['montant_payer'];
                 $numeroBillets   = $_POST['numeroBillets'];
                 $date_enregistrement = date('Y-m-d H:i:s');
 
@@ -184,10 +183,12 @@ class Reservation_formulaire extends Controller
                     if (!$rowProg) throw new Exception("Aucun car programmé pour cette heure et ce trajet.");
 
                     $idCarProgrammer = $rowProg['id_car_programmer'];
-                    $car = $programmeModel->fetchOne(
-                        "SELECT nbr_place, nbr_place_reserve FROM car WHERE id_car = :num LIMIT 1",
-                        [':num' => $idCarProgrammer]
-                    );
+                    // SELECT ... FOR UPDATE : verrouille la ligne le temps de la transaction pour
+                    // empêcher deux réservations simultanées de lire le même nbr_place_reserve et
+                    // de faire du surbooking (race condition).
+                    $stmtCar = $pdo->prepare("SELECT nbr_place, nbr_place_reserve FROM car WHERE id_car = :num LIMIT 1 FOR UPDATE");
+                    $stmtCar->execute([':num' => $idCarProgrammer]);
+                    $car = $stmtCar->fetch(PDO::FETCH_ASSOC);
                     if (!$car) throw new Exception("Car introuvable.");
 
                     $placesDispo = $car['nbr_place'] - $car['nbr_place_reserve'];
@@ -197,6 +198,26 @@ class Reservation_formulaire extends Controller
                     $end   = $start + $nbPassagers - 1;
                     $numPlace = ($nbPassagers == 1) ? "$start" : "$start-$end";
                 }
+
+                // --- Prix recalculé côté serveur (le montant_payer posté n'est qu'un aperçu JS,
+                // falsifiable via les DevTools : on ignore toujours $_POST['montant_payer']). ---
+                if (!$programme) {
+                    throw new Exception("Trajet invalide.");
+                }
+                $prixUnitaire = (int) $programme->prix;
+                if (!empty($escaleFinale)) {
+                    $ligneEscale = $programmeModel->fetchOne(
+                        "SELECT lt.prix_escale
+                         FROM ligneTrajet lt
+                         JOIN escale e ON e.id_escale = lt.id_escales
+                         WHERE lt.id_trajets = :id_trajet AND lt.type_trajet = 'programmer' AND e.escales = :escale",
+                        [':id_trajet' => $programme->idProgrammer, ':escale' => $escaleFinale]
+                    );
+                    if ($ligneEscale) {
+                        $prixUnitaire = (int) $ligneEscale['prix_escale'];
+                    }
+                }
+                $prixTotal = $prixUnitaire * $nbPassagers;
 
                 // --- 2️⃣ Enregistrement client ---
                 $stmt = $pdo->prepare(

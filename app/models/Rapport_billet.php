@@ -113,7 +113,8 @@ class Rapport_billet extends Model
             FROM billets b
             INNER JOIN client c ON b.id_client = c.idClient
             WHERE b.id_compagnie = :compagnie
-              AND b.status_reservation IN ('presentiel', 'en_ligne')";
+              AND b.status_reservation IN ('presentiel', 'en_ligne')
+              AND (b.status_billets IS NULL OR b.status_billets != 'annule')";
 
         if ($mois !== null) {
             $sql .= " AND DATE_FORMAT(b.date_reservation, '%Y-%m') = :mois";
@@ -146,7 +147,8 @@ class Rapport_billet extends Model
             FROM billets b
             INNER JOIN client c ON b.id_client = c.idClient
             WHERE b.id_compagnie = :compagnie
-              AND b.status_reservation IN ('presentiel', 'en_ligne')";
+              AND b.status_reservation IN ('presentiel', 'en_ligne')
+              AND (b.status_billets IS NULL OR b.status_billets != 'annule')";
 
         if ($annee !== null) {
             $sql .= " AND YEAR(b.date_reservation) = :annee";

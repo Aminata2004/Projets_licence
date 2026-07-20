@@ -85,11 +85,19 @@ class Add_liste_trajet extends Model
 
     public function deleteTrajet($id)
     {
+        // Un Admin ne peut supprimer que les trajets de sa propre compagnie (IDOR sinon)
+        $sql = "DELETE FROM trajet WHERE idTrajet = :id";
+        $params = [":id" => $id];
+        if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+            $sql .= " AND id_compagnie = :id_compagnie";
+            $params[":id_compagnie"] = $_SESSION['id_compagnie'] ?? null;
+        }
+
         // Supprimer d'abord les liaisons avec les escales
         $this->insertion_update_simples("DELETE FROM ligneTrajet WHERE id_trajets = :id AND type_trajet = 'trajet'", [":id" => $id]);
 
-        // Supprimer ensuite le trajet
-        $stmt = $this->insertion_update_simples("DELETE FROM trajet WHERE idTrajet = :id", [":id" => $id]);
+        // Supprimer ensuite le trajet (uniquement si la compagnie correspond)
+        $stmt = $this->insertion_update_simples($sql, $params);
         return $stmt ? true : false;
     }
 
@@ -116,12 +124,18 @@ class Add_liste_trajet extends Model
             return $errors;
         }
         
-        // Mettre à jour le trajet
-        $this->insertion_update_simples("UPDATE trajet SET depart = :depart, destination = :destination WHERE idTrajet = :id", [
+        // Mettre à jour le trajet (un Admin ne peut modifier que les trajets de sa propre compagnie)
+        $sql = "UPDATE trajet SET depart = :depart, destination = :destination WHERE idTrajet = :id";
+        $params = [
             ":depart" => $depart,
             ":destination" => $destination,
             ":id" => $idTrajet
-        ]);
+        ];
+        if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+            $sql .= " AND id_compagnie = :id_compagnie";
+            $params[":id_compagnie"] = $_SESSION['id_compagnie'] ?? null;
+        }
+        $this->insertion_update_simples($sql, $params);
         
         // Supprimer les anciennes escales
         $this->insertion_update_simples("DELETE FROM ligneTrajet WHERE id_trajets = :id AND type_trajet = 'trajet'", [":id" => $idTrajet]);

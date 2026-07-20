@@ -14,6 +14,12 @@ class Caisse extends Controller
         );
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_caisse'], $_POST['newStatut'])) {
+            if (!csrf_verify()) {
+                $liste_gare->set_flash("Session expirée, merci de réessayer.", "danger");
+                header("Location: " . $_SERVER['REQUEST_URI']);
+                exit;
+            }
+
             $id = (int)$_POST['id_caisse'];
             $status_caisse = (int)$_POST['newStatut'];
 
@@ -81,8 +87,11 @@ class Caisse extends Controller
         }
 
         if (isset($_POST["saveAgence"])) {
-
-            $liste_gare->saveCaisse();
+            if (!csrf_verify()) {
+                $liste_gare->set_flash("Session expirée, merci de réessayer.", "danger");
+            } else {
+                $liste_gare->saveCaisse();
+            }
         }
         $this->view('admin/add_caisse', ['listes' => $listes]);
     }
@@ -101,6 +110,7 @@ class Caisse extends Controller
     INNER JOIN client c ON b.id_client = c.idClient
     WHERE b.id_compagnie = :compagnie
       AND b.validation_billets = 'valider'
+      AND (b.status_billets IS NULL OR b.status_billets != 'annule')
       AND b.departId = :ville
 ";
 

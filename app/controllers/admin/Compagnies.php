@@ -6,9 +6,24 @@ class Compagnies extends  Controller
     $this->requireLogin(); // L'utilisateur doit être connecté pour accéder à n'importe quelle méthode
   }
 
+  // Ce contrôleur gère TOUTES les compagnies du SaaS (pas seulement celle de l'utilisateur
+  // connecté) : réservé au super_admin. Seul impersonate() vérifiait déjà ce rôle ; index(),
+  // edit(), delete(), place_limite() et edit1() étaient accessibles à n'importe quel
+  // utilisateur connecté, de n'importe quel rôle et de n'importe quelle compagnie — delete()
+  // permettait ainsi à un simple "Utilisateur" de supprimer n'importe quelle compagnie du
+  // système (vérifié en conditions réelles).
+  private function requireSuperAdmin()
+  {
+    if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+      header("Location: " . BASE_URL . "/admin/Homes/home");
+      exit;
+    }
+  }
 
   public function index()
   {
+    $this->requireSuperAdmin();
+
     // Instanciation du modèle
     $compagnie = new Compagnie();
 
@@ -29,6 +44,8 @@ class Compagnies extends  Controller
   // fonction pour la modification des compagnie
   public function edit()
   {
+    $this->requireSuperAdmin();
+
     $compagnie = new Compagnie();
 
     if (isset($_POST['edit'])) {
@@ -82,6 +99,8 @@ class Compagnies extends  Controller
 
   public function delete($id)
   {
+    $this->requireSuperAdmin();
+
     $compagnie = new Compagnie();
     // Définir la requête de suppression et les paramètres
     $sql = 'DELETE FROM compagnie WHERE id_compagnie = :id';
@@ -99,6 +118,8 @@ class Compagnies extends  Controller
   // limitation de place 
   public function place_limite()
   {
+    $this->requireSuperAdmin();
+
     // Instanciation du modèle
     $compagnie = new Compagnie();
     $liste_place = $compagnie->SelectAllData('*', "place_minumale");
@@ -108,6 +129,8 @@ class Compagnies extends  Controller
 
   public function edit1()
   {
+    $this->requireSuperAdmin();
+
     $compagnie = new Compagnie();
 
     if (isset($_POST['edit'])) {

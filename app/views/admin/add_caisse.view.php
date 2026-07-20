@@ -45,6 +45,7 @@
                         <div class="card-body p-4">
                             <div class="p-4 border rounded-3">
                                 <form class="row g-3" method="post">
+                                    <?= csrf_field() ?>
 
                                     <div class="col-md-6">
                                         <label for="validationCustom01" class="form-label fw-semibold">Reference caisse</label>

@@ -58,17 +58,33 @@
 
         public function updateChauffeur($id, $data)
         {
-            $stmt = $this->connect()->prepare("UPDATE chauffeur SET nom_prenom = :nom, numero = :numero, id_car = :id_car WHERE id_chauffeur = :id");
+            // Un Admin ne peut modifier que les chauffeurs de sa propre compagnie (IDOR sinon)
+            $sql = "UPDATE chauffeur SET nom_prenom = :nom, numero = :numero, id_car = :id_car WHERE id_chauffeur = :id";
+            if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+                $sql .= " AND id_compagnie = :id_compagnie";
+            }
+            $stmt = $this->connect()->prepare($sql);
             $stmt->bindParam(':nom', $data['nom_prenom']);
             $stmt->bindParam(':numero', $data['numero']);
             $stmt->bindParam(':id_car', $data['id_car']);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+                $stmt->bindValue(':id_compagnie', $_SESSION['id_compagnie'] ?? null);
+            }
             return $stmt->execute();
         }
 
          public function deleteChauffeur($id) {
-        $stmt = $this->connect()->prepare("DELETE FROM chauffeur WHERE id_chauffeur = :id");
+        // Un Admin ne peut supprimer que les chauffeurs de sa propre compagnie (IDOR sinon)
+        $sql = "DELETE FROM chauffeur WHERE id_chauffeur = :id";
+        if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+            $sql .= " AND id_compagnie = :id_compagnie";
+        }
+        $stmt = $this->connect()->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+            $stmt->bindValue(':id_compagnie', $_SESSION['id_compagnie'] ?? null);
+        }
         return $stmt->execute();
     }
     }

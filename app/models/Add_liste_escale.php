@@ -53,17 +53,26 @@
         public function updateEscale($id, $nom)
         {
             $sql = "UPDATE escale SET escales = :nom WHERE id_escale = :id";
+            $params = [':nom' => $nom, ':id' => $id];
+            // Un Admin ne peut modifier que les escales de sa propre compagnie (IDOR sinon)
+            if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+                $sql .= " AND id_compagnie = :id_compagnie";
+                $params[':id_compagnie'] = $_SESSION['id_compagnie'] ?? null;
+            }
             $stmt = $this->connect()->prepare($sql);
-            $stmt->bindValue(':nom', $nom, PDO::PARAM_STR);
-            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-            return $stmt->execute();
+            return $stmt->execute($params);
         }
 
         public function deleteEscale($id)
         {
             $sql = "DELETE FROM escale WHERE id_escale = :id";
+            $params = [':id' => $id];
+            // Un Admin ne peut supprimer que les escales de sa propre compagnie (IDOR sinon)
+            if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+                $sql .= " AND id_compagnie = :id_compagnie";
+                $params[':id_compagnie'] = $_SESSION['id_compagnie'] ?? null;
+            }
             $stmt = $this->connect()->prepare($sql);
-            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-            return $stmt->execute();
+            return $stmt->execute($params);
         }
     }

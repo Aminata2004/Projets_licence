@@ -3,6 +3,9 @@ class Livraisons_colis extends Model
 {
     public function findByCode(string $code): ?array
     {
+        // Filtré par id_compagnie : sans ça, un opérateur pouvait consulter/livrer le colis
+        // d'une AUTRE compagnie si le nom de ville + numéro de gare coïncidaient par hasard
+        // (le contrôleur ne vérifiait que localite/numeroGare, jamais la compagnie).
         $sql = "SELECT colis.*,
                        expediteurs.expediteur        AS expediteur,
                        expediteurs.numero_exp         AS numero_exp,
@@ -16,9 +19,9 @@ class Livraisons_colis extends Model
                 INNER JOIN expediteurs   ON expediteurs.id_expediteur    = colis.id_expediteur
                 INNER JOIN destinataires ON destinataires.id_destinataire = colis.id_destinataire
                 INNER JOIN agence        ON agence.idAgence             = colis.id_agence
-                WHERE colis.code_colis = :code";
+                WHERE colis.code_colis = :code AND colis.id_compagnie = :id_compagnie";
 
-        return $this->query($sql, [':code' => $code], true);
+        return $this->query($sql, [':code' => $code, ':id_compagnie' => $_SESSION['id_compagnie'] ?? null], true);
     }
 
     public function getById(int $id): ?array
@@ -36,16 +39,17 @@ class Livraisons_colis extends Model
                 INNER JOIN expediteurs   ON expediteurs.id_expediteur     = colis.id_expediteur
                 INNER JOIN destinataires ON destinataires.id_destinataire = colis.id_destinataire
                 INNER JOIN agence        ON agence.idAgence              = colis.id_agence
-                WHERE colis.id_colis = :id";
+                WHERE colis.id_colis = :id AND colis.id_compagnie = :id_compagnie";
 
-        return $this->query($sql, [':id' => $id], true);
+        return $this->query($sql, [':id' => $id, ':id_compagnie' => $_SESSION['id_compagnie'] ?? null], true);
     }
 
     public function livrer(int $id_colis): bool
     {
-        $sql = "UPDATE colis SET status = 'livre', date_livraison = NOW() WHERE id_colis = :id";
+        $sql = "UPDATE colis SET status = 'livre', date_livraison = NOW() WHERE id_colis = :id AND id_compagnie = :id_compagnie";
         $stmt = $this->connect()->prepare($sql);
         $stmt->bindParam(':id', $id_colis, PDO::PARAM_INT);
+        $stmt->bindValue(':id_compagnie', $_SESSION['id_compagnie'] ?? null);
         $stmt->execute();
 
         return $stmt->rowCount() > 0;

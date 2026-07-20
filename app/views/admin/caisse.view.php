@@ -128,6 +128,7 @@
                         <?php if ($user->userHasPermission('Caisse_apercue') && $isOpen): ?>
                         <div class="footer-card">
                             <form method="post" action="<?= BASE_URL ?>/admin/Caisse" id="form-fermer-<?= $caisse->id_caisse ?>">
+                                <?= csrf_field() ?>
                                 <input type="hidden" name="id_caisse" value="<?= $caisse->id_caisse ?>">
                                 <input type="hidden" name="newStatut" value="0">
                                 <button type="button" class="btn-cloture" onclick="confirmClose(<?= $caisse->id_caisse ?>, '<?= addslashes($caisse->localite) ?>')">🔒 Clôturer</button>

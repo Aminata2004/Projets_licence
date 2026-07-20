@@ -70,8 +70,8 @@ class Liste_gare extends Model
 
     public function editAgence($data)
     {
-        $req = "UPDATE agence 
-           SET numeroGare =:numeroGare, 
+        $req = "UPDATE agence
+           SET numeroGare =:numeroGare,
                localite=:localite,
                code=:code,
                 tel=:tel
@@ -84,6 +84,12 @@ class Liste_gare extends Model
             ':tel' => $data['tel'],
             ':idAgence' => $data['idAgence'],
         ];
+
+        // Un Admin ne peut modifier que les gares de sa propre compagnie (IDOR sinon)
+        if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+            $req .= " AND id_compagnie = :id_compagnie";
+            $params[':id_compagnie'] = $_SESSION['id_compagnie'] ?? null;
+        }
 
         $modification = $this->insertion_update_simples($req, $params);
 
@@ -208,16 +214,22 @@ public function saveCaisse()
     public function suspendGare($idAgence)
     {
         $db = $this->connect();
-        $stmt = $db->prepare("SELECT status FROM agence WHERE idAgence = ?");
-        $stmt->execute([$idAgence]);
+        // Un Admin ne peut suspendre que les gares de sa propre compagnie (IDOR sinon)
+        if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+            $stmt = $db->prepare("SELECT status FROM agence WHERE idAgence = ? AND id_compagnie = ?");
+            $stmt->execute([$idAgence, $_SESSION['id_compagnie'] ?? null]);
+        } else {
+            $stmt = $db->prepare("SELECT status FROM agence WHERE idAgence = ?");
+            $stmt->execute([$idAgence]);
+        }
         $agence = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($agence) {
             $current_status = isset($agence['status']) ? $agence['status'] : 1;
             $new_status = ($current_status == 1) ? 0 : 1;
             $update = $db->prepare("UPDATE agence SET status = ? WHERE idAgence = ?");
             $update->execute([$new_status, $idAgence]);
-            
+
             if ($new_status == 1) {
                 $this->set_flash("Gare activée avec succès.", "success");
             } else {
@@ -229,25 +241,31 @@ public function saveCaisse()
     public function deleteGare($idAgence)
     {
         $db = $this->connect();
-        $stmt = $db->prepare("SELECT numeroGare FROM agence WHERE idAgence = ?");
-        $stmt->execute([$idAgence]);
+        // Un Admin ne peut supprimer que les gares de sa propre compagnie (IDOR sinon)
+        if (($_SESSION['droit'] ?? null) !== 'super_admin') {
+            $stmt = $db->prepare("SELECT numeroGare FROM agence WHERE idAgence = ? AND id_compagnie = ?");
+            $stmt->execute([$idAgence, $_SESSION['id_compagnie'] ?? null]);
+        } else {
+            $stmt = $db->prepare("SELECT numeroGare FROM agence WHERE idAgence = ?");
+            $stmt->execute([$idAgence]);
+        }
         $agence = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($agence) {
             $numeroGare = $agence['numeroGare'];
-            
+
             $countBillets = $db->prepare("SELECT COUNT(*) FROM billets WHERE num_gare = ?");
             $countBillets->execute([$numeroGare]);
             $hasBillets = $countBillets->fetchColumn();
-            
+
             $countColis = $db->prepare("SELECT COUNT(*) FROM colis WHERE num_gare = ? OR id_agence = ?");
             $countColis->execute([$numeroGare, $idAgence]);
             $hasColis = $countColis->fetchColumn();
-            
+
             $countCaisse = $db->prepare("SELECT COUNT(*) FROM caisse WHERE id_agence = ?");
             $countCaisse->execute([$idAgence]);
             $hasCaisse = $countCaisse->fetchColumn();
-            
+
             if ($hasBillets == 0 && $hasColis == 0 && $hasCaisse == 0) {
                 $del = $db->prepare("DELETE FROM agence WHERE idAgence = ?");
                 $del->execute([$idAgence]);

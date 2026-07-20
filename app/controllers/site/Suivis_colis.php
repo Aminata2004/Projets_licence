@@ -33,25 +33,29 @@ class Suivis_colis extends Controller
 
 
             if ($resultat) {
-                // Rediriger avec uniquement un paramètre pour éviter que le champ garde la valeur
-                header("Location: " . BASE_URL . "/site/Suivis_colis?show_code=" . urlencode($codeColis));
+                // Rediriger avec le code ET la compagnie : sans id_compagnie ici, l'étape suivante
+                // n'avait plus aucun moyen de revérifier l'appartenance du colis (le contrôle de la
+                // ligne 27 devenait alors purement cosmétique, contournable en appelant directement
+                // ?show_code=...).
+                header("Location: " . BASE_URL . "/site/Suivis_colis?show_code=" . urlencode($codeColis) . "&id_compagnie=" . $idCompagnie);
                 exit();
             } else {
                 $messageErreur = "Ce colis n'appartient pas à la compagnie sélectionnée.";
             }
         }
 
-        // Si show_code est dans l'URL, récupérer les infos du colis sans garder tous les paramètres
-        if (isset($_GET['show_code'])) {
+        // Si show_code est dans l'URL, récupérer les infos du colis en revérifiant la compagnie
+        if (isset($_GET['show_code'], $_GET['id_compagnie'])) {
             $codeColis = $_GET['show_code'];
+            $idCompagnie = intval($_GET['id_compagnie']);
             $colis = $Compagnie->getColisByCodeAndCompagnie(
                 "SELECT colis.*, expediteurs.*, destinataires.*, a.*, colis.status AS status
          FROM colis
          JOIN expediteurs ON colis.id_expediteur = expediteurs.id_expediteur
          JOIN destinataires ON colis.id_destinataire = destinataires.id_destinataire
          JOIN agence a ON colis.id_agence = a.idAgence
-         WHERE colis.code_colis = :code",
-                [":code" => $codeColis]
+         WHERE colis.code_colis = :code AND colis.id_compagnie = :id_compagnie",
+                [":code" => $codeColis, ":id_compagnie" => $idCompagnie]
             );
         }
 

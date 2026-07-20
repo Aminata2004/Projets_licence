@@ -17,6 +17,11 @@ class Programmation_car extends Model
         if (empty($idTrajet)) {
             $errors[] = "Le trajet est obligatoire.";
         }
+
+        // Un Admin ne peut programmer que les cars de sa propre compagnie (IDOR sinon)
+        if (empty($errors) && !$this->carAppartientCompagnie($id_car)) {
+            $errors[] = "Ce car n'appartient pas à votre compagnie.";
+        }
         // Si aucune erreur, on procède à l'insertion
         if (count($errors) === 0) {
             $insertion = $this->insertion_update_simple(
@@ -66,6 +71,11 @@ class Programmation_car extends Model
             $errors[] = "Le trajet est obligatoire.";
         }
 
+        // Un Admin ne peut modifier que les cars de sa propre compagnie (IDOR sinon)
+        if (empty($errors) && !$this->carAppartientCompagnie($id_car)) {
+            $errors[] = "Ce car n'appartient pas à votre compagnie.";
+        }
+
         if (count($errors) === 0) {
             $success = $this->linkTrajetsToCar($id_car, $_POST['idTrajet'], $_SESSION['id_compagnie']);
 
@@ -85,11 +95,31 @@ class Programmation_car extends Model
     // et remet le car en disponible pour une nouvelle programmation.
     public function supprimerProgrammation($id_car)
     {
+        // Un Admin ne peut déprogrammer que les cars de sa propre compagnie (IDOR sinon)
+        if (!$this->carAppartientCompagnie($id_car)) {
+            return false;
+        }
+
         $this->insertion_update_simples("DELETE FROM liaison_car_trajet WHERE id_car = :id_car", [":id_car" => $id_car]);
         $this->insertion_update_simples("DELETE FROM reference_car WHERE id_car = :id_car", [":id_car" => $id_car]);
         $stmt = $this->insertion_update_simples("UPDATE car SET programmer_car = 'off' WHERE id_car = :id_car", [":id_car" => $id_car]);
 
         return $stmt ? true : false;
+    }
+
+    // Vérifie que le car appartient à la compagnie de l'utilisateur connecté (super_admin exempté)
+    private function carAppartientCompagnie($id_car)
+    {
+        if (($_SESSION['droit'] ?? null) === 'super_admin') {
+            return true;
+        }
+        $car = $this->FetchSelectWhere(
+            "id_car",
+            "car",
+            "id_car = :id_car AND id_compagnie = :id_compagnie",
+            [":id_car" => $id_car, ":id_compagnie" => $_SESSION['id_compagnie'] ?? null]
+        );
+        return (bool) $car;
     }
 
     // Relie un ou plusieurs trajets (et leur sens inverse) à un car, sans dupliquer les liaisons existantes.

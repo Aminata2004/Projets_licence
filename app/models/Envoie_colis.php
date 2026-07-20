@@ -6,6 +6,15 @@ class Envoie_colis extends Model
    {
       $date_enregistre = date('YmdHis');
       $id_compagnie = $_SESSION['id_compagnie'];
+
+      // Ne traiter que les colis appartenant réellement à la compagnie de l'utilisateur :
+      // sans ce filtre, un id_colis posté d'une AUTRE compagnie était accepté tel quel et son
+      // statut passait à 'en_cours' (IDOR en écriture sur les données d'une autre compagnie).
+      $colis_ids = $this->filtrerColisDeLaCompagnie($colis_ids, $id_compagnie);
+      if (empty($colis_ids)) {
+         return;
+      }
+
       // Insertion dans ligne_envoi
       $this->insertion_update_simples(
          "INSERT INTO ligne_envoi (numero_car, dates,id_compagnie) VALUES(:numero_car, :dates,:id_compagnie)",
@@ -19,7 +28,7 @@ class Envoie_colis extends Model
       // Insertion dans la table envoi pour chaque colis
       foreach ($colis_ids as $id_colis) {
          $this->insertion_update_simples(
-            "INSERT INTO envoi (id_coli, id_car, date_enregistre, id_compagnie) 
+            "INSERT INTO envoi (id_coli, id_car, date_enregistre, id_compagnie)
        VALUES (:id_coli, :id_car, :date_enregistre, :id_compagnie)",
             [
                ':id_coli' => $id_colis,
@@ -33,8 +42,25 @@ class Envoie_colis extends Model
 
       // Mise à jour des statuts des colis sélectionnés
       $placeholders = implode(',', array_fill(0, count($colis_ids), '?'));
-      $sql = "UPDATE colis SET status = 'en_cours' WHERE id_colis IN ($placeholders)";
-      $this->connect()->prepare($sql)->execute($colis_ids);
+      $sql = "UPDATE colis SET status = 'en_cours' WHERE id_colis IN ($placeholders) AND id_compagnie = ?";
+      $this->connect()->prepare($sql)->execute([...$colis_ids, $id_compagnie]);
+   }
+
+   // Restreint une liste d'id_colis postés à ceux qui appartiennent réellement à la
+   // compagnie de l'utilisateur connecté (protection IDOR commune à traiterEnvoi/traiterEnvoi1).
+   private function filtrerColisDeLaCompagnie(array $colis_ids, $id_compagnie): array
+   {
+      if (empty($colis_ids)) {
+         return [];
+      }
+      $placeholders = implode(',', array_fill(0, count($colis_ids), '?'));
+      $params = $colis_ids;
+      $params[] = $id_compagnie;
+      $stmt = $this->connect()->prepare(
+         "SELECT id_colis FROM colis WHERE id_colis IN ($placeholders) AND id_compagnie = ?"
+      );
+      $stmt->execute($params);
+      return $stmt->fetchAll(PDO::FETCH_COLUMN);
    }
 
    public function getColisEnregistres()
@@ -123,6 +149,13 @@ class Envoie_colis extends Model
    {
       date_default_timezone_set('Africa/Bamako');
       $id_compagnie = $_SESSION['id_compagnie'];
+
+      // Ne traiter que les colis appartenant réellement à la compagnie de l'utilisateur (IDOR sinon).
+      $colis_ids = $this->filtrerColisDeLaCompagnie($colis_ids, $id_compagnie);
+      if (empty($colis_ids)) {
+         return;
+      }
+
       $date_enregistre = $this->getOuCreerLigneEnvoiDuJour($id_car, $id_compagnie);
 
       // Insertion dans la table envoi
@@ -141,8 +174,8 @@ class Envoie_colis extends Model
 
       // Mise à jour du statut des colis
       $placeholders = implode(',', array_fill(0, count($colis_ids), '?'));
-      $sql = "UPDATE colis SET status = 'en_cours' WHERE id_colis IN ($placeholders)";
-      $this->connect()->prepare($sql)->execute($colis_ids);
+      $sql = "UPDATE colis SET status = 'en_cours' WHERE id_colis IN ($placeholders) AND id_compagnie = ?";
+      $this->connect()->prepare($sql)->execute([...$colis_ids, $id_compagnie]);
    }
 
    // Retourne la date du lot d'envoi du jour pour ce car (le crée s'il n'existe pas encore).

@@ -79,6 +79,7 @@
                                         </div>
                                     <?php else: ?>
                                         <form action="<?= BASE_URL ?>/admin/Reclamations" method="post">
+                                            <?= csrf_field() ?>
                                             <input type="hidden" name="id_colis" value="<?= $colisData->id_colis ?>">
                                             <div class="mb-3">
                                                 <label class="form-label fw-semibold">Motif de la réclamation <span class="text-danger">*</span></label>
@@ -153,6 +154,7 @@
                                                                             <p><strong>Colis:</strong> <?= htmlspecialchars($rec->code_colis) ?></p>
                                                                             <p><strong>Motif complet:</strong><br><?= nl2br(htmlspecialchars($rec->motif_reclamation)) ?></p>
                                                                             <form action="<?= BASE_URL ?>/admin/Reclamations" method="post">
+                                                                                <?= csrf_field() ?>
                                                                                 <input type="hidden" name="id_colis_status" value="<?= $rec->id_colis ?>">
                                                                                 <div class="mb-3">
                                                                                 <label class="form-label">Changer le statut</label>

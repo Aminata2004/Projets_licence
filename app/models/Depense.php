@@ -70,6 +70,19 @@ class Depense extends Model
             return false;
         }
 
+        // Un Admin ne peut débiter que les gares de sa propre compagnie (IDOR sinon :
+        // id_agence posté pouvait sinon viser la caisse d'une AUTRE compagnie).
+        $agenceValide = $this->FetchSelectWhere(
+            "idAgence",
+            "agence",
+            "idAgence = :id_agence AND id_compagnie = :id_compagnie",
+            [":id_agence" => $id_agence, ":id_compagnie" => $id_compagnie]
+        );
+        if (!$agenceValide) {
+            $this->set_flash("Cette gare n'appartient pas à votre compagnie.", "danger");
+            return false;
+        }
+
         $caisse = $this->FetchSelectWhere(
             "id_caisse",
             "caisse",
@@ -156,7 +169,8 @@ class Depense extends Model
             "SELECT SUM(CAST(REGEXP_REPLACE(c.montant_payer, '[[:space:]]|FCFA', '') AS UNSIGNED)) AS total
              FROM billets b
              INNER JOIN client c ON b.id_client = c.idClient
-             WHERE b.id_compagnie = :id_compagnie AND b.validation_billets = 'valider'"
+             WHERE b.id_compagnie = :id_compagnie AND b.validation_billets = 'valider'
+               AND (b.status_billets IS NULL OR b.status_billets != 'annule')"
             . ($gareVille ? ' AND b.departId = :gareVille' : '')
             . str_replace('date_col', 'b.date_reservation', $filtreDate)
         );
