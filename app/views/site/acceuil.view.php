@@ -20,6 +20,9 @@
             color: #1a1f2e;
             line-height: 1.5;
             overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* ========== VARIABLES ========== */

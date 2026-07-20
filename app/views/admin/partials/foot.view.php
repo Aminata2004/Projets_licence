@@ -1,5 +1,5 @@
 
-  <footer class="text-center py-3" style="border-top:1px solid #e9ecef; background:#fff;">
+  <footer class="text-center py-3" style="border-top:1px solid #e9ecef; background:#fff; margin-top:auto;">
     <p class="mb-0 text-muted small">Copyright © 2026 digitafrika.io. All rights reserved.</p>
   </footer>
 

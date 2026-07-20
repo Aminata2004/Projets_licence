@@ -105,18 +105,8 @@ class Liste_du_jours extends  Controller
     include ROOT . '/app/views/admin/pdf/ticket.php';
     $html = ob_get_clean();
 
-    // Dompdf
-    $opt = new \Dompdf\Options();
-    $opt->setChroot(ROOT); // Important pour le chemin du logo
-    $opt->setIsRemoteEnabled(true);
-
-    $dompdf = new \Dompdf\Dompdf($opt);
-    $dompdf->loadHtml($html);
-    $dompdf->setPaper('A6', 'portrait');
-    $dompdf->render();
-
-    $dompdf->stream("ticket_{$idBillets}.pdf", ['Attachment' => false]);
-    exit;
+    // Génération PDF (imprimante thermique 58mm)
+    $this->streamThermalPdf($html, "ticket_{$idBillets}.pdf");
   }
 
   public function imprimerListe()

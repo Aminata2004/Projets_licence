@@ -2,8 +2,6 @@
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use Dompdf\Dompdf;
-use Dompdf\Options;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 
@@ -59,15 +57,7 @@ class Reservation_formulaire extends Controller
         include ROOT . '/app/views/admin/pdf/billet_client.php';
         $html = ob_get_clean();
 
-        $options = new Options();
-        $options->setIsRemoteEnabled(true);
-        $options->setChroot(ROOT);
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A6', 'portrait');
-        $dompdf->render();
-        $dompdf->stream("billet_{$billet->numeroBillets}.pdf", ['Attachment' => false]);
-        exit;
+        $this->streamThermalPdf($html, "billet_{$billet->numeroBillets}.pdf");
     }
 
     // public function index()

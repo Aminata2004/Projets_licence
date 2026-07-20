@@ -126,6 +126,23 @@ $fromAndWhere = "liaison_car_trajet
             return false;
         }
 
+        // L'heure choisie doit correspondre à un trajet réellement programmé (table "programmer")
+        // pour ce départ/cette destination : sinon on pourrait enregistrer un voyage à une heure
+        // qui n'existe pas pour ce trajet (ex. Ségou->Bamako à 17h alors que ce trajet ne part qu'à 8h).
+        $trajetValide = $this->fetchOne(
+            "SELECT p.idProgrammer
+             FROM programmer p
+             LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
+             LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
+             WHERE a1.localite = :dep AND a2.localite = :dest AND p.heureDepart = :heure AND p.id_compagnie = :id_compagnie
+             LIMIT 1",
+            [':dep' => $localite_user, ':dest' => $id_destination, ':heure' => $id_horaire, ':id_compagnie' => $id_compagnie]
+        );
+
+        if (!$trajetValide) {
+            return false;
+        }
+
         // Le formulaire ne propose déjà que les cars disponibles (getProgrammationCars()),
         // mais rien ne revérifiait côté serveur qu'un id_care soumis directement l'est
         // toujours : un car déjà "En_transit_*" (parti sur un trajet en cours) pouvait être

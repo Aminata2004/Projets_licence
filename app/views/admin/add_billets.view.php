@@ -51,21 +51,28 @@
                                     <?= csrf_field() ?>
                                     <div class="row">
                                         <div class="col-xl-12">
+                                            <?php if (($_SESSION['droit'] ?? null) === 'Admin'): ?>
                                             <div class="mb-3 row">
-                                                <label class="col-lg-4 col-form-label"
-                                                    for="validationCustom06">Nom et
-                                                    Prénom
+                                                <label class="col-lg-4 col-form-label" for="departSelect">Départ (gare)
                                                     <span class="text-danger">*</span>
                                                 </label>
                                                 <div class="col-lg-8">
-                                                    <input type="text" class="form-control" id="" name="Client"
-                                                        value="" required
-                                                        placeholder="Nom & Prénom">
+                                                    <select class="form-select" name="idDepart" id="departSelect" required
+                                                        onchange="location.href = '<?= BASE_URL ?>/admin/Add_billets?idDepart=' + this.value">
+                                                        <option value="">Choisissez la gare de départ</option>
+                                                        <?php foreach (($agences ?? []) as $ag): ?>
+                                                            <option value="<?= $ag['idAgence'] ?>"
+                                                                <?= (isset($idDepartSelectionne) && $idDepartSelectionne == $ag['idAgence']) ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($ag['localite']) ?> - <?= htmlspecialchars($ag['numeroGare']) ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
                                                     <div class="invalid-feedback">
-                                                        Veuillez entrez le nom et le prenom du client.
+                                                        Veuillez choisir la gare de départ. C'est la caisse de cette gare qui sera alimentée.
                                                     </div>
                                                 </div>
                                             </div>
+                                            <?php endif; ?>
                                             <div class="mb-3 row">
                                                 <label class="col-lg-4 col-form-label"
                                                     for="validationCustom05">Destination
@@ -87,6 +94,21 @@
                                                 </div>
                                             </div>
                                             <input type="hidden" name="destinationId" id="hiddenDestinationId">
+                                            <div class="mb-3 row">
+                                                <label class="col-lg-4 col-form-label"
+                                                    for="validationCustom06">Nom et
+                                                    Prénom
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="col-lg-8">
+                                                    <input type="text" class="form-control" id="" name="Client"
+                                                        value="" required
+                                                        placeholder="Nom & Prénom">
+                                                    <div class="invalid-feedback">
+                                                        Veuillez entrez le nom et le prenom du client.
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             <div class="mb-3 row">
                                                 <label class="col-lg-4 col-form-label" for="jourVoyage">Date de voyage

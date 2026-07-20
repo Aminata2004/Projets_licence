@@ -1,7 +1,5 @@
 <?php
 
-use Dompdf\Dompdf;
-use Dompdf\Options;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Endroid\QrCode\Builder\Builder;
@@ -632,14 +630,7 @@ class Liste_ententes extends Controller
                             include ROOT . '/app/views/admin/pdf/billet_client.php';
                             $html = ob_get_clean();
 
-                            $options = new Options();
-                            $options->setIsRemoteEnabled(true);
-                            $options->setChroot(ROOT);
-                            $dompdf = new Dompdf($options);
-                            $dompdf->loadHtml($html);
-                            $dompdf->setPaper('A6', 'portrait');
-                            $dompdf->render();
-                            $pdfContent = $dompdf->output();
+                            $pdfContent = $this->outputThermalPdf($html);
 
                             $mail = new PHPMailer(true);
                             $mail->isSMTP();

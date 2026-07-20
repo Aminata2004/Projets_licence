@@ -12,6 +12,11 @@ class Add_billets extends Controller
         date_default_timezone_set('Africa/Bamako');
         $data['destinations'] = $model->getDestinationsWithHeuresAndEscales();
 
+        if (($_SESSION['droit'] ?? null) === 'Admin') {
+            $data['agences'] = $model->getAgencesByCompagnie();
+            $data['idDepartSelectionne'] = $_POST['idDepart'] ?? $_GET['idDepart'] ?? null;
+        }
+
         if (isset($_POST['save'])) {
             $result = $model->saveBillets();
 

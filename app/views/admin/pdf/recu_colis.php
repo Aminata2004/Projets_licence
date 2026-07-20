@@ -3,65 +3,50 @@
 <head>
 <meta charset="utf-8">
 <style>
-    body{font-family:DejaVu Sans,sans-serif;font-size:11px;margin:0 18px}
-    header{border-bottom:1px solid #555;margin-bottom:12px;padding-bottom:6px;text-align:center}
-    header img{height:55px}
-    h2{margin:0;font-size:18px;text-transform:uppercase}
-    small{font-size:9px;color:#555}
-    .bloc{margin-bottom:10px}
-    .bloc h3{background:#eee;padding:3px 6px;font-size:12px;margin:0 0 4px}
-    table{width:100%;border-collapse:collapse}
-    td{padding:2px 4px;vertical-align:top}
-    footer{border-top:1px solid #555;margin-top:12px;padding-top:5px;font-size:9px;text-align:center}
-    .qr{margin-top:6px;text-align:right}
+    @page{margin:2mm 3mm}
+    body{font-family:DejaVu Sans,sans-serif;font-size:9px;margin:0;padding:0;color:#000}
+    header{border-bottom:1px dashed #000;margin-bottom:6px;padding-bottom:4px;text-align:center}
+    header img{height:36px;display:block;margin:0 auto 3px}
+    h2{margin:2px 0;font-size:12px;text-transform:uppercase}
+    small{font-size:8px;color:#333}
+    .bloc{margin-bottom:6px}
+    .bloc h3{font-size:9px;margin:0 0 2px;text-transform:uppercase;border-bottom:1px solid #000;padding-bottom:1px}
+    .row{padding:1px 0}
+    .row .label{font-weight:bold}
+    footer{border-top:1px dashed #000;margin-top:6px;padding-top:4px;font-size:7px;text-align:center}
+    .qr{margin-top:6px;text-align:center}
 </style>
 </head>
 <body>
 <?php date_default_timezone_set('Africa/Bamako');?>
 <header>
-    <table style="width: 100%;">
-        <tr>
-            <td style="width: 70px;">
-                <?php if (!empty($logoPath)): ?>
-                    <img src="<?= $logoPath ?>" alt="Logo" style="height: 60px;">
-                <?php endif; ?>
-            </td>
-            <td style="text-align: center;">
-                <h2 style="margin: 0;"><?= htmlspecialchars($compagnie['nom']) ?></h2>
-                <?php if (!empty($compagnie['slogant'])): ?>
-                    <small><em><?= htmlspecialchars($compagnie['slogant']) ?></em></small><br>
-                <?php endif; ?>
-            </td>
-        </tr>
-    </table>
-    <hr>
+    <?php if (!empty($logoPath)): ?>
+        <img src="<?= $logoPath ?>" alt="Logo">
+    <?php endif; ?>
+    <h2><?= htmlspecialchars($compagnie['nom']) ?></h2>
+    <?php if (!empty($compagnie['slogant'])): ?>
+        <small><em><?= htmlspecialchars($compagnie['slogant']) ?></em></small>
+    <?php endif; ?>
 </header>
-
 
 <div class="bloc">
     <h3>Expéditeur</h3>
-    <table>
-        <tr><td>Nom :</td><td><?= htmlspecialchars($colis['expediteur']) ?></td></tr>
-        <tr><td>Téléphone :</td><td><?= htmlspecialchars($colis['numero_exp']) ?></td></tr>
-    </table>
+    <div class="row"><span class="label">Nom :</span> <?= htmlspecialchars($colis['expediteur']) ?></div>
+    <div class="row"><span class="label">Tél :</span> <?= htmlspecialchars($colis['numero_exp']) ?></div>
 </div>
 
 <div class="bloc">
     <h3>Destinataire</h3>
-    <table>
-        <tr><td>Nom :</td><td><?= htmlspecialchars($colis['destinataire']) ?></td></tr>
-        <tr><td>Téléphone :</td><td><?= htmlspecialchars($colis['numero_dest']) ?></td></tr>
-    </table>
+    <div class="row"><span class="label">Nom :</span> <?= htmlspecialchars($colis['destinataire']) ?></div>
+    <div class="row"><span class="label">Tél :</span> <?= htmlspecialchars($colis['numero_dest']) ?></div>
 </div>
 
-
-
 <div class="qr">
-    <img src="<?= $qrPath ?>" width="100">
+    <img src="<?= $qrPath ?>" width="90">
 </div>
 
 <footer>
-    Reçu généré le <?= date('d/m/Y à H:i') ?> — Merci d’avoir choisi <?= htmlspecialchars($compagnie['nom']) ?>.
+    Reçu généré le <?= date('d/m/Y à H:i') ?><br>Merci d’avoir choisi <?= htmlspecialchars($compagnie['nom']) ?>.
 </footer>
 
 </body>

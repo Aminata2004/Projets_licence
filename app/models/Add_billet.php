@@ -54,15 +54,55 @@
         // }
 
 
+        // Liste des gares (agences) de la compagnie, utilisée pour le select "Départ"
+        // affiché uniquement à l'Admin (les autres rôles ont une gare fixe en session).
+        public function getAgencesByCompagnie()
+        {
+            $idCompagnie = $_SESSION['id_compagnie'] ?? null;
+            if (!$idCompagnie) return [];
+
+            return $this->fetchAll(
+                "SELECT idAgence, localite, numeroGare FROM agence WHERE id_compagnie = :ic ORDER BY localite, numeroGare",
+                [':ic' => $idCompagnie]
+            );
+        }
+
+        // Détermine la gare de départ effective pour la vente en cours.
+        // - Admin : gare choisie dans le formulaire (idDepart posté/GET), revalidée contre
+        //   sa propre compagnie pour empêcher toute sélection d'une gare d'une autre compagnie.
+        // - Autres rôles (chef_d_escale, Utilisateur) : toujours leur gare de session, jamais
+        //   influencée par une valeur postée par le client (empêche de créditer la caisse d'une
+        //   autre gare que la sienne).
+        private function resolveDepart(): array
+        {
+            if (($_SESSION['droit'] ?? null) === 'Admin') {
+                $idAgencePoste = $_POST['idDepart'] ?? $_GET['idDepart'] ?? null;
+                if (!$idAgencePoste) {
+                    return [null, null, null];
+                }
+                $agence = $this->fetchOne(
+                    "SELECT idAgence, localite, numeroGare FROM agence WHERE idAgence = :id AND id_compagnie = :ic LIMIT 1",
+                    [':id' => $idAgencePoste, ':ic' => $_SESSION['id_compagnie'] ?? null]
+                );
+                return $agence
+                    ? [$agence['idAgence'], $agence['localite'], $agence['numeroGare']]
+                    : [null, null, null];
+            }
+
+            return [$_SESSION['id_agence'] ?? null, $_SESSION['ville'] ?? null, $_SESSION['numero_gare'] ?? null];
+        }
+
         public function getDestinationsWithHeuresAndEscales()
         {
-            $idDepart    = $_SESSION['ville'] ?? null;
+            [$idAgenceDepart, , ] = $this->resolveDepart();
             $idCompagnie = $_SESSION['id_compagnie'] ?? null;
 
-            if (!$idDepart || !$idCompagnie) return [];
+            if (!$idAgenceDepart || !$idCompagnie) return [];
 
-            // Récupère les programmes avec les noms de localité
-            $sql = "SELECT 
+            // Filtre sur l'ID de la gare (et non son nom de ville) : plusieurs gares d'une
+            // même compagnie peuvent partager la même localité (ex. "Segou" Gare I et Gare II),
+            // un filtre par nom mélangerait alors les trajets des deux gares.
+            $sql = "SELECT
                 p.idProgrammer,
                 p.heureDepart,
                 p.prix,
@@ -72,12 +112,12 @@
             FROM programmer p
             LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
             LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
-            WHERE a1.localite = :departLocalite
+            WHERE p.idDepart = :idAgenceDepart
               AND p.id_compagnie = :idCompagnie
            ";
 
             $rows = $this->fetchAll($sql, [
-                ':departLocalite' => $idDepart,
+                ':idAgenceDepart' => $idAgenceDepart,
                 ':idCompagnie' => $idCompagnie
             ]);
 
@@ -123,7 +163,7 @@
         // Recalcule le prix de référence côté serveur (ne jamais faire confiance au prix posté par le client)
         private function getPrixReference($heureDepart, $destinationLocalite, $escaleNom)
         {
-            $idDepart    = $_SESSION['ville'] ?? null;
+            [$idAgenceDepart, , ] = $this->resolveDepart();
             $idCompagnie = $_SESSION['id_compagnie'] ?? null;
 
             $row = $this->fetchOne(
@@ -131,13 +171,13 @@
                  FROM programmer p
                  LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
                  LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
-                 WHERE a1.localite = :departLocalite
+                 WHERE p.idDepart = :idAgenceDepart
                    AND a2.localite = :destLocalite
                    AND p.heureDepart = :heure
                    AND p.id_compagnie = :idCompagnie
                  LIMIT 1",
                 [
-                    ':departLocalite' => $idDepart,
+                    ':idAgenceDepart' => $idAgenceDepart,
                     ':destLocalite'   => $destinationLocalite,
                     ':heure'          => $heureDepart,
                     ':idCompagnie'    => $idCompagnie
@@ -423,6 +463,12 @@
             extract($_POST);
             $pdo = $this->connect();
 
+            [$idAgenceDepart, $departLocalite, $numeroGareDepart] = $this->resolveDepart();
+            if (!$departLocalite) {
+                $this->set_flash("Veuillez choisir la gare de départ.", "danger");
+                return false;
+            }
+
             $jourVoyage = date('Y-m-d', strtotime($jourVoyage));
             $aujourdhui = date('Y-m-d');
             $demain     = date('Y-m-d', strtotime('+1 day'));
@@ -486,7 +532,7 @@
                             ':h' => $programme,
                             ':d' => $jourVoyage,
                             ':t' => $destinationId,
-                            ':l' => $_SESSION['ville'],
+                            ':l' => $departLocalite,
                             ':c' => $_SESSION['id_compagnie']
                         ]
                     );
@@ -544,7 +590,7 @@
                  AND date_reservation = :jr AND id_compagnie = :id_compagnie LIMIT 1 FOR UPDATE"
                     );
                     $stmt->execute([
-                        ':dep'          => $_SESSION['ville'],
+                        ':dep'          => $departLocalite,
                         ':dest'         => $destFinale,
                         ':h'            => $programme,
                         ':jr'           => $jourVoyage,
@@ -577,7 +623,7 @@
                         $stmt->execute([
                             ':n'     => (int)$nombrePassages,
                             ':total' => $placeTotale,
-                            ':dep'   => $_SESSION['ville'],
+                            ':dep'   => $departLocalite,
                             ':dest'  => $destFinale,
                             ':h'     => $programme,
                             ':jr'    => $jourVoyage,
@@ -592,7 +638,7 @@
                     $stmt->execute([
                         ':j'            => $jourVoyage,
                         ':h'            => $programme,
-                        ':dep'          => $_SESSION['ville'],
+                        ':dep'          => $departLocalite,
                         ':dest'         => $destFinale,
                         ':id_compagnie' => $_SESSION['id_compagnie']
                     ]);
@@ -633,14 +679,14 @@
                     ':h'     => $programme,
                     ':n'     => $nombrePassages,
                     ':dest'  => $destFinale,
-                    ':dep'   => $_SESSION['ville'],
+                    ':dep'   => $departLocalite,
                     ':exp'   => date('Y-m-d', strtotime($jourVoyage . ' +1 week')),
                     ':place' => $numPlace,
                     ':res'   => date('Ymd'),
                     ':stat'  => 'presentiel',
                     ':validation_billets' => 'valider',
                     ':id_compagnie' => $_SESSION['id_compagnie'],
-                    ':num_gare' => $_SESSION['numero_gare']
+                    ':num_gare' => $numeroGareDepart
                 ]);
 
                 // Màj car pour aujourd'hui
@@ -671,8 +717,8 @@
                 ");
                 $stmt->execute([
                     ':id_compagnie' => $_SESSION['id_compagnie'],
-                    ':ville'        => $_SESSION['ville'],
-                    ':numeroGare'   => $_SESSION['numero_gare']
+                    ':ville'        => $departLocalite,
+                    ':numeroGare'   => $numeroGareDepart
                 ]);
                 $caisse = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -695,7 +741,11 @@
 
                 $pdo->commit();
                 $this->set_flash("Réservation enregistrée avec succès et caisse alimentée.", "info");
-                header("Location: " . $_SERVER['REQUEST_URI']);
+                $redirectUrl = strtok($_SERVER['REQUEST_URI'], '?');
+                if (($_SESSION['droit'] ?? null) === 'Admin' && $idAgenceDepart) {
+                    $redirectUrl .= '?idDepart=' . $idAgenceDepart;
+                }
+                header("Location: " . $redirectUrl);
                 exit;
             } catch (Throwable $e) {
                 $pdo->rollBack();

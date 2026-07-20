@@ -15,7 +15,7 @@
     <!-- Bootstrap CSS -->
     <link href="<?= BASE_URL ?>/assets/css/bootstrap1.min.css" rel="stylesheet" />
     <link href="<?= BASE_URL ?>/assets/css/bootstrap-extended.css" rel="stylesheet" />
-    <link href="<?= BASE_URL ?>/assets/css/style.css" rel="stylesheet" />
+    <link href="<?= BASE_URL ?>/assets/css/style.css?v=<?= @filemtime('public/assets/css/style.css') ?: time() ?>" rel="stylesheet" />
     <link href="<?= BASE_URL ?>/assets/css/icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">

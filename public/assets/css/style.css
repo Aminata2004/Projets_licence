@@ -33,6 +33,9 @@ body {
     font-family: Roboto, sans-serif;
     background-color: #f7f8fa;
     overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .wrapper{

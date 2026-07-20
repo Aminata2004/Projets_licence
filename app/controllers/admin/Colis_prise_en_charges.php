@@ -1,7 +1,5 @@
 <?php
 
-use Dompdf\Dompdf;
-use Dompdf\Options;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Encoding\Encoding;
@@ -145,17 +143,7 @@ class Colis_prise_en_charges extends  Controller
     include ROOT . '/app/views/admin/pdf/recu_colis.php';
     $html = ob_get_clean();
 
-    /* ---------- 4. Génération PDF ---------- */
-    $opt = new \Dompdf\Options();
-    $opt->setChroot(ROOT);
-    $opt->setIsRemoteEnabled(true);
-
-    $dompdf = new \Dompdf\Dompdf($opt);
-    $dompdf->loadHtml($html);
-    $dompdf->setPaper('A6', 'portrait');
-    $dompdf->render();
-
-    $dompdf->stream("recu_colis_{$colis['id_colis']}.pdf", ['Attachment' => false]);
-    exit;
+    /* ---------- 4. Génération PDF (imprimante thermique 58mm) ---------- */
+    $this->streamThermalPdf($html, "recu_colis_{$colis['id_colis']}.pdf");
   }
 }

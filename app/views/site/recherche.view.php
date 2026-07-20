@@ -14,6 +14,9 @@
             background: #f4f6fa;
             color: #1a1f2e;
             line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         :root {
             --primary: #0f3b5e;
@@ -125,7 +128,7 @@
         }
         .no-results i { font-size: 2.5rem; color: var(--gray-light); margin-bottom: 16px; display: block; }
 
-        .footer { background: #1a1f2e; color: #94a3b8; padding: 48px 0 24px; margin-top: 40px; }
+        .footer { background: #1a1f2e; color: #94a3b8; padding: 48px 0 24px; margin-top: auto; }
         .footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 48px; margin-bottom: 48px; }
         .footer h4 { color: white; font-size: 1rem; margin-bottom: 20px; }
         .footer a { color: #94a3b8; text-decoration: none; display: block; margin-bottom: 12px; font-size: 0.85rem; }

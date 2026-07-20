@@ -87,13 +87,10 @@
                                                     <input type="hidden" name="id_care[]" value="<?= htmlspecialchars($destinations[0]->id_car) ?>">
                                                 </td>
                                                 <td>
-                                                    <select class="form-select shadow-sm" name="id_horaire[]" >
-                                                        <option value="" disabled selected>Choisir un horaire</option>
-                                                        <?php foreach ($listehoraire as $horaire): ?>
-                                                            <option value="<?= $horaire->heuredepart ?>">
-                                                                <?= date('H:i', strtotime($horaire->heuredepart)) ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
+                                                    <!-- Rempli en JS depuis le trajet choisi (jamais une saisie libre) : évite de
+                                                         programmer un car à une heure qui n'existe pas pour ce trajet. -->
+                                                    <select class="form-select shadow-sm" name="id_horaire[]">
+                                                        <option value="" disabled selected>Choisir d'abord une destination</option>
                                                     </select>
                                                 </td>
                                                 <?php if ($_SESSION['droit'] === 'Admin'): ?>
@@ -121,8 +118,11 @@
                                                             ?>
 
                                                             <?php if ($afficher): ?>
-                                                                <option value="<?= htmlspecialchars($d->destinationLocalite) ?>" data-depart="<?= htmlspecialchars($d->departLocalite) ?>">
+                                                                <option value="<?= htmlspecialchars($d->destinationLocalite) ?>"
+                                                                    data-depart="<?= htmlspecialchars($d->departLocalite) ?>"
+                                                                    data-heure="<?= htmlspecialchars($d->heureDepart) ?>">
                                                                     <?= htmlspecialchars($d->departLocalite . ' -> ' . $d->destinationLocalite) ?>
+                                                                    (<?= htmlspecialchars(date('H:i', strtotime($d->heureDepart))) ?>)
                                                                 </option>
                                                             <?php endif; ?>
                                                         <?php endforeach; ?>
@@ -239,14 +239,26 @@
             });
         });
 
-        // Admin uniquement : remplit automatiquement le champ "Départ" selon la
-        // destination choisie (chaque option porte la localité de départ réelle du trajet).
+        // Remplit automatiquement, selon la destination (trajet) choisie :
+        // - le champ "Départ" (Admin uniquement : localité de départ réelle du trajet)
+        // - le select "Horaire" : jamais une saisie libre, toujours l'heure réelle de ce
+        //   trajet précis (évite de programmer un car à une heure qui n'existe pas pour lui).
         document.querySelectorAll('select[name="id_destination[]"]').forEach(function(select) {
             select.addEventListener('change', function() {
-                const depart = this.options[this.selectedIndex]?.getAttribute('data-depart') || '';
-                const champDepart = this.closest('tr').querySelector('.champ-depart');
+                const tr = this.closest('tr');
+                const selectedOption = this.options[this.selectedIndex];
+
+                const champDepart = tr.querySelector('.champ-depart');
                 if (champDepart) {
-                    champDepart.value = depart;
+                    champDepart.value = selectedOption?.getAttribute('data-depart') || '';
+                }
+
+                const selectHoraire = tr.querySelector('select[name="id_horaire[]"]');
+                if (selectHoraire) {
+                    const heure = selectedOption?.getAttribute('data-heure') || '';
+                    selectHoraire.innerHTML = heure
+                        ? `<option value="${heure}" selected>${heure.slice(0, 5)}</option>`
+                        : '<option value="" disabled selected>Choisir d\'abord une destination</option>';
                 }
             });
         });
@@ -271,17 +283,24 @@
                     const selectDestination = tr.querySelector('select[name="id_destination[]"]');
                     const checkbox = tr.querySelector('.checkbox-car');
 
-                    const horaireExiste = selectHoraire && [...selectHoraire.options].some(o => o.value === prev.id_horaire);
                     const destinationExiste = selectDestination && [...selectDestination.options].some(o => o.value === prev.id_trajet);
-
-                    if (!horaireExiste || !destinationExiste) {
+                    if (!destinationExiste) {
                         ignores++;
                         return;
                     }
 
-                    selectHoraire.value = prev.id_horaire;
                     selectDestination.value = prev.id_trajet;
-                    selectDestination.dispatchEvent(new Event('change')); // met à jour le champ "Départ" (Admin)
+                    // Déclenche le remplissage automatique de l'horaire (et du champ "Départ" pour Admin)
+                    // depuis le trajet choisi ci-dessus.
+                    selectDestination.dispatchEvent(new Event('change'));
+
+                    // L'horaire d'hier doit correspondre exactement à celui déduit du trajet
+                    // aujourd'hui (sinon ce trajet n'existe plus à cette heure : on l'ignore).
+                    if (!selectHoraire || selectHoraire.value !== prev.id_horaire) {
+                        ignores++;
+                        return;
+                    }
+
                     if (checkbox) checkbox.checked = true;
                     appliques++;
                 });

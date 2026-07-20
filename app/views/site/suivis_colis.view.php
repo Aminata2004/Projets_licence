@@ -19,6 +19,9 @@
             background: #f5f7fb;
             color: #1a1f2e;
             overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* ========== VARIABLES ========== */
@@ -514,7 +517,7 @@
             background: #1a1f2e;
             color: #94a3b8;
             padding: 48px 0 24px;
-            margin-top: 40px;
+            margin-top: auto;
         }
         .footer-grid {
             display: grid;
