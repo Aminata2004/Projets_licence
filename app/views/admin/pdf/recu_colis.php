@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <style>
     @page{margin:2mm 3mm}
-    body{font-family:DejaVu Sans,sans-serif;font-size:9px;margin:0;padding:0;color:#000}
+    body{font-family:DejaVu Sans,sans-serif;font-size:13px;margin:0;padding:0;color:#000}
     header{border-bottom:1px dashed #000;margin-bottom:6px;padding-bottom:4px;text-align:center}
     header img{height:36px;display:block;margin:0 auto 3px}
-    h2{margin:2px 0;font-size:12px;text-transform:uppercase}
-    small{font-size:8px;color:#333}
+    h2{margin:2px 0;font-size:16px;text-transform:uppercase}
+    small{font-size:11px;color:#333}
     .bloc{margin-bottom:6px}
-    .bloc h3{font-size:9px;margin:0 0 2px;text-transform:uppercase;border-bottom:1px solid #000;padding-bottom:1px}
+    .bloc h3{font-size:12px;margin:0 0 2px;text-transform:uppercase;border-bottom:1px solid #000;padding-bottom:1px}
     .row{padding:1px 0}
     .row .label{font-weight:bold}
-    footer{border-top:1px dashed #000;margin-top:6px;padding-top:4px;font-size:7px;text-align:center}
+    footer{border-top:1px dashed #000;margin-top:6px;padding-top:4px;font-size:10px;text-align:center}
     .qr{margin-top:6px;text-align:center}
 </style>
 </head>

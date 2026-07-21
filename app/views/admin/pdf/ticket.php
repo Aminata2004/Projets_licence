@@ -9,7 +9,7 @@
 
     body {
       font-family: DejaVu Sans, sans-serif;
-      font-size: 9px;
+      font-size: 13px;
       margin: 0;
       padding: 0;
       color: #111;
@@ -29,7 +29,7 @@
 
     h1 {
       margin: 1px 0;
-      font-size: 13px;
+      font-size: 17px;
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 0.3px;
@@ -37,7 +37,7 @@
 
     .slogan {
       display: block;
-      font-size: 8px;
+      font-size: 11px;
       font-style: italic;
       color: #555;
     }
@@ -50,7 +50,7 @@
 
     .doc-title {
       text-align: center;
-      font-size: 10px;
+      font-size: 14px;
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -59,7 +59,7 @@
 
     .doc-number {
       text-align: center;
-      font-size: 11px;
+      font-size: 15px;
       font-weight: bold;
       margin: 2px 0 4px;
     }
@@ -73,7 +73,7 @@
     table.infos td {
       padding: 2px 0;
       vertical-align: top;
-      font-size: 9px;
+      font-size: 13px;
     }
 
     table.infos td.label {
@@ -97,20 +97,20 @@
     .total-box table { width: 100%; border-collapse: collapse; }
 
     .total-box .label {
-      font-size: 9px;
+      font-size: 13px;
       font-weight: bold;
       text-transform: uppercase;
     }
 
     .total-box .value {
-      font-size: 13px;
+      font-size: 17px;
       font-weight: bold;
       text-align: right;
     }
 
     .conditions {
       margin: 6px 0;
-      font-size: 7.5px;
+      font-size: 10.5px;
       color: #333;
       line-height: 1.5;
       text-align: center;
@@ -120,14 +120,14 @@
       margin-top: 6px;
       padding-top: 4px;
       border-top: 1px dashed #444;
-      font-size: 7px;
+      font-size: 10px;
       color: #555;
       text-align: center;
       line-height: 1.5;
     }
 
     footer .thanks {
-      font-size: 8px;
+      font-size: 11px;
       color: #111;
       font-weight: bold;
       margin-top: 2px;
