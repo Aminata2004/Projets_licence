@@ -1,10 +1,9 @@
 RewriteEngine On
-RewriteBase /Gestion_compagnie_mcv/
 
 # Si ce n'est pas un fichier ou dossier existant
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Rediriger toute requête vers index.php avec paramètre url
-RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+# Rediriger toute requête vers l'index.php racine (index.php n'existe pas dans public/)
+RewriteRule ^(.*)$ ../index.php?url=$1 [QSA,L]
 
