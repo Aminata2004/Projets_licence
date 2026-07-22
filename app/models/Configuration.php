@@ -157,6 +157,10 @@
 
         public function userHasPermission($userPermissionName)
         {
+            if (($_SESSION['droit'] ?? null) === 'super_admin') {
+                return true;
+            }
+
             $sql = "SELECT p.nom_permission
                 FROM permision p
                 JOIN user_permission up ON p.id_permision = up.permission_id
