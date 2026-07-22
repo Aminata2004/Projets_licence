@@ -136,7 +136,7 @@ class App {
     }
 
     private function redirectToHome() {
-        header("Location: /Gestion_compagnie_mcv/");
+        header("Location: " . BASE_URL . "/");
         exit;
     }
 }

@@ -40,7 +40,7 @@ class Controller
 
     public  function redirect($page)
     {
-        header("Location:".ROOT."/".trim($page,"/"));
+        header("Location: ".BASE_URL."/".trim($page,"/"));
         exit();
     }
 

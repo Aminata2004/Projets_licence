@@ -38,12 +38,12 @@ class Envoi_colis extends  Controller
         $envoie_colis->traiterEnvoi($colis_ids, $id_car);
         $envoie_colis->set_flash("Colis envoyés avec succès", "primary");
 
-        header("Location: " . ROOT . "/admin/Envoi_colis/index");
+        header("Location: " . BASE_URL . "/admin/Envoi_colis/index");
         exit;
       } else {
         $envoie_colis->set_flash("Veuillez sélectionner au moins un colis et un car.", "danger");
 
-        header("Location: " . ROOT . "/admin/Envoi_colis/index");
+        header("Location: " . BASE_URL . "/admin/Envoi_colis/index");
         exit;
       }
     }
