@@ -96,6 +96,7 @@
                                                 <?php if ($_SESSION['droit'] === 'Admin'): ?>
                                                     <td>
                                                         <input type="text" name="id_depart[]" class="form-control text-center shadow-sm champ-depart" readonly placeholder="—">
+                                                        <input type="hidden" name="id_depart_agence[]" class="champ-depart-agence">
                                                     </td>
                                                 <?php endif; ?>
                                                 <td>
@@ -120,6 +121,7 @@
                                                             <?php if ($afficher): ?>
                                                                 <option value="<?= htmlspecialchars($d->destinationLocalite) ?>"
                                                                     data-depart="<?= htmlspecialchars($d->departLocalite) ?>"
+                                                                    data-depart-agence="<?= htmlspecialchars($d->idDepart) ?>"
                                                                     data-heure="<?= htmlspecialchars($d->heureDepart) ?>">
                                                                     <?= htmlspecialchars($d->departLocalite . ' -> ' . $d->destinationLocalite) ?>
                                                                     (<?= htmlspecialchars(date('H:i', strtotime($d->heureDepart))) ?>)
@@ -251,6 +253,11 @@
                 const champDepart = tr.querySelector('.champ-depart');
                 if (champDepart) {
                     champDepart.value = selectedOption?.getAttribute('data-depart') || '';
+                }
+
+                const champDepartAgence = tr.querySelector('.champ-depart-agence');
+                if (champDepartAgence) {
+                    champDepartAgence.value = selectedOption?.getAttribute('data-depart-agence') || '';
                 }
 
                 const selectHoraire = tr.querySelector('select[name="id_horaire[]"]');

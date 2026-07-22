@@ -524,15 +524,19 @@
                 // Gestion des places
                 if ($jourVoyage == $aujourdhui) {
                     // Aujourd'hui → réservation sur car
+                    // Filtre sur id_agence (gare précise) en plus de la localité : sans ça, deux
+                    // gares d'une même ville programmées sur le même créneau se disputeraient le
+                    // même car de façon arbitraire (LIMIT 1). Voir ajout_id_agence_programmation_voyage.sql.
                     $rowProg = $this->fetchOne(
                         "SELECT id_car_programmer FROM programmation_voyage
                  WHERE id_horaire = :h AND date_enregistre = :d AND id_trajet = :t
-                 AND localite_user = :l AND id_compagnie = :c LIMIT 1",
+                 AND localite_user = :l AND id_agence = :a AND id_compagnie = :c LIMIT 1",
                         [
                             ':h' => $programme,
                             ':d' => $jourVoyage,
                             ':t' => $destinationId,
                             ':l' => $departLocalite,
+                            ':a' => $idAgenceDepart,
                             ':c' => $_SESSION['id_compagnie']
                         ]
                     );

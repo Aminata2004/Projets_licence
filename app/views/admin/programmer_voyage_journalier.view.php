@@ -44,6 +44,7 @@
                 </div>
             </div>
 
+            <?php $this->view("admin/set_flash") ?>
 
             <div class="card shadow-lg border-0 rounded-3">
                 <div class="card-header bg-primary text-white fw-bold">
@@ -100,6 +101,12 @@
                                                 </a>
                                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Programmation_voyages/edit/<?= $listeProgrammers->id_programmation ?>"><i class="bx bx-edit me-2"></i>Modifier</a></li>
+                                                    <?php if ((int)$listeProgrammers->place_disponible > 0): ?>
+                                                        <li><a class="dropdown-item transfer-btn" href="#"
+                                                                data-id-programmation="<?= $listeProgrammers->id_programmation ?>"
+                                                                data-bs-toggle="modal" data-bs-target="#modalTransfert">
+                                                                <i class="bx bx-transfer me-2"></i>Transférer les passagers</a></li>
+                                                    <?php endif; ?>
                                                     <li><a class="dropdown-item text-danger" href="#"><i class="bx bx-x-circle me-2"></i>Désactiver</a></li>
                                                 </ul>
                                             </div>
@@ -126,7 +133,94 @@
 
     </div>
     <!--end wrapper-->
+
+    <!-- Modal transfert de passagers -->
+    <div class="modal fade" id="modalTransfert" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title text-white">Transférer les passagers</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="transfertLoading" class="text-center text-muted py-3">Recherche des gares compatibles...</div>
+                    <div id="transfertAucune" class="alert alert-warning" style="display:none;">
+                        Aucune gare compatible n'est disponible pour l'instant (même destination, même heure, même jour, même localité).
+                    </div>
+                    <div id="transfertContenu" style="display:none;">
+                        <p class="text-muted">Le transfert n'a lieu que si la gare choisie peut accueillir <strong>la totalité</strong> des passagers de votre gare. Votre voyage sera alors annulé et la recette transférée vers la caisse de la gare choisie.</p>
+                        <div id="transfertListeGares"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- fin modal transfert -->
+
     <?php $this->view('admin/partials/foot') ?>
+
+    <script>
+        const csrfTokenTransfert = <?= json_encode(csrf_token()) ?>;
+
+        $(document).ready(function() {
+            $('.transfer-btn').click(function(e) {
+                e.preventDefault();
+                const idProgrammation = $(this).data('id-programmation');
+
+                $('#transfertLoading').show();
+                $('#transfertContenu').hide();
+                $('#transfertAucune').hide();
+                $('#transfertListeGares').empty();
+
+                $.ajax({
+                    url: '<?= BASE_URL ?>/admin/Transferts_gares/candidats/' + idProgrammation,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        $('#transfertLoading').hide();
+
+                        if (response.error || !response.gares || response.gares.length === 0) {
+                            $('#transfertAucune').show();
+                            return;
+                        }
+
+                        let html = '';
+                        response.gares.forEach(function(g) {
+                            const a = g.apercu;
+                            const possible = a && a.possible;
+                            const montant = a ? Number(a.montant_total).toLocaleString('fr-FR') : '0';
+
+                            html += '<div class="card mb-2">'
+                                + '<div class="card-body d-flex justify-content-between align-items-center">'
+                                + '<div>'
+                                + '<strong>' + g.numeroGare + '</strong><br>'
+                                + '<small>Places libres : ' + g.places_libres + '</small><br>'
+                                + (a ? '<small>' + a.nombre_passagers + ' passager(s) à transférer — ' + montant + ' FCFA</small>' : '')
+                                + (a && !possible ? '<br><small class="text-danger">Transfert impossible (places insuffisantes ou aucun passager à transférer)</small>' : '')
+                                + '</div>'
+                                + '<form method="post" action="<?= BASE_URL ?>/admin/Transferts_gares/executer">'
+                                + '<input type="hidden" name="csrf_token" value="' + csrfTokenTransfert + '">'
+                                + '<input type="hidden" name="id_programmation_source" value="' + idProgrammation + '">'
+                                + '<input type="hidden" name="id_programmation_destination" value="' + g.id_programmation + '">'
+                                + '<button type="submit" class="btn btn-sm btn-success"' + (possible ? '' : ' disabled') + '>Confirmer</button>'
+                                + '</form>'
+                                + '</div></div>';
+                        });
+
+                        $('#transfertListeGares').html(html);
+                        $('#transfertContenu').show();
+                    },
+                    error: function() {
+                        $('#transfertLoading').hide();
+                        $('#transfertAucune').text('Erreur lors de la recherche des gares compatibles.').show();
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 

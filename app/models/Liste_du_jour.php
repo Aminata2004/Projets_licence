@@ -235,13 +235,21 @@
           $billet['departId'], $billet['Heur_departs'], $billet['destinationId'], $id_compagnie
         );
 
+        // Gare précise du billet (idAgence) : indispensable pour ne pas résoudre le car
+        // d'une autre gare partageant la même localité. Voir ajout_id_agence_programmation_voyage.sql.
+        $agenceBillet = $this->fetchOne(
+          "SELECT idAgence FROM agence WHERE localite = :l AND numeroGare = :ng AND id_compagnie = :c LIMIT 1",
+          [':l' => $billet['departId'], ':ng' => $billet['num_gare'], ':c' => $id_compagnie]
+        );
+        $idAgenceBillet = $agenceBillet['idAgence'] ?? null;
+
         // 1) Libère la place sur l'ANCIEN créneau, s'il était suivi (aujourd'hui ou demain).
         if ($ancienJour === $aujourdhui) {
           $rowProg = $this->fetchOne(
             "SELECT id_car_programmer FROM programmation_voyage
              WHERE id_horaire = :h AND date_enregistre = :d AND id_trajet = :t
-             AND localite_user = :l AND id_compagnie = :c LIMIT 1",
-            [':h' => $billet['Heur_departs'], ':d' => $ancienJour, ':t' => $mainDest, ':l' => $billet['departId'], ':c' => $id_compagnie]
+             AND localite_user = :l AND id_agence = :a AND id_compagnie = :c LIMIT 1",
+            [':h' => $billet['Heur_departs'], ':d' => $ancienJour, ':t' => $mainDest, ':l' => $billet['departId'], ':a' => $idAgenceBillet, ':c' => $id_compagnie]
           );
           if ($rowProg) {
             $stmt = $pdo->prepare("SELECT nbr_place_reserve FROM car WHERE id_car = :id FOR UPDATE");
@@ -276,8 +284,8 @@
           $rowProg = $this->fetchOne(
             "SELECT id_car_programmer FROM programmation_voyage
              WHERE id_horaire = :h AND date_enregistre = :d AND id_trajet = :t
-             AND localite_user = :l AND id_compagnie = :c LIMIT 1",
-            [':h' => $data['Heur_departs'], ':d' => $nouveauJour, ':t' => $mainDest, ':l' => $billet['departId'], ':c' => $id_compagnie]
+             AND localite_user = :l AND id_agence = :a AND id_compagnie = :c LIMIT 1",
+            [':h' => $data['Heur_departs'], ':d' => $nouveauJour, ':t' => $mainDest, ':l' => $billet['departId'], ':a' => $idAgenceBillet, ':c' => $id_compagnie]
           );
           if (!$rowProg) {
             $pdo->rollBack();
@@ -473,17 +481,26 @@
           $billet->id_compagnie
         );
 
+        // Gare précise du billet (idAgence) : indispensable pour ne pas résoudre le car
+        // d'une autre gare partageant la même localité. Voir ajout_id_agence_programmation_voyage.sql.
+        $agenceBillet = $this->fetchOne(
+          "SELECT idAgence FROM agence WHERE localite = :l AND numeroGare = :ng AND id_compagnie = :c LIMIT 1",
+          [':l' => $billet->departId, ':ng' => $billet->num_gare, ':c' => $billet->id_compagnie]
+        );
+        $idAgenceBillet = $agenceBillet['idAgence'] ?? null;
+
         if ($jourVoyage == $aujourdhui) {
           // Aujourd'hui : la place vendue est comptabilisée sur car.nbr_place_reserve
           $rowProg = $this->fetchOne(
             "SELECT id_car_programmer FROM programmation_voyage
              WHERE id_horaire = :h AND date_enregistre = :d AND id_trajet = :t
-             AND localite_user = :l AND id_compagnie = :c LIMIT 1",
+             AND localite_user = :l AND id_agence = :a AND id_compagnie = :c LIMIT 1",
             [
               ':h' => $billet->Heur_departs,
               ':d' => $jourVoyage,
               ':t' => $mainDest,
               ':l' => $billet->departId,
+              ':a' => $idAgenceBillet,
               ':c' => $billet->id_compagnie
             ]
           );

@@ -196,6 +196,10 @@
                     <li> <a href="<?= BASE_URL ?>/admin/Programmation_voyages/liste_programmer_voyage"><i class="bi bi-arrow-right-short"></i>Programmation du voyage</a>
                     </li>
                   <?php } ?>
+                  <?php if ($user->userHasPermission('Programme_programmation_voyage') && in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale', 'super_admin'], true)): ?>
+                    <li> <a href="<?= BASE_URL ?>/admin/Transferts_gares/historique"><i class="bi bi-arrow-right-short"></i>Transferts entre gares</a>
+                    </li>
+                  <?php endif; ?>
                   <?php if ($user->userHasPermission('Programme_hors_programme')) { ?>
                     <li> <a href="#"><i class="bi bi-arrow-right-short"></i>Hors programmer</a>
                     </li>
