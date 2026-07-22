@@ -4,6 +4,36 @@ class Loguin extends Model
     private const MAX_TENTATIVES = 10;
     private const BLOCAGE_MINUTES = 5;
 
+    // Comptes super_admin recréés automatiquement à chaque fois que la table
+    // utilisateur est vide (nouvelle base, reset accidentel...), pour ne jamais
+    // se retrouver sans accès admin.
+    private const SUPER_ADMINS_PAR_DEFAUT = [
+        ['nom' => 'Aminata Diallo', 'email' => 'amitacompt9@gmail.com', 'motPasse' => 'superadmin1'],
+        ['nom' => 'Rokhaya Djiré', 'email' => 'rokhayadjire5@gmail.com', 'motPasse' => 'superadmin2'],
+        ['nom' => 'Barry', 'email' => 'maitredjkbarry@icloud.com', 'motPasse' => 'superadmin3'],
+    ];
+
+    public function seedSuperAdminsSiTableVide(): void
+    {
+        $db = $this->connect();
+        $nbUtilisateurs = (int) $db->query("SELECT COUNT(*) FROM utilisateur")->fetchColumn();
+        if ($nbUtilisateurs > 0) {
+            return;
+        }
+
+        $stmt = $db->prepare(
+            "INSERT INTO utilisateur (utilisateurs, droit, motPasse, status, emailUser)
+             VALUES (:nom, 'super_admin', :motPasse, 1, :email)"
+        );
+        foreach (self::SUPER_ADMINS_PAR_DEFAUT as $admin) {
+            $stmt->execute([
+                ':nom' => $admin['nom'],
+                ':motPasse' => password_hash($admin['motPasse'], PASSWORD_DEFAULT),
+                ':email' => $admin['email'],
+            ]);
+        }
+    }
+
     public function connecter()
     {
         if (!csrf_verify()) {
@@ -72,7 +102,7 @@ class Loguin extends Model
             // echo "id_compagnie = " . $_SESSION['id_compagnie'];
             // exit;
 
-            header("Location: index.php?url=admin/Homes/home");
+            header("Location: " . BASE_URL . "/admin/Homes/home");
             exit;
         } else {
             $this->enregistrerTentativeEchouee($emailUser);
