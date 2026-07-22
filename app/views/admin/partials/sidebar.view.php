@@ -174,6 +174,29 @@
                 </li>
               <?php endif; ?>
 
+              <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)): ?>
+                <li class="menu-label">Banque</li>
+                <li>
+                  <a href="javascript:;" class="has-arrow">
+                    <div class="parent-icon"><i class="bx bx-buildings"></i>
+                    </div>
+                    <div class="menu-title">Dépôt en banque</div>
+                  </a>
+                  <ul>
+                    <?php if ($_SESSION['droit'] === 'Admin'): ?>
+                      <li> <a href="<?= BASE_URL ?>/admin/Banques"><i class="bi bi-arrow-right-short"></i>Comptes banque</a>
+                      </li>
+                      <li> <a href="<?= BASE_URL ?>/admin/Depots_banque/enAttente"><i class="bi bi-arrow-right-short"></i>Demandes en attente</a>
+                      </li>
+                    <?php endif; ?>
+                    <li> <a href="<?= BASE_URL ?>/admin/Depots_banque"><i class="bi bi-arrow-right-short"></i>Faire un dépôt</a>
+                    </li>
+                    <li> <a href="<?= BASE_URL ?>/admin/Depots_banque/historique"><i class="bi bi-arrow-right-short"></i>Historique des dépôts</a>
+                    </li>
+                  </ul>
+                </li>
+              <?php endif; ?>
+
               <?php if ($user->userHasPermission('Programme_Creation')) { ?>
                 <li class="menu-label">Gestion des programmations</li>
                 <li>
