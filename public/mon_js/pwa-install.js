@@ -4,6 +4,12 @@
     var STORAGE_INSTALLED = 'transgest_pwa_installed';
     var deferredPrompt = null;
 
+    // L'application installable est réservée à l'espace admin (agents/staff),
+    // pas au site public consulté par les clients.
+    function isAdminSection() {
+        return /\/admin(\/|$)/i.test(window.location.pathname);
+    }
+
     function addMeta(attr, name, content) {
         if (document.querySelector('meta[' + attr + '="' + name + '"]')) return;
         var m = document.createElement('meta');
@@ -12,24 +18,26 @@
         document.head.appendChild(m);
     }
 
-    // --- Manifest + meta tags "app mobile" (injectés une seule fois, sans toucher chaque vue) ---
-    if (!document.querySelector('link[rel="manifest"]')) {
-        var manifestLink = document.createElement('link');
-        manifestLink.rel = 'manifest';
-        manifestLink.href = BASE + '/manifest.json';
-        document.head.appendChild(manifestLink);
+    if (isAdminSection()) {
+        // --- Manifest + meta tags "app mobile" (injectés une seule fois, sans toucher chaque vue) ---
+        if (!document.querySelector('link[rel="manifest"]')) {
+            var manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = BASE + '/manifest.json';
+            document.head.appendChild(manifestLink);
+        }
+        if (!document.querySelector('link[rel="apple-touch-icon"]')) {
+            var appleIcon = document.createElement('link');
+            appleIcon.rel = 'apple-touch-icon';
+            appleIcon.href = BASE + '/assets_site/img/icons/apple-touch-icon.png';
+            document.head.appendChild(appleIcon);
+        }
+        addMeta('name', 'theme-color', '#0f3b5e');
+        addMeta('name', 'mobile-web-app-capable', 'yes');
+        addMeta('name', 'apple-mobile-web-app-capable', 'yes');
+        addMeta('name', 'apple-mobile-web-app-status-bar-style', 'black-translucent');
+        addMeta('name', 'apple-mobile-web-app-title', 'TransGest Admin');
     }
-    if (!document.querySelector('link[rel="apple-touch-icon"]')) {
-        var appleIcon = document.createElement('link');
-        appleIcon.rel = 'apple-touch-icon';
-        appleIcon.href = BASE + '/assets_site/img/icons/apple-touch-icon.png';
-        document.head.appendChild(appleIcon);
-    }
-    addMeta('name', 'theme-color', '#0f3b5e');
-    addMeta('name', 'mobile-web-app-capable', 'yes');
-    addMeta('name', 'apple-mobile-web-app-capable', 'yes');
-    addMeta('name', 'apple-mobile-web-app-status-bar-style', 'black-translucent');
-    addMeta('name', 'apple-mobile-web-app-title', 'TransGest');
 
     // --- Service worker (nécessaire pour l'installabilité + un peu de cache statique) ---
     if ('serviceWorker' in navigator) {
@@ -68,13 +76,13 @@
         var overlay = document.createElement('div');
         overlay.id = 'pwaInstallOverlay';
 
-        var iosBlock = '<p>Ajoutez TransGest sur votre écran d’accueil pour l’ouvrir comme une vraie application.</p>'
+        var iosBlock = '<p>Ajoutez TransGest Admin sur votre écran d’accueil pour l’ouvrir comme une vraie application.</p>'
             + '<ul class="pwa-steps">'
             + '<li><b>1</b> Appuyez sur <strong>Partager</strong> en bas de l’écran</li>'
             + '<li><b>2</b> Choisissez <strong>« Sur l’écran d’accueil »</strong></li>'
             + '<li><b>3</b> Confirmez avec <strong>Ajouter</strong></li>'
             + '</ul>';
-        var androidBlock = '<p>Installez TransGest sur votre téléphone pour un accès rapide en plein écran, comme une vraie application.</p>';
+        var androidBlock = '<p>Installez TransGest Admin sur votre téléphone pour un accès rapide en plein écran, comme une vraie application.</p>';
 
         overlay.innerHTML =
             '<style>' +
@@ -95,8 +103,8 @@
             '#pwaDismissBtn{background:#f1f3f5;color:#5b6472;}' +
             '</style>' +
             '<div id="pwaInstallCard">' +
-            '<img class="pwa-icon" src="' + BASE + '/assets_site/img/icons/icon-192.png" alt="TransGest">' +
-            '<h3>Installer TransGest</h3>' +
+            '<img class="pwa-icon" src="' + BASE + '/assets_site/img/icons/icon-192.png" alt="TransGest Admin">' +
+            '<h3>Installer TransGest Admin</h3>' +
             (mode === 'ios' ? iosBlock : androidBlock) +
             '<div class="pwa-actions">' +
             '<button id="pwaDismissBtn" type="button">Plus tard</button>' +
@@ -135,7 +143,7 @@
     window.addEventListener('beforeinstallprompt', function (e) {
         e.preventDefault();
         deferredPrompt = e;
-        if (!alreadyHandled() && isMobile()) {
+        if (isAdminSection() && !alreadyHandled() && isMobile()) {
             setTimeout(function () { showModal('android'); }, 1200);
         }
     });
@@ -146,7 +154,7 @@
     });
 
     // iOS Safari ne déclenche jamais beforeinstallprompt : instructions manuelles
-    if (isIos() && !alreadyHandled() && isMobile()) {
+    if (isAdminSection() && isIos() && !alreadyHandled() && isMobile()) {
         setTimeout(function () { showModal('ios'); }, 1200);
     }
 })();

@@ -52,7 +52,7 @@ class Controller
 public function requireLogin()
 {
     if (!$this->isLoggedIn()) {
-        header('Location: ' . BASE_URL . '/Loguins');
+        header('Location: ' . BASE_URL . '/admin/Loguins');
         exit();
     }
 }
