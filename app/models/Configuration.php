@@ -157,7 +157,14 @@
 
         public function userHasPermission($userPermissionName)
         {
-            if (($_SESSION['droit'] ?? null) === 'super_admin') {
+            // Mode support technique : le super_admin impersonné voit tout comme un admin normal
+            if (($_SESSION['super_admin_droit'] ?? null) === 'super_admin') {
+                return true;
+            }
+
+            // Super_admin direct : seulement l'accès à Configuration et à l'onglet Utilisateur
+            if (($_SESSION['droit'] ?? null) === 'super_admin'
+                && in_array($userPermissionName, ['Configuration_apercu', 'utilisateur_apercu'], true)) {
                 return true;
             }
 
