@@ -110,7 +110,7 @@ class Liste_du_jours extends  Controller
     include ROOT . '/app/views/admin/pdf/ticket.php';
     $html = ob_get_clean();
 
-    // Génération PDF (imprimante thermique 58mm)
+    // Génération PDF (imprimante thermique 80mm)
     $this->streamThermalPdf($html, "ticket_{$idBillets}.pdf");
   }
 

@@ -1,0 +1,38 @@
+{
+    "name": "TransGest - Réservation & Suivi de colis",
+    "short_name": "TransGest",
+    "description": "Réservez vos billets de bus et suivez vos colis partout au Mali.",
+    "start_url": "./site/Accueil",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#0f3b5e",
+    "theme_color": "#0f3b5e",
+    "lang": "fr",
+    "icons": [
+        {
+            "src": "assets_site/img/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "assets_site/img/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "assets_site/img/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "assets_site/img/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

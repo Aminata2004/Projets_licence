@@ -20,7 +20,18 @@ if (getenv('APP_ENV') === 'local') {
 date_default_timezone_set('Africa/Bamako');
 
 session_start();
-ob_start(); // ← autorise les echo dans le contrôleur
+
+// Injecte automatiquement le tag PWA (manifest + service worker + modal d'installation)
+// juste avant </body> sur toutes les pages HTML rendues, sans toucher chaque vue.
+// N'affecte jamais les réponses JSON/AJAX puisqu'elles ne contiennent pas de balise </body>.
+ob_start(function ($html) {
+    if (stripos($html, '</body>') === false) {
+        return $html;
+    }
+    $tag = '<script>window.PWA_BASE_URL = ' . json_encode(BASE_URL) . ';</script>' . "\n"
+        . '<script src="' . BASE_URL . '/mon_js/pwa-install.js" defer></script>' . "\n</body>";
+    return preg_replace('/<\/body>/i', $tag, $html, 1);
+});
 
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/app/core/autoload.php';

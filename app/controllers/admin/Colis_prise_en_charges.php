@@ -143,7 +143,7 @@ class Colis_prise_en_charges extends  Controller
     include ROOT . '/app/views/admin/pdf/recu_colis.php';
     $html = ob_get_clean();
 
-    /* ---------- 4. Génération PDF (imprimante thermique 58mm) ---------- */
+    /* ---------- 4. Génération PDF (imprimante thermique 80mm) ---------- */
     $this->streamThermalPdf($html, "recu_colis_{$colis['id_colis']}.pdf");
   }
 }
