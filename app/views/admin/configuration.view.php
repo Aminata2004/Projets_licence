@@ -162,7 +162,7 @@
                       <tr class="align-middle text-center">
                         <td data-label="Utilisateur"><?= htmlspecialchars($listes->utilisateurs) ?></td>
                         <td data-label="Email"><?= htmlspecialchars($listes->emailUser) ?></td>
-                        <td data-label="Gare"><?= htmlspecialchars($listes->numeroGare) ?></td>
+                        <td data-label="Gare"><?= htmlspecialchars($listes->numeroGare ?? '') ?></td>
                         <td data-label="Droit"><?= htmlspecialchars($listes->droit) ?></td>
                         <td data-label="Service">
                           <?php if ($listes->droit === 'Utilisateur' && !empty($listes->profile)): ?>
