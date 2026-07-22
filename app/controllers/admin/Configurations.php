@@ -85,6 +85,46 @@ class Configurations extends Controller
             ? ['super_admin', 'Admin', 'Utilisateur', 'chef_d_escale']
             : ['Utilisateur', 'chef_d_escale'];
 
+        // Suppression d'un compte : réservée au super_admin, confirmation façon GitHub
+        // (il faut saisir l'email exact du compte ciblé, pas juste cliquer "Oui").
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteUtilisateur'])) {
+            if ($role !== 'super_admin' || !csrf_verify()) {
+                $configuration->set_flash("Action non autorisée.", "danger");
+                header("Location: " . $_SERVER['REQUEST_URI']);
+                exit;
+            }
+
+            $idUserCible = (int)($_POST['idUser'] ?? 0);
+            $cible = $configuration->getUserById($idUserCible);
+
+            if (!$cible) {
+                $configuration->set_flash("Utilisateur introuvable.", "danger");
+                header("Location: " . $_SERVER['REQUEST_URI']);
+                exit;
+            }
+
+            if ($idUserCible === (int)($_SESSION['id_utilisateur'] ?? 0)) {
+                $configuration->set_flash("Vous ne pouvez pas supprimer votre propre compte.", "danger");
+                header("Location: " . $_SERVER['REQUEST_URI']);
+                exit;
+            }
+
+            $confirmation = trim($_POST['confirmation'] ?? '');
+            if ($confirmation === '' || $confirmation !== $cible['emailUser']) {
+                $configuration->set_flash("Confirmation incorrecte : l'email saisi ne correspond pas au compte.", "danger");
+                header("Location: " . $_SERVER['REQUEST_URI']);
+                exit;
+            }
+
+            if ($configuration->deleteUtilisateur($idUserCible)) {
+                $configuration->set_flash("Utilisateur supprimé avec succès.", "success");
+            } else {
+                $configuration->set_flash("Erreur lors de la suppression de l'utilisateur.", "danger");
+            }
+            header("Location: " . $_SERVER['REQUEST_URI']);
+            exit;
+        }
+
         // Gestion du POST : changement de statut
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idUser'], $_POST['newStatut'])) {
             $id = (int)$_POST['idUser'];
@@ -161,12 +201,15 @@ class Configurations extends Controller
         $userColumns = 'utilisateur.idUser, utilisateur.utilisateurs, utilisateur.emailUser, utilisateur.motPasse,
             utilisateur.droit, utilisateur.profile, utilisateur.status, agence.numeroGare';
 
+        // Les comptes super_admin n'apparaissent jamais dans cette liste, y compris pour
+        // un autre super_admin : ce rôle n'est ni visible ni gérable depuis cette interface.
         if ($role === 'super_admin') {
-            $listes = $configuration->SelectAllData(
+            $listes = $configuration->FetchSelectWheres(
                 $userColumns,
                 'utilisateur
             LEFT JOIN agence ON agence.idAgence = utilisateur.id_agence
-            LEFT JOIN compagnie ON compagnie.id_compagnie = agence.id_compagnie'
+            LEFT JOIN compagnie ON compagnie.id_compagnie = agence.id_compagnie',
+                "utilisateur.droit != 'super_admin'"
             );
         } else {
             $listes = $configuration->FetchSelectWheres(
@@ -174,7 +217,7 @@ class Configurations extends Controller
                 'utilisateur
             INNER JOIN agence ON agence.idAgence = utilisateur.id_agence
             INNER JOIN compagnie ON compagnie.id_compagnie = agence.id_compagnie',
-                'agence.id_compagnie = :id_compagnie',
+                "agence.id_compagnie = :id_compagnie AND utilisateur.droit != 'super_admin'",
                 ['id_compagnie' => $id_compagnie]
             );
         }

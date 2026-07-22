@@ -18,7 +18,7 @@ class MailController
             $mail->SMTPAuth = true;
             $mail->Username = MAIL_USERNAME;
             $mail->Password = MAIL_PASSWORD;
-            $mail->SMTPSecure = 'tls';
+            $mail->SMTPSecure = MAIL_ENCRYPTION;
             $mail->Port = MAIL_PORT;
 
             $mail->setFrom(MAIL_USERNAME, MAIL_FROM_NAME);

@@ -222,8 +222,57 @@
                               data-bs-target="#animationModal<?= $listes->idUser ?>">
                             </i>
                           <?php endif; ?>
+
+                          <?php if (($_SESSION['droit'] ?? null) === 'super_admin'): ?>
+                            <!-- Supprimer (réservé au super_admin) -->
+                            <i class="bx bx-trash text-danger fs-4 cursor-pointer ms-2"
+                              title="Supprimer définitivement"
+                              data-bs-toggle="modal"
+                              data-bs-target="#deleteModal<?= $listes->idUser ?>">
+                            </i>
+                          <?php endif; ?>
                         </td>
                       </tr>
+
+                      <?php if (($_SESSION['droit'] ?? null) === 'super_admin'): ?>
+                      <!-- Modal Suppression définitive -->
+                      <div class="modal fade" id="deleteModal<?= $listes->idUser ?>" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content">
+                            <form action="<?= BASE_URL ?>/admin/Configurations" method="post">
+                              <div class="modal-header bg-danger">
+                                <h5 class="modal-title text-white">Supprimer définitivement ce compte</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                              </div>
+                              <div class="modal-body">
+                                <p>
+                                  Cette action est <strong class="text-danger">irréversible</strong>. Le compte
+                                  <strong><?= htmlspecialchars($listes->utilisateurs) ?></strong> sera supprimé
+                                  ainsi que ses données propres (permissions, historique de connexion).
+                                  Ses billets/colis/dépenses déjà enregistrés sont conservés mais détachés de son compte.
+                                </p>
+                                <p class="mb-1">Pour confirmer, saisissez l'email exact de ce compte :</p>
+                                <p class="fw-bold mb-2"><?= htmlspecialchars($listes->emailUser) ?></p>
+                                <input type="text"
+                                  class="form-control confirm-delete-input"
+                                  name="confirmation"
+                                  data-expected="<?= htmlspecialchars($listes->emailUser) ?>"
+                                  autocomplete="off"
+                                  placeholder="Saisir l'email pour confirmer">
+                                <input type="hidden" name="idUser" value="<?= $listes->idUser ?>">
+                                <?= csrf_field() ?>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <button type="submit" name="deleteUtilisateur" class="btn btn-danger delete-submit-btn" disabled>
+                                  Supprimer définitivement
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                      <?php endif; ?>
                       <!-- Modal Activation/Désactivation -->
                       <div class="modal fade animate__animated animate__slideInDown"
                         id="animationModal<?= $listes->idUser ?>"
@@ -373,6 +422,15 @@
       });
 
       editDroit.addEventListener('change', toggleServiceField);
+
+      // Suppression : le bouton ne s'active que si l'email saisi correspond exactement
+      document.querySelectorAll('.confirm-delete-input').forEach(function(input) {
+        input.addEventListener('input', function() {
+          var form = input.closest('form');
+          var btn = form.querySelector('.delete-submit-btn');
+          btn.disabled = input.value !== input.dataset.expected;
+        });
+      });
     });
   </script>
 </body>

@@ -11,8 +11,10 @@
 
 class Loguins extends Controller {
     public function index() {
+        $model = new \Loguin();  // instancie ton modèle
+        $model->seedSuperAdminsSiTableVide();
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["connexion"])) {
-            $model = new \Loguin();  // instancie ton modèle
             $model->connecter();
         }
         $this->view("admin/loguin");  // affiche le formulaire

@@ -252,4 +252,44 @@
         {
             $this->connect()->prepare("DELETE FROM password_resets WHERE email = :email")->execute([':email' => $email]);
         }
+
+        // Supprime définitivement un compte utilisateur et ses données propres (permissions,
+        // historique de connexion, jetons de réinitialisation). Les billets/colis/dépenses déjà
+        // enregistrés par ce compte sont conservés (historique comptable) mais détachés : leur
+        // référence à l'utilisateur passe à NULL plutôt que d'être supprimés avec lui.
+        public function deleteUtilisateur($idUser)
+        {
+            $utilisateur = $this->getUserById($idUser);
+            if (!$utilisateur) {
+                return false;
+            }
+
+            $pdo = $this->connect();
+            $pdo->beginTransaction();
+
+            try {
+                $pdo->prepare("UPDATE billets SET idUser = NULL WHERE idUser = :id")
+                    ->execute([':id' => $idUser]);
+                $pdo->prepare("UPDATE colis SET id_utilisateur = NULL WHERE id_utilisateur = :id")
+                    ->execute([':id' => $idUser]);
+                $pdo->prepare("UPDATE depense SET id_utilisateur = NULL WHERE id_utilisateur = :id")
+                    ->execute([':id' => $idUser]);
+                $pdo->prepare("DELETE FROM user_permission WHERE user_id = :id")
+                    ->execute([':id' => $idUser]);
+                $pdo->prepare("DELETE FROM login_attempts WHERE identifiant = :email")
+                    ->execute([':email' => $utilisateur['emailUser']]);
+                $pdo->prepare("DELETE FROM password_resets WHERE email = :email")
+                    ->execute([':email' => $utilisateur['emailUser']]);
+                $pdo->prepare("DELETE FROM utilisateur WHERE idUser = :id")
+                    ->execute([':id' => $idUser]);
+
+                $pdo->commit();
+                return true;
+            } catch (\Throwable $e) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                return false;
+            }
+        }
     }

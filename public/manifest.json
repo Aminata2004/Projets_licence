@@ -1,0 +1,38 @@
+{
+    "name": "TransGest Admin",
+    "short_name": "TransGest Admin",
+    "description": "Espace de gestion TransGest : billets, colis, programmations et caisse.",
+    "start_url": "./admin/Loguins",
+    "scope": "./admin/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#0f3b5e",
+    "theme_color": "#0f3b5e",
+    "lang": "fr",
+    "icons": [
+        {
+            "src": "assets_site/img/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "assets_site/img/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "assets_site/img/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "assets_site/img/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}
