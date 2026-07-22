@@ -8,7 +8,8 @@
  //session_start();
 
 class Database {
-    private ?PDO $database = null;
+    /** @var PDO|null */
+    private $database = null;
 
     public function connect() {
         try {
