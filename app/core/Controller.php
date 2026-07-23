@@ -58,12 +58,15 @@ public function requireLogin()
 }
 
     /**
-     * Rendu Dompdf pour imprimante thermique à rouleau (E-POS ECO250, 80mm).
-     * La largeur de page est fixe (80mm par défaut) mais la hauteur est calculée
-     * automatiquement à partir du contenu réel (recherche par dichotomie sur le
-     * nombre de pages produites), pour ne pas gaspiller de papier à chaque impression.
+     * Rendu Dompdf pour imprimante thermique à rouleau (E-POS ECO250, papier 80mm).
+     * Largeur de page à 72mm (pas 80) : la zone imprimable réelle d'une imprimante
+     * thermique "80mm" est plus étroite que le rouleau lui-même (marges mécaniques de
+     * chaque côté de la tête d'impression) — à 80mm plein, le contenu était rogné à
+     * droite par le pilote. La hauteur est calculée automatiquement à partir du contenu
+     * réel (recherche par dichotomie sur le nombre de pages produites), pour ne pas
+     * gaspiller de papier à chaque impression.
      */
-    private function renderThermalDompdf(string $html, float $widthMm = 80.0): \Dompdf\Dompdf
+    private function renderThermalDompdf(string $html, float $widthMm = 72.0): \Dompdf\Dompdf
     {
         $ptPerMm = 72 / 25.4;
         $widthPt = $widthMm * $ptPerMm;
@@ -97,13 +100,13 @@ public function requireLogin()
         return $render($hi + (3 * $ptPerMm));
     }
 
-    protected function streamThermalPdf(string $html, string $filename, float $widthMm = 80.0): void
+    protected function streamThermalPdf(string $html, string $filename, float $widthMm = 72.0): void
     {
         $this->renderThermalDompdf($html, $widthMm)->stream($filename, ['Attachment' => false]);
         exit;
     }
 
-    protected function outputThermalPdf(string $html, float $widthMm = 80.0): string
+    protected function outputThermalPdf(string $html, float $widthMm = 72.0): string
     {
         return $this->renderThermalDompdf($html, $widthMm)->output();
     }
