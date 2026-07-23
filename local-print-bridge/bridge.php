@@ -53,6 +53,11 @@ if ($origin !== '' && in_array($origin, $originsAutorisees, true)) {
 }
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
+// Chrome (Private Network Access) bloque par défaut qu'un site public en HTTPS appelle
+// une adresse locale (127.0.0.1) sans cet en-tête explicite sur la réponse au preflight.
+// Sans lui, l'appel échoue silencieusement côté navigateur ("pont injoignable") même si
+// le pont tourne bien et répond correctement en direct (ex: via /health).
+header('Access-Control-Allow-Private-Network: true');
 header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
