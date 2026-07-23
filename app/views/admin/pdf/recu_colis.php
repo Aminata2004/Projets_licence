@@ -41,9 +41,18 @@
     <div class="row"><span class="label">Tél :</span> <?= htmlspecialchars($colis['numero_dest']) ?></div>
 </div>
 
+<div class="bloc">
+    <h3>Trajet</h3>
+    <div class="row"><span class="label">Gare de départ :</span> <?= htmlspecialchars($colis['provient_de'] ?? '-') ?></div>
+    <div class="row"><span class="label">Gare de destination :</span> <?= htmlspecialchars($colis['localite'] ?? '-') ?></div>
+</div>
+
 <div class="qr">
     <img src="<?= $qrPath ?>" width="90">
+    <div class="row" style="font-weight:bold;margin-top:3px;">Code : <?= htmlspecialchars($colis['code_colis'] ?? '-') ?></div>
 </div>
+
+<div class="row" style="text-align:center;"><span class="label">Enregistré par :</span> <?= htmlspecialchars($colis['agent_nom'] ?? '-') ?></div>
 
 <footer>
     Reçu généré le <?= date('d/m/Y à H:i') ?><br>Merci d’avoir choisi <?= htmlspecialchars($compagnie['nom']) ?>.

@@ -73,10 +73,10 @@
                                         Reporter le voyage
                                     </a>
                                     <a class="dropdown-item" href="' . BASE_URL . '/admin/Liste_du_jours/recu/' . htmlspecialchars($item->idBillets) . '" target="_blank">
-                                        Imprimer le reçu (PDF)
+                                        Imprimer (imprimante câble/USB)
                                     </a>
                                     <a class="dropdown-item thermal-print-btn" href="#" data-id="' . htmlspecialchars($item->idBillets) . '">
-                                        Imprimer sur imprimante thermique
+                                        Imprimer (imprimante WiFi)
                                     </a>
                                 </div>
                             </div>
