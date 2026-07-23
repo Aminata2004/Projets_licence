@@ -8,7 +8,7 @@
     header{border-bottom:1px dashed #000;margin-bottom:6px;padding-bottom:4px;text-align:center}
     header img{height:36px;display:block;margin:0 auto 3px}
     h2{margin:2px 0;font-size:16px;text-transform:uppercase}
-    small{font-size:11px;color:#333}
+    small{font-size:11px;color:#000}
     .bloc{margin-bottom:6px}
     .bloc h3{font-size:12px;margin:0 0 2px;text-transform:uppercase;border-bottom:1px solid #000;padding-bottom:1px}
     .row{padding:1px 0}
