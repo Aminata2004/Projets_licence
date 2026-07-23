@@ -693,6 +693,8 @@
                     ':num_gare' => $numeroGareDepart
                 ]);
 
+                $idBilletCree = (int) $pdo->lastInsertId();
+
                 // Màj car pour aujourd'hui
                 if ($jourVoyage == $aujourdhui) {
                     $stmt = $pdo->prepare("UPDATE car SET nbr_place_reserve = nbr_place_reserve + :n WHERE id_car = :num");
@@ -746,9 +748,14 @@
                 $pdo->commit();
                 $this->set_flash("Réservation enregistrée avec succès et caisse alimentée.", "info");
                 $redirectUrl = strtok($_SERVER['REQUEST_URI'], '?');
+                $params = [];
                 if (($_SESSION['droit'] ?? null) === 'Admin' && $idAgenceDepart) {
-                    $redirectUrl .= '?idDepart=' . $idAgenceDepart;
+                    $params['idDepart'] = $idAgenceDepart;
                 }
+                // Le ticket est la preuve de paiement remise au client : imprimé automatiquement
+                // (cf. thermal-print.js) dès que la page de résultat se charge, sans clic supplémentaire.
+                $params['billetImprime'] = $idBilletCree;
+                $redirectUrl .= '?' . http_build_query($params);
                 header("Location: " . $redirectUrl);
                 exit;
             } catch (Throwable $e) {

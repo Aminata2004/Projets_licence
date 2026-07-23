@@ -88,9 +88,8 @@
     }
 
     .total-box {
-      margin: 6px 0;
-      padding: 5px 6px;
-      border: 1px solid #000;
+      margin: 4px 0;
+      padding: 2px 0;
     }
 
     .total-box table { width: 100%; border-collapse: collapse; }
@@ -186,6 +185,8 @@
     </tr>
   </table>
 
+  <hr>
+
   <div class="total-box">
     <table>
       <tr>
@@ -201,6 +202,8 @@
       </tr>
     </table>
   </div>
+
+  <hr>
 
   <div class="conditions">
     Merci d’être à la gare <strong>45 minutes avant</strong> l’heure de départ.<br>

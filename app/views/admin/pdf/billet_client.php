@@ -86,9 +86,8 @@
     }
 
     .total-box {
-      margin: 6px 0;
-      padding: 5px 6px;
-      border: 1px solid #000;
+      margin: 4px 0;
+      padding: 2px 0;
     }
 
     .total-box table { width: 100%; border-collapse: collapse; }
@@ -168,8 +167,11 @@
     </tr>
     <tr>
       <td class="label">Départ</td>
+      <td class="value"><?= htmlspecialchars($_SESSION['ville'] ?? '-') ?></td>
+    </tr>
+    <tr>
+      <td class="label">Heure</td>
       <td class="value">
-        <?= htmlspecialchars($_SESSION['ville'] ?? '-') ?> à
         <?php
           $heureTs = !empty($billet->Heur_departs) ? strtotime($billet->Heur_departs) : false;
           echo $heureTs !== false ? date('H\hi', $heureTs) : htmlspecialchars($billet->Heur_departs ?? '-');
@@ -185,6 +187,8 @@
       <td class="value"><?= htmlspecialchars($billet->numeroPlace ?? '-') ?></td>
     </tr>
   </table>
+
+  <hr>
 
   <div class="total-box">
     <table>
@@ -202,6 +206,8 @@
     </table>
   </div>
 
+  <hr>
+
   <?php if (!empty($qrPath)): ?>
     <div class="qr">
       <img src="<?= $qrPath ?>" width="90" alt="QR Code Billet">
@@ -214,7 +220,7 @@
   </div>
 
   <footer>
-    Émis par <?= htmlspecialchars($billet->agent ?? '-') ?> le <?= date('d/m/Y à H:i') ?>
+    Émis par <?= htmlspecialchars($billet->agent ?? '-') ?>
     <div class="thanks">Merci d’avoir choisi <?= htmlspecialchars($compagnie['nom'] ?? 'notre compagnie') ?></div>
   </footer>
 
