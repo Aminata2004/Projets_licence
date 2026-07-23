@@ -123,12 +123,18 @@ class Liste_du_jours extends  Controller
   // et qui seul peut réellement parler à l'imprimante (cf. ThermalPrinter::printBillet()).
   public function donneesTicketThermique($idBillets)
   {
+    // Tampon dédié : si un warning/notice PHP s'imprime avant le JSON (APP_ENV=local
+    // affiche les erreurs à l'écran), il casserait le parsing JSON côté navigateur sans
+    // qu'on comprenne pourquoi. On l'intercepte ici et on ne garde que le JSON final.
+    ob_start();
+
     $colisModel = new Livraisons_colis();
     $billets = new Liste_du_jour();
 
     $billet = $billets->getBilletById($idBillets);
     $compagnie = $colisModel->infoCompagnie($_SESSION['id_compagnie'] ?? 0);
 
+    ob_clean();
     header('Content-Type: application/json; charset=utf-8');
 
     if (!$billet || !$compagnie) {
@@ -139,7 +145,7 @@ class Liste_du_jours extends  Controller
     $heureTs = !empty($billet->Heur_departs) ? strtotime($billet->Heur_departs) : false;
     $montantNet = preg_replace('/[^\d.]/', '', $billet->montant_payer ?? '');
 
-    echo json_encode([
+    $json = json_encode([
       'compagnie' => $compagnie['nom'] ?? 'Nom Compagnie',
       'slogan' => $compagnie['slogant'] ?? '',
       'numero' => $billet->numeroBillets ?? '-',
@@ -152,6 +158,11 @@ class Liste_du_jours extends  Controller
       'montant' => !empty($montantNet) ? number_format((float)$montantNet, 0, ',', ' ') : '-',
       'emisPar' => $billet->utilisateurs ?? '-',
     ]);
+
+    // json_encode() renvoie false (donc une réponse vide, invalide en JSON) en cas de
+    // caractères mal encodés dans les données — on l'expose ici plutôt que de laisser
+    // le navigateur échouer sur une réponse vide sans explication.
+    echo $json !== false ? $json : json_encode(['error' => 'Erreur d\'encodage des données : ' . json_last_error_msg()]);
     exit;
   }
 
