@@ -15,7 +15,7 @@
  * imprimante (ex: raccourci dans le dossier Démarrage, ou tâche planifiée).
  */
 
-require_once __DIR__ . '/../app/core/ThermalPrinter.php';
+require_once __DIR__ . '/ThermalPrinter.php';
 
 // --- Config imprimante : lue depuis local-print-bridge/.env (PAS le .env principal du
 // site — ce pont n'a besoin d'aucun accès base de données, seulement des réglages imprimante) ---

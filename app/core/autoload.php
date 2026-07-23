@@ -41,7 +41,6 @@ include_once ("database.php");
 include_once ("Controller.php");
 include_once ("model.php");
 include_once ("app.php");
-include_once ("ThermalPrinter.php");
 
 // **Ne PAS inclure vendor/autoload.php ici, c'est déjà fait dans index.php**
 // require_once ROOT . '/vendor/autoload.php'; // <-- commenter ou supprimer
