@@ -62,9 +62,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $chemin = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
+// Route de diagnostic : ouvrir http://127.0.0.1:9200/health dans un navigateur sur CE
+// poste permet de vérifier en un coup d'œil que le pont tourne bien, sans passer par le
+// site ni par une impression réelle (utile pour distinguer "pont pas démarré" de "CORS
+// bloqué" ou "imprimante injoignable").
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $chemin === '/health') {
+    echo json_encode([
+        'success' => true,
+        'message' => 'Pont actif.',
+        'printer_mode' => PRINTER_MODE,
+    ]);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || $chemin !== '/print') {
     http_response_code(404);
-    echo json_encode(['success' => false, 'message' => 'Route inconnue. Utilisez POST /print.']);
+    echo json_encode(['success' => false, 'message' => 'Route inconnue. Utilisez POST /print ou GET /health.']);
     exit;
 }
 
