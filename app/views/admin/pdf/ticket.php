@@ -165,8 +165,11 @@
     </tr>
     <tr>
       <td class="label">Départ</td>
+      <td class="value"><?= htmlspecialchars($_SESSION['ville'] ?? '-') ?></td>
+    </tr>
+    <tr>
+      <td class="label">Heure</td>
       <td class="value">
-        <?= htmlspecialchars($_SESSION['ville'] ?? '-') ?> à
         <?php
           $heureTs = !empty($billet->Heur_departs) ? strtotime($billet->Heur_departs) : false;
           echo $heureTs !== false ? date('H\hi', $heureTs) : htmlspecialchars($billet->Heur_departs ?? '-');
@@ -205,7 +208,7 @@
   </div>
 
   <footer>
-    Émis par <?= htmlspecialchars($billet->utilisateurs ?? '-') ?> le <?= date('d/m/Y à H:i') ?>
+    Émis par <?= htmlspecialchars($billet->utilisateurs ?? '-') ?>
     <div class="thanks">Merci d’avoir choisi <?= htmlspecialchars($compagnie['nom'] ?? 'notre compagnie') ?></div>
   </footer>
 
