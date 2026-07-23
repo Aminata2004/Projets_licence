@@ -124,7 +124,9 @@ class Colis_prise_en_charges extends  Controller
     $qrData = "Nom du colis : {$colis['nom_colis']}\n" .
       "Nature       : {$colis['nature']}\n" .
       "Code         : {$colis['code_colis']}\n" .
+      "Depart       : {$colis['provient_de']}\n" .
       "Destination  : {$colis['localite']}\n" .
+      "Enregistre par : {$colis['agent_nom']}\n" .
       "Valeur       : " . number_format($colis['valeur'], 0, ',', ' ') . " FCFA\n" .
       "Frais        : " . number_format($colis['fraix_transaction'], 0, ',', ' ') . " FCFA";
 
