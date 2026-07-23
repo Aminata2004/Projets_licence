@@ -113,15 +113,29 @@ Get-Process php -ErrorAction SilentlyContinue |
     Stop-Process -Force -ErrorAction SilentlyContinue
 
 Start-Process -FilePath $phpExe -ArgumentList "-S 127.0.0.1:9200 `"$bridgePath`"" -WindowStyle Hidden
-Start-Sleep -Seconds 1
 
-try {
-    $test = Invoke-WebRequest -Uri 'http://127.0.0.1:9200/print' -Method OPTIONS -Headers @{ Origin = ($AllowedOrigins -split ',')[0] } -UseBasicParsing
+# Le tout premier lancement peut afficher une invite "Autoriser l'accès" du pare-feu
+# Windows ; le port ne répond qu'une fois cette invite acceptée. On retente donc
+# plusieurs fois avant de conclure à un échec, au lieu de tester une seule fois trop tôt.
+$pontOk = $false
+for ($tentative = 1; $tentative -le 8; $tentative++) {
+    Start-Sleep -Seconds 1
+    try {
+        $test = Invoke-WebRequest -Uri 'http://127.0.0.1:9200/health' -UseBasicParsing -TimeoutSec 2
+        Write-Host ""
+        Write-Host "Le pont d'impression répond correctement (code $($test.StatusCode))." -ForegroundColor Green
+        $pontOk = $true
+        break
+    } catch {
+        continue
+    }
+}
+
+if (-not $pontOk) {
     Write-Host ""
-    Write-Host "Le pont d'impression répond correctement (code $($test.StatusCode))." -ForegroundColor Green
-} catch {
-    Write-Host ""
-    Write-Host "Le pont ne répond pas encore. Vérifiez qu'aucun pare-feu ne bloque le port 9200 en local." -ForegroundColor Yellow
+    Write-Host "Le pont ne répond pas encore." -ForegroundColor Yellow
+    Write-Host "Vérifiez s'il y a une invite du pare-feu Windows à accepter (souvent en arrière-plan)," -ForegroundColor Yellow
+    Write-Host "puis retestez dans le navigateur : http://127.0.0.1:9200/health" -ForegroundColor Yellow
 }
 
 Write-Host ""
