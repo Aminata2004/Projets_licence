@@ -67,7 +67,7 @@ class Homes extends Controller
         }
 
         if ($showVoyages) {
-            $data['voyagesJour'] = $this->homeModel->getVoyagesProgrammes($gareLabel);
+            $data['voyagesJour'] = $this->homeModel->getVoyagesProgrammes($gareLabel, $gareId);
         }
 
         if ($showColis) {
