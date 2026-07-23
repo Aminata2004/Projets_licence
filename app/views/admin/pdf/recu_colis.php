@@ -30,6 +30,12 @@
 </header>
 
 <div class="bloc">
+    <h3>Colis</h3>
+    <div class="row"><span class="label">Nom :</span> <?= htmlspecialchars($colis['nom_colis'] ?? '-') ?></div>
+    <div class="row"><span class="label">Nature :</span> <?= htmlspecialchars($colis['nature'] ?? '-') ?></div>
+</div>
+
+<div class="bloc">
     <h3>Expéditeur</h3>
     <div class="row"><span class="label">Nom :</span> <?= htmlspecialchars($colis['expediteur']) ?></div>
     <div class="row"><span class="label">Tél :</span> <?= htmlspecialchars($colis['numero_exp']) ?></div>
