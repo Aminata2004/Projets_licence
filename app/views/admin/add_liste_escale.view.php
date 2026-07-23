@@ -209,19 +209,29 @@
                         <div class="modal-body">
                             <form action="" method="post" class="needs-validation" novalidate>
 
-                                <!-- Champ Escale -->
-                                <div class="mb-3">
-                                    <label for="escaleInput" class="form-label fw-semibold">Nom de l’escale
-                                        <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text"
-                                        class="form-control form-control-lg"
-                                        id="escaleInput"
-                                        name="escales"
-                                        placeholder="Ex : Fana"
-                                        required>
-                                    <div class="invalid-feedback">Veuillez entrer le nom de l’escale.</div>
+                                <!-- Lignes d'escales, ajoutables dynamiquement -->
+                                <div id="escalesRows">
+                                    <div class="mb-3 d-flex gap-2 align-items-start escale-row">
+                                        <div class="flex-grow-1">
+                                            <label class="form-label fw-semibold">Nom de l’escale
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text"
+                                                class="form-control form-control-lg"
+                                                name="escales[]"
+                                                placeholder="Ex : Fana"
+                                                required>
+                                            <div class="invalid-feedback">Veuillez entrer le nom de l’escale.</div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-danger remove-row-btn mt-4 d-none" title="Retirer cette ligne">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
+
+                                <button type="button" id="addEscaleRow" class="btn btn-sm btn-outline-primary mb-3">
+                                    <i class="bx bx-plus"></i> Ajouter une ligne
+                                </button>
 
                                 <!-- Footer -->
                                 <div class="modal-footer border-0">
@@ -295,6 +305,36 @@
 
 
     <?php $this->view('admin/partials/foot') ?>
+    <script>
+        // "Add to row" : permet de saisir plusieurs escales d'un coup avant d'enregistrer.
+        document.addEventListener("DOMContentLoaded", function() {
+            const rowsContainer = document.getElementById("escalesRows");
+            const addBtn = document.getElementById("addEscaleRow");
+
+            function toggleRemoveButtons() {
+                const rows = rowsContainer.querySelectorAll(".escale-row");
+                rows.forEach(function(row) {
+                    row.querySelector(".remove-row-btn").classList.toggle("d-none", rows.length <= 1);
+                });
+            }
+
+            addBtn.addEventListener("click", function() {
+                const firstRow = rowsContainer.querySelector(".escale-row");
+                const newRow = firstRow.cloneNode(true);
+                newRow.querySelector("input").value = "";
+                rowsContainer.appendChild(newRow);
+                toggleRemoveButtons();
+            });
+
+            rowsContainer.addEventListener("click", function(e) {
+                const btn = e.target.closest(".remove-row-btn");
+                if (btn) {
+                    btn.closest(".escale-row").remove();
+                    toggleRemoveButtons();
+                }
+            });
+        });
+    </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const editButtons = document.querySelectorAll(".edit-btn");

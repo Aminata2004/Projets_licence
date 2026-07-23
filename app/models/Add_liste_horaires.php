@@ -2,51 +2,54 @@
     class Add_liste_horaires extends Model
     {
 
+        // Le formulaire envoie heuredepart[] (plusieurs lignes ajoutées dynamiquement, "add to
+        // row") : chaque ligne est traitée indépendamment, une heure déjà existante n'empêche
+        // pas l'enregistrement des autres.
         public function saveHoraire()
         {
-            // Récupération sécurisée des données du formulaire
-            extract($_POST);
-            $errors = [];
             $id_compagnie = $_SESSION["id_compagnie"];
-            // Vérification des champs requis
-            if (empty($heuredepart)) {
-                $errors[] = "L'heure de depart  est obligatoire.";
+            $liste = $_POST['heuredepart'] ?? [];
+            if (!is_array($liste)) {
+                $liste = [$liste];
             }
-            $db = $this->connect();
-            // Vérifier si la combinaison localité + numéroGare existe
-            $check = $db->prepare("SELECT id_heure FROM horaire WHERE  heuredepart = :heuredepart AND id_compagnie = :id_compagnie");
-            $check->execute([
-                ':heuredepart' => $heuredepart,
-                ':id_compagnie' => $id_compagnie
-            ]);
-            $existe = $check->fetch();
 
-            if ($existe) {
-                $errors[] = "Cet heure de depart existe déjà.";
-            }
-            // Si aucune erreur, on procède à l'insertion
-            if (count($errors) === 0) {
+            $db = $this->connect();
+            $check = $db->prepare("SELECT id_heure FROM horaire WHERE heuredepart = :heuredepart AND id_compagnie = :id_compagnie");
+
+            $nbAjoutes = 0;
+            $erreurs = [];
+
+            foreach ($liste as $heuredepart) {
+                $heuredepart = trim($heuredepart);
+                if ($heuredepart === '') {
+                    continue;
+                }
+
+                $check->execute([':heuredepart' => $heuredepart, ':id_compagnie' => $id_compagnie]);
+                if ($check->fetch()) {
+                    $erreurs[] = "« $heuredepart » existe déjà.";
+                    continue;
+                }
 
                 $insertion = $this->insertion_update_simples(
-                    "INSERT INTO horaire 
-                ( heuredepart,id_compagnie ) VALUES(:heuredepart,:id_compagnie)",
-                    [
-                        ":heuredepart" => $heuredepart,
-                        ":id_compagnie" => $id_compagnie
-                    ]
+                    "INSERT INTO horaire (heuredepart, id_compagnie) VALUES (:heuredepart, :id_compagnie)",
+                    [":heuredepart" => $heuredepart, ":id_compagnie" => $id_compagnie]
                 );
-                if ($insertion == true) {
-                    $this->set_flash('Heure ajouter avec succes', 'info');
-                    //  header("Location: " . $_SERVER['PHP_SELF']); // Redirection vers la même page
-                    //  exit();
+                if ($insertion) {
+                    $nbAjoutes++;
                 } else {
-                    $this->set_flash('heure non ajouter');
+                    $erreurs[] = "Échec de l'ajout de « $heuredepart ».";
                 }
-            } else {
-                // Affichage des erreurs
-                foreach ($errors as $error) {
-                    $this->set_flash($error, "danger");
-                }
+            }
+
+            if ($nbAjoutes > 0) {
+                $this->set_flash($nbAjoutes > 1 ? "$nbAjoutes horaires ajoutés avec succès." : "Heure ajoutée avec succès.", 'info');
+            }
+            foreach ($erreurs as $erreur) {
+                $this->set_flash($erreur, "danger");
+            }
+            if ($nbAjoutes === 0 && count($erreurs) === 0) {
+                $this->set_flash("Aucun horaire à ajouter.", "danger");
             }
         }
         public function editHoraire($data)

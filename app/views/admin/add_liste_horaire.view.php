@@ -190,13 +190,22 @@
                         </div>
                         <div class="modal-body">
                             <form action="" method="post">
-                                <div class="col-md-12">
-                                    <label for="bsValidation3" class="form-label"> Heure<span
-                                            class="text-danger scale5 ms-2">*</span></label>
-                                    <input type="time" class="form-control solid"
-                                        aria-label="name" name="heuredepart" placeholder="ex:10:00">
-
+                                <div id="horairesRows">
+                                    <div class="col-md-12 mb-3 d-flex gap-2 align-items-start horaire-row">
+                                        <div class="flex-grow-1">
+                                            <label class="form-label"> Heure<span
+                                                    class="text-danger scale5 ms-2">*</span></label>
+                                            <input type="time" class="form-control solid"
+                                                aria-label="name" name="heuredepart[]" placeholder="ex:10:00">
+                                        </div>
+                                        <button type="button" class="btn btn-outline-danger remove-row-btn mt-4 d-none" title="Retirer cette ligne">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
+                                <button type="button" id="addHoraireRow" class="btn btn-sm btn-outline-primary mb-3">
+                                    <i class="bx bx-plus"></i> Ajouter une ligne
+                                </button>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                                     <button type="submit" class="btn btn-primary" name="save">Enregistre</button>
@@ -252,6 +261,36 @@
 
     <?php $this->view('admin/partials/foot') ?>
     <script src="<?= BASE_URL ?>/mon_js/alert_delete.js"></script>
+    <script>
+        // "Add to row" : permet de saisir plusieurs horaires d'un coup avant d'enregistrer.
+        document.addEventListener("DOMContentLoaded", function() {
+            const rowsContainer = document.getElementById("horairesRows");
+            const addBtn = document.getElementById("addHoraireRow");
+
+            function toggleRemoveButtons() {
+                const rows = rowsContainer.querySelectorAll(".horaire-row");
+                rows.forEach(function(row) {
+                    row.querySelector(".remove-row-btn").classList.toggle("d-none", rows.length <= 1);
+                });
+            }
+
+            addBtn.addEventListener("click", function() {
+                const firstRow = rowsContainer.querySelector(".horaire-row");
+                const newRow = firstRow.cloneNode(true);
+                newRow.querySelector("input").value = "";
+                rowsContainer.appendChild(newRow);
+                toggleRemoveButtons();
+            });
+
+            rowsContainer.addEventListener("click", function(e) {
+                const btn = e.target.closest(".remove-row-btn");
+                if (btn) {
+                    btn.closest(".horaire-row").remove();
+                    toggleRemoveButtons();
+                }
+            });
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.edit-horaire-btn').forEach(function(button) {

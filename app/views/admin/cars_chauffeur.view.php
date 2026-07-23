@@ -47,25 +47,30 @@
                                     </div>
                                     <div class="modal-body text-dart">
                                         <form action="" method="post">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label for="validationCustom01" class="form-label">Numero de car</label>
-                                                    <input type="number" class="form-control" id="validationCustom01" placeholder="Numero de car" name="numero_car" required autocomplete="off">
-
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="validationCustom02" class="form-label">Matricule</label>
-                                                    <input type="text" class="form-control" id="validationCustom02" placeholder="Matricule" name="matriculle" required autocomplete="off">
-
+                                            <div id="carsRows">
+                                                <div class="row align-items-end mb-2 car-row">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Numero de car</label>
+                                                        <input type="number" class="form-control" placeholder="Numero de car" name="numero_car[]" required autocomplete="off">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Matricule</label>
+                                                        <input type="text" class="form-control" placeholder="Matricule" name="matriculle[]" required autocomplete="off">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Nombre de place</label>
+                                                        <input type="number" class="form-control" placeholder="Nombre de place" name="nbr_place[]" required autocomplete="off">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <button type="button" class="btn btn-outline-danger remove-row-btn d-none w-100" title="Retirer cette ligne">
+                                                            <i class="bx bx-trash"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-12">
-                                                <label for="validationCustomUsername" class="form-label">Nombre de place</label>
-                                                <div class="input-group has-validation">
-                                                    <input type="number" class="form-control" id="validationCustomUsername" placeholder="Nombre de place" name="nbr_place" required autocomplete="off">
-
-                                                </div>
-                                            </div>
+                                            <button type="button" id="addCarRow" class="btn btn-sm btn-outline-primary mb-3">
+                                                <i class="bx bx-plus"></i> Ajouter une ligne
+                                            </button>
 
                                     </div>
                                     <div class="modal-footer">
@@ -319,6 +324,36 @@
 
 
     <?php $this->view('admin/partials/foot') ?>
+    <script>
+        // "Add to row" : permet de saisir plusieurs cars (numéro/matricule/places) d'un coup.
+        document.addEventListener("DOMContentLoaded", function() {
+            const rowsContainer = document.getElementById("carsRows");
+            const addBtn = document.getElementById("addCarRow");
+
+            function toggleRemoveButtons() {
+                const rows = rowsContainer.querySelectorAll(".car-row");
+                rows.forEach(function(row) {
+                    row.querySelector(".remove-row-btn").classList.toggle("d-none", rows.length <= 1);
+                });
+            }
+
+            addBtn.addEventListener("click", function() {
+                const firstRow = rowsContainer.querySelector(".car-row");
+                const newRow = firstRow.cloneNode(true);
+                newRow.querySelectorAll("input").forEach(function(input) { input.value = ""; });
+                rowsContainer.appendChild(newRow);
+                toggleRemoveButtons();
+            });
+
+            rowsContainer.addEventListener("click", function(e) {
+                const btn = e.target.closest(".remove-row-btn");
+                if (btn) {
+                    btn.closest(".car-row").remove();
+                    toggleRemoveButtons();
+                }
+            });
+        });
+    </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const editButtons = document.querySelectorAll(".edit-btn");
