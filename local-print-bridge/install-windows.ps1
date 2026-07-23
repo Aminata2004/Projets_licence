@@ -13,6 +13,9 @@
 .NOTES
     À exécuter en PowerShell sur CHAQUE poste équipé d'une imprimante thermique.
     Peut être relancé sans risque (réinstalle/écrase proprement).
+    Ne nécessite PAS de droits administrateur (installation dans le profil utilisateur).
+    Si l'exécution de scripts est bloquée, lancer via :
+      powershell -ExecutionPolicy Bypass -File install-windows.ps1 -PrinterMode network -PrinterIp ...
 #>
 
 param(
@@ -22,8 +25,8 @@ param(
     [int]$PrinterPort = 9100,
     [string]$PrinterUsbName = 'POS-80',
     [string]$AllowedOrigins = 'https://annexpress.malitecnologie.com,https://devannexpress.malitecnologie.com',
-    [string]$InstallDir = 'C:\print-bridge',
-    [string]$PhpDir = 'C:\php',
+    [string]$InstallDir = (Join-Path $env:LOCALAPPDATA 'PrintBridge'),
+    [string]$PhpDir = (Join-Path $env:LOCALAPPDATA 'PrintBridge\php'),
     [string]$RepoRawBase = 'https://raw.githubusercontent.com/Aminata2004/Projets_licence/main/local-print-bridge'
 )
 
