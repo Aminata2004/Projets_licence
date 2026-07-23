@@ -169,6 +169,7 @@ class Colis_prise_en_charges extends  Controller
       'type' => 'colis',
       'compagnie' => $compagnie['nom'] ?? 'Nom Compagnie',
       'slogan' => $compagnie['slogant'] ?? '',
+      'nom' => $colis['nom_colis'] ?? '-',
       'code' => $colis['code_colis'] ?? '-',
       'expediteur' => $colis['expediteur'] ?? '-',
       'numeroExp' => $colis['numero_exp'] ?? '-',

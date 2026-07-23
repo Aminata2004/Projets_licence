@@ -85,11 +85,12 @@ class ThermalPrinter
         $r .= $sep;
         $r .= $ESC . "!" . "\x10";
         $r .= "RECU DE COLIS\n";
-        $r .= "Code " . self::clean($colis['code'] ?? '-') . "\n";
         $r .= $ESC . "!" . "\x00";
+        $r .= self::clean($colis['nom'] ?? '-') . "\n";
         $r .= $sep;
 
         $r .= $ESC . "a" . "\x00";
+        $r .= sprintf("%-13s%s\n", "Code", self::clean($colis['code'] ?? '-'));
         $r .= sprintf("%-13s%s\n", "Expediteur", self::clean($colis['expediteur'] ?? '-'));
         $r .= sprintf("%-13s%s\n", "Tel", self::clean($colis['numeroExp'] ?? '-'));
         $r .= sprintf("%-13s%s\n", "Destinataire", self::clean($colis['destinataire'] ?? '-'));
@@ -104,11 +105,33 @@ class ThermalPrinter
         $r .= $ESC . "!" . "\x00";
         $r .= $sep;
 
+        // QR code (vérification/suivi), centré, avec le code du colis rappelé en dessous
         $r .= $ESC . "a" . "\x01";
+        $r .= self::qrCode(self::clean($colis['code'] ?? '-'));
+        $r .= self::clean($colis['code'] ?? '-') . "\n";
+        $r .= $sep;
+
         $r .= "Enregistre par " . self::clean($colis['agent'] ?? '-') . "\n";
         $r .= "Merci d'avoir choisi " . self::clean($colis['compagnie'] ?? '') . "\n";
         $r .= "\n\n\n";
         $r .= $GS . "V" . "\x00"; // coupe papier
+
+        return $r;
+    }
+
+    // Commande ESC/POS standard (GS ( k) pour imprimer un QR code, supportée par la
+    // quasi-totalité des imprimantes thermiques modernes (Epson TM et clones compatibles).
+    private static function qrCode(string $data): string
+    {
+        $prefix = "\x1D" . "(k";
+        $len = strlen($data) + 3;
+
+        $r = '';
+        $r .= $prefix . chr(4) . chr(0) . chr(0x31) . chr(0x41) . chr(50) . chr(0); // modèle 2
+        $r .= $prefix . chr(3) . chr(0) . chr(0x31) . chr(0x43) . chr(6);            // taille module
+        $r .= $prefix . chr(3) . chr(0) . chr(0x31) . chr(0x45) . chr(49);           // correction erreur (M)
+        $r .= $prefix . chr($len % 256) . chr(intdiv($len, 256)) . chr(0x31) . chr(0x50) . chr(0x30) . $data; // stocke
+        $r .= $prefix . chr(3) . chr(0) . chr(0x31) . chr(0x51) . chr(0x30) . "\n"; // imprime
 
         return $r;
     }
