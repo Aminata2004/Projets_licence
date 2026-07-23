@@ -67,6 +67,52 @@ class ThermalPrinter
         return $r;
     }
 
+    public static function buildColisContent(array $colis): string
+    {
+        $ESC = "\x1B";
+        $GS  = "\x1D";
+        $sep = str_repeat('-', self::LARGEUR_COLONNES) . "\n";
+
+        $r = $ESC . "@"; // init imprimante
+
+        $r .= $ESC . "a" . "\x01";
+        $r .= $ESC . "!" . "\x30";
+        $r .= self::clean($colis['compagnie'] ?? '') . "\n";
+        $r .= $ESC . "!" . "\x00";
+        if (!empty($colis['slogan'])) {
+            $r .= self::clean($colis['slogan']) . "\n";
+        }
+        $r .= $sep;
+        $r .= $ESC . "!" . "\x10";
+        $r .= "RECU DE COLIS\n";
+        $r .= "Code " . self::clean($colis['code'] ?? '-') . "\n";
+        $r .= $ESC . "!" . "\x00";
+        $r .= $sep;
+
+        $r .= $ESC . "a" . "\x00";
+        $r .= sprintf("%-13s%s\n", "Expediteur", self::clean($colis['expediteur'] ?? '-'));
+        $r .= sprintf("%-13s%s\n", "Tel", self::clean($colis['numeroExp'] ?? '-'));
+        $r .= sprintf("%-13s%s\n", "Destinataire", self::clean($colis['destinataire'] ?? '-'));
+        $r .= sprintf("%-13s%s\n", "Tel", self::clean($colis['numeroDest'] ?? '-'));
+        $r .= sprintf("%-13s%s\n", "Depart", self::clean($colis['depart'] ?? '-'));
+        $r .= sprintf("%-13s%s\n", "Destination", self::clean($colis['destination'] ?? '-'));
+        $r .= $sep;
+
+        $r .= $ESC . "!" . "\x10";
+        $r .= "VALEUR   " . self::clean($colis['valeur'] ?? '-') . " FCFA\n";
+        $r .= "FRAIS    " . self::clean($colis['frais'] ?? '-') . " FCFA\n";
+        $r .= $ESC . "!" . "\x00";
+        $r .= $sep;
+
+        $r .= $ESC . "a" . "\x01";
+        $r .= "Enregistre par " . self::clean($colis['agent'] ?? '-') . "\n";
+        $r .= "Merci d'avoir choisi " . self::clean($colis['compagnie'] ?? '') . "\n";
+        $r .= "\n\n\n";
+        $r .= $GS . "V" . "\x00"; // coupe papier
+
+        return $r;
+    }
+
     // La plupart des imprimantes thermiques génériques (jeu de caractères par défaut)
     // n'affichent pas correctement les accents UTF-8 : on les retire par sécurité.
     private static function clean(string $texte): string
@@ -125,7 +171,16 @@ class ThermalPrinter
 
     public static function printBillet(array $billet): array
     {
-        $data = self::buildBilletContent($billet);
+        return self::envoyer(self::buildBilletContent($billet));
+    }
+
+    public static function printColis(array $colis): array
+    {
+        return self::envoyer(self::buildColisContent($colis));
+    }
+
+    private static function envoyer(string $data): array
+    {
         $mode = strtolower(defined('PRINTER_MODE') ? PRINTER_MODE : 'network');
 
         if ($mode === 'usb') {

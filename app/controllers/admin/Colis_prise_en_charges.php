@@ -148,4 +148,40 @@ class Colis_prise_en_charges extends  Controller
     /* ---------- 4. Génération PDF (imprimante thermique 80mm) ---------- */
     $this->streamThermalPdf($html, "recu_colis_{$colis['id_colis']}.pdf");
   }
+
+  // Renvoie les données du reçu colis en JSON pour impression thermique ESC/POS
+  // (pont local, cf. donneesTicketThermique() dans Liste_du_jours pour les billets).
+  public function donneesRecuThermique(int $id_colis): void
+  {
+    $colisModel = new Livraisons_colis();
+
+    $colis = $colisModel->getById($id_colis);
+    $compagnie = $colisModel->infoCompagnie($_SESSION['id_compagnie'] ?? 0);
+
+    header('Content-Type: application/json; charset=utf-8');
+
+    if (!$colis || !$compagnie) {
+      echo json_encode(['error' => 'Colis ou compagnie introuvable.']);
+      exit;
+    }
+
+    $json = json_encode([
+      'type' => 'colis',
+      'compagnie' => $compagnie['nom'] ?? 'Nom Compagnie',
+      'slogan' => $compagnie['slogant'] ?? '',
+      'code' => $colis['code_colis'] ?? '-',
+      'expediteur' => $colis['expediteur'] ?? '-',
+      'numeroExp' => $colis['numero_exp'] ?? '-',
+      'destinataire' => $colis['destinataire'] ?? '-',
+      'numeroDest' => $colis['numero_dest'] ?? '-',
+      'depart' => $colis['provient_de'] ?? '-',
+      'destination' => $colis['localite'] ?? '-',
+      'valeur' => number_format((float)($colis['valeur'] ?? 0), 0, ',', ' '),
+      'frais' => number_format((float)($colis['fraix_transaction'] ?? 0), 0, ',', ' '),
+      'agent' => $colis['agent_nom'] ?? '-',
+    ]);
+
+    echo $json !== false ? $json : json_encode(['error' => 'Erreur d\'encodage des données : ' . json_last_error_msg()]);
+    exit;
+  }
 }

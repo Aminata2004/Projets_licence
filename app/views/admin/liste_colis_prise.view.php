@@ -115,7 +115,12 @@
                                                         <a class="dropdown-item"
                                                             href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimer_recu/<?= $colis['id_colis'] ?>"
                                                             target="_blank">
-                                                            <i class="bx bx-printer me-2"></i>Imprimer le reçu
+                                                            <i class="bx bx-printer me-2"></i>Imprimer (imprimante câble/USB)
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item thermal-print-colis-btn" href="#" data-id="<?= $colis['id_colis'] ?>">
+                                                            <i class="bx bx-printer me-2"></i>Imprimer (imprimante WiFi)
                                                         </a>
                                                     </li>
                                                 </ul>
@@ -338,6 +343,7 @@
     </style>
 
     <?php $this->view('admin/partials/foot') ?>
+    <script src="<?= BASE_URL ?>/mon_js/thermal-print.js"></script>
 
 </body>
 

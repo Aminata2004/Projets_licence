@@ -86,11 +86,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || $chemin !== '/print') {
     exit;
 }
 
-$billet = json_decode(file_get_contents('php://input'), true);
-if (!is_array($billet)) {
+$donnees = json_decode(file_get_contents('php://input'), true);
+if (!is_array($donnees)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Corps de requête invalide (JSON attendu).']);
     exit;
 }
 
-echo json_encode(ThermalPrinter::printBillet($billet));
+// "type" distingue le document à imprimer (billet de voyage ou reçu de colis) : absent
+// -> billet, pour rester compatible avec les appels existants qui n'envoient pas ce champ.
+$type = $donnees['type'] ?? 'billet';
+echo json_encode($type === 'colis' ? ThermalPrinter::printColis($donnees) : ThermalPrinter::printBillet($donnees));
