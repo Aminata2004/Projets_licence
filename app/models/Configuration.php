@@ -1,8 +1,5 @@
  <?php
 
-    use PHPMailer\PHPMailer\PHPMailer;
-    use PHPMailer\PHPMailer\Exception;
-
     class Configuration extends Model
     {
         /**
@@ -13,6 +10,8 @@
          *
          * Affiche des messages d'erreur ou de succès via SweetAlert.
          */
+
+        const MOT_DE_PASSE_PAR_DEFAUT = '123456';
 
         private $idUser;
 
@@ -44,15 +43,10 @@
             }
 
             if (count($errors) === 0) {
-                // Génération d’un mot de passe
-                function genererMotDePasse($longueur = 10)
-                {
-                    $caracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
-                    return substr(str_shuffle(str_repeat($caracteres, $longueur)), 0, $longueur);
-                }
-
-                $motPasseGenere = genererMotDePasse();
-                $motPasseHash = password_hash($motPasseGenere, PASSWORD_DEFAULT);
+                // Mot de passe par défaut identique pour tous les nouveaux comptes,
+                // à communiquer à l'utilisateur (pas d'envoi d'email) : il le change
+                // lui-même à sa première connexion.
+                $motPasseHash = password_hash(self::MOT_DE_PASSE_PAR_DEFAUT, PASSWORD_DEFAULT);
 
                 $id_agence = $_POST['id_agence'] ?? null;
                 $id_compagnie = ($droit === 'Admin') ? ($_POST['id_compagnie'] ?? null) : $id_compagnie_session;
@@ -79,41 +73,11 @@
                     );
 
                     if ($insertion) {
-                        // --- Envoi Email ---
-                        $mail = new PHPMailer(true);
-                        $mail->isSMTP();
-                        $mail->Host       = MAIL_HOST;
-                        $mail->SMTPAuth   = true;
-                        $mail->Username   = MAIL_USERNAME;
-                        $mail->Password   = MAIL_PASSWORD;
-                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                        $mail->Port       = MAIL_PORT;
-
-                        $mail->setFrom(MAIL_USERNAME, MAIL_FROM_NAME);
-                        $mail->addAddress($emailUser, $utilisateurs);
-                        $mail->CharSet = 'UTF-8';
-                        $mail->isHTML(true);
-
-                        $mail->Subject = "Création de votre compte utilisateur";
-                        $mail->Body = <<<HTML
-                        Bonjour <strong>{$utilisateurs}</strong>,<br><br>
-                        Votre compte a été créé avec succès.<br>
-                        Voici vos identifiants de connexion :<br><br>
-                        <b>Email :</b> {$emailUser}<br>
-                        <b>Mot de passe :</b> {$motPasseGenere}<br><br>
-                         Merci de changer ce mot de passe dès votre première connexion.<br><br>
-                        Cordialement,<br>
-                        L’équipe .......
-                        HTML;
-
-                        $mail->send();
-
-                        // ✅ On valide la transaction
                         $pdo->commit();
 
                         $this->set_swal(
                             "👤 Utilisateur ajouté !",
-                            "L'utilisateur a été ajouté avec succès et son mot de passe lui a été envoyé par email.",
+                            "L'utilisateur a été ajouté avec succès. Mot de passe par défaut : " . self::MOT_DE_PASSE_PAR_DEFAUT . " (à communiquer à l'utilisateur, qui pourra le modifier après sa première connexion).",
                             "success",
                             "#0d6efd",
                             BASE_URL . "/admin/Configurations/add_utilisateurs"
@@ -122,7 +86,7 @@
                         $pdo->rollBack();
                         $this->set_swal("Erreur", "Échec de l'ajout de l'utilisateur.", "error", "#dc3545");
                     }
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     // 🚫 rollback sur la même connexion
                     if ($pdo->inTransaction()) {
                         $pdo->rollBack();

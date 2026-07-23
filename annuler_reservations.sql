@@ -8,12 +8,20 @@
 -- rencontrée, pas la somme des deux — d'où l'agrégation préalable.
 
 -- 1) Restaurer les places dans le car déjà programmé (billets pour aujourd'hui)
+-- Passe par "agence" (localite + numeroGare du billet -> idAgence) plutôt que par
+-- b.departId = p.localite_user (nom de ville seul) : sinon deux gares d'une même ville
+-- (ex. "Segou" Gare I et Gare II) sur le même créneau se mélangeraient. Voir
+-- ajout_id_agence_programmation_voyage.sql.
 UPDATE car c
 JOIN (
     SELECT p.id_car_programmer AS id_car, SUM(b.nombrePassages) AS total_annule
     FROM billets b
+    JOIN agence a
+        ON a.localite = b.departId
+        AND a.numeroGare = b.num_gare
+        AND a.id_compagnie = b.id_compagnie
     JOIN programmation_voyage p
-        ON b.departId = p.localite_user
+        ON p.id_agence = a.idAgence
         AND b.jourVoyage = p.date_enregistre
         AND b.Heur_departs = p.id_horaire
         AND b.id_compagnie = p.id_compagnie

@@ -87,6 +87,10 @@ class Programmation_voyages extends Controller
                 // Départ choisi dans le formulaire (Admin uniquement) ; pour un chef d'escale,
                 // le modèle retombe sur sa propre gare de session.
                 $id_depart = $_POST['id_depart'][$index] ?? null;
+                // Gare précise (idAgence) correspondant à ce départ : nécessaire pour ne pas
+                // mélanger deux gares d'une même ville sur le même créneau (revalidée côté
+                // modèle, jamais faite confiance telle quelle).
+                $id_agence_depart = $_POST['id_depart_agence'][$index] ?? null;
 
                 if (!$id_care || !$id_horaire || !$id_destination) {
                     $errors[] = "Veuillez remplir tous les champs pour la ligne choisie.";
@@ -98,7 +102,7 @@ class Programmation_voyages extends Controller
                     continue;
                 }
 
-                $insert_result = $model->insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre, $id_depart);
+                $insert_result = $model->insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre, $id_depart, $id_agence_depart);
                 if ($insert_result) {
                     $update_result = $model->updateCareStatus($id_care, $id_destination);
                     if (!$update_result) {
@@ -200,14 +204,16 @@ class Programmation_voyages extends Controller
         $id_compagnie = $_SESSION['id_compagnie'];
 
         $listeProgrammer = $programmation_voyage->FetchSelectWheres(
-            'pv.*, 
+            'pv.*,
      c.numero_car,
      c.nbr_place,
      c.nbr_place_reserve,
      (c.nbr_place - c.nbr_place_reserve) AS place_disponible',
             'programmation_voyage pv
      INNER JOIN car c ON pv.id_car_programmer = c.id_car',
-            'pv.id_compagnie = :id_compagnie',
+            // Un voyage annulé (ex. après un transfert de passagers vers une autre gare) ne doit
+            // plus apparaître dans la liste des départs à gérer aujourd'hui.
+            "pv.id_compagnie = :id_compagnie AND pv.statut = 'active'",
             ['id_compagnie' => $id_compagnie]
         );
 
