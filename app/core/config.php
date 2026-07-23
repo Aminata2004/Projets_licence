@@ -16,3 +16,10 @@ define("MAIL_ENCRYPTION", getenv('MAIL_ENCRYPTION') ?: "tls");
 define("MAIL_USERNAME", getenv('MAIL_USERNAME') ?: "");
 define("MAIL_PASSWORD", getenv('MAIL_PASSWORD') ?: "");
 define("MAIL_FROM_NAME", getenv('MAIL_FROM_NAME') ?: "Airbarry");
+
+// Impression thermique (billets) : "network" (IP fixe, port 9100) ou "usb" (imprimante
+// installée localement sur le poste qui imprime, cf. app/core/ThermalPrinter.php).
+define("PRINTER_MODE", getenv('PRINTER_MODE') ?: "network");
+define("PRINTER_IP", getenv('PRINTER_IP') ?: "192.168.1.100");
+define("PRINTER_PORT", getenv('PRINTER_PORT') ?: 9100);
+define("PRINTER_USB_NAME", getenv('PRINTER_USB_NAME') ?: "POS-80");
