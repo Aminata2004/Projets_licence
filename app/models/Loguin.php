@@ -4,9 +4,10 @@ class Loguin extends Model
     private const MAX_TENTATIVES = 10;
     private const BLOCAGE_MINUTES = 5;
 
-    // Comptes super_admin recréés automatiquement à chaque fois que la table
-    // utilisateur est vide (nouvelle base, reset accidentel...), pour ne jamais
-    // se retrouver sans accès admin.
+    // Comptes super_admin garantis présents en base : on vérifie individuellement
+    // chacun des trois (par email), et on ne (re)crée que ceux qui manquent, plutôt
+    // que d'attendre que la table utilisateur entière soit vide. Ça couvre aussi bien
+    // une base neuve qu'un vidage partiel (un seul compte supprimé par erreur).
     private const SUPER_ADMINS_PAR_DEFAUT = [
         ['nom' => 'Aminata Diallo', 'email' => 'amitacompt9@gmail.com', 'motPasse' => 'superadmin1'],
         ['nom' => 'Rokhaya Djiré', 'email' => 'rokhayadjire5@gmail.com', 'motPasse' => 'superadmin2'],
@@ -16,21 +17,41 @@ class Loguin extends Model
     public function seedSuperAdminsSiTableVide(): void
     {
         $db = $this->connect();
-        $nbUtilisateurs = (int) $db->query("SELECT COUNT(*) FROM utilisateur")->fetchColumn();
-        if ($nbUtilisateurs > 0) {
-            return;
-        }
 
-        $stmt = $db->prepare(
+        $verifie = $db->prepare("SELECT idUser FROM utilisateur WHERE emailUser = :email");
+        $insere = $db->prepare(
             "INSERT INTO utilisateur (utilisateurs, droit, motPasse, status, emailUser)
              VALUES (:nom, 'super_admin', :motPasse, 1, :email)"
         );
+
+        $permissionModel = new Permission();
+        $permissionModel->seedPermissionsParDefautSiVide();
+        $toutesLesPermissions = $permissionModel->getAll();
+
         foreach (self::SUPER_ADMINS_PAR_DEFAUT as $admin) {
-            $stmt->execute([
-                ':nom' => $admin['nom'],
-                ':motPasse' => password_hash($admin['motPasse'], PASSWORD_DEFAULT),
-                ':email' => $admin['email'],
-            ]);
+            $verifie->execute([':email' => $admin['email']]);
+            $ligne = $verifie->fetch(PDO::FETCH_ASSOC);
+
+            if ($ligne) {
+                $idUtilisateur = (int) $ligne['idUser'];
+            } else {
+                $insere->execute([
+                    ':nom' => $admin['nom'],
+                    ':motPasse' => password_hash($admin['motPasse'], PASSWORD_DEFAULT),
+                    ':email' => $admin['email'],
+                ]);
+                $idUtilisateur = (int) $db->lastInsertId();
+            }
+
+            // Un super_admin a toutes les permissions par conception (voir
+            // Configuration::userHasPermission), pas seulement à la création : si le
+            // catalogue permision était vide au moment où ce compte a été créé, on
+            // rattrape ici les permissions manquantes plutôt que de ne rien faire.
+            // assignPermissionToUser() est idempotent (ne duplique pas), donc rejouer
+            // ceci pour un compte déjà complet ne fait rien.
+            foreach ($toutesLesPermissions as $permission) {
+                $permissionModel->assignPermissionToUser($idUtilisateur, $permission->id_permision);
+            }
         }
     }
 

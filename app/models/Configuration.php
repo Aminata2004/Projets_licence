@@ -73,7 +73,22 @@
                     );
 
                     if ($insertion) {
+                        $idNouvelUtilisateur = (int) $pdo->lastInsertId();
                         $pdo->commit();
+
+                        // Un super_admin a accès à tout par conception (voir userHasPermission) ;
+                        // on lui assigne aussi toutes les permissions en base pour que les écrans
+                        // qui lisent directement user_permission (ex: assignation) reflètent ça.
+                        // Fait après commit() : assignPermissionToUser() ouvre sa propre connexion
+                        // PDO (Model::connect() n'est pas partagée), donc la ligne utilisateur doit
+                        // déjà être visible pour les autres connexions.
+                        if ($droit === 'super_admin') {
+                            $permissionModel = new Permission();
+                            $permissionModel->seedPermissionsParDefautSiVide();
+                            foreach ($permissionModel->getAll() as $permission) {
+                                $permissionModel->assignPermissionToUser($idNouvelUtilisateur, $permission->id_permision);
+                            }
+                        }
 
                         $this->set_swal(
                             "👤 Utilisateur ajouté !",
@@ -135,9 +150,9 @@
                 return true;
             }
 
-            // Super_admin direct : seulement l'accès à Configuration et à l'onglet Utilisateur
-            if (($_SESSION['droit'] ?? null) === 'super_admin'
-                && in_array($userPermissionName, ['Configuration_apercu', 'utilisateur_apercu'], true)) {
+            // Le super_admin a toutes les permissions par conception, y compris en direct
+            // (pas seulement en mode impersonation).
+            if (($_SESSION['droit'] ?? null) === 'super_admin') {
                 return true;
             }
 

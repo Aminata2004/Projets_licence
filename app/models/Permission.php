@@ -2,9 +2,58 @@
 <?php
 class Permission extends Model
 {
+    // Catalogue des permissions correspondant aux écrans réels de l'admin (sidebar,
+    // écrans Configuration...). La table permision n'a pas de seed SQL versionné : sur
+    // une base neuve ou vidée, elle est vide et personne (pas même un super_admin
+    // nouvellement créé) ne peut se voir assigner de permission tant qu'un admin n'en a
+    // pas ajouté manuellement via l'écran "Ajouter permission". On la seed donc ici.
+    private const NOMS_PERMISSIONS_PAR_DEFAUT = [
+        'utilisateur_apercu',
+        'Configuration_apercu',
+        'Configuration_gestion_gare',
+        'Configuration_gestion_escale',
+        'Configuration_gestion_trajets',
+        'Configuration_gestion_horaire',
+        'Configuration_gestion_car/chauffeur',
+        'Configuration_place/limite',
+        'Caisse_creation',
+        'Caisse_apercue',
+        'Caisse_billant',
+        'Billets_creation',
+        'Billets_apercue',
+        'Billets_validation',
+        'Billets_historique',
+        'Billets_notification',
+        'colis_creation',
+        'colis_envoi',
+        'colis_mouvement',
+        'colis_livraison',
+        'colis_reclamation',
+        'colis_historique',
+        'Depenses_gestion',
+        'Programme_Creation',
+        'Programme_programmer_car',
+        'Programme_programmation_voyage',
+        'Programme_hors_programme',
+    ];
+
     public function getAll()
     {
         return $this->FetchSelectAllWhere("id_permision, nom_permission", "permision", "1", []);
+    }
+
+    // Seede le catalogue par défaut si la table permision est vide (base neuve, vidage
+    // total...). N'écrase rien si des permissions existent déjà, même partiellement.
+    public function seedPermissionsParDefautSiVide(): void
+    {
+        if (!empty($this->getAll())) {
+            return;
+        }
+
+        $sql = "INSERT INTO permision (nom_permission) VALUES (:nom_permission)";
+        foreach (self::NOMS_PERMISSIONS_PAR_DEFAUT as $nom) {
+            $this->insertion_update_simples($sql, [':nom_permission' => $nom]);
+        }
     }
     // Récupère les IDs des permissions d'un utilisateur
     public function getUserPermissions($userId)
