@@ -1,223 +1,222 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="<?= BASE_URL ?>/assets/images/favicon-32x32.png" type="image/png" />
     <title>Mot de passe oublié · TransGest</title>
-    
-    <!-- Google Font + Bootstrap Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="<?= BASE_URL ?>/assets/images/favicon-32x32.png" type="image/png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary:      #f59e0b;
+            --primary-dark: #ea580c;
+            --navy:         #0B1F3A;
+            --bg:           #f4f6f9;
+            --card-bg:      #ffffff;
+            --text-main:    #0B1F3A;
+            --text-muted:   #64748b;
+            --input-bg:     #f9f9f9;
+            --input-border: #d1d5db;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Outfit', sans-serif;
             min-height: 100vh;
-            background: url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=2069&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover;
+            background: var(--bg);
+            color: var(--text-main);
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            padding: 20px;
         }
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.5) 100%);
-            z-index: 0;
+
+        .auth-box { width: 100%; max-width: 440px; }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0,0,0,.07);
+            border-radius: 24px;
+            box-shadow: 0 20px 48px -12px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.9);
+            padding: 44px 40px;
+            animation: cardIn .65s ease-out;
         }
-        .auth-wrapper {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 460px;
-            padding: 1.5rem;
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(22px) scale(.98); }
+            to   { opacity: 1; transform: translateY(0)    scale(1);   }
         }
-        .auth-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 3rem 2.5rem;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: white;
-            animation: fadeIn 0.8s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .brand-header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-        .brand-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            border-radius: 22px;
+
+        .card-header-block { text-align: center; margin-bottom: 28px; }
+
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 18px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.2rem;
-            color: white;
-            margin-bottom: 1.2rem;
-            box-shadow: 0 12px 25px -5px rgba(37, 99, 235, 0.6);
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 20px -8px rgba(234,88,12,.5);
         }
-        .brand-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
-        }
-        .brand-header p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-        .input-group {
-            margin-bottom: 2rem;
-        }
-        .input-group label {
+
+        .card-header-block h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
+        .card-sub { color: var(--text-muted); font-size: .88rem; line-height: 1.5; }
+
+        .form-group { margin-bottom: 18px; }
+
+        .form-group label {
             display: block;
-            font-size: 0.8rem;
+            font-size: .76rem;
             font-weight: 600;
-            margin-bottom: 0.6rem;
-            color: rgba(255, 255, 255, 0.9);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 7px;
         }
-        .input-wrapper {
-            position: relative;
-        }
-        .input-wrapper i {
+
+        .input-wrap { position: relative; }
+
+        .input-wrap .icon-l {
             position: absolute;
-            left: 1.2rem;
-            top: 50%;
+            left: 15px; top: 50%;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 1.2rem;
-            transition: color 0.3s;
-        }
-        .input-wrapper input {
-            width: 100%;
-            padding: 1rem 1rem 1rem 3.2rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 18px;
-            color: white;
+            color: var(--text-muted);
             font-size: 1.05rem;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            padding: 12px 15px 12px 42px;
+            background: var(--input-bg);
+            border: 1.5px solid var(--input-border);
+            border-radius: 13px;
+            color: var(--text-main);
+            font-size: .98rem;
             font-family: inherit;
-            transition: all 0.3s ease;
+            transition: all .3s ease;
         }
-        .input-wrapper input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-        .input-wrapper input:focus {
+        .input-wrap input::placeholder { color: #94a3b8; }
+        .input-wrap input:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(245,158,11,.13);
         }
-        .input-wrapper input:focus + i, .input-wrapper input:focus ~ i {
-            color: #3b82f6;
-        }
+
         .btn-submit {
-            width: 100%;
-            padding: 1.1rem;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            border: none;
-            border-radius: 18px;
-            color: white;
-            font-size: 1.05rem;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.5);
-            margin-bottom: 1rem;
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none; border-radius: 13px;
+            color: #fff; font-size: 1.02rem; font-weight: 600;
+            font-family: inherit; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 10px 20px -8px rgba(234,88,12,.58);
+            transition: all .3s ease;
+            margin-top: 8px;
         }
-        .btn-submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.6);
-        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 26px -8px rgba(234,88,12,.72); }
+
         .btn-back {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 1.1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 18px;
-            color: white;
-            font-size: 1.05rem;
-            font-weight: 500;
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; padding: 13px; margin-top: 10px;
+            background: transparent;
+            border: 1.5px solid var(--input-border);
+            border-radius: 13px;
+            color: var(--text-muted);
+            font-size: .95rem; font-weight: 500;
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all .3s ease;
         }
-        .btn-back:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
+        .btn-back:hover { border-color: var(--primary); color: var(--primary); }
+
         .alert {
-            padding: 1rem;
-            border-radius: 14px;
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
+            padding: 12px 16px;
+            border-radius: 13px;
+            margin-bottom: 18px;
+            font-size: .9rem;
             text-align: center;
         }
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-        }
+        .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; }
+        .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
     </style>
 </head>
 <body>
 
-<div class="auth-wrapper">
-    <div class="auth-card">
-        <div class="brand-header">
-            <div class="brand-icon">
-                <i class="bi bi-shield-lock-fill"></i>
-            </div>
-            <h1>Mot de passe oublié</h1>
-            <p>Saisissez votre adresse email pour recevoir un lien de réinitialisation sécurisé.</p>
+<div class="auth-box">
+    <div class="glass-card">
+        <div class="card-header-block">
+            <div class="card-icon"><i class="bi bi-shield-lock-fill"></i></div>
+            <?php if (!empty($emailValide)): ?>
+                <h1>Nouveau mot de passe</h1>
+                <p class="card-sub">Compte : <strong><?= htmlspecialchars($emailValide) ?></strong></p>
+            <?php else: ?>
+                <h1>Mot de passe oublié</h1>
+                <p class="card-sub">Saisissez votre adresse email pour définir un nouveau mot de passe.</p>
+            <?php endif; ?>
         </div>
 
         <?php $this->view("admin/set_flash"); ?>
         <?php if (!empty($error)): ?>
             <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
-        <?php if (!empty($success)): ?>
-            <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-        <?php endif; ?>
 
-        <form method="post" action="">
-            <div class="input-group">
-                <label>Adresse e-mail</label>
-                <div class="input-wrapper">
-                    <input type="email" name="emailUser" placeholder="Votre email..." required autofocus>
-                    <i class="bi bi-envelope-fill"></i>
+        <?php if (!empty($emailValide)): ?>
+            <!-- Étape 2 : email déjà validé, on définit le nouveau mot de passe -->
+            <form method="post" action="">
+                <?= csrf_field() ?>
+                <input type="hidden" name="emailUser" value="<?= htmlspecialchars($emailValide) ?>">
+
+                <div class="form-group">
+                    <label>Nouveau mot de passe</label>
+                    <div class="input-wrap">
+                        <input type="password" name="new_password" placeholder="••••••••" required autofocus>
+                        <i class="bi bi-lock-fill icon-l"></i>
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit" class="btn-submit">
-                <i class="bi bi-send-fill"></i> Envoyer le lien
-            </button>
-            <a href="<?= BASE_URL ?>/admin/Loguins" class="btn-back">
-                Retour à la connexion
-            </a>
-        </form>
+                <div class="form-group">
+                    <label>Confirmer le mot de passe</label>
+                    <div class="input-wrap">
+                        <input type="password" name="confirm_password" placeholder="••••••••" required>
+                        <i class="bi bi-shield-check icon-l"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-check-circle-fill"></i> Confirmer
+                </button>
+                <a href="<?= BASE_URL ?>/admin/Loguins" class="btn-back">Retour à la connexion</a>
+            </form>
+        <?php else: ?>
+            <!-- Étape 1 : saisie de l'email -->
+            <form method="post" action="">
+                <?= csrf_field() ?>
+                <div class="form-group">
+                    <label>Adresse e-mail</label>
+                    <div class="input-wrap">
+                        <input type="email" name="emailUser" placeholder="exemple@transgest.com" required autofocus>
+                        <i class="bi bi-envelope-fill icon-l"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-arrow-right-circle-fill"></i> Continuer
+                </button>
+                <a href="<?= BASE_URL ?>/admin/Loguins" class="btn-back">Retour à la connexion</a>
+            </form>
+        <?php endif; ?>
     </div>
 </div>
 
