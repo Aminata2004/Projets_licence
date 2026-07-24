@@ -14,19 +14,38 @@ class Envoi_colis extends  Controller
     $envoie_colis = new Envoie_colis();
     $id_compagnie = $_SESSION['id_compagnie'];
     $ville_user = $_SESSION['ville'] ?? null;
+    $id_agence_user = $_SESSION['id_agence'] ?? null;
+    $isAdmin = ($_SESSION['droit'] ?? null) === 'Admin';
     $liste_colis = $envoie_colis->FetchSelectcolis();
 
+    // Filtre par id_agence (pas seulement localite_user) : deux gares d'une même compagnie
+    // peuvent partager la même ville (ex. "Segou" Gare I et Gare II), auquel cas le simple
+    // nom de ville ne suffit pas à distinguer "le car de MA gare" (cf.
+    // ajout_id_agence_programmation_voyage.sql, même correctif déjà appliqué ailleurs :
+    // Add_billet.php, Liste_du_jour.php). Un Admin n'a pas de gare fixe : il voit tous les
+    // cars de la compagnie, comme déjà le cas dans Envoie_colis::getCarsDisponiblesAujourdhui().
+    $condition = "programmation_voyage.id_compagnie = :id_compagnie
+   AND TIMESTAMPDIFF(HOUR, programmation_voyage.date_enregistre, NOW()) < 24
+   AND programmation_voyage.statut = 'active'";
+    $params = [":id_compagnie" => $id_compagnie];
+
+    if (!$isAdmin) {
+      $condition .= " AND programmation_voyage.localite_user = :ville AND programmation_voyage.id_agence = :id_agence";
+      $params[":ville"] = $ville_user;
+      $params[":id_agence"] = $id_agence_user;
+    }
+
+    // horaire.id_heure est un entier (1, 2, 3...), pas une heure : la jointure doit se faire
+    // sur horaire.heuredepart (vraie valeur TIME, comparable à programmation_voyage.id_horaire),
+    // comme le fait déjà correctement Envoie_colis::getCarsDisponiblesAujourdhui(). Avec
+    // id_heure, la jointure ne matchait quasiment jamais, donc listeprogrammer restait vide.
     $listeprogrammer = $envoie_colis->FetchWheresJoin(
       "*",
-      "programmation_voyage 
-   INNER JOIN horaire ON horaire.id_heure = programmation_voyage.id_horaire",
-      "programmation_voyage.id_compagnie = :id_compagnie 
-   AND TIMESTAMPDIFF(HOUR, programmation_voyage.date_enregistre, NOW()) < 24 
-   AND programmation_voyage.localite_user = :ville",
-      [
-        ":id_compagnie" => $id_compagnie,
-        ":ville" => $ville_user
-      ]
+      "programmation_voyage
+   INNER JOIN horaire ON horaire.heuredepart = programmation_voyage.id_horaire
+                      AND horaire.id_compagnie = programmation_voyage.id_compagnie",
+      $condition,
+      $params
     );
 
     // envoi des colis

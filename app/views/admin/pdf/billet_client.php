@@ -12,7 +12,7 @@
       font-size: 13px;
       margin: 0;
       padding: 0;
-      color: #111;
+      color: #000;
     }
 
     .ticket { width: 100%; }
@@ -37,12 +37,12 @@
       display: block;
       font-size: 11px;
       font-style: italic;
-      color: #555;
+      color: #000;
     }
 
     hr {
       border: none;
-      border-top: 1px dashed #444;
+      border-top: 1px dashed #000;
       margin: 5px 0;
     }
 
@@ -75,7 +75,7 @@
     }
 
     table.infos td.label {
-      color: #444;
+      color: #000;
       white-space: nowrap;
       padding-right: 6px;
     }
@@ -86,10 +86,8 @@
     }
 
     .total-box {
-      margin: 6px 0;
-      padding: 5px 6px;
-      border: 1px solid #111;
-      border-radius: 2px;
+      margin: 4px 0;
+      padding: 2px 0;
     }
 
     .total-box table { width: 100%; border-collapse: collapse; }
@@ -114,7 +112,7 @@
     .conditions {
       margin: 6px 0;
       font-size: 10.5px;
-      color: #333;
+      color: #000;
       line-height: 1.5;
       text-align: center;
     }
@@ -122,16 +120,16 @@
     footer {
       margin-top: 6px;
       padding-top: 4px;
-      border-top: 1px dashed #444;
+      border-top: 1px dashed #000;
       font-size: 10px;
-      color: #555;
+      color: #000;
       text-align: center;
       line-height: 1.5;
     }
 
     footer .thanks {
       font-size: 11px;
-      color: #111;
+      color: #000;
       font-weight: bold;
       margin-top: 2px;
     }
@@ -169,8 +167,11 @@
     </tr>
     <tr>
       <td class="label">Départ</td>
+      <td class="value"><?= htmlspecialchars($_SESSION['ville'] ?? '-') ?></td>
+    </tr>
+    <tr>
+      <td class="label">Heure</td>
       <td class="value">
-        <?= htmlspecialchars($_SESSION['ville'] ?? '-') ?> à
         <?php
           $heureTs = !empty($billet->Heur_departs) ? strtotime($billet->Heur_departs) : false;
           echo $heureTs !== false ? date('H\hi', $heureTs) : htmlspecialchars($billet->Heur_departs ?? '-');
@@ -186,6 +187,8 @@
       <td class="value"><?= htmlspecialchars($billet->numeroPlace ?? '-') ?></td>
     </tr>
   </table>
+
+  <hr>
 
   <div class="total-box">
     <table>
@@ -203,6 +206,8 @@
     </table>
   </div>
 
+  <hr>
+
   <?php if (!empty($qrPath)): ?>
     <div class="qr">
       <img src="<?= $qrPath ?>" width="90" alt="QR Code Billet">
@@ -215,7 +220,7 @@
   </div>
 
   <footer>
-    Émis par <?= htmlspecialchars($billet->agent ?? '-') ?> le <?= date('d/m/Y à H:i') ?>
+    Émis par <?= htmlspecialchars($billet->agent ?? '-') ?>
     <div class="thanks">Merci d’avoir choisi <?= htmlspecialchars($compagnie['nom'] ?? 'notre compagnie') ?></div>
   </footer>
 

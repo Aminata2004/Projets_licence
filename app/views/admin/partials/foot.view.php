@@ -44,6 +44,23 @@ $(document).ready(function() {
 });
 </script>
 
+<script>
+  // Un menu "..." (dropdown-menu) ouvert dans un tableau .table-responsive était rogné
+  // par le défilement horizontal du tableau (overflow-x: auto rend aussi overflow-y
+  // effectif, donc tout ce qui dépasse verticalement est masqué). On désactive le
+  // défilement le temps que le menu est ouvert, pour qu'il s'affiche en entier.
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.table-responsive').forEach(function (wrapper) {
+      wrapper.addEventListener('show.bs.dropdown', function () {
+        wrapper.style.overflow = 'visible';
+      });
+      wrapper.addEventListener('hide.bs.dropdown', function () {
+        wrapper.style.overflow = '';
+      });
+    });
+  });
+</script>
+
 
  
 

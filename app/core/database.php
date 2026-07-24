@@ -13,7 +13,10 @@ class Database {
 
     public function connect() {
         try {
-            $bdd = new PDO('mysql:host=' . DBHOST . ';dbname=' . DBNAME, DBUSERNAME, DBPASSWORD);
+            // charset=utf8mb4 explicite : sans lui, PDO négocie le charset par défaut du
+            // serveur MySQL (souvent latin1), ce qui corrompt les caractères accentués et
+            // fait échouer silencieusement json_encode() (retourne false) sur ces données.
+            $bdd = new PDO('mysql:host=' . DBHOST . ';dbname=' . DBNAME . ';charset=utf8mb4', DBUSERNAME, DBPASSWORD);
             $bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Optionnel mais recommandé
             return $bdd;
         } catch (PDOException $e) {

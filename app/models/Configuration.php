@@ -73,7 +73,22 @@
                     );
 
                     if ($insertion) {
+                        $idNouvelUtilisateur = (int) $pdo->lastInsertId();
                         $pdo->commit();
+
+                        // Un super_admin a accès à tout par conception (voir userHasPermission) ;
+                        // on lui assigne aussi toutes les permissions en base pour que les écrans
+                        // qui lisent directement user_permission (ex: assignation) reflètent ça.
+                        // Fait après commit() : assignPermissionToUser() ouvre sa propre connexion
+                        // PDO (Model::connect() n'est pas partagée), donc la ligne utilisateur doit
+                        // déjà être visible pour les autres connexions.
+                        if ($droit === 'super_admin') {
+                            $permissionModel = new Permission();
+                            $permissionModel->seedPermissionsParDefautSiVide();
+                            foreach ($permissionModel->getAll() as $permission) {
+                                $permissionModel->assignPermissionToUser($idNouvelUtilisateur, $permission->id_permision);
+                            }
+                        }
 
                         $this->set_swal(
                             "👤 Utilisateur ajouté !",
@@ -119,6 +134,15 @@
         }
 
 
+        // Le menu latéral (sidebar) appelle userHasPermission() ~26 fois à lui seul, sur
+        // CHAQUE page admin, et une page peut créer plusieurs instances de Configuration
+        // (une pour elle-même, une pour le sidebar) : sans cache, ça fait 26+ allers-retours
+        // SQL (jointure sur 3 tables) juste pour savoir quoi afficher dans le menu, à chaque
+        // clic. On charge donc la liste complète des permissions de l'utilisateur en UNE
+        // seule requête, mise en cache en session (partagée entre toutes les instances de la
+        // même requête HTTP, contrairement à un cache d'instance). Effet de bord accepté : un
+        // changement de permission par un admin ne prend effet, pour l'utilisateur concerné,
+        // qu'à sa prochaine connexion (le cache n'est invalidé qu'à la (re)connexion).
         public function userHasPermission($userPermissionName)
         {
             // Mode support technique : le super_admin impersonné voit tout comme un admin normal
@@ -126,19 +150,23 @@
                 return true;
             }
 
-            // Super_admin direct : seulement l'accès à Configuration et à l'onglet Utilisateur
-            if (($_SESSION['droit'] ?? null) === 'super_admin'
-                && in_array($userPermissionName, ['Configuration_apercu', 'utilisateur_apercu'], true)) {
+            // Le super_admin a toutes les permissions par conception, y compris en direct
+            // (pas seulement en mode impersonation).
+            if (($_SESSION['droit'] ?? null) === 'super_admin') {
                 return true;
             }
 
-            $sql = "SELECT p.nom_permission
-                FROM permision p
-                JOIN user_permission up ON p.id_permision = up.permission_id
-                JOIN utilisateur u ON u.idUser = up.user_id
-                WHERE u.idUser = ? AND p.nom_permission = ?";
-            $result = $this->select_data_table_join_where($sql, [$this->idUser, $userPermissionName]);
-            return count($result) > 0;
+            if (!isset($_SESSION['permissions_cache']) || ($_SESSION['permissions_cache_user'] ?? null) !== $this->idUser) {
+                $sql = "SELECT p.nom_permission
+                    FROM permision p
+                    JOIN user_permission up ON p.id_permision = up.permission_id
+                    WHERE up.user_id = ?";
+                $result = $this->select_data_table_join_where($sql, [$this->idUser]);
+                $_SESSION['permissions_cache'] = array_map(fn($row) => $row->nom_permission, $result);
+                $_SESSION['permissions_cache_user'] = $this->idUser;
+            }
+
+            return in_array($userPermissionName, $_SESSION['permissions_cache'], true);
         }
 
         // Récupérer les infos d’un utilisateur

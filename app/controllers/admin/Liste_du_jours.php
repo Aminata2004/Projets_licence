@@ -114,6 +114,58 @@ class Liste_du_jours extends  Controller
     $this->streamThermalPdf($html, "ticket_{$idBillets}.pdf");
   }
 
+  // Renvoie les données du billet en JSON pour impression thermique ESC/POS.
+  //
+  // Le site est hébergé sur un serveur distant (LWS) : il ne peut pas atteindre
+  // l'imprimante du comptoir (IP locale type 192.168.1.x, ou USB branchée sur le poste).
+  // Le navigateur récupère donc les données ici, puis les transmet en JS au pont
+  // d'impression local (local-print-bridge/), qui tourne sur le poste du comptoir
+  // et qui seul peut réellement parler à l'imprimante (cf. ThermalPrinter::printBillet()).
+  public function donneesTicketThermique($idBillets)
+  {
+    // Tampon dédié : si un warning/notice PHP s'imprime avant le JSON (APP_ENV=local
+    // affiche les erreurs à l'écran), il casserait le parsing JSON côté navigateur sans
+    // qu'on comprenne pourquoi. On l'intercepte ici et on ne garde que le JSON final.
+    ob_start();
+
+    $colisModel = new Livraisons_colis();
+    $billets = new Liste_du_jour();
+
+    $billet = $billets->getBilletById($idBillets);
+    $compagnie = $colisModel->infoCompagnie($_SESSION['id_compagnie'] ?? 0);
+
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
+    if (!$billet || !$compagnie) {
+      echo json_encode(['error' => 'Billet ou compagnie introuvable.']);
+      exit;
+    }
+
+    $heureTs = !empty($billet->Heur_departs) ? strtotime($billet->Heur_departs) : false;
+    $montantNet = preg_replace('/[^\d.]/', '', $billet->montant_payer ?? '');
+
+    $json = json_encode([
+      'compagnie' => $compagnie['nom'] ?? 'Nom Compagnie',
+      'slogan' => $compagnie['slogant'] ?? '',
+      'numero' => $billet->numeroBillets ?? '-',
+      'client' => $billet->Client ?? '-',
+      'date' => !empty($billet->jourVoyage) ? date('d/m/Y', strtotime($billet->jourVoyage)) : '-',
+      'depart' => $_SESSION['ville'] ?? '-',
+      'heure' => $heureTs !== false ? date('H\hi', $heureTs) : (string)($billet->Heur_departs ?? '-'),
+      'destination' => $billet->destinationId ?? '-',
+      'places' => $billet->numeroPlace ?? '-',
+      'montant' => !empty($montantNet) ? number_format((float)$montantNet, 0, ',', ' ') : '-',
+      'emisPar' => $billet->utilisateurs ?? '-',
+    ]);
+
+    // json_encode() renvoie false (donc une réponse vide, invalide en JSON) en cas de
+    // caractères mal encodés dans les données — on l'expose ici plutôt que de laisser
+    // le navigateur échouer sur une réponse vide sans explication.
+    echo $json !== false ? $json : json_encode(['error' => 'Erreur d\'encodage des données : ' . json_last_error_msg()]);
+    exit;
+  }
+
   public function imprimerListe()
   {
     date_default_timezone_set('Africa/Bamako');

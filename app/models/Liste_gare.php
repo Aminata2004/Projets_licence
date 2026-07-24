@@ -1,71 +1,167 @@
 <?php
 class Liste_gare extends Model
 {
+    // Le formulaire envoie localite[]/numeroGare[]/code[]/tel[] (plusieurs lignes ajoutées
+    // dynamiquement, "add to row"). Tout ou rien : toutes les lignes sont d'abord validées ;
+    // si UNE seule est en erreur, RIEN n'est inséré (l'utilisateur doit tout corriger avant
+    // de pouvoir réenregistrer), et si tout est valide, l'insertion se fait dans une seule
+    // transaction (soit toutes les gares sont ajoutées, soit aucune en cas d'échec SQL).
+    // Retourne les lignes soumises avec, pour chacune, les champs en erreur (pour les
+    // souligner en rouge côté vue) et un message ; tableau vide si tout a été enregistré.
     public function saveGares()
-    { // Initialiser un tableau d'erreurs
-        $errors = [];
+    {
         $id_compagnie = $_SESSION['id_compagnie'];
 
-        // Récupération sécurisée des données du formulaire
-        extract($_POST);
+        $localites = $_POST['localite'] ?? [];
+        $numeroGares = $_POST['numeroGare'] ?? [];
+        $codes = $_POST['code'] ?? [];
+        $tels = $_POST['tel'] ?? [];
 
+        if (!is_array($localites)) {
+            $localites = [$localites];
+            $numeroGares = [$numeroGares];
+            $codes = [$codes];
+            $tels = [$tels];
+        }
 
         $db = $this->connect();
-
-        // Vérifier si la combinaison localité + numéroGare existe
         $check = $db->prepare("SELECT idAgence FROM agence WHERE localite = :localite AND numeroGare = :numeroGare AND id_compagnie = :id_compagnie");
-        $check->execute([
-            ':localite' => $localite,
-            ':numeroGare' => $numeroGare,
-            ':id_compagnie' => $id_compagnie
-        ]);
-        $existe = $check->fetch();
 
-        if ($existe) {
-            $errors[] = "Cette gare existe déjà dans cette localité.";
+        $lignes = [];
+        // Détecte aussi les doublons ENTRE les lignes du même envoi : l'unicité en base ne
+        // les voit pas puisqu'aucune n'est encore insérée au moment du check.
+        $combosVues = [];
+        $telsVus = [];
+        $codesVus = [];
+        $auMoinsUneLigneSaisie = false;
+
+        foreach ($localites as $index => $localite) {
+            $localite = trim($localite);
+            $numeroGare = trim($numeroGares[$index] ?? '');
+            $code = trim($codes[$index] ?? '');
+            $tel = trim($tels[$index] ?? '');
+
+            if ($localite === '' && $numeroGare === '' && $code === '' && $tel === '') {
+                continue; // ligne "add to row" jamais remplie : pas une vraie tentative
+            }
+            $auMoinsUneLigneSaisie = true;
+
+            $champsEnErreur = [];
+            $messages = [];
+
+            foreach (['localite' => $localite, 'numeroGare' => $numeroGare, 'code' => $code, 'tel' => $tel] as $champ => $valeur) {
+                if ($valeur === '') {
+                    $champsEnErreur[] = $champ;
+                }
+            }
+            if (!empty($champsEnErreur)) {
+                $messages[] = "Tous les champs sont obligatoires.";
+            }
+
+            // Les vérifications suivantes exigent que les 4 champs soient remplis.
+            if (empty($champsEnErreur)) {
+                $combo = $localite . '|' . $numeroGare;
+
+                if (preg_match('/^-/', $code)) {
+                    $champsEnErreur[] = 'code';
+                    $messages[] = "Le code marchand ne peut pas commencer par un signe négatif.";
+                }
+                if (in_array($combo, $combosVues, true)) {
+                    $champsEnErreur[] = 'localite';
+                    $champsEnErreur[] = 'numeroGare';
+                    $messages[] = "« $localite / $numeroGare » est en double dans les lignes saisies.";
+                }
+                if (in_array($tel, $telsVus, true)) {
+                    $champsEnErreur[] = 'tel';
+                    $messages[] = "Le numéro « $tel » est en double dans les lignes saisies.";
+                }
+                if (in_array($code, $codesVus, true)) {
+                    $champsEnErreur[] = 'code';
+                    $messages[] = "Le code marchand « $code » est en double dans les lignes saisies.";
+                }
+
+                if (empty($champsEnErreur)) {
+                    $check->execute([
+                        ':localite' => $localite,
+                        ':numeroGare' => $numeroGare,
+                        ':id_compagnie' => $id_compagnie
+                    ]);
+                    if ($check->fetch()) {
+                        $champsEnErreur[] = 'localite';
+                        $champsEnErreur[] = 'numeroGare';
+                        $messages[] = "« $localite / $numeroGare » existe déjà dans cette localité.";
+                    }
+                    if ($this->existe('agence', 'tel', $tel)) {
+                        $champsEnErreur[] = 'tel';
+                        $messages[] = "Le numéro « $tel » est déjà utilisé.";
+                    }
+                    if ($this->existe('agence', 'code', $code)) {
+                        $champsEnErreur[] = 'code';
+                        $messages[] = "Le code marchand « $code » est déjà utilisé.";
+                    }
+                }
+
+                if (empty($champsEnErreur)) {
+                    $combosVues[] = $combo;
+                    $telsVus[] = $tel;
+                    $codesVus[] = $code;
+                }
+            }
+
+            $lignes[] = [
+                'localite' => $localite,
+                'numeroGare' => $numeroGare,
+                'code' => $code,
+                'tel' => $tel,
+                'champs_en_erreur' => array_values(array_unique($champsEnErreur)),
+                'erreur' => implode(' ', array_unique($messages)),
+            ];
         }
-        // Vérifier si le téléphone existe déjà
-        $telExiste = $this->existe('agence', 'tel', $tel);
-        if ($telExiste) {
-            $errors[] = "Ce numéro de téléphone est déjà utilisé.";
+
+        if (!$auMoinsUneLigneSaisie) {
+            $this->set_flash("Aucune gare à ajouter.", "danger");
+            return [];
         }
 
-        // Vérifier si le code marchand existe déjà
-        $codeExiste = $this->existe('agence', 'code', $code);
-        if ($codeExiste) {
-            $errors[] = "Ce code marchand est déjà utilisé.";
+        $yADesErreurs = false;
+        foreach ($lignes as $ligne) {
+            if (!empty($ligne['champs_en_erreur'])) {
+                $yADesErreurs = true;
+                break;
+            }
         }
 
-        // Vérifier si le code commence par un chiffre négatif
-        if (preg_match('/^-/', $code)) {
-            $errors[] = "Le code marchand ne peut pas commencer par un signe négatif.";
+        if ($yADesErreurs) {
+            $this->set_flash("Corrigez les champs en rouge avant d'enregistrer.", "danger");
+            return $lignes;
         }
 
-
-        if (count($errors) === 0) {
-            $insertion = $this->insertion_update_simples(
-                "INSERT INTO agence(code, localite, numeroGare, tel, id_compagnie) 
-         VALUES(:code, :localite, :numeroGare, :tel,  :id_compagnie)",
-                [
-                    ":code" => $code,
-                    ":localite" => $localite,
-                    ":numeroGare" => $numeroGare,
-                    ":tel" => $tel,
-                  
-                    ":id_compagnie" => $id_compagnie
-                ]
+        // Tout est valide : insertion atomique (tout ou rien).
+        try {
+            $db->beginTransaction();
+            $insert = $db->prepare(
+                "INSERT INTO agence(code, localite, numeroGare, tel, id_compagnie)
+                 VALUES(:code, :localite, :numeroGare, :tel, :id_compagnie)"
             );
-
-            if ($insertion == true) {
-                $this->set_flash('Gare ajoutée avec succès', 'info');
-            } else {
-                $this->set_flash('Gare non ajoutée');
+            foreach ($lignes as $ligne) {
+                $insert->execute([
+                    ':code' => $ligne['code'],
+                    ':localite' => $ligne['localite'],
+                    ':numeroGare' => $ligne['numeroGare'],
+                    ':tel' => $ligne['tel'],
+                    ':id_compagnie' => $id_compagnie
+                ]);
             }
-        } else {
-            foreach ($errors as $error) {
-                $this->set_flash($error, "danger");
-            }
+            $db->commit();
+        } catch (Throwable $e) {
+            $db->rollBack();
+            $this->set_flash("Échec de l'enregistrement, rien n'a été ajouté. Réessayez.", "danger");
+            return $lignes;
         }
+
+        $nb = count($lignes);
+        $this->set_flash($nb > 1 ? "$nb gares ajoutées avec succès." : "Gare ajoutée avec succès.", 'info');
+        return [];
     }
 
     public function editAgence($data)

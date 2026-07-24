@@ -154,7 +154,11 @@
                                                             Reporter le voyage
                                                         </a>
                                                         <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Liste_du_jours/recu/<?= $item->idBillets ?>" target="_blank">
-                                                            Imprimer le reçu
+                                                            Imprimer (imprimante câble/USB)
+                                                        </a>
+
+                                                        <a class="dropdown-item thermal-print-btn" href="#" data-id="<?= $item->idBillets ?>">
+                                                            Imprimer (imprimante WiFi)
                                                         </a>
 
                                                         <a href="#" class="dropdown-item cancel-btn text-danger"
@@ -263,6 +267,7 @@
 
 
     <?php $this->view('admin/partials/foot') ?>
+    <script src="<?= BASE_URL ?>/mon_js/thermal-print.js"></script>
     <script>
         $(document).ready(function() {
             $('#selectheure, #id_destination').change(function() {

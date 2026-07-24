@@ -221,15 +221,19 @@ class Envoie_colis extends Model
    public function getCarsDisponiblesAujourdhui()
    {
       $condition = "programmation_voyage.date_enregistre = :today
-       AND programmation_voyage.id_compagnie = :id_compagnie";
+       AND programmation_voyage.id_compagnie = :id_compagnie
+       AND programmation_voyage.statut = 'active'";
       $params = [
          ":today" => date('Y-m-d'),
          ":id_compagnie" => $_SESSION['id_compagnie']
       ];
 
+      // id_agence (pas seulement localite_user) : deux gares peuvent partager la même ville,
+      // cf. ajout_id_agence_programmation_voyage.sql.
       if (($_SESSION['droit'] ?? null) === 'chef_d_escale') {
-         $condition .= " AND programmation_voyage.localite_user = :ville";
+         $condition .= " AND programmation_voyage.localite_user = :ville AND programmation_voyage.id_agence = :id_agence";
          $params[":ville"] = $_SESSION['ville'];
+         $params[":id_agence"] = $_SESSION['id_agence'] ?? null;
       }
 
       return $this->FetchSelectWhere1(

@@ -34,11 +34,13 @@ class Livraisons_colis extends Model
                        destinataires.numero_dest   AS numero_dest,
                        destinataires.whatsapp_dest AS whatsapp_dest,
                        agence.localite             AS localite,
-                       agence.numeroGare           AS numero_gare
+                       agence.numeroGare           AS numero_gare,
+                       utilisateur.utilisateurs    AS agent_nom
                 FROM colis
                 INNER JOIN expediteurs   ON expediteurs.id_expediteur     = colis.id_expediteur
                 INNER JOIN destinataires ON destinataires.id_destinataire = colis.id_destinataire
                 INNER JOIN agence        ON agence.idAgence              = colis.id_agence
+                LEFT JOIN  utilisateur   ON utilisateur.idUser            = colis.id_utilisateur
                 WHERE colis.id_colis = :id AND colis.id_compagnie = :id_compagnie";
 
         return $this->query($sql, [':id' => $id, ':id_compagnie' => $_SESSION['id_compagnie'] ?? null], true);

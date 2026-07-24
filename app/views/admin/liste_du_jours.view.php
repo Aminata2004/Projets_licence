@@ -169,7 +169,11 @@
                                                         </a>
 
                                                         <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Liste_du_jours/recu/<?= $item->idBillets ?>" target="_blank">
-                                                            Imprimer le reçu
+                                                            Imprimer (imprimante câble/USB)
+                                                        </a>
+
+                                                        <a class="dropdown-item thermal-print-btn" href="#" data-id="<?= $item->idBillets ?>">
+                                                            Imprimer (imprimante WiFi)
                                                         </a>
 
                                                         <a href="#" class="dropdown-item cancel-btn text-danger"
@@ -282,6 +286,7 @@
     <!-- JQuery et SweetAlert2 déjà inclus -->
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+    <script src="<?= BASE_URL ?>/mon_js/thermal-print.js"></script>
     <script>
         $(document).ready(function() {
             $('#selectheure, #id_destination').change(function() {

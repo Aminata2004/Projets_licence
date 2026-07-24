@@ -219,6 +219,23 @@
     <!--end wrapper-->
 
     <?php $this->view('admin/partials/foot') ?>
+    <script src="<?= BASE_URL ?>/mon_js/thermal-print.js"></script>
+    <script>
+        // Le ticket est la preuve de paiement remise au client : imprimé automatiquement
+        // dès l'arrivée sur cette page après enregistrement d'un billet (cf.
+        // Add_billet::saveBillets(), paramètre ?billetImprime=<idBillets> dans l'URL de
+        // redirection). Nettoie ensuite l'URL pour qu'un rechargement de page ne réimprime pas.
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const idBillet = params.get('billetImprime');
+            if (idBillet) {
+                imprimerBilletThermique(idBillet, { auto: true });
+                params.delete('billetImprime');
+                const nouvelleUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                window.history.replaceState({}, '', nouvelleUrl);
+            }
+        })();
+    </script>
 
     <script>
         const dateInput = document.getElementById('jourVoyage');

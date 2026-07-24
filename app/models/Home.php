@@ -226,7 +226,10 @@ class Home extends Model
         ];
     }
 
-    public function getVoyagesProgrammes($gareVille = null)
+    // $gareId (id_agence) desambiguise deux gares d'une meme compagnie partageant la meme
+    // ville (ex. Segou Gare I et II) : localite_user (nom de ville) seul ne suffit pas, cf.
+    // ajout_id_agence_programmation_voyage.sql et le meme correctif dans Envoi_colis.php.
+    public function getVoyagesProgrammes($gareVille = null, $gareId = null)
     {
         $today = date('Y-m-d');
 
@@ -241,11 +244,16 @@ class Home extends Model
         ];
 
         if ($_SESSION['droit'] === 'chef_d_escale' || $_SESSION['droit'] === 'Utilisateur') {
-            $sql .= " AND localite_user = :ville";
+            $sql .= " AND localite_user = :ville AND id_agence = :agence";
             $params[':ville'] = $_SESSION['ville'];
+            $params[':agence'] = $_SESSION['id_agence'] ?? null;
         } elseif ($_SESSION['droit'] === 'Admin' && $gareVille) {
             $sql .= " AND localite_user = :ville";
             $params[':ville'] = $gareVille;
+            if ($gareId) {
+                $sql .= " AND id_agence = :agence";
+                $params[':agence'] = $gareId;
+            }
         }
 
         $stmt = $this->connect()->prepare($sql);

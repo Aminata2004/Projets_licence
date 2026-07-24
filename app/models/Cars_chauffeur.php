@@ -2,60 +2,84 @@
     class Cars_chauffeur extends Model
     {
 
+        // Le formulaire envoie numero_car[]/matriculle[]/nbr_place[] (plusieurs lignes ajoutées
+        // dynamiquement, "add to row", les 3 champs alignés par index) : chaque ligne est
+        // validée et insérée indépendamment, une erreur sur l'une n'empêche pas les autres.
         public function saveCare()
         {
-            // Récupération sécurisée des données du formulaire
-            extract($_POST);
-            $errors = [];
-            $programmer_car = "off";
-            $nbr_place_reserve = 0;
             $id_compagnie = $_SESSION["id_compagnie"];
-            // Vérification des champs requis
-            if (empty($numero_car)) {
-                $errors[] = "Le numéro du car est obligatoire.";
+            $numeros = $_POST['numero_car'] ?? [];
+            $matriculles = $_POST['matriculle'] ?? [];
+            $nbrPlaces = $_POST['nbr_place'] ?? [];
+            if (!is_array($numeros)) {
+                $numeros = [$numeros];
+                $matriculles = [$matriculles];
+                $nbrPlaces = [$nbrPlaces];
             }
 
-            if (empty($matriculle)) {
-                $errors[] = "Le matricule est obligatoire.";
-            }
+            $nbAjoutes = 0;
+            $erreurs = [];
 
-            if (empty($nbr_place)) {
-                $errors[] = "Le nombre de places est obligatoire.";
-            } elseif (!is_numeric($nbr_place)) {
-                $errors[] = "Le nombre de places doit être un nombre.";
-            }
+            foreach ($numeros as $i => $numero_car) {
+                $numero_car = trim($numero_car);
+                $matriculle = trim($matriculles[$i] ?? '');
+                $nbr_place = trim($nbrPlaces[$i] ?? '');
 
-            // Vérification d'unicité du numéro du car
-            if ($this->existe_deja('numero_car', $numero_car, 'car')) {
-                $errors[] = "Ce numéro de car existe déjà.";
-            }
+                // Ligne vide (pas remplie par l'agent) : ignorée silencieusement, ce n'est pas
+                // une erreur en soi si d'autres lignes sont valides.
+                if ($numero_car === '' && $matriculle === '' && $nbr_place === '') {
+                    continue;
+                }
 
-            // Si aucune erreur, on procède à l'insertion
-            if (count($errors) === 0) {
+                if (empty($numero_car)) {
+                    $erreurs[] = "Ligne " . ($i + 1) . " : le numéro du car est obligatoire.";
+                    continue;
+                }
+                if (empty($matriculle)) {
+                    $erreurs[] = "Ligne " . ($i + 1) . " : le matricule est obligatoire.";
+                    continue;
+                }
+                if (empty($nbr_place)) {
+                    $erreurs[] = "Ligne " . ($i + 1) . " : le nombre de places est obligatoire.";
+                    continue;
+                }
+                if (!is_numeric($nbr_place)) {
+                    $erreurs[] = "Ligne " . ($i + 1) . " : le nombre de places doit être un nombre.";
+                    continue;
+                }
+                if ($this->existe_deja('numero_car', $numero_car, 'car')) {
+                    $erreurs[] = "Le car « $numero_car » existe déjà.";
+                    continue;
+                }
+
                 $insertion = $this->insertion_update_simples(
-                    "INSERT INTO car (numero_car, matriculle, nbr_place, nbr_place_reserve, programmer_car, id_compagnie) 
-        VALUES (:numero_car, :matriculle, :nbr_place, :nbr_place_reserve,:programmer_car,:id_compagnie)",
+                    "INSERT INTO car (numero_car, matriculle, nbr_place, nbr_place_reserve, programmer_car, id_compagnie)
+        VALUES (:numero_car, :matriculle, :nbr_place, :nbr_place_reserve, :programmer_car, :id_compagnie)",
                     [
                         ":numero_car" => $numero_car,
                         ":matriculle" => $matriculle,
                         ":nbr_place"  => $nbr_place,
-                        ":programmer_car" => $programmer_car,
+                        ":programmer_car" => "off",
                         ":id_compagnie" => $id_compagnie,
-                        ":nbr_place_reserve" => $nbr_place_reserve
-
+                        ":nbr_place_reserve" => 0
                     ]
                 );
 
                 if ($insertion) {
-                    $this->set_flash("Car ajouté avec succès", "info");
+                    $nbAjoutes++;
                 } else {
-                    $this->set_flash("Erreur : le car n'a pas pu être ajouté");
+                    $erreurs[] = "Le car « $numero_car » n'a pas pu être ajouté.";
                 }
-            } else {
-                // Affichage des erreurs
-                foreach ($errors as $error) {
-                    $this->set_flash($error, "danger");
-                }
+            }
+
+            if ($nbAjoutes > 0) {
+                $this->set_flash($nbAjoutes > 1 ? "$nbAjoutes cars ajoutés avec succès." : "Car ajouté avec succès.", 'info');
+            }
+            foreach ($erreurs as $erreur) {
+                $this->set_flash($erreur, "danger");
+            }
+            if ($nbAjoutes === 0 && count($erreurs) === 0) {
+                $this->set_flash("Aucun car à ajouter.", "danger");
             }
         }
 
