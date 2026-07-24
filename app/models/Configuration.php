@@ -119,6 +119,15 @@
         }
 
 
+        // Le menu latéral (sidebar) appelle userHasPermission() ~26 fois à lui seul, sur
+        // CHAQUE page admin, et une page peut créer plusieurs instances de Configuration
+        // (une pour elle-même, une pour le sidebar) : sans cache, ça fait 26+ allers-retours
+        // SQL (jointure sur 3 tables) juste pour savoir quoi afficher dans le menu, à chaque
+        // clic. On charge donc la liste complète des permissions de l'utilisateur en UNE
+        // seule requête, mise en cache en session (partagée entre toutes les instances de la
+        // même requête HTTP, contrairement à un cache d'instance). Effet de bord accepté : un
+        // changement de permission par un admin ne prend effet, pour l'utilisateur concerné,
+        // qu'à sa prochaine connexion (le cache n'est invalidé qu'à la (re)connexion).
         public function userHasPermission($userPermissionName)
         {
             // Mode support technique : le super_admin impersonné voit tout comme un admin normal
@@ -132,13 +141,17 @@
                 return true;
             }
 
-            $sql = "SELECT p.nom_permission
-                FROM permision p
-                JOIN user_permission up ON p.id_permision = up.permission_id
-                JOIN utilisateur u ON u.idUser = up.user_id
-                WHERE u.idUser = ? AND p.nom_permission = ?";
-            $result = $this->select_data_table_join_where($sql, [$this->idUser, $userPermissionName]);
-            return count($result) > 0;
+            if (!isset($_SESSION['permissions_cache']) || ($_SESSION['permissions_cache_user'] ?? null) !== $this->idUser) {
+                $sql = "SELECT p.nom_permission
+                    FROM permision p
+                    JOIN user_permission up ON p.id_permision = up.permission_id
+                    WHERE up.user_id = ?";
+                $result = $this->select_data_table_join_where($sql, [$this->idUser]);
+                $_SESSION['permissions_cache'] = array_map(fn($row) => $row->nom_permission, $result);
+                $_SESSION['permissions_cache_user'] = $this->idUser;
+            }
+
+            return in_array($userPermissionName, $_SESSION['permissions_cache'], true);
         }
 
         // Récupérer les infos d’un utilisateur
