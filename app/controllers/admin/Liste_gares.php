@@ -41,20 +41,30 @@ class  Liste_gares extends  Controller
             return;
         }
 
+        // Lignes en échec du dernier essai d'ajout (voir add_gares()) : stockées en session
+        // le temps de la redirection PRG, consommées une seule fois ici pour rouvrir la
+        // modal pré-remplie avec les valeurs saisies et les champs fautifs en rouge.
+        $lignesEnErreur = $_SESSION['gares_lignes_en_erreur'] ?? [];
+        unset($_SESSION['gares_lignes_en_erreur']);
+
         // Affiche la vue
-        $this->view('admin/liste_gare', ['listes' => $listes]);
+        $this->view('admin/liste_gare', ['listes' => $listes, 'lignesEnErreur' => $lignesEnErreur]);
     }
 
-    // methode pour enregistre
+    // methode pour enregistre : POST -> Redirect -> GET, comme les autres formulaires
+    // "add to row" (escales/horaires/cars), pour un cycle de soumission fiable (pas de
+    // resoumission accidentelle au rechargement) et une page de liste unique.
     public function add_gares()
     {
-        $liste_gare = new Liste_gare();
-
-        if (isset($_POST["enregistre"])) {
-            // var_dump($_POST);exit;
-            $liste_gare->saveGares();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["enregistre"])) {
+            $liste_gare = new Liste_gare();
+            $lignesEnErreur = $liste_gare->saveGares();
+            if (!empty($lignesEnErreur)) {
+                $_SESSION['gares_lignes_en_erreur'] = $lignesEnErreur;
+            }
         }
-        $this->view('admin/add_gare');
+        header("Location: " . BASE_URL . "/admin/Liste_gares/index");
+        exit;
     }
 
     public function edit()
