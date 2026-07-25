@@ -115,15 +115,23 @@
                             <form action="" method="post">
                                 <div class="modal-body">
                                     <div class="col-12">
-                                        <label class="form-label">Car(s) <span class="text-danger">*</span></label>
-                                        <p class="small text-muted mb-2">Cochez un ou plusieurs cars : les mêmes trajets choisis ci-dessous leur seront affectés à tous, en une seule fois.</p>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="form-label mb-0">Car(s) <span class="text-danger">*</span></label>
+                                            <?php if (!empty($listeCar)): ?>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input" type="checkbox" id="toutCocherCars">
+                                                    <label class="form-check-label small" for="toutCocherCars">Tout cocher</label>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <p class="small text-muted mb-2">Cochez un ou plusieurs cars (ou "Tout cocher" pour tous les attribuer d'un coup) : les mêmes trajets choisis ci-dessous leur seront affectés à tous, en une seule fois.</p>
                                         <div class="border rounded p-2" style="max-height: 180px; overflow-y: auto;">
                                             <?php if (empty($listeCar)): ?>
                                                 <p class="text-muted small mb-0">Aucun car disponible à programmer.</p>
                                             <?php else: ?>
                                                 <?php foreach ($listeCar as $listeCars): ?>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="id_car[]"
+                                                        <input class="form-check-input car-checkbox" type="checkbox" name="id_car[]"
                                                             value="<?= $listeCars->id_car ?>"
                                                             id="carProg<?= $listeCars->id_car ?>">
                                                         <label class="form-check-label" for="carProg<?= $listeCars->id_car ?>">
@@ -135,7 +143,14 @@
                                         </div>
                                     </div>
                                     <div class="mb-3 col-12 mt-4">
-                                        <label class="form-label">Trajet a parcourire</label>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="form-label mb-0">Trajet a parcourire</label>
+                                            <?php if (!empty($listeTrajet)): ?>
+                                                <button type="button" id="toutSelectionnerTrajets" class="btn btn-sm btn-outline-primary">
+                                                    Tout sélectionner
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
                                         <select class="form-control multiple-select" multiple="multiple" placeholder="Choisissez un ou plusieurs escale" name="idTrajet[]">
                                             <option value="" disabled>Choisissez un ou plusieurs trajet</option>
                                             <?php foreach ($listeTrajet as $listeTrajets): ?>
@@ -218,6 +233,23 @@
             });
             $('.multiple-select-ajouter').select2({
                 dropdownParent: $('#modalAjouterTrajet')
+            });
+
+            // Raccourcis "Tout cocher" / "Tout sélectionner" : pour attribuer tous les
+            // cars disponibles à tous les trajets en une seule soumission, sans avoir à
+            // cocher/sélectionner un par un.
+            $('#toutCocherCars').on('change', function() {
+                $('.car-checkbox').prop('checked', $(this).is(':checked'));
+            });
+            $('.car-checkbox').on('change', function() {
+                var totalCars = $('.car-checkbox').length;
+                var cochees = $('.car-checkbox:checked').length;
+                $('#toutCocherCars').prop('checked', totalCars > 0 && cochees === totalCars);
+            });
+
+            $('#toutSelectionnerTrajets').on('click', function() {
+                $('.multiple-select option').prop('selected', true);
+                $('.multiple-select').trigger('change');
             });
 
             // Remplir le modal "Ajouter un trajet" avec le car cliqué
