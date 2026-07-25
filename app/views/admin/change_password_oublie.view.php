@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="<?= BASE_URL ?>/assets/images/favicon-32x32.png" type="image/png" />
+    <link rel="icon" href="<?= BASE_URL ?>/assets/images/favicon-32x32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="<?= BASE_URL ?>/assets/images/favicon-16x16.png" type="image/png" sizes="16x16" />
     <title>Nouveau mot de passe · TransGest</title>
     
     <!-- Google Font + Bootstrap Icons -->

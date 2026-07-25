@@ -12,7 +12,8 @@
     <!-- ======== Page title ============ -->
     <title>Shared on THEMELOCK.COM - Travo - Tour Booking Html Template</title>
     <!--<< Favcion >>-->
-    <link rel="shortcut icon" href="<?=BASE_URL?>/assets_site/img/favicon.svg">
+    <link rel="icon" href="<?=BASE_URL?>/assets/images/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="<?=BASE_URL?>/assets/images/favicon-16x16.png" type="image/png" sizes="16x16">
     <!--<< Bootstrap min.css >>-->
     <link rel="stylesheet" href="<?=BASE_URL?>/assets_site/css/bootstrap.min1.css">
     <!--<< All Min Css >>-->
