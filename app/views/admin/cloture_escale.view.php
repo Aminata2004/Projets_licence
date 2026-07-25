@@ -7,17 +7,26 @@
 
     <main class="page-content">
 
+        <?php $retourQs = http_build_query($estAdmin ? ['date' => $date, 'id_agence' => $idAgenceSelectionnee] : ['date' => $date]); ?>
         <div class="d-flex align-items-center mb-4 gap-3">
-            <a href="<?= BASE_URL ?>/admin/Caisse/caisses_escale?date=<?= $date ?>" class="btn btn-outline-secondary btn-sm rounded-pill">← Retour</a>
+            <a href="<?= BASE_URL ?>/admin/Caisse/caisses_escale?<?= $retourQs ?>" class="btn btn-outline-secondary btn-sm rounded-pill">← Retour</a>
             <div>
-                <h4 class="fw-bold mb-0">🔒 Clôture de l'Escale</h4>
+                <h4 class="fw-bold mb-0"><i class="bx bx-lock-alt text-dark me-1"></i>Clôture de l'Escale</h4>
                 <p class="text-muted small mb-0"><?= htmlspecialchars($_SESSION['ville'] ?? '') ?> – <?= date('d/m/Y', strtotime($date)) ?></p>
             </div>
         </div>
 
         <?php $this->view("admin/set_flash") ?>
 
-        <?php 
+        <?php if ($estAdmin && !$idAgenceSelectionnee): ?>
+        <div class="card border-0 shadow-sm rounded-3 text-center py-5">
+            <div class="text-muted"><i class="bx bx-shield-quarter" style="font-size:4rem;"></i></div>
+            <h5 class="mt-2 fw-bold">Aucune gare sélectionnée</h5>
+            <p class="text-muted">Retournez à la Supervision Escale et choisissez une gare avant de procéder à la clôture.</p>
+        </div>
+        <?php else: ?>
+
+        <?php
         // Vérifier si toutes les caisses de la journée sont fermées ou versées
         $toutesFermees = true;
         foreach($caisses as $c) {
@@ -30,7 +39,7 @@
 
         <div class="row">
             <div class="col-lg-8 mx-auto">
-                
+
                 <?php if(!$toutesFermees): ?>
                 <div class="alert alert-danger shadow-sm rounded-3 mb-4">
                     <div class="d-flex align-items-center">
@@ -77,6 +86,10 @@
 
                         <form method="post">
                             <?= csrf_field() ?>
+                            <?php if ($estAdmin): ?>
+                                <input type="hidden" name="id_agence" value="<?= htmlspecialchars($idAgenceSelectionnee) ?>">
+                            <?php endif; ?>
+                            <input type="hidden" name="date_cloture" value="<?= htmlspecialchars($date) ?>">
                             <div class="d-grid">
                                 <button type="submit" name="cloturer" class="btn btn-dark btn-lg fw-bold rounded-pill shadow" <?= !$toutesFermees ? 'disabled' : '' ?>>
                                     <i class="bx bx-lock-alt me-1"></i> Valider la clôture du <?= date('d/m/Y', strtotime($date)) ?>
@@ -109,6 +122,8 @@
 
             </div>
         </div>
+
+        <?php endif; ?>
 
     </main>
 </div>

@@ -13,14 +13,32 @@
                 <h4 class="fw-bold mb-1"><i class="bx bx-shield-quarter text-primary me-1"></i>Supervision Escale</h4>
                 <p class="text-muted small mb-0"><?= htmlspecialchars($_SESSION['ville'] ?? '') ?> – <?= date('d/m/Y', strtotime($date)) ?></p>
             </div>
-            
-            <form method="get" class="d-flex gap-2">
+
+            <form method="get" class="d-flex gap-2 flex-wrap">
+                <?php if ($estAdmin): ?>
+                    <select name="id_agence" class="form-select form-select-sm rounded-pill px-3" onchange="this.form.submit()">
+                        <option value="" disabled <?= !$idAgenceSelectionnee ? 'selected' : '' ?>>Choisissez une gare</option>
+                        <?php foreach ($listeAgences as $a): ?>
+                            <option value="<?= htmlspecialchars($a->idAgence) ?>" <?= (int)$a->idAgence === $idAgenceSelectionnee ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($a->localite . ' (' . $a->numeroGare . ')') ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                <?php endif; ?>
                 <input type="date" name="date" class="form-control form-control-sm rounded-pill px-3" value="<?= htmlspecialchars($date) ?>" max="<?= date('Y-m-d') ?>">
                 <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">Filtrer</button>
             </form>
         </div>
 
         <?php $this->view("admin/set_flash") ?>
+
+        <?php if ($estAdmin && !$idAgenceSelectionnee): ?>
+        <div class="card border-0 shadow-sm rounded-3 text-center py-5">
+            <div class="text-muted"><i class="bx bx-shield-quarter" style="font-size:4rem;"></i></div>
+            <h5 class="mt-2 fw-bold">Choisissez une gare</h5>
+            <p class="text-muted">Sélectionnez une gare ci-dessus pour superviser ses caisses.</p>
+        </div>
+        <?php else: ?>
 
         <!-- KPI Globaux de la journée -->
         <div class="row g-3 mb-4">
@@ -55,7 +73,7 @@
         <!-- Action Clôture -->
         <?php if($date === date('Y-m-d')): ?>
         <div class="d-flex justify-content-end mb-4">
-            <a href="<?= BASE_URL ?>/admin/Caisse/cloture_escale?date=<?= $date ?>" class="btn btn-dark fw-bold rounded-pill px-4 shadow">
+            <a href="<?= BASE_URL ?>/admin/Caisse/cloture_escale?<?= http_build_query($estAdmin ? ['date' => $date, 'id_agence' => $idAgenceSelectionnee] : ['date' => $date]) ?>" class="btn btn-dark fw-bold rounded-pill px-4 shadow">
                 <i class="bx bx-check-double me-1"></i> Procéder à la clôture de l'escale
             </a>
         </div>
@@ -151,6 +169,8 @@
                                 <form action="<?= BASE_URL ?>/admin/Caisse/valider_versement" method="post" class="d-flex gap-2">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="id_versement" value="<?= $v->id_versement ?>">
+                                    <input type="hidden" name="id_agence" value="<?= htmlspecialchars($idAgenceSelectionnee) ?>">
+                                    <input type="hidden" name="date" value="<?= htmlspecialchars($date) ?>">
                                     <button type="submit" name="action" value="valide" class="btn btn-sm btn-success flex-grow-1 fw-semibold">
                                         Valider
                                     </button>
@@ -165,6 +185,8 @@
                 </div>
             </div>
         </div>
+
+        <?php endif; ?>
 
     </main>
 </div>

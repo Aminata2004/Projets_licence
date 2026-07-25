@@ -408,25 +408,68 @@ class Caisse extends Controller
         $idVersement = (int)($_POST['id_versement'] ?? 0);
         $action      = $_POST['action'] ?? '';
         $model->validerVersement($idVersement, $action);
-        header("Location: " . BASE_URL . "/admin/Caisse/caisses_escale");
+
+        // Pour l'Admin, conserve la gare/date consultées (postées par le formulaire) au
+        // retour, sinon il retomberait sur un écran "choisissez une gare" à chaque action.
+        $retour = BASE_URL . "/admin/Caisse/caisses_escale";
+        $qs = [];
+        if (!empty($_POST['id_agence'])) $qs['id_agence'] = (int)$_POST['id_agence'];
+        if (!empty($_POST['date'])) $qs['date'] = $_POST['date'];
+        if ($qs) $retour .= '?' . http_build_query($qs);
+
+        header("Location: " . $retour);
         exit;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // CHEF D'ESCALE
+    // CHEF D'ESCALE (+ ADMIN EN SUPERVISION)
     // ─────────────────────────────────────────────────────────────────────────
 
-    /** Vue chef d'escale : toutes les caisses + versements en attente. */
+    /**
+     * Résout la gare consultée pour les écrans de supervision d'escale.
+     * Admin (pas de gare fixe) : gare choisie dans le formulaire (GET id_agence), revalidée
+     * contre sa propre compagnie. chef_d_escale : toujours sa propre gare de session.
+     * Retourne [idAgence (0 si Admin n'a encore rien choisi), estAdmin, listeAgences].
+     */
+    private function resolveGareEscale(Caisse_utilisateur $model): array
+    {
+        $estAdmin = ($_SESSION['droit'] ?? null) === 'Admin';
+
+        if (!$estAdmin) {
+            return [(int)($_SESSION['id_agence'] ?? 0), false, []];
+        }
+
+        $idCompagnie  = (int)($_SESSION['id_compagnie'] ?? 0);
+        $listeAgences = $model->FetchSelectWheres(
+            'idAgence, localite, numeroGare',
+            'agence',
+            'id_compagnie = :id_compagnie',
+            [':id_compagnie' => $idCompagnie]
+        );
+
+        $idAgencePoste = (int)($_GET['id_agence'] ?? $_POST['id_agence'] ?? 0);
+        if ($idAgencePoste) {
+            $agenceValide = $model->fetchOne(
+                "SELECT idAgence FROM agence WHERE idAgence = :id AND id_compagnie = :ic LIMIT 1",
+                [':id' => $idAgencePoste, ':ic' => $idCompagnie]
+            );
+            $idAgencePoste = $agenceValide ? $idAgencePoste : 0;
+        }
+
+        return [$idAgencePoste, true, $listeAgences];
+    }
+
+    /** Vue chef d'escale / Admin : toutes les caisses + versements en attente d'une gare. */
     public function caisses_escale()
     {
-        $idAgence = (int)($_SESSION['id_agence'] ?? 0);
-        $idChef   = (int)($_SESSION['id_utilisateur'] ?? 0);
-        $date     = $_GET['date'] ?? date('Y-m-d');
-        $model    = new Caisse_utilisateur();
+        $model = new Caisse_utilisateur();
+        [$idAgence, $estAdmin, $listeAgences] = $this->resolveGareEscale($model);
+        $idChef = (int)($_SESSION['id_utilisateur'] ?? 0);
+        $date   = $_GET['date'] ?? date('Y-m-d');
 
-        $caisses           = $model->getCaissesEscale($idAgence, $date);
-        $versementsAttente = $model->getVersementsEnAttente($idChef, $idAgence);
-        $historiqueVers    = $model->getHistoriqueVersements($idChef, $idAgence);
+        $caisses           = $idAgence ? $model->getCaissesEscale($idAgence, $date) : [];
+        $versementsAttente = $idAgence ? $model->getVersementsEnAttente($estAdmin ? null : $idChef, $idAgence) : [];
+        $historiqueVers    = $idAgence ? $model->getHistoriqueVersements($estAdmin ? null : $idChef, $idAgence) : [];
 
         $totalBillets = $totalColis = $totalEcarts = 0;
         foreach ($caisses as $c) {
@@ -444,15 +487,18 @@ class Caisse extends Controller
             'total_colis'        => $totalColis,
             'total_ecarts'       => $totalEcarts,
             'grand_total'        => $totalBillets + $totalColis,
+            'estAdmin'           => $estAdmin,
+            'listeAgences'       => $listeAgences,
+            'idAgenceSelectionnee' => $idAgence,
         ]);
     }
 
-    /** Chef d'escale : clôture la journée et génère le rapport. */
+    /** Chef d'escale / Admin : clôture la journée et génère le rapport. */
     public function cloture_escale()
     {
-        $model    = new Caisse_utilisateur();
-        $idAgence = (int)($_SESSION['id_agence'] ?? 0);
-        $date     = $_GET['date'] ?? date('Y-m-d');
+        $model = new Caisse_utilisateur();
+        [$idAgence, $estAdmin, $listeAgences] = $this->resolveGareEscale($model);
+        $date  = $_GET['date'] ?? date('Y-m-d');
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cloturer'])) {
             if (!csrf_verify()) {
@@ -460,13 +506,14 @@ class Caisse extends Controller
             } else {
                 $ok = $model->cloturerEscale();
                 if ($ok) {
-                    header("Location: " . BASE_URL . "/admin/Caisse/caisses_escale");
+                    $qs = $estAdmin ? '?' . http_build_query(['id_agence' => $idAgence]) : '';
+                    header("Location: " . BASE_URL . "/admin/Caisse/caisses_escale" . $qs);
                     exit;
                 }
             }
         }
 
-        $caisses = $model->getCaissesEscale($idAgence, $date);
+        $caisses = $idAgence ? $model->getCaissesEscale($idAgence, $date) : [];
         $totalBillets = $totalColis = $totalEcarts = 0;
         foreach ($caisses as $c) {
             $totalBillets += (float)$c->total_billets;
@@ -474,10 +521,13 @@ class Caisse extends Controller
             $totalEcarts  += isset($c->ecart) ? (float)$c->ecart : 0;
         }
 
-        $pdo  = $model->connect();
-        $stmt = $pdo->prepare("SELECT * FROM clotures_escale WHERE id_agence = :agence ORDER BY date_cloture DESC LIMIT 30");
-        $stmt->execute([':agence' => $idAgence]);
-        $historique_clotures = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $historique_clotures = [];
+        if ($idAgence) {
+            $pdo  = $model->connect();
+            $stmt = $pdo->prepare("SELECT * FROM clotures_escale WHERE id_agence = :agence ORDER BY date_cloture DESC LIMIT 30");
+            $stmt->execute([':agence' => $idAgence]);
+            $historique_clotures = $stmt->fetchAll(PDO::FETCH_OBJ);
+        }
 
         $this->view('admin/cloture_escale', [
             'caisses'             => $caisses,
@@ -487,6 +537,9 @@ class Caisse extends Controller
             'total_ecarts'        => $totalEcarts,
             'grand_total'         => $totalBillets + $totalColis,
             'historique_clotures' => $historique_clotures,
+            'estAdmin'            => $estAdmin,
+            'listeAgences'        => $listeAgences,
+            'idAgenceSelectionnee' => $idAgence,
         ]);
     }
 
