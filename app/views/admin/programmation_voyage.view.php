@@ -191,8 +191,11 @@
                                             ?>
                                         </td>
                                         <td>
-                                            <form action="" method="post" class="d-inline">
+                                            <form action="" method="post" class="d-inline form-valider-arrivee"
+                                                data-depart-datetime="<?= htmlspecialchars($car->depart_datetime ?? '') ?>"
+                                                data-id-programmation="<?= htmlspecialchars($car->id_programmation ?? '') ?>">
                                                 <input type="hidden" name="id_car_arrivee" value="<?= $car->id_car ?>">
+                                                <input type="hidden" name="force_arrivee" value="0" class="champ-force-arrivee">
                                                 <button type="submit" name="valider_arrivee" class="btn btn-sm btn-success shadow-sm rounded-pill px-3">
                                                     <i class="bx bx-check-double me-1"></i> Valider l'arrivée
                                                 </button>
