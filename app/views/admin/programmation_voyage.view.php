@@ -189,9 +189,15 @@
                                             <form action="" method="post" class="d-inline form-valider-arrivee"
                                                 data-depart-datetime="<?= htmlspecialchars($car->depart_datetime ?? '') ?>"
                                                 data-id-programmation="<?= htmlspecialchars($car->id_programmation ?? '') ?>">
+                                                <!-- Champ caché plutôt que name="valider_arrivee" sur le bouton : quand la
+                                                     confirmation "moins de 3h" force la soumission via form.submit() en JS
+                                                     (voir plus bas), le nom du bouton n'est PAS inclus dans les données
+                                                     envoyées (contrairement à un vrai clic) — le serveur ne voyait donc
+                                                     jamais valider_arrivee et ne faisait rien, sans aucune erreur visible. -->
+                                                <input type="hidden" name="valider_arrivee" value="1">
                                                 <input type="hidden" name="id_car_arrivee" value="<?= $car->id_car ?>">
                                                 <input type="hidden" name="force_arrivee" value="0" class="champ-force-arrivee">
-                                                <button type="submit" name="valider_arrivee" class="btn btn-sm btn-success shadow-sm rounded-pill px-3">
+                                                <button type="submit" class="btn btn-sm btn-success shadow-sm rounded-pill px-3">
                                                     <i class="bx bx-check-double me-1"></i> Valider l'arrivée
                                                 </button>
                                             </form>
