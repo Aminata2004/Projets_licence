@@ -102,11 +102,18 @@
                                                     <?= htmlspecialchars($detail->nbr_place) ?>
                                                 </p>
 
-                                                <p class="mb-0">
+                                                <p class="mb-1">
                                                     <strong>Itinéraire :</strong><br>
                                                     <?= htmlspecialchars($detail->depart) ?>
                                                     →
                                                     <?= htmlspecialchars($detail->destination) ?>
+                                                </p>
+
+                                                <p class="mb-0">
+                                                    <strong>Horaire :</strong>
+                                                    <span class="badge bg-primary-subtle text-primary">
+                                                        <i class="bx bx-time"></i> <?= htmlspecialchars(substr($detail->heureDepart, 0, 5)) ?>
+                                                    </span>
                                                 </p>
                                             </div>
                                         </div>

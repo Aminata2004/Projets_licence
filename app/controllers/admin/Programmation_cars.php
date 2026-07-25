@@ -30,6 +30,7 @@ class Programmation_cars extends  Controller
       // Admin : liste des trajets appartenant à sa compagnie
       $listeTrajet = $programmation_car->FetchSelectWheres(
         "programmer.idProgrammer,
+     programmer.heureDepart,
      depart.localite AS depart,
      depart.numeroGare AS gareDepart,
      destination.localite AS destination,
@@ -38,7 +39,7 @@ class Programmation_cars extends  Controller
      INNER JOIN agence AS depart ON programmer.idDepart = depart.idAgence
      INNER JOIN agence AS destination ON programmer.idDestination = destination.idAgence",
         "programmer.id_compagnie = :id_compagnie
-     GROUP BY programmer.idDepart, programmer.idDestination",
+     GROUP BY programmer.idDepart, programmer.idDestination, programmer.heureDepart",
         [':id_compagnie' => $id_compagnie]
       );
 
@@ -63,6 +64,7 @@ class Programmation_cars extends  Controller
 
       $listeTrajet = $programmation_car->FetchSelectWheres(
         "programmer.idProgrammer,
+     programmer.heureDepart,
      depart.localite AS depart,
      depart.numeroGare AS gareDepart,
      destination.localite AS destination,
@@ -71,7 +73,7 @@ class Programmation_cars extends  Controller
      INNER JOIN agence AS depart ON programmer.idDepart = depart.idAgence
      INNER JOIN agence AS destination ON programmer.idDestination = destination.idAgence",
         "programmer.id_compagnie = :id_compagnie
-     GROUP BY programmer.idDepart, programmer.idDestination",
+     GROUP BY programmer.idDepart, programmer.idDestination, programmer.heureDepart",
         [':id_compagnie' => $id_compagnie]
       );
 
@@ -81,10 +83,25 @@ class Programmation_cars extends  Controller
     }
 
 
+    // Trajets déjà assignés à chaque car : sert à griser (au lieu de laisser cliquable puis
+    // rejeter en silence) les trajets déjà liés quand on rouvre "Ajouter un trajet" pour un
+    // car précis, pour empêcher les doublons directement dans l'interface.
+    $liaisonsExistantes = $programmation_car->FetchSelectWheres(
+      'id_car, id_trajets',
+      'liaison_car_trajet',
+      'id_compagnie = :id_compagnie',
+      [':id_compagnie' => $id_compagnie]
+    );
+    $trajetsParCar = [];
+    foreach ($liaisonsExistantes as $liaison) {
+      $trajetsParCar[$liaison->id_car][] = (int) $liaison->id_trajets;
+    }
+
     $this->view('admin/programmation_car', [
       'listeTrajet' => $listeTrajet,
       'listeCar' => $listeCar,
-      'Select_car1' => $Select_car1
+      'Select_car1' => $Select_car1,
+      'trajetsParCar' => $trajetsParCar
     ]);
   }
 
@@ -94,13 +111,14 @@ class Programmation_cars extends  Controller
 
     // Récupérer les détails du car programmé
     $details = $programmation_car->FetchSelectWheres(
-      "car.numero_car, car.nbr_place, programmer.idProgrammer, depart.localite AS depart, destination.localite AS destination",
+      "car.numero_car, car.nbr_place, programmer.idProgrammer, programmer.heureDepart, depart.localite AS depart, destination.localite AS destination",
       "car
        INNER JOIN liaison_car_trajet ON car.id_car = liaison_car_trajet.id_car
         INNER JOIN programmer ON liaison_car_trajet.id_trajets = programmer.idProgrammer
        INNER JOIN agence AS depart ON programmer.idDepart = depart.idAgence
        INNER JOIN agence AS destination ON programmer.idDestination = destination.idAgence",
-      "car.id_car = :id_car",
+      "car.id_car = :id_car
+       ORDER BY depart.localite, destination.localite, programmer.heureDepart",
       [':id_car' => $id_car]
     );
 

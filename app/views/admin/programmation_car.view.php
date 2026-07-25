@@ -83,7 +83,8 @@
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#modalAjouterTrajet"
                                                                 data-id-car="<?= $Select_cars->id_car ?>"
-                                                                data-numero-car="<?= htmlspecialchars($Select_cars->numero_car) ?>">
+                                                                data-numero-car="<?= htmlspecialchars($Select_cars->numero_car) ?>"
+                                                                data-trajets-existants="<?= htmlspecialchars(json_encode($trajetsParCar[$Select_cars->id_car] ?? []), ENT_QUOTES) ?>">
                                                                 Ajouter
                                                             </a>
                                                             <a class="dropdown-item text-danger supprimer-car-button"
@@ -114,26 +115,32 @@
                             <form action="" method="post">
                                 <div class="modal-body">
                                     <div class="col-12">
-                                        <label class="form-label" for="formValidationName">Car</label>
-                                        <select class="form-control " name="id_car">
-                                            <option disabled>Choisissez le car</option>
-                                            <?php foreach ($listeCar as $listeCars): ?>
-                                                <option value="<?= $listeCars->id_car ?>">car : <?= $listeCars->numero_car ?></option>
-                                            <?php endforeach ?>
-                                        </select>
+                                        <label class="form-label">Car(s) <span class="text-danger">*</span></label>
+                                        <p class="small text-muted mb-2">Cochez un ou plusieurs cars : les mêmes trajets choisis ci-dessous leur seront affectés à tous, en une seule fois.</p>
+                                        <div class="border rounded p-2" style="max-height: 180px; overflow-y: auto;">
+                                            <?php if (empty($listeCar)): ?>
+                                                <p class="text-muted small mb-0">Aucun car disponible à programmer.</p>
+                                            <?php else: ?>
+                                                <?php foreach ($listeCar as $listeCars): ?>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="id_car[]"
+                                                            value="<?= $listeCars->id_car ?>"
+                                                            id="carProg<?= $listeCars->id_car ?>">
+                                                        <label class="form-check-label" for="carProg<?= $listeCars->id_car ?>">
+                                                            Car : <?= htmlspecialchars($listeCars->numero_car) ?>
+                                                        </label>
+                                                    </div>
+                                                <?php endforeach ?>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                     <div class="mb-3 col-12 mt-4">
                                         <label class="form-label">Trajet a parcourire</label>
                                         <select class="form-control multiple-select" multiple="multiple" placeholder="Choisissez un ou plusieurs escale" name="idTrajet[]">
                                             <option value="" disabled>Choisissez un ou plusieurs trajet</option>
-                                            <!-- <?php foreach ($listeTrajet as $listeTrajets): ?>
-                                                <option value="<?= htmlspecialchars($listeTrajets->idProgrammer); ?>">
-                                                    <?= htmlspecialchars($listeTrajets->idDepart . ' - ' . $listeTrajets->idDestination) ?>
-                                                </option>
-                                            <?php endforeach; ?> -->
                                             <?php foreach ($listeTrajet as $listeTrajets): ?>
                                                 <option value="<?= htmlspecialchars($listeTrajets->idProgrammer); ?>">
-                                                    <?= htmlspecialchars($listeTrajets->depart . ' (' . $listeTrajets->gareDepart . ') → ' . $listeTrajets->destination . ' (' . $listeTrajets->gareDestination . ')'); ?>
+                                                    <?= htmlspecialchars($listeTrajets->depart . ' (' . $listeTrajets->gareDepart . ') → ' . $listeTrajets->destination . ' (' . $listeTrajets->gareDestination . ') — ' . substr($listeTrajets->heureDepart, 0, 5)); ?>
                                                 </option>
                                             <?php endforeach; ?>
 
@@ -170,7 +177,7 @@
                                     <select class="form-control multiple-select-ajouter" multiple="multiple" placeholder="Choisissez un ou plusieurs trajet" name="idTrajet[]">
                                         <?php foreach ($listeTrajet as $listeTrajets): ?>
                                             <option value="<?= htmlspecialchars($listeTrajets->idProgrammer); ?>">
-                                                <?= htmlspecialchars($listeTrajets->depart . ' (' . $listeTrajets->gareDepart . ') → ' . $listeTrajets->destination . ' (' . $listeTrajets->gareDestination . ')'); ?>
+                                                <?= htmlspecialchars($listeTrajets->depart . ' (' . $listeTrajets->gareDepart . ') → ' . $listeTrajets->destination . ' (' . $listeTrajets->gareDestination . ') — ' . substr($listeTrajets->heureDepart, 0, 5)); ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
@@ -217,9 +224,28 @@
             $('.ajouter-trajet-button').click(function() {
                 var idCar = $(this).data('id-car');
                 var numeroCar = $(this).data('numero-car');
+                var trajetsExistants = $(this).data('trajets-existants') || [];
 
                 $('#modalAjouterIdCar').val(idCar);
                 $('#modalAjouterNumeroCar').text('(Car : ' + numeroCar + ')');
+
+                // Grise les trajets déjà assignés à ce car (au lieu de les laisser
+                // sélectionnables puis rejetés en silence côté serveur) : empêche
+                // directement le doublon plutôt que de le bloquer après coup.
+                var $selectAjouter = $('.multiple-select-ajouter');
+                $selectAjouter.val(null);
+                $selectAjouter.find('option').each(function() {
+                    var $option = $(this);
+                    var dejaAssigne = trajetsExistants.includes(parseInt($option.val(), 10));
+                    var texteBase = $option.data('texte-base');
+                    if (texteBase === undefined) {
+                        texteBase = $option.text();
+                        $option.data('texte-base', texteBase);
+                    }
+                    $option.prop('disabled', dejaAssigne);
+                    $option.text(dejaAssigne ? texteBase + ' (déjà assigné à ce car)' : texteBase);
+                });
+                $selectAjouter.trigger('change');
             });
 
             // Confirmation avant suppression de la programmation d'un car

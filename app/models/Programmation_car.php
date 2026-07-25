@@ -3,57 +3,83 @@
 class Programmation_car extends Model
 {
 
+    // Le formulaire permet de cocher plusieurs cars à la fois (au lieu d'un seul) : les
+    // mêmes trajets sélectionnés une fois sont assignés à chaque car coché, pour ne pas
+    // avoir à rouvrir le modal et resaisir les trajets pour chaque car.
     public function Programmer_car()
     {
-        // Récupération sécurisée des données du formulaire
-        extract($_POST);
         $errors = [];
 
-        // Vérification des champs requis
-        if (empty($id_car)) {
-            $errors[] = "Le numéro du car est obligatoire.";
+        $idCars = $_POST['id_car'] ?? [];
+        if (!is_array($idCars)) {
+            $idCars = [$idCars];
         }
+        $idCars = array_values(array_unique(array_filter(
+            $idCars,
+            fn($id) => trim((string) $id) !== ''
+        )));
 
+        $idTrajet = $_POST['idTrajet'] ?? [];
+
+        if (empty($idCars)) {
+            $errors[] = "Veuillez cocher au moins un car.";
+        }
         if (empty($idTrajet)) {
             $errors[] = "Le trajet est obligatoire.";
         }
 
         // Un Admin ne peut programmer que les cars de sa propre compagnie (IDOR sinon)
-        if (empty($errors) && !$this->carAppartientCompagnie($id_car)) {
-            $errors[] = "Ce car n'appartient pas à votre compagnie.";
+        foreach ($idCars as $id_car) {
+            if (!$this->carAppartientCompagnie($id_car)) {
+                $errors[] = "Le car #$id_car n'appartient pas à votre compagnie.";
+            }
         }
-        // Si aucune erreur, on procède à l'insertion
-        if (count($errors) === 0) {
+
+        if (!empty($errors)) {
+            // set_swal() (popup SweetAlert) plutôt que set_flash() (bandeau discret en haut
+            // de page) : après une soumission depuis la modal, un bandeau qui apparaît
+            // derrière la modal qui se ferme passe facilement inaperçu. La popup, elle,
+            // s'affiche par-dessus tout et oblige à cliquer "OK" pour la fermer.
+            $errorsHtml = implode("<br>", array_map('htmlspecialchars', $errors));
+            $this->set_swal("Erreur", $errorsHtml, "warning", "#ffc107");
+            return;
+        }
+
+        $id_compagnie = $_SESSION['id_compagnie'];
+        $nbProgrammes = 0;
+
+        foreach ($idCars as $id_car) {
             $insertion = $this->insertion_update_simple(
-                "INSERT INTO reference_car(id_car) VALUES( :id_car)",
+                "INSERT INTO reference_car(id_car) VALUES(:id_car)",
                 [":id_car" => $id_car]
             );
-            // Vérifier si l'insertion dans reference_car a réussi
-            if ($insertion !== false) {
-                //  Mettre à jour la colonne programme_car dans la table care avec la valeur "on"
-                $bdd = $this->connect();
-                $sql_update_care = "UPDATE car SET programmer_car = 'on' WHERE id_car = :id_car";
-                $stmt_update_care = $bdd->prepare($sql_update_care);
-                $stmt_update_care->bindParam(':id_car', $id_car);
-                // Exécuter la requête de mise à jour
-                $stmt_update_care->execute();
+            if ($insertion === false) {
+                continue;
             }
-            // si la mis a jours est effectue alors enregistre les ligne de trajets
-            if ($stmt_update_care !== false) {
 
-                $Save_ligne_chauffeur = $this->linkTrajetsToCar($id_car, $_POST['idTrajet'], $_SESSION['id_compagnie']);
+            $bdd = $this->connect();
+            $stmt_update_car = $bdd->prepare("UPDATE car SET programmer_car = 'on' WHERE id_car = :id_car");
+            $stmt_update_car->bindParam(':id_car', $id_car);
+            $stmt_update_car->execute();
 
-                if ($Save_ligne_chauffeur == true) {
-                    $this->set_flash('Car programmer avec succès', 'info');
-                } else {
-                    $this->set_flash('Car non programmer', 'danger');
-                }
-            }
+            $this->linkTrajetsToCar($id_car, $idTrajet, $id_compagnie);
+
+            $nbProgrammes++;
+        }
+
+        if ($nbProgrammes > 0) {
+            $nbTrajets = count($idTrajet);
+            $message = "$nbProgrammes car" . ($nbProgrammes > 1 ? 's' : '') . " programmé" . ($nbProgrammes > 1 ? 's' : '')
+                . " avec $nbTrajets trajet" . ($nbTrajets > 1 ? 's' : '') . " chacun (aller-retour inclus automatiquement).";
+            $this->set_swal(
+                "🚌 Car" . ($nbProgrammes > 1 ? 's' : '') . " programmé" . ($nbProgrammes > 1 ? 's' : '') . " !",
+                $message,
+                "success",
+                "#0d6efd",
+                BASE_URL . "/admin/Programmation_cars/index"
+            );
         } else {
-            // Affichage des erreurs
-            foreach ($errors as $error) {
-                $this->set_flash($error, "danger");
-            }
+            $this->set_swal("Erreur", "Aucun car n'a pu être programmé.", "error", "#dc3545");
         }
     }
 
