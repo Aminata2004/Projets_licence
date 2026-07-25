@@ -59,7 +59,7 @@
                                             <div class="mt-3">
                                                 <label for="selectCar" class="form-label">Car</label>
                                                 <select class="form-select" name="id_car" id="selectCar" required>
-                                                    <option selected disabled>Choisissez le car</option>
+                                                    <option></option>
                                                     <?php foreach ($listeCar as $listeCars): ?>
                                                         <option value="<?= $listeCars->id_car ?>">Car : <?= $listeCars->numero_car ?></option>
                                                     <?php endforeach ?>
@@ -306,7 +306,7 @@
                         <div class="mb-3">
                             <label for="edit_car" class="form-label">Car attribué</label>
                             <select class="form-select" name="id_car" id="edit_car" required>
-                                <option disabled>Choisissez le car</option>
+                                <option></option>
                                 <?php foreach ($listeCar as $listeCars): ?>
                                     <option value="<?= $listeCars->id_car ?>">Car : <?= $listeCars->numero_car ?></option>
                                 <?php endforeach ?>
@@ -333,8 +333,23 @@
                     document.getElementById("edit_chauffeur_id").value = this.dataset.id;
                     document.getElementById("edit_nom").value = this.dataset.nom;
                     document.getElementById("edit_numero").value = this.dataset.numero;
-                    document.getElementById("edit_car").value = this.dataset.idcar;
+                    $('#edit_car').val(this.dataset.idcar).trigger('change');
                 });
+            });
+        });
+
+        $(document).ready(function() {
+            $('#selectCar').select2({
+                placeholder: "Choisissez le car",
+                allowClear: true,
+                dropdownParent: $('#addChauffeurModal'),
+                width: '100%'
+            });
+            $('#edit_car').select2({
+                placeholder: "Choisissez le car",
+                allowClear: true,
+                dropdownParent: $('#editChauffeurModal'),
+                width: '100%'
             });
         });
 

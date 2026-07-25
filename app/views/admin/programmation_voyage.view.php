@@ -100,7 +100,7 @@
                                                     </td>
                                                 <?php endif; ?>
                                                 <td>
-                                                    <select class="form-select shadow-sm" name="id_destination[]">
+                                                    <select class="form-select shadow-sm" name="id_destination[]" required>
                                                         <option selected disabled value="">Choisir une destination</option>
                                                         <?php foreach ($destinations as $d): ?>
                                                             <?php
@@ -122,13 +122,15 @@
                                                                 <option value="<?= htmlspecialchars($d->destinationLocalite) ?>"
                                                                     data-depart="<?= htmlspecialchars($d->departLocalite) ?>"
                                                                     data-depart-agence="<?= htmlspecialchars($d->idDepart) ?>"
+                                                                    data-destination-agence="<?= htmlspecialchars($d->idDestination) ?>"
                                                                     data-heure="<?= htmlspecialchars($d->heureDepart) ?>">
-                                                                    <?= htmlspecialchars($d->departLocalite . ' -> ' . $d->destinationLocalite) ?>
+                                                                    <?= htmlspecialchars($d->departLocalite . ' (Gare ' . $d->numeroGareDepart . ') -> ' . $d->destinationLocalite . ' (Gare ' . $d->numeroGareDestination . ')') ?>
                                                                     (<?= htmlspecialchars(date('H:i', strtotime($d->heureDepart))) ?>)
                                                                 </option>
                                                             <?php endif; ?>
                                                         <?php endforeach; ?>
                                                     </select>
+                                                    <input type="hidden" name="id_destination_agence[]" class="champ-destination-agence">
                                                 </td>
                                             </tr>
                                             <?php $indexRow++; ?>
@@ -179,10 +181,13 @@
                                         <td class="fw-bold"><?= htmlspecialchars($car->numero_car) ?></td>
                                         <td><?= htmlspecialchars($car->nbr_place) ?></td>
                                         <td>
-                                            <?php 
+                                            <?php
                                                 // Extract the destination string from En_transit_X
                                                 $dest = substr($car->status_car, 11);
                                                 echo htmlspecialchars($dest);
+                                                if (!empty($car->numeroGareDestination)) {
+                                                    echo ' <span class="text-muted">(Gare ' . htmlspecialchars($car->numeroGareDestination) . ')</span>';
+                                                }
                                             ?>
                                         </td>
                                         <td>
@@ -258,6 +263,11 @@
                 const champDepartAgence = tr.querySelector('.champ-depart-agence');
                 if (champDepartAgence) {
                     champDepartAgence.value = selectedOption?.getAttribute('data-depart-agence') || '';
+                }
+
+                const champDestinationAgence = tr.querySelector('.champ-destination-agence');
+                if (champDestinationAgence) {
+                    champDestinationAgence.value = selectedOption?.getAttribute('data-destination-agence') || '';
                 }
 
                 const selectHoraire = tr.querySelector('select[name="id_horaire[]"]');

@@ -47,11 +47,13 @@ class Programmation_voyage extends Model
         // $fromAndWhere = "liaison_car_trajet 
         // INNER JOIN programmer ON liaison_car_trajet.id_trajets = programmer.idProgrammer
         // INNER JOIN car ON liaison_car_trajet.id_car = car.id_car";
-        $select = "liaison_car_trajet.*, 
-           programmer.*, 
-           car.*, 
-           a1.localite AS departLocalite, 
-           a2.localite AS destinationLocalite";
+        $select = "liaison_car_trajet.*,
+           programmer.*,
+           car.*,
+           a1.localite AS departLocalite,
+           a2.localite AS destinationLocalite,
+           a1.numeroGare AS numeroGareDepart,
+           a2.numeroGare AS numeroGareDestination";
 
 $fromAndWhere = "liaison_car_trajet
     INNER JOIN programmer ON liaison_car_trajet.id_trajets = programmer.idProgrammer
@@ -115,7 +117,7 @@ $fromAndWhere = "liaison_car_trajet
     //     return $this->insertion_update_simples($insert, $params);
     // }
 
-    public function insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre, $id_depart = null, $id_agence_depart = null)
+    public function insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre, $id_depart = null, $id_agence_depart = null, $id_agence_destination = null)
     {
         // Admin (plusieurs gares) : départ choisi dans le formulaire.
         // chef_d_escale (une seule gare) : toujours sa propre localité de session.
@@ -148,16 +150,31 @@ $fromAndWhere = "liaison_car_trajet
             return false;
         }
 
+        // Gare précise de destination (idAgence) : obligatoire, pour le même motif que le
+        // départ — sans elle, deux gares de la même ville de destination (ex. "Bamako" Gare I
+        // et Gare II) seraient indiscernables. Revalidée côté modèle, jamais faite confiance
+        // telle quelle. Voir ajout_id_agence_destination_programmation_voyage.sql.
+        if (!$id_agence_destination) {
+            return false;
+        }
+        $agenceDestination = $this->fetchOne(
+            "SELECT idAgence, localite FROM agence WHERE idAgence = :id AND id_compagnie = :ic LIMIT 1",
+            [':id' => $id_agence_destination, ':ic' => $id_compagnie]
+        );
+        if (!$agenceDestination || $agenceDestination['localite'] !== $id_destination) {
+            return false;
+        }
+
         // L'heure choisie doit correspondre à un trajet réellement programmé (table "programmer")
-        // pour CETTE gare précise et cette destination : sinon on pourrait enregistrer un voyage à
-        // une heure qui n'existe pas pour ce trajet, ou mélanger deux gares de la même ville.
+        // pour CETTE gare précise et CETTE gare de destination précise : sinon on pourrait
+        // enregistrer un voyage à une heure qui n'existe pas pour ce trajet, ou mélanger deux
+        // gares de la même ville.
         $trajetValide = $this->fetchOne(
             "SELECT p.idProgrammer
              FROM programmer p
-             LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
-             WHERE p.idDepart = :id_agence AND a2.localite = :dest AND p.heureDepart = :heure AND p.id_compagnie = :id_compagnie
+             WHERE p.idDepart = :id_agence AND p.idDestination = :id_agence_destination AND p.heureDepart = :heure AND p.id_compagnie = :id_compagnie
              LIMIT 1",
-            [':id_agence' => $id_agence, ':dest' => $id_destination, ':heure' => $id_horaire, ':id_compagnie' => $id_compagnie]
+            [':id_agence' => $id_agence, ':id_agence_destination' => $id_agence_destination, ':heure' => $id_horaire, ':id_compagnie' => $id_compagnie]
         );
 
         if (!$trajetValide) {
@@ -193,9 +210,9 @@ $fromAndWhere = "liaison_car_trajet
 
         // 1. Insertion dans programmation_voyage
         $insert = "INSERT INTO programmation_voyage (
-            id_car_programmer, id_horaire, id_trajet, localite_user, id_agence, date_enregistre, id_compagnie
+            id_car_programmer, id_horaire, id_trajet, localite_user, id_agence, id_agence_destination, date_enregistre, id_compagnie
        ) VALUES (
-            :id_car_programmer, :id_horaire, :id_trajet, :localite_user, :id_agence, :date_enregistre, :id_compagnie
+            :id_car_programmer, :id_horaire, :id_trajet, :localite_user, :id_agence, :id_agence_destination, :date_enregistre, :id_compagnie
        )";
 
         $params = [
@@ -204,6 +221,7 @@ $fromAndWhere = "liaison_car_trajet
             ':id_trajet' => $id_destination,
             ':localite_user' => $localite_user,
             ':id_agence' => $id_agence,
+            ':id_agence_destination' => $id_agence_destination,
             ':date_enregistre' => $date_enregistre,
             ':id_compagnie' => $id_compagnie
         ];
@@ -412,10 +430,11 @@ $fromAndWhere = "liaison_car_trajet
     // et l'id_programmation à proposer en reprogrammation si l'arrivée n'est pas jugée réelle.
     public function getProgrammationActivePourCar($id_car, $destination)
     {
-        $sql = "SELECT id_programmation, date_enregistre, id_horaire
-                FROM programmation_voyage
-                WHERE id_car_programmer = :id_car AND id_trajet = :destination
-                ORDER BY date_enregistre DESC, id_programmation DESC
+        $sql = "SELECT pv.id_programmation, pv.date_enregistre, pv.id_horaire, a.numeroGare AS numeroGareDestination
+                FROM programmation_voyage pv
+                LEFT JOIN agence a ON a.idAgence = pv.id_agence_destination
+                WHERE pv.id_car_programmer = :id_car AND pv.id_trajet = :destination
+                ORDER BY pv.date_enregistre DESC, pv.id_programmation DESC
                 LIMIT 1";
         $stmt = $this->connect()->prepare($sql);
         $stmt->execute([':id_car' => $id_car, ':destination' => $destination]);
@@ -482,7 +501,7 @@ $fromAndWhere = "liaison_car_trajet
     public function updateProgrammation($id_programmation, $id_horaire, $id_destination, $action = null, $id_car_remplacement = null)
     {
         $prog = $this->fetchOne(
-            "SELECT id_car_programmer, id_horaire, id_trajet, localite_user, id_agence, date_enregistre, id_compagnie
+            "SELECT id_car_programmer, id_horaire, id_trajet, localite_user, id_agence, id_agence_destination, date_enregistre, id_compagnie
              FROM programmation_voyage WHERE id_programmation = :id",
             [':id' => $id_programmation]
         );
@@ -500,7 +519,7 @@ $fromAndWhere = "liaison_car_trajet
         // historiques pas encore rattachées à une gare précise.
         if ($id_agence) {
             $trajetValide = $this->fetchOne(
-                "SELECT p.idProgrammer
+                "SELECT p.idProgrammer, p.idDestination
                  FROM programmer p
                  LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
                  WHERE p.idDepart = :id_agence AND a2.localite = :dest AND p.heureDepart = :heure AND p.id_compagnie = :id_compagnie
@@ -509,7 +528,7 @@ $fromAndWhere = "liaison_car_trajet
             );
         } else {
             $trajetValide = $this->fetchOne(
-                "SELECT p.idProgrammer
+                "SELECT p.idProgrammer, p.idDestination
                  FROM programmer p
                  LEFT JOIN agence a1 ON p.idDepart = a1.idAgence
                  LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
@@ -521,6 +540,9 @@ $fromAndWhere = "liaison_car_trajet
         if (!$trajetValide) {
             return ['error' => 'horaire_invalide'];
         }
+        // Gare précise de la NOUVELLE destination (résolue via le trajet fixe qui vient d'être
+        // validé ci-dessus), pour garder id_agence_destination cohérent après une modification.
+        $nouvelIdAgenceDestination = $trajetValide['idDestination'];
 
         $memeCreneau = ($id_horaire === $prog['id_horaire'] && $id_destination === $prog['id_trajet']);
 
@@ -555,7 +577,8 @@ $fromAndWhere = "liaison_car_trajet
                         null,
                         $prog['date_enregistre'],
                         $localite_user,
-                        $id_agence
+                        $id_agence,
+                        $prog['id_agence_destination']
                     );
                     if (!$ok) {
                         return ['error' => 'car_remplacement_invalide'];
@@ -585,12 +608,13 @@ $fromAndWhere = "liaison_car_trajet
         }
 
         $update = "UPDATE programmation_voyage
-            SET id_horaire = :id_horaire, id_trajet = :id_trajet
+            SET id_horaire = :id_horaire, id_trajet = :id_trajet, id_agence_destination = :id_agence_destination
             WHERE id_programmation = :id_programmation";
 
         $result = $this->insertion_update_simples($update, [
             ':id_horaire' => $id_horaire,
             ':id_trajet' => $id_destination,
+            ':id_agence_destination' => $nouvelIdAgenceDestination,
             ':id_programmation' => $id_programmation
         ]);
 

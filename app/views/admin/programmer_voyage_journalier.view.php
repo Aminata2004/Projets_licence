@@ -89,7 +89,12 @@
                                         <?php endif; ?>
 
                                         <td><?= htmlspecialchars($listeProgrammers->id_horaire) ?></td>
-                                        <td><?= htmlspecialchars($listeProgrammers->id_trajet) ?></td>
+                                        <td>
+                                            <?= htmlspecialchars($listeProgrammers->id_trajet) ?>
+                                            <?php if (!empty($listeProgrammers->numeroGareDestination)): ?>
+                                                <span class="text-muted">(Gare <?= htmlspecialchars($listeProgrammers->numeroGareDestination) ?>)</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td class="fw-bold text-success">
                                             <?= htmlspecialchars($listeProgrammers->place_disponible) ?>
                                         </td>

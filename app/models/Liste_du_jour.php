@@ -313,8 +313,8 @@
           $end   = $start + $nombrePassages - 1;
           $numPlace = ($nombrePassages == 1) ? "$start" : "$start-$end";
         } elseif ($nouveauJour === $demain) {
-          $stmt = $pdo->prepare("SELECT place_minumale FROM place_minumale LIMIT 1");
-          $stmt->execute();
+          $stmt = $pdo->prepare("SELECT place_minumale FROM place_minumale WHERE id_compagnie = :ic LIMIT 1");
+          $stmt->execute([':ic' => $id_compagnie]);
           $rowPlace = $stmt->fetch();
           $placeTotale = $rowPlace ? (int)$rowPlace['place_minumale'] : 0;
 
@@ -438,11 +438,110 @@
       return $viaEscale['mainDest'] ?? $destinationId;
     }
 
-    // Annule un billet vendu au guichet : restaure la place vendue (car ou suivis selon le jour),
-    // marque le billet comme annulé et déduit le montant de la caisse actuellement ouverte pour
-    // cette gare (si aucune caisse n'est ouverte, l'annulation a quand même lieu mais la caisse
-    // devra être ajustée manuellement).
-    public function annulerBillet($idBillets, $motif = '')
+    // Étape 1 (chef d'escale uniquement — voir Liste_du_jours::annuler()) : soumet une
+    // demande d'annulation sans toucher à la place ni à la caisse. Un simple Utilisateur ne
+    // peut même pas atteindre cette méthode (bloqué côté contrôleur). Seul un Admin peut
+    // ensuite confirmer (confirmerAnnulationBillet) ou rejeter (rejeterAnnulationBillet).
+    public function demanderAnnulationBillet($idBillets, $motif = '')
+    {
+      if (!csrf_verify()) {
+        $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+        return false;
+      }
+
+      $billet = $this->getBilletById($idBillets); // déjà filtré par compagnie de session
+      if (!$billet) {
+        $this->set_flash("Billet introuvable.", "danger");
+        return false;
+      }
+
+      if (in_array($billet->status_billets ?? null, ['annule', 'annulation_demandee'], true)) {
+        $this->set_flash("Ce billet est déjà annulé ou une demande d'annulation est déjà en cours.", "warning");
+        return false;
+      }
+
+      date_default_timezone_set('Africa/Bamako');
+      $jourVoyage = date('Y-m-d', strtotime($billet->jourVoyage));
+      if ($jourVoyage < date('Y-m-d')) {
+        $this->set_flash("Impossible de demander l'annulation d'un billet dont le voyage est déjà passé.", "danger");
+        return false;
+      }
+
+      $ok = $this->insertion_update_simples(
+        "UPDATE billets SET status_billets = 'annulation_demandee', motif_annulation = :motif,
+            demande_annulation_par = :par, demande_annulation_le = NOW()
+         WHERE idBillets = :id AND id_compagnie = :id_compagnie",
+        [
+          ':motif' => $motif !== '' ? $motif : null,
+          ':par' => $_SESSION['id_utilisateur'] ?? null,
+          ':id' => $idBillets,
+          ':id_compagnie' => $billet->id_compagnie
+        ]
+      );
+
+      if ($ok) {
+        $this->set_flash("Demande d'annulation envoyée : un Admin doit la confirmer avant que la place et l'argent ne soient libérés.", "success");
+        return true;
+      }
+      $this->set_flash("Erreur lors de l'envoi de la demande d'annulation.", "danger");
+      return false;
+    }
+
+    // Demandes en attente de confirmation, pour l'écran Admin dédié.
+    public function getDemandesAnnulationEnAttente($id_compagnie)
+    {
+      return $this->fetchAll(
+        "SELECT b.idBillets, b.numeroBillets, b.jourVoyage, b.Heur_departs, b.departId, b.destinationId,
+                b.motif_annulation, b.demande_annulation_le, c.Client, c.montant_payer,
+                u.utilisateurs AS demandeur
+         FROM billets b
+         INNER JOIN client c ON b.id_client = c.idClient
+         LEFT JOIN utilisateur u ON u.idUser = b.demande_annulation_par
+         WHERE b.id_compagnie = :id_compagnie AND b.status_billets = 'annulation_demandee'
+         ORDER BY b.demande_annulation_le ASC",
+        [':id_compagnie' => $id_compagnie]
+      );
+    }
+
+    // Étape 2a (Admin uniquement) : rejette une demande d'annulation en attente. Le billet
+    // redevient actif normalement, sans laisser de trace de la demande sur le billet lui-même.
+    public function rejeterAnnulationBillet($idBillets)
+    {
+      if (!csrf_verify()) {
+        $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+        return false;
+      }
+
+      $billet = $this->getBilletById($idBillets);
+      if (!$billet || ($billet->status_billets ?? null) !== 'annulation_demandee') {
+        $this->set_flash("Aucune demande d'annulation en attente pour ce billet.", "warning");
+        return false;
+      }
+
+      $ok = $this->insertion_update_simples(
+        "UPDATE billets SET status_billets = NULL, motif_annulation = NULL,
+            demande_annulation_par = NULL, demande_annulation_le = NULL
+         WHERE idBillets = :id AND id_compagnie = :id_compagnie",
+        [':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie]
+      );
+
+      if ($ok) {
+        $this->set_flash("Demande d'annulation rejetée : le billet reste actif.", "info");
+        return true;
+      }
+      $this->set_flash("Erreur lors du rejet de la demande.", "danger");
+      return false;
+    }
+
+    // Étape 2b (Admin uniquement — voir Liste_du_jours::annuler()) : confirme l'annulation
+    // d'un billet, qu'elle vienne d'une demande d'un chef d'escale (statut
+    // 'annulation_demandee', motif déjà renseigné) ou d'une annulation directe par l'Admin
+    // lui-même (motif fourni ici). Restaure la place vendue (car ou suivis selon le jour),
+    // marque le billet comme annulé et enregistre le remboursement comme une dépense
+    // formelle ("Remboursement annulation") sur la caisse actuellement ouverte de la gare,
+    // pour garder une trace auditable de la sortie d'argent (si aucune caisse n'est ouverte,
+    // l'annulation a quand même lieu mais la caisse devra être ajustée manuellement).
+    public function confirmerAnnulationBillet($idBillets, $motifSiDirect = '')
     {
       if (!csrf_verify()) {
         $this->set_flash("Session expirée, veuillez réessayer.", "danger");
@@ -468,6 +567,10 @@
         $this->set_flash("Impossible d'annuler un billet dont le voyage est déjà passé.", "danger");
         return false;
       }
+
+      $motif = ($billet->status_billets ?? null) === 'annulation_demandee'
+        ? $billet->motif_annulation
+        : ($motifSiDirect !== '' ? $motifSiDirect : null);
 
       $pdo = $this->connect();
 
@@ -543,13 +646,13 @@
            WHERE idBillets = :id AND id_compagnie = :id_compagnie"
         );
         $updBillet->execute([
-          ':motif' => $motif !== '' ? $motif : null,
+          ':motif' => $motif,
           ':annule_par' => $_SESSION['id_utilisateur'] ?? null,
           ':id' => $idBillets,
           ':id_compagnie' => $billet->id_compagnie
         ]);
 
-        // Ajuster la caisse actuellement ouverte pour cette gare, si elle existe
+        // Caisse actuellement ouverte pour cette gare, si elle existe
         $stmtCaisse = $pdo->prepare("
           SELECT c.id_caisse
           FROM caisse c
@@ -567,17 +670,35 @@
         ]);
         $caisse = $stmtCaisse->fetch(PDO::FETCH_ASSOC);
 
-        if ($caisse) {
-          $updCaisse = $pdo->prepare("UPDATE caisse SET montant_billets = GREATEST(0, montant_billets - :montant) WHERE id_caisse = :id_caisse");
-          $updCaisse->execute([':montant' => $billet->montant_payer, ':id_caisse' => $caisse['id_caisse']]);
+        $montant = (int) preg_replace('/[^\d]/', '', (string) $billet->montant_payer);
+
+        if ($caisse && $montant > 0) {
+          // Le remboursement est enregistré comme une dépense formelle (pas une simple
+          // déduction silencieuse) : ça garde une trace auditable de l'argent qui sort
+          // de la caisse, visible dans le suivi des dépenses de la gare.
+          $pdo->prepare(
+            "INSERT INTO depense (id_compagnie, id_agence, id_caisse, categorie, libelle, montant, date_depense, id_utilisateur)
+             VALUES (:id_compagnie, :id_agence, :id_caisse, 'Remboursement annulation', :libelle, :montant, :date_depense, :id_utilisateur)"
+          )->execute([
+            ':id_compagnie' => $billet->id_compagnie,
+            ':id_agence' => $idAgenceBillet,
+            ':id_caisse' => $caisse['id_caisse'],
+            ':libelle' => 'Remboursement billet annulé n°' . $billet->numeroBillets,
+            ':montant' => $montant,
+            ':date_depense' => $aujourdhui,
+            ':id_utilisateur' => $_SESSION['id_utilisateur'] ?? null
+          ]);
+
+          $pdo->prepare("UPDATE caisse SET montant_depense = montant_depense + :montant WHERE id_caisse = :id_caisse")
+            ->execute([':montant' => $montant, ':id_caisse' => $caisse['id_caisse']]);
         }
 
         $pdo->commit();
 
-        if ($caisse) {
-          $this->set_flash("Billet annulé avec succès. Caisse ajustée de -" . number_format((float)$billet->montant_payer, 0, ',', ' ') . " FCFA.", "success");
+        if ($caisse && $montant > 0) {
+          $this->set_flash("Billet annulé avec succès. Remboursement de " . number_format($montant, 0, ',', ' ') . " FCFA enregistré comme dépense.", "success");
         } else {
-          $this->set_flash("Billet annulé avec succès. Aucune caisse ouverte pour cette gare : ajustez le montant manuellement.", "warning");
+          $this->set_flash("Billet annulé avec succès. Aucune caisse ouverte pour cette gare : le remboursement devra être enregistré manuellement.", "warning");
         }
         return true;
       } catch (Throwable $e) {

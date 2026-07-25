@@ -575,8 +575,8 @@
                     $numPlace = ($nombrePassages == 1) ? "$start" : "$start-$end";
                 } else {
                     // Demain → gestion via suivi et place minimale
-                    $stmt = $pdo->prepare("SELECT place_minumale FROM place_minumale LIMIT 1");
-                    $stmt->execute();
+                    $stmt = $pdo->prepare("SELECT place_minumale FROM place_minumale WHERE id_compagnie = :ic LIMIT 1");
+                    $stmt->execute([':ic' => $_SESSION['id_compagnie']]);
                     $rowPlace = $stmt->fetch();
                     $placeTotale = $rowPlace ? (int)$rowPlace['place_minumale'] : 0;
 

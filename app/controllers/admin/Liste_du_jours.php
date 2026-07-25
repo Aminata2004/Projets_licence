@@ -324,19 +324,63 @@ class Liste_du_jours extends  Controller
     }
   }
 
+  // Un simple Utilisateur ne peut pas annuler un billet. Un chef d'escale ne peut que
+  // DEMANDER l'annulation (aucune place/caisse touchée avant confirmation). Seul un Admin
+  // (ou super_admin) peut annuler directement — c'est déjà l'équivalent d'une confirmation.
   public function annuler()
   {
     if (isset($_POST['annuler_billet'])) {
       $billets = new Liste_du_jour();
       $idBillets = $_POST['idBillets'] ?? null;
       $motif = trim($_POST['motif_annulation'] ?? '');
+      $droit = $_SESSION['droit'] ?? null;
 
-      if ($idBillets) {
-        $billets->annulerBillet($idBillets, $motif);
+      if ($idBillets && in_array($droit, ['Admin', 'super_admin'], true)) {
+        $billets->confirmerAnnulationBillet($idBillets, $motif);
+      } elseif ($idBillets && $droit === 'chef_d_escale') {
+        $billets->demanderAnnulationBillet($idBillets, $motif);
+      } else {
+        $billets->set_flash("Vous n'avez pas le droit d'annuler un billet.", "danger");
       }
     }
 
     header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
+    exit;
+  }
+
+  // Admin/super_admin : demandes d'annulation en attente, pour toute la compagnie.
+  public function demandesAnnulation()
+  {
+    $billets = new Liste_du_jour();
+
+    if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+      $billets->set_flash("Accès refusé.", "danger");
+      header("Location: " . BASE_URL . "/admin/Homes/home");
+      exit;
+    }
+
+    $this->view('admin/demandes_annulation_billet', [
+      'listeDemandes' => $billets->getDemandesAnnulationEnAttente($_SESSION['id_compagnie'])
+    ]);
+  }
+
+  public function confirmerAnnulation($idBillets)
+  {
+    $billets = new Liste_du_jour();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+      $billets->confirmerAnnulationBillet($idBillets);
+    }
+    header("Location: " . BASE_URL . "/admin/Liste_du_jours/demandesAnnulation");
+    exit;
+  }
+
+  public function rejeterAnnulation($idBillets)
+  {
+    $billets = new Liste_du_jour();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+      $billets->rejeterAnnulationBillet($idBillets);
+    }
+    header("Location: " . BASE_URL . "/admin/Liste_du_jours/demandesAnnulation");
     exit;
   }
 }

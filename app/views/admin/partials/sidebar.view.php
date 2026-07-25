@@ -48,6 +48,10 @@
             </li>
           <?php }
           ?>
+          <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)): ?>
+            <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours/demandesAnnulation"><i class="bi bi-arrow-right-short"></i>Demandes d'annulation</a>
+            </li>
+          <?php endif; ?>
         </ul>
         </li>
         <?php if ($user->userHasPermission('Billets_creation')) { ?>
@@ -197,7 +201,13 @@
                 </li>
               <?php endif; ?>
 
-              <?php if ($user->userHasPermission('Programme_Creation')) { ?>
+              <?php
+                $peutVoirGProgramme = $user->userHasPermission('Programme_Creation')
+                    || $user->userHasPermission('Programme_programmer_car')
+                    || $user->userHasPermission('Programme_programmation_voyage')
+                    || $user->userHasPermission('Programme_hors_programme');
+              ?>
+              <?php if ($peutVoirGProgramme): ?>
                 <li class="menu-label">Gestion des programmations</li>
                 <li>
                   <a href="javascript:;" class="has-arrow">
@@ -205,7 +215,6 @@
                     </div>
                     <div class="menu-title">G-programme</div>
                   </a>
-                <?php } ?>
                 <ul>
                   <?php if ($user->userHasPermission('Programme_Creation')) { ?>
                     <li> <a href="<?= BASE_URL ?>/admin/Programmer_voyages"><i class="bi bi-arrow-right-short"></i>Programme du voyage</a>
@@ -229,6 +238,7 @@
                   <?php } ?>
                 </ul>
                 </li>
+              <?php endif; ?>
                 <li class="menu-label"></li>
                 <!-- <li>
               <a href="#">

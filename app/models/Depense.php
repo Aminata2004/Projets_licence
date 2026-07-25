@@ -10,6 +10,7 @@ class Depense extends Model
         'Salaire',
         'Loyer',
         'Assurance',
+        'Remboursement annulation',
         'Autre'
     ];
 

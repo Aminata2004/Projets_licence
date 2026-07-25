@@ -122,7 +122,10 @@ class Compagnies extends  Controller
 
     // Instanciation du modèle
     $compagnie = new Compagnie();
-    $liste_place = $compagnie->SelectAllData('*', "place_minumale");
+    $liste_place = $compagnie->SelectAllData(
+      'place_minumale.*, compagnie.nom_compagnie',
+      'place_minumale INNER JOIN compagnie ON place_minumale.id_compagnie = compagnie.id_compagnie'
+    );
 
     $this->view('admin/place_limite', ['liste_place' => $liste_place]);
   }

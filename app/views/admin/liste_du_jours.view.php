@@ -176,10 +176,23 @@
                                                             Imprimer (imprimante WiFi)
                                                         </a>
 
-                                                        <a href="#" class="dropdown-item cancel-btn text-danger"
-                                                            data-idbillets="<?= $item->idBillets ?>">
-                                                            Annuler le billet
-                                                        </a>
+                                                        <?php
+                                                        // Un simple Utilisateur ne peut pas annuler. Un chef d'escale ne peut que
+                                                        // demander l'annulation (validée ensuite par un Admin) ; l'Admin annule
+                                                        // directement.
+                                                        $droitUser = $_SESSION['droit'] ?? null;
+                                                        $statutAnnulation = $item->status_billets ?? null;
+                                                        ?>
+                                                        <?php if ($statutAnnulation === 'annule'): ?>
+                                                            <span class="dropdown-item text-muted">Billet annulé</span>
+                                                        <?php elseif ($statutAnnulation === 'annulation_demandee'): ?>
+                                                            <span class="dropdown-item text-muted">Demande d'annulation en attente</span>
+                                                        <?php elseif (in_array($droitUser, ['Admin', 'super_admin', 'chef_d_escale'], true)): ?>
+                                                            <a href="#" class="dropdown-item cancel-btn text-danger"
+                                                                data-idbillets="<?= $item->idBillets ?>">
+                                                                <?= in_array($droitUser, ['Admin', 'super_admin'], true) ? "Annuler le billet" : "Demander l'annulation" ?>
+                                                            </a>
+                                                        <?php endif; ?>
 
                                                     </div>
                                                 </div>
@@ -255,26 +268,31 @@
     </div>
 
     <!-- Modal annulation de billet -->
+    <?php $estAdminAnnulation = in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true) ?>
     <div class="modal fade" id="modalAnnulerBillet" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-danger">
-                    <h5 class="modal-title text-white">Annuler le billet</h5>
+                    <h5 class="modal-title text-white"><?= $estAdminAnnulation ? "Annuler le billet" : "Demander l'annulation" ?></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
                 </div>
                 <form action="<?= BASE_URL ?>/admin/Liste_du_jours/annuler" method="post">
                     <?= csrf_field() ?>
                     <div class="modal-body">
-                        <p>Cette action est définitive : la place sera restituée et la caisse ajustée si une caisse est ouverte pour cette gare.</p>
+                        <?php if ($estAdminAnnulation): ?>
+                            <p>Cette action est définitive : la place sera restituée et le remboursement enregistré comme dépense sur la caisse ouverte de cette gare.</p>
+                        <?php else: ?>
+                            <p>La place et l'argent ne seront libérés qu'après confirmation par un Admin. Le billet reste valide en attendant.</p>
+                        <?php endif; ?>
                         <input type="hidden" name="idBillets" id="annulerIdBillets">
                         <div class="mb-3">
-                            <label for="motifAnnulation" class="form-label">Motif (optionnel)</label>
-                            <textarea class="form-control" id="motifAnnulation" name="motif_annulation" rows="2"></textarea>
+                            <label for="motifAnnulation" class="form-label">Motif<?= $estAdminAnnulation ? ' (optionnel)' : '' ?></label>
+                            <textarea class="form-control" id="motifAnnulation" name="motif_annulation" rows="2" <?= $estAdminAnnulation ? '' : 'required' ?>></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
-                        <button type="submit" class="btn btn-danger" name="annuler_billet">Confirmer l'annulation</button>
+                        <button type="submit" class="btn btn-danger" name="annuler_billet"><?= $estAdminAnnulation ? "Confirmer l'annulation" : "Envoyer la demande" ?></button>
                     </div>
                 </form>
             </div>

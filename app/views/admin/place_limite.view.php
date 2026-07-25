@@ -146,23 +146,20 @@
                             <h5 class="mb-0 fw-bold"><i class="bx bx-chair me-2"></i>Limites des places</h5>
                         </div>
                         <div class="card-body p-4">
-                            <div class="d-flex align-items-center flex-wrap gap-3">
-                                <div class="flex-grow-1">
-                                    <p class="mb-0 text-secondary">Le nombre de place </p>
-                                    <?php foreach ($liste_place as $liste_places):
-                                    ?>
+                            <?php foreach ($liste_place as $liste_places): ?>
+                                <div class="d-flex align-items-center flex-wrap gap-3 mb-3">
+                                    <div class="flex-grow-1">
+                                        <p class="mb-0 text-secondary"><?= htmlspecialchars($liste_places->nom_compagnie, ENT_QUOTES) ?></p>
                                         <h4 class="my-1"><?= $liste_places->place_minumale ?></h4>
-                                    <?php endforeach
-                                    ?>
+                                    </div>
+                                    <button type="button" class="add-button btn btn-link ms-auto p-0" data-bs-toggle="modal"
+                                        data-bs-target="#staticBackdrop"
+                                        data-place_minumale="<?= $liste_places->place_minumale ?>"
+                                        data-id_place_minumale="<?= $liste_places->id_place_minumale ?>" title="Modifier">
+                                        <i class='bx bx-message-square-edit fs-1'></i>
+                                    </button>
                                 </div>
-                                <button type="button" class="add-button btn btn-link ms-auto p-0" data-bs-toggle="modal"
-                                    data-bs-target="#staticBackdrop"
-                                    data-place_minumale="<?= $liste_places->place_minumale ?>"
-                                    data-id_place_minumale="<?= $liste_places->id_place_minumale ?>" title="Modifier">
-                                    <i class='bx bx-message-square-edit fs-1'></i>
-                                </button>
-
-                            </div>
+                            <?php endforeach ?>
                         </div>
                     </div>
                 </div>
