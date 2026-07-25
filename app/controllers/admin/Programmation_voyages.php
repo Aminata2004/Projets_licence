@@ -91,8 +91,11 @@ class Programmation_voyages extends Controller
                 // mélanger deux gares d'une même ville sur le même créneau (revalidée côté
                 // modèle, jamais faite confiance telle quelle).
                 $id_agence_depart = $_POST['id_depart_agence'][$index] ?? null;
+                // Gare précise (idAgence) de la destination, pour le même motif : sans elle,
+                // deux gares de la même ville de destination seraient indiscernables.
+                $id_agence_destination = $_POST['id_destination_agence'][$index] ?? null;
 
-                if (!$id_care || !$id_horaire || !$id_destination) {
+                if (!$id_care || !$id_horaire || !$id_destination || !$id_agence_destination) {
                     $errors[] = "Veuillez remplir tous les champs pour la ligne choisie.";
                     continue; // passe à la ligne suivante sans insérer
                 }
@@ -102,7 +105,7 @@ class Programmation_voyages extends Controller
                     continue;
                 }
 
-                $insert_result = $model->insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre, $id_depart, $id_agence_depart);
+                $insert_result = $model->insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre, $id_depart, $id_agence_depart, $id_agence_destination);
                 if ($insert_result) {
                     $update_result = $model->updateCareStatus($id_care, $id_destination);
                     if (!$update_result) {
@@ -170,6 +173,7 @@ class Programmation_voyages extends Controller
             $prog = $programmation_voyage->getProgrammationActivePourCar($car->id_car, $destination);
             $car->id_programmation = $prog->id_programmation ?? null;
             $car->depart_datetime = $prog ? $prog->date_enregistre . ' ' . $prog->id_horaire : null;
+            $car->numeroGareDestination = $prog->numeroGareDestination ?? null;
         }
 
         // Dernière programmation existante (pour pré-remplissage à la demande, cf. bouton "Reproduire").
@@ -208,7 +212,16 @@ class Programmation_voyages extends Controller
      c.numero_car,
      c.nbr_place,
      c.nbr_place_reserve,
-     (c.nbr_place - c.nbr_place_reserve) AS place_disponible',
+     (c.nbr_place - c.nbr_place_reserve) AS place_disponible,
+     COALESCE(
+       (SELECT aDest.numeroGare FROM agence aDest WHERE aDest.idAgence = pv.id_agence_destination),
+       (SELECT aDest.numeroGare
+          FROM programmer p
+          INNER JOIN agence aDest ON p.idDestination = aDest.idAgence
+          WHERE p.idDepart = pv.id_agence AND p.heureDepart = pv.id_horaire
+            AND p.id_compagnie = pv.id_compagnie AND aDest.localite = pv.id_trajet
+          LIMIT 1)
+     ) AS numeroGareDestination',
             'programmation_voyage pv
      INNER JOIN car c ON pv.id_car_programmer = c.id_car',
             // Un voyage annulé (ex. après un transfert de passagers vers une autre gare) ne doit

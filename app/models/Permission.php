@@ -37,6 +37,61 @@ class Permission extends Model
         'Programme_hors_programme',
     ];
 
+    // Chef d'escale : toutes les permissions par défaut SAUF la programmation fixe
+    // ("Programme du voyage") et l'affectation des cars sur un trajet — ces deux écrans
+    // restent réservés à l'Admin/super_admin, un chef d'escale ne fait qu'utiliser les
+    // trajets déjà programmés (programmation journalière, billets, colis, caisse...).
+    private const NOMS_PERMISSIONS_CHEF_ESCALE = [
+        'utilisateur_apercu',
+        'Configuration_apercu',
+        'Configuration_gestion_gare',
+        'Configuration_gestion_escale',
+        'Configuration_gestion_trajets',
+        'Configuration_gestion_horaire',
+        'Configuration_gestion_car/chauffeur',
+        'Configuration_place/limite',
+        'Caisse_creation',
+        'Caisse_apercue',
+        'Caisse_billant',
+        'Billets_creation',
+        'Billets_apercue',
+        'Billets_validation',
+        'Billets_historique',
+        'Billets_notification',
+        'colis_creation',
+        'colis_envoi',
+        'colis_mouvement',
+        'colis_livraison',
+        'colis_reclamation',
+        'colis_historique',
+        'Depenses_gestion',
+        'Programme_programmation_voyage',
+        'Programme_hors_programme',
+    ];
+
+    // Utilisateur simple, service "Billetterie" : uniquement les écrans billets + la
+    // caisse (indispensable pour encaisser une vente de billet).
+    private const NOMS_PERMISSIONS_BILLET = [
+        'Billets_creation',
+        'Billets_apercue',
+        'Billets_validation',
+        'Billets_historique',
+        'Billets_notification',
+        'Caisse_creation',
+        'Caisse_apercue',
+        'Caisse_billant',
+    ];
+
+    // Utilisateur simple, service "Colis / Courrier" : uniquement les écrans colis.
+    private const NOMS_PERMISSIONS_COLIS = [
+        'colis_creation',
+        'colis_envoi',
+        'colis_mouvement',
+        'colis_livraison',
+        'colis_reclamation',
+        'colis_historique',
+    ];
+
     public function getAll()
     {
         return $this->FetchSelectAllWhere("id_permision, nom_permission", "permision", "1", []);
@@ -55,6 +110,39 @@ class Permission extends Model
             $this->insertion_update_simples($sql, [':nom_permission' => $nom]);
         }
     }
+
+    // Assigne à un utilisateur nouvellement créé le jeu de permissions correspondant à
+    // son droit (et, pour un simple Utilisateur, à son service billet/colis), pour qu'il
+    // ait directement accès à ce qu'il peut faire sans passer par l'écran d'assignation.
+    // Ne fait rien pour les droits non concernés (ex: Admin, géré autrement).
+    public function assignPermissionsParDefautPourRole($idUtilisateur, $droit, $profile = null): void
+    {
+        if ($droit === 'super_admin') {
+            $noms = self::NOMS_PERMISSIONS_PAR_DEFAUT;
+        } elseif ($droit === 'chef_d_escale') {
+            $noms = self::NOMS_PERMISSIONS_CHEF_ESCALE;
+        } elseif ($droit === 'Utilisateur' && $profile === 'billet') {
+            $noms = self::NOMS_PERMISSIONS_BILLET;
+        } elseif ($droit === 'Utilisateur' && $profile === 'colis') {
+            $noms = self::NOMS_PERMISSIONS_COLIS;
+        } else {
+            return;
+        }
+
+        $this->seedPermissionsParDefautSiVide();
+
+        $parNom = [];
+        foreach ($this->getAll() as $permission) {
+            $parNom[$permission->nom_permission] = $permission->id_permision;
+        }
+
+        foreach ($noms as $nom) {
+            if (isset($parNom[$nom])) {
+                $this->assignPermissionToUser($idUtilisateur, $parNom[$nom]);
+            }
+        }
+    }
+
     // Récupère les IDs des permissions d'un utilisateur
     public function getUserPermissions($userId)
     {

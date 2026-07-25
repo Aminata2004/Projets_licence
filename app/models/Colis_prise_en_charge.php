@@ -92,43 +92,40 @@
                         ":id_compagnie" => $id_compagnie
                     ]);
 
-                    // === Alimentation de la caisse ===
-                    $stmt = $pdo->prepare("
-                        SELECT c.id_caisse, c.montant_colis
-                        FROM caisse c
-                        INNER JOIN agence a ON c.id_agence = a.idAgence
-                        WHERE c.id_compagnie = :id_compagnie
-                          AND a.localite = :ville
-                          AND a.numeroGare = :numeroGare
-                          AND c.status_caisse = 1
-                        LIMIT 1
-                    ");
-                    $stmt->execute([
-                        ':id_compagnie' => $_SESSION['id_compagnie'],
-                        ':ville'        => $_SESSION['ville'],
-                        ':numeroGare'   => $_SESSION['numero_gare']
-                    ]);
-                    $caisse = $stmt->fetch(PDO::FETCH_ASSOC);
+                    // === Alimentation de la caisse individuelle de l'agent colis ===
+                    $idColisInsere = (int)$pdo->lastInsertId();
+                    $caisseModel = new Caisse_utilisateur();
+                    $creditOk = $caisseModel->crediterColis(
+                        $pdo,
+                        $id_utilisateur,
+                        (float)$fraix_transaction,
+                        $code_colis,
+                        $idColisInsere
+                    );
 
-                    if ($caisse) {
-                        $stmtUpdate = $pdo->prepare("
-                            UPDATE caisse
-                            SET montant_colis = montant_colis + :montant
-                            WHERE id_caisse = :id_caisse
-                        ");
-                        $stmtUpdate->execute([
-                            ':montant'   => $fraix_transaction,
-                            ':id_caisse' => $caisse['id_caisse']
-                        ]);
-                    } else {
+                    if ($creditOk === false) {
                         $pdo->rollBack();
                         $this->set_swal(
                             "Erreur caisse",
-                            "Opération bloquée : Aucune caisse ouverte pour cette gare. Veuillez ouvrir une caisse d'abord.",
+                            "Opération bloquée : Aucune caisse ouverte pour votre compte. Veuillez ouvrir votre caisse d'abord.",
                             "error",
                             "#dc3545"
                         );
                         return false;
+                    }
+
+                    // Maintenir la caisse d'agence pour compatibilité (bilan global)
+                    $stmtA = $pdo->prepare("
+                        SELECT c.id_caisse FROM caisse c
+                        INNER JOIN agence a ON c.id_agence = a.idAgence
+                        WHERE c.id_compagnie = :ic AND a.localite = :ville
+                          AND a.numeroGare = :ng AND c.status_caisse = 1 LIMIT 1
+                    ");
+                    $stmtA->execute([':ic' => $_SESSION['id_compagnie'], ':ville' => $_SESSION['ville'], ':ng' => $_SESSION['numero_gare']]);
+                    $caisseAgence = $stmtA->fetch(PDO::FETCH_ASSOC);
+                    if ($caisseAgence) {
+                        $pdo->prepare("UPDATE caisse SET montant_colis = montant_colis + :m WHERE id_caisse = :id")
+                            ->execute([':m' => $fraix_transaction, ':id' => $caisseAgence['id_caisse']]);
                     }
                     $pdo->commit();
 

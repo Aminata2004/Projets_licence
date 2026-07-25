@@ -76,19 +76,15 @@
                         $idNouvelUtilisateur = (int) $pdo->lastInsertId();
                         $pdo->commit();
 
-                        // Un super_admin a accès à tout par conception (voir userHasPermission) ;
-                        // on lui assigne aussi toutes les permissions en base pour que les écrans
-                        // qui lisent directement user_permission (ex: assignation) reflètent ça.
+                        // Chaque rôle reçoit directement le jeu de permissions correspondant à ce
+                        // qu'il peut faire (super_admin : tout ; chef_d_escale : tout sauf la
+                        // programmation fixe et l'affectation des cars ; Utilisateur billet/colis :
+                        // uniquement son service), sans passer par l'écran d'assignation manuelle.
                         // Fait après commit() : assignPermissionToUser() ouvre sa propre connexion
                         // PDO (Model::connect() n'est pas partagée), donc la ligne utilisateur doit
                         // déjà être visible pour les autres connexions.
-                        if ($droit === 'super_admin') {
-                            $permissionModel = new Permission();
-                            $permissionModel->seedPermissionsParDefautSiVide();
-                            foreach ($permissionModel->getAll() as $permission) {
-                                $permissionModel->assignPermissionToUser($idNouvelUtilisateur, $permission->id_permision);
-                            }
-                        }
+                        $permissionModel = new Permission();
+                        $permissionModel->assignPermissionsParDefautPourRole($idNouvelUtilisateur, $droit, $profile);
 
                         $this->set_swal(
                             "👤 Utilisateur ajouté !",

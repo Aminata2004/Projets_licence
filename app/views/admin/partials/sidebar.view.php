@@ -48,6 +48,10 @@
             </li>
           <?php }
           ?>
+          <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)): ?>
+            <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours/demandesAnnulation"><i class="bi bi-arrow-right-short"></i>Demandes d'annulation</a>
+            </li>
+          <?php endif; ?>
         </ul>
         </li>
         <?php if ($user->userHasPermission('Billets_creation')) { ?>
@@ -144,12 +148,22 @@
               <ul>
                 <?php if ($user->userHasPermission('Caisse_apercue')) {
                 ?>
-                  <li> <a href="<?= BASE_URL ?>/admin/Caisse"><i class="bi bi-arrow-right-short"></i>Ajouter caisse</a>
-                  </li>
+                  <!-- Module de caisse individuelle (remplace l'ancienne "Caisse Générale") -->
+                  <?php if (in_array($_SESSION['droit'] ?? null, ['Utilisateur', 'Admin', 'chef_d_escale'], true)): ?>
+                    <li> <a href="<?= BASE_URL ?>/admin/Caisse/ma_caisse"><i class="bi bi-arrow-right-short"></i>Ma Caisse</a></li>
+                  <?php endif; ?>
+
+                  <?php if (in_array($_SESSION['droit'] ?? null, ['chef_d_escale', 'Admin'], true)): ?>
+                    <li> <a href="<?= BASE_URL ?>/admin/Caisse/caisses_escale"><i class="bi bi-arrow-right-short"></i>Supervision Escale</a></li>
+                  <?php endif; ?>
+
+                  <?php if ($_SESSION['droit'] === 'Admin'): ?>
+                    <li> <a href="<?= BASE_URL ?>/admin/Caisse/rapport_proprietaire"><i class="bi bi-arrow-right-short"></i>Rapport Compagnie</a></li>
+                  <?php endif; ?>
                 <?php } ?>
                 <?php if ($user->userHasPermission('Caisse_billant')) {
                 ?>
-                  <li> <a href="<?= BASE_URL ?>/admin/Caisse/bilant_caisse_billets"><i class="bi bi-arrow-right-short"></i>Billant de caisse</a>
+                  <li> <a href="<?= BASE_URL ?>/admin/Caisse/bilant_caisse_billets"><i class="bi bi-arrow-right-short"></i>Bilan de caisse</a>
                   </li>
                 <?php } ?>
               </ul>
@@ -197,7 +211,13 @@
                 </li>
               <?php endif; ?>
 
-              <?php if ($user->userHasPermission('Programme_Creation')) { ?>
+              <?php
+                $peutVoirGProgramme = $user->userHasPermission('Programme_Creation')
+                    || $user->userHasPermission('Programme_programmer_car')
+                    || $user->userHasPermission('Programme_programmation_voyage')
+                    || $user->userHasPermission('Programme_hors_programme');
+              ?>
+              <?php if ($peutVoirGProgramme): ?>
                 <li class="menu-label">Gestion des programmations</li>
                 <li>
                   <a href="javascript:;" class="has-arrow">
@@ -205,7 +225,6 @@
                     </div>
                     <div class="menu-title">G-programme</div>
                   </a>
-                <?php } ?>
                 <ul>
                   <?php if ($user->userHasPermission('Programme_Creation')) { ?>
                     <li> <a href="<?= BASE_URL ?>/admin/Programmer_voyages"><i class="bi bi-arrow-right-short"></i>Programme du voyage</a>
@@ -229,6 +248,7 @@
                   <?php } ?>
                 </ul>
                 </li>
+              <?php endif; ?>
                 <li class="menu-label"></li>
                 <!-- <li>
               <a href="#">

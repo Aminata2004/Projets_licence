@@ -47,14 +47,23 @@
                 $sql = "INSERT INTO compagnie (nom_compagnie, libele, slogant, logo)
                 VALUES (:nom_compagnie, :libele, :slogant, :logo)";
 
-                $ok = $this->insertion_update_simples($sql, [
+                $result = $this->insertion_update_simples_insert_id($sql, [
                     ':nom_compagnie' => $nom_compagnie,
                     ':libele'        => $libele,
                     ':slogant'       => $slogant,
                     ':logo'          => $logoNameInDb
                 ]);
+                $ok = $result['q'];
 
                 if ($ok) {
+                    // Chaque compagnie a besoin de sa propre limite de places (utilisée pour les
+                    // réservations "demain") : sans cette ligne, la lecture par id_compagnie ne
+                    // trouverait rien et bloquerait les réservations du lendemain.
+                    $this->insertion_update_simples(
+                        "INSERT INTO place_minumale (place_minumale, id_compagnie) VALUES (0, :ic)",
+                        [':ic' => $result['lastInsertId']]
+                    );
+
                     $this->set_flash("Compagnie ajoutée avec succès.", "success");
                     header("Location: " . BASE_URL . "/admin/Compagnies");
                     exit;
