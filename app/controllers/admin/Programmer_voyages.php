@@ -36,6 +36,7 @@ class Programmer_voyages extends  Controller
     LEFT JOIN agence a2 ON p.idDestination = a2.idAgence
     WHERE p.id_compagnie = :id_compagnie
     GROUP BY p.idProgrammer
+    ORDER BY a1.localite, a2.localite, p.heureDepart
 ", ['id_compagnie' => $id_compagnie]);
 
         // Détail des escales (id + nom + prix) de chaque programme, utilisé pour le formulaire de modification
@@ -48,6 +49,20 @@ class Programmer_voyages extends  Controller
                WHERE lt.id_trajets = :id AND lt.type_trajet = 'programmer'",
               [':id' => $programme->idProgrammer]
             );
+          }
+
+          // Un même trajet (départ/destination/heure) ne devrait jamais apparaître deux
+          // fois : ça ne peut plus arriver depuis la création/modification (contrôles
+          // ajoutés), mais on le signale si ça existe encore dans des données plus
+          // anciennes, plutôt que de le laisser passer inaperçu dans la liste.
+          $occurrences = [];
+          foreach ($listeProgrammer as $programme) {
+            $cle = $programme->idDepart . '|' . $programme->idDestination . '|' . $programme->heureDepart;
+            $occurrences[$cle] = ($occurrences[$cle] ?? 0) + 1;
+          }
+          foreach ($listeProgrammer as $programme) {
+            $cle = $programme->idDepart . '|' . $programme->idDestination . '|' . $programme->heureDepart;
+            $programme->estDoublon = $occurrences[$cle] > 1;
           }
         }
       } else {
@@ -181,7 +196,15 @@ class Programmer_voyages extends  Controller
       $programmer_voyage->editPrix($data);
 
       if (!empty($_POST['heureDepart']) && !empty($_POST['rdv'])) {
-        $programmer_voyage->editHoraire($_POST['idProgrammer'], $_POST['heureDepart'], $_POST['rdv']);
+        $resultatHoraire = $programmer_voyage->editHoraire($_POST['idProgrammer'], $_POST['heureDepart'], $_POST['rdv']);
+        if ($resultatHoraire === 'doublon') {
+          $programmer_voyage->set_flash(
+            "Impossible de changer l'heure : ce trajet existe déjà à cette heure-là. Modifiez plutôt ce trajet existant, ou choisissez une autre heure.",
+            "danger"
+          );
+          header("Location: " . BASE_URL . "/admin/Programmer_voyages/index");
+          exit;
+        }
       }
 
       if (!empty($_POST['prix_escale']) && is_array($_POST['prix_escale'])) {

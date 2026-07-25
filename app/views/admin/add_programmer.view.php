@@ -118,14 +118,24 @@
                                                     </div>
 
                                                     <div class="col-12 col-lg-4">
-                                                        <label class="form-label"><i class="bx bx-map-alt text-primary me-1"></i>Escale(s)</label>
-                                                        <select class="form-control multiple-select" multiple name="idEscale[]" data-placeholder="Choisissez une ou plusieurs escales">
-                                                            <?php foreach ($listeEscale as $listeEscales): ?>
-                                                                <option value="<?= htmlspecialchars($listeEscales->id_escale); ?>">
-                                                                    <?= htmlspecialchars($listeEscales->escales); ?>
-                                                                </option>
-                                                            <?php endforeach; ?>
-                                                        </select>
+                                                        <label class="form-label"><i class="bx bx-map-alt text-primary me-1"></i>Escale(s) <small class="text-muted">(optionnel)</small></label>
+                                                        <div class="border rounded p-2 shadow-sm" style="max-height: 180px; overflow-y: auto;">
+                                                            <?php if (empty($listeEscale)): ?>
+                                                                <p class="text-muted small mb-0">Aucune escale disponible.</p>
+                                                            <?php else: ?>
+                                                                <?php foreach ($listeEscale as $listeEscales): ?>
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input escale-checkbox" type="checkbox" name="idEscale[]"
+                                                                            value="<?= htmlspecialchars($listeEscales->id_escale); ?>"
+                                                                            id="escale<?= htmlspecialchars($listeEscales->id_escale); ?>"
+                                                                            data-nom="<?= htmlspecialchars($listeEscales->escales); ?>">
+                                                                        <label class="form-check-label" for="escale<?= htmlspecialchars($listeEscales->id_escale); ?>">
+                                                                            <?= htmlspecialchars($listeEscales->escales); ?>
+                                                                        </label>
+                                                                    </div>
+                                                                <?php endforeach; ?>
+                                                            <?php endif; ?>
+                                                        </div>
                                                     </div>
 
                                                     <div class="col-12 col-lg-4">
@@ -157,25 +167,31 @@
                                             <!-- Étape 2 : Horaire -->
                                             <div id="step-horaire" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger2">
                                                 <div class="row g-3">
-                                                    <div class="col-12 col-lg-6">
-                                                        <label for="heureDepart" class="form-label">
-                                                            <i class="bx bx-time text-primary me-1"></i>Heure de départ<span class="text-danger ms-1">*</span>
+                                                    <div class="col-12">
+                                                        <label class="form-label">
+                                                            <i class="bx bx-time text-primary me-1"></i>Heure(s) de départ<span class="text-danger ms-1">*</span>
                                                         </label>
-                                                        <select class="single-select" id="heureDepart" name="heureDepart" onchange="calculerRDV(); checkStepHoraire();">
-                                                            <option value="United States">Toutes les heures</option>
-                                                            <?php foreach ($listehoraire as $listehoraires): ?>
-                                                                <option value="<?= $listehoraires->heuredepart ?>">
-                                                                    <?= $listehoraires->heuredepart ?>
-                                                                </option>
-                                                            <?php endforeach ?>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="col-12 col-lg-6">
-                                                        <label for="rdv" class="form-label">
-                                                            <i class="bx bx-alarm text-primary me-1"></i>RDV<span class="text-danger ms-1">*</span>
-                                                        </label>
-                                                        <input type="time" class="form-control shadow-sm" id="rdv" name="rdv" value="" required>
+                                                        <p class="small text-muted mb-2">
+                                                            Cochez une ou plusieurs heures : un voyage sera programmé pour chacune, avec le même itinéraire et les mêmes tarifs saisis aux autres étapes. Le RDV (rendez-vous) est calculé automatiquement, 45 min avant chaque départ.
+                                                        </p>
+                                                        <div class="d-flex flex-wrap gap-2">
+                                                            <?php if (empty($listehoraire)): ?>
+                                                                <p class="text-muted small mb-0">Aucun horaire disponible pour votre compagnie.</p>
+                                                            <?php else: ?>
+                                                                <?php foreach ($listehoraire as $listehoraires):
+                                                                    $idHoraire = 'horaire' . htmlspecialchars(str_replace(':', '', $listehoraires->heuredepart));
+                                                                ?>
+                                                                    <div class="form-check form-check-inline border rounded px-3 py-2 m-0">
+                                                                        <input class="form-check-input horaire-checkbox" type="checkbox" name="heureDepart[]"
+                                                                            value="<?= htmlspecialchars($listehoraires->heuredepart) ?>"
+                                                                            id="<?= $idHoraire ?>">
+                                                                        <label class="form-check-label" for="<?= $idHoraire ?>">
+                                                                            <?= htmlspecialchars($listehoraires->heuredepart) ?>
+                                                                        </label>
+                                                                    </div>
+                                                                <?php endforeach ?>
+                                                            <?php endif; ?>
+                                                        </div>
                                                     </div>
 
                                                     <div class="col-12">
@@ -205,6 +221,12 @@
                                                     </div>
 
                                                     <div class="col-12" id="fraixEscaleField" style="display: none;">
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <label class="form-label fw-semibold mb-0"><i class="bx bx-map-alt me-1"></i>Frais des escales</label>
+                                                            <button type="button" id="btnAppliquerTous" class="btn btn-sm btn-outline-primary">
+                                                                <i class="bx bx-copy"></i> Appliquer le tarif de base à toutes les escales
+                                                            </button>
+                                                        </div>
                                                         <div id="fraixEscaleContainer"></div>
                                                     </div>
 
@@ -245,57 +267,56 @@
     <!--end wrapper-->
     <?php $this->view('admin/partials/foot') ?>
     <script>
-        function calculerRDV() {
-            let heureDepart = document.getElementById("heureDepart").value;
-            let rdvInput = document.getElementById("rdv");
+        // Synchronise les champs de tarif par escale avec les cases cochées : ajoute un
+        // champ (pré-rempli avec le tarif de base) pour toute escale nouvellement cochée,
+        // retire celui d'une escale décochée, et laisse intacts ceux des escales toujours
+        // cochées pour ne jamais écraser un tarif déjà personnalisé par l'utilisateur.
+        document.addEventListener('DOMContentLoaded', function() {
+            const prixInput = document.getElementById('prix');
+            const fraixEscaleField = document.getElementById('fraixEscaleField');
+            const fraixEscaleContainer = document.getElementById('fraixEscaleContainer');
+            const escaleCheckboxes = document.querySelectorAll('.escale-checkbox');
+            const btnAppliquerTous = document.getElementById('btnAppliquerTous');
 
-            if (heureDepart) {
-                // Convertir l'heure de départ en heures et minutes
-                let [heures, minutes] = heureDepart.split(':').map(Number);
+            function syncEscalePriceFields() {
+                const cochees = Array.from(escaleCheckboxes).filter(cb => cb.checked);
 
-                // Soustraire 45 minutes
-                minutes -= 45;
-                if (minutes < 0) {
-                    minutes += 60;
-                    heures -= 1;
-                }
+                fraixEscaleContainer.querySelectorAll('[data-escale-id]').forEach(function(group) {
+                    const dejaCoche = cochees.some(cb => cb.value === group.dataset.escaleId);
+                    if (!dejaCoche) {
+                        group.remove();
+                    }
+                });
 
-                // Formatage pour affichage (ajout de zéro si nécessaire)
-                let heureRDV = (heures < 10 ? "0" : "") + heures + ":" + (minutes < 10 ? "0" : "") + minutes;
+                cochees.forEach(function(cb) {
+                    if (fraixEscaleContainer.querySelector('[data-escale-id="' + cb.value + '"]')) {
+                        return;
+                    }
+                    const group = document.createElement('div');
+                    group.className = 'input-group mb-2';
+                    group.dataset.escaleId = cb.value;
+                    group.innerHTML =
+                        '<span class="input-group-text">' + cb.dataset.nom + '</span>' +
+                        '<input type="number" class="form-control" name="prix_escale[' + cb.value + ']" placeholder="Frais pour ' + cb.dataset.nom + '">' +
+                        '<span class="input-group-text">FCFA</span>';
+                    group.querySelector('input').value = prixInput.value || '';
+                    fraixEscaleContainer.appendChild(group);
+                });
 
-                // Mettre la valeur calculée dans le champ RDV
-                rdvInput.value = heureRDV;
+                fraixEscaleField.style.display = cochees.length > 0 ? '' : 'none';
             }
-        }
-    </script>
-    <script>
-        $(document).ready(function() {
-            const fraixEscaleField = $('#fraixEscaleField');
-            const fraixEscaleContainer = $('#fraixEscaleContainer');
 
-            $('select[name="idEscale[]"]').on('change', function() {
-                const selectEscale = $(this);
-                const selected = selectEscale.val(); // Récupère toutes les escales sélectionnées
-                fraixEscaleContainer.empty(); // On vide le contenu précédent
-
-                if (selected && selected.length > 0) {
-                    fraixEscaleContainer.append('<label class="form-label fw-semibold"><i class="bx bx-map-alt me-1"></i>Frais des escales</label>');
-                    selected.forEach((id) => {
-                        const escaleName = selectEscale.find('option[value="' + id + '"]').text().trim();
-                        const group = $('<div class="input-group mb-2"></div>');
-                        group.append($('<span class="input-group-text"></span>').text(escaleName));
-                        group.append($('<input type="number" class="form-control">').attr({
-                            name: 'prix_escale[' + id + ']',
-                            placeholder: 'Frais pour ' + escaleName
-                        }));
-                        group.append('<span class="input-group-text">FCFA</span>');
-                        fraixEscaleContainer.append(group);
-                    });
-                    fraixEscaleField.show();
-                } else {
-                    fraixEscaleField.hide();
-                }
+            escaleCheckboxes.forEach(function(cb) {
+                cb.addEventListener('change', syncEscalePriceFields);
             });
+
+            if (btnAppliquerTous) {
+                btnAppliquerTous.addEventListener('click', function() {
+                    fraixEscaleContainer.querySelectorAll('input[type="number"]').forEach(function(input) {
+                        input.value = prixInput.value || '';
+                    });
+                });
+            }
         });
     </script>
 
@@ -347,8 +368,10 @@
     <script>
         // Avance automatiquement à l'étape suivante dès que les champs obligatoires
         // de l'étape courante sont remplis, pour aller plus vite dans la saisie.
+        // L'étape Horaire n'a plus d'avance automatique : comme on peut y cocher
+        // plusieurs heures, avancer dès la première case cochée empêcherait d'en
+        // cocher d'autres. On garde le bouton "Suivant" manuel pour cette étape.
         let step1Complete = false;
-        let step2Complete = false;
 
         function checkStepItineraire() {
             const isComplete = document.getElementById('choixAgence').value !== '' &&
@@ -359,17 +382,8 @@
             step1Complete = isComplete;
         }
 
-        function checkStepHoraire() {
-            const isComplete = document.getElementById('rdv').value !== '';
-            if (isComplete && !step2Complete && typeof stepper1 !== 'undefined' && stepper1) {
-                stepper1.next();
-            }
-            step2Complete = isComplete;
-        }
-
         document.getElementById('choixAgence').addEventListener('change', checkStepItineraire);
         document.getElementById('choixAgences').addEventListener('change', checkStepItineraire);
-        document.getElementById('rdv').addEventListener('input', checkStepHoraire);
     </script>
 
 

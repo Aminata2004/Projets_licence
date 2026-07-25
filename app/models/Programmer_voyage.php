@@ -2,6 +2,11 @@
     class Programmer_voyage extends Model
     {
 
+        // Le formulaire permet de cocher plusieurs heures de départ à la fois (au lieu
+        // d'en choisir une seule) : le même itinéraire/escales/tarifs saisis une fois sont
+        // réutilisés pour programmer un voyage par heure cochée, RDV calculé automatiquement
+        // (heure de départ - 45 min) pour chacune. Une heure déjà programmée pour ce même
+        // trajet est ignorée (pas de doublon) plutôt que de faire échouer tout l'envoi.
         public function saveProgrammer()
         {
             $errors = [];
@@ -26,12 +31,53 @@
                 $errors[] = "Impossible d'enregistrer ce trajet : le départ et la destination sont dans la même localité (voyage interne).";
             }
 
-            // Si pas d'erreurs
-            if (count($errors) === 0) {
-                // Insertion dans programmer
+            $heureDeparts = $_POST['heureDepart'] ?? [];
+            if (!is_array($heureDeparts)) {
+                $heureDeparts = [$heureDeparts];
+            }
+            $heureDeparts = array_values(array_unique(array_filter(
+                $heureDeparts,
+                fn($h) => trim((string) $h) !== ''
+            )));
+            if (empty($heureDeparts)) {
+                $errors[] = "Veuillez cocher au moins une heure de départ.";
+            }
+
+            if (!empty($errors)) {
+                $errorsHtml = implode("<br>", array_map('htmlspecialchars', $errors));
+                $this->set_swal("Erreurs détectées", $errorsHtml, "warning", "#ffc107");
+                return $errors;
+            }
+
+            $idEscales = !empty($_POST['idEscale']) && is_array($_POST['idEscale']) ? $_POST['idEscale'] : [];
+            $prixEscales = $_POST['prix_escale'] ?? [];
+
+            $nbAjoutes = 0;
+            $dejaExistants = [];
+
+            foreach ($heureDeparts as $heureDepart) {
+                // Un même trajet (départ/destination/heure) déjà programmé n'est pas dupliqué.
+                $existe = $this->FetchSelectWhere(
+                    "idProgrammer",
+                    "programmer",
+                    "idDepart = :idDepart AND idDestination = :idDestination AND heureDepart = :heureDepart AND id_compagnie = :id_compagnie",
+                    [
+                        ":idDepart" => $idDepart,
+                        ":idDestination" => $idDestination,
+                        ":heureDepart" => $heureDepart,
+                        ":id_compagnie" => $id_compagnie
+                    ]
+                );
+                if ($existe) {
+                    $dejaExistants[] = $heureDepart;
+                    continue;
+                }
+
+                $rdv = $this->calculerRdv($heureDepart);
+
                 $id_trajet = $this->insertion_update_simple(
                     "INSERT INTO programmer (idDepart, idDestination, heureDepart, rdv, prix, id_compagnie)
-             VALUES(:idDepart, :idDestination, :heureDepart, :rdv, :prix, :id_compagnie)",
+                     VALUES(:idDepart, :idDestination, :heureDepart, :rdv, :prix, :id_compagnie)",
                     [
                         ":idDepart" => $idDepart,
                         ":idDestination" => $idDestination,
@@ -42,89 +88,106 @@
                     ]
                 );
 
-                // Si insertion réussie
-                if ($id_trajet) {
-                    $programmer = true;
-
-                    // Gestion des escales (s'il y en a)
-                    if (!empty($_POST['idEscale']) && is_array($_POST['idEscale'])) {
-                        foreach ($_POST['idEscale'] as $escale) {
-                            $prixEscale = isset($_POST['prix_escale'][$escale])
-                                ? (float)$_POST['prix_escale'][$escale]
-                                : 0;
-
-                            $programmer = $this->insertion_update_simple(
-                                "INSERT INTO ligneTrajet (id_escales, id_trajets, type_trajet, prix_escale)
-                         VALUES(:id_escales, :id_trajets, 'programmer', :prix_escale)",
-                                [
-                                    ":id_escales" => $escale,
-                                    ":id_trajets" => $id_trajet,
-                                    ":prix_escale" => $prixEscale
-                                ]
-                            );
-                        }
-                    }
-
-                    // Crée automatiquement le trajet retour (destination -> depart) s'il n'existe pas déjà,
-                    // pour qu'une ligne soit toujours disponible dans les deux sens.
-                    $this->ensureReverseProgrammer(
-                        $idDepart,
-                        $idDestination,
-                        $heureDepart,
-                        $rdv,
-                        $prix,
-                        $id_compagnie,
-                        !empty($_POST['idEscale']) && is_array($_POST['idEscale']) ? $_POST['idEscale'] : [],
-                        $_POST['prix_escale'] ?? []
-                    );
-
-                    // Message de succès
-                    if ($programmer) {
-                        $this->set_swal(
-                            "🕒 Programme enregistré !",
-                            "Le programme a été ajouté avec succès (aller-retour créé automatiquement).",
-                            "success",
-                            "#0d6efd",
-                            BASE_URL . "/admin/Programmer_voyages/add_programmer"
-                        );
-                    } else {
-                        $this->set_swal(
-                            "Erreur",
-                            "Échec de l'ajout des escales au trajet.",
-                            "error",
-                            "#dc3545"
-                        );
-                    }
-                } else {
-                    $errors[] = "Une erreur est survenue lors de l'enregistrement du trajet.";
+                if (!$id_trajet) {
+                    $errors[] = "Échec de l'enregistrement du trajet pour $heureDepart.";
+                    continue;
                 }
+
+                foreach ($idEscales as $escale) {
+                    $prixEscale = isset($prixEscales[$escale]) ? (float) $prixEscales[$escale] : 0;
+                    $this->insertion_update_simple(
+                        "INSERT INTO ligneTrajet (id_escales, id_trajets, type_trajet, prix_escale)
+                         VALUES(:id_escales, :id_trajets, 'programmer', :prix_escale)",
+                        [
+                            ":id_escales" => $escale,
+                            ":id_trajets" => $id_trajet,
+                            ":prix_escale" => $prixEscale
+                        ]
+                    );
+                }
+
+                // Crée automatiquement le trajet retour (destination -> depart) s'il n'existe pas déjà,
+                // pour qu'une ligne soit toujours disponible dans les deux sens, pour cette heure.
+                $this->ensureReverseProgrammer(
+                    $idDepart,
+                    $idDestination,
+                    $heureDepart,
+                    $rdv,
+                    $prix,
+                    $id_compagnie,
+                    $idEscales,
+                    $prixEscales
+                );
+
+                $nbAjoutes++;
             }
 
-            // Affichage des erreurs si présentes
-            if (!empty($errors)) {
-                $errorsHtml = implode("<br>", array_map('htmlspecialchars', $errors));
+            if ($nbAjoutes > 0) {
+                $message = $nbAjoutes > 1
+                    ? "$nbAjoutes voyages programmés avec succès (aller-retour créé automatiquement pour chacun)."
+                    : "Le programme a été ajouté avec succès (aller-retour créé automatiquement).";
+                if (!empty($dejaExistants)) {
+                    $message .= " Déjà programmé, donc ignoré pour : " . implode(', ', $dejaExistants) . ".";
+                }
                 $this->set_swal(
-                    "Erreurs détectées",
-                    $errorsHtml,
+                    "🕒 Programme enregistré !",
+                    $message,
+                    "success",
+                    "#0d6efd",
+                    BASE_URL . "/admin/Programmer_voyages/add_programmer"
+                );
+            } elseif (!empty($dejaExistants)) {
+                $this->set_swal(
+                    "Déjà programmé",
+                    "Ce trajet est déjà programmé pour : " . implode(', ', $dejaExistants) . ".",
                     "warning",
                     "#ffc107"
                 );
+            } elseif (!empty($errors)) {
+                $errorsHtml = implode("<br>", array_map('htmlspecialchars', $errors));
+                $this->set_swal("Erreurs détectées", $errorsHtml, "warning", "#ffc107");
             }
 
             return $errors;
         }
 
+        // RDV = heure de départ moins 45 minutes (même règle que l'ancien calcul en JS,
+        // maintenant appliquée par heure côté serveur puisqu'on peut en cocher plusieurs).
+        private function calculerRdv(string $heureDepart): string
+        {
+            $parts = array_map('intval', explode(':', $heureDepart));
+            $heures = $parts[0] ?? 0;
+            $minutes = $parts[1] ?? 0;
+
+            $minutes -= 45;
+            if ($minutes < 0) {
+                $minutes += 60;
+                $heures -= 1;
+                if ($heures < 0) {
+                    $heures += 24;
+                }
+            }
+
+            return sprintf('%02d:%02d', $heures, $minutes);
+        }
+
         // Garantit qu'un trajet et son sens inverse existent toujours ensemble,
         // pour qu'un car ne se retrouve jamais bloqué sans destination valide au retour.
+        //
+        // Le contrôle d'existence porte aussi sur heureDepart, pas seulement sur le couple
+        // départ/destination : sinon, avec plusieurs horaires programmés dans le même envoi
+        // (voir saveProgrammer), un seul trajet retour aurait été créé au lieu d'un par
+        // horaire, cassant la correspondance "un départ par horaire" côté retour.
         private function ensureReverseProgrammer($idDepart, $idDestination, $heureDepart, $rdv, $prix, $id_compagnie, $idEscales = [], $prixEscales = [])
         {
             $existingReverse = $this->FetchSelectWhere(
                 "idProgrammer",
                 "programmer",
-                "idDepart = :idDepart AND idDestination = :idDestination AND id_compagnie = :id_compagnie",
+                "idDepart = :idDepart AND idDestination = :idDestination AND heureDepart = :heureDepart AND id_compagnie = :id_compagnie",
                 [
                     ":idDepart" => $idDestination,
                     ":idDestination" => $idDepart,
+                    ":heureDepart" => $heureDepart,
                     ":id_compagnie" => $id_compagnie
                 ]
             );
@@ -189,8 +252,39 @@
             }
         }
 
+        // Empêche de changer l'heure d'un trajet vers une heure déjà utilisée par un AUTRE
+        // trajet identique (même départ/destination) : sans ce contrôle, on pouvait créer un
+        // doublon simplement en éditant l'heure, en contournant la vérification déjà en
+        // place à la création (voir saveProgrammer()). Retourne 'doublon' dans ce cas.
         public function editHoraire($idProgrammer, $heureDepart, $rdv)
         {
+            $trajet = $this->FetchSelectWhere(
+                "idDepart, idDestination, id_compagnie",
+                "programmer",
+                "idProgrammer = :id",
+                [":id" => $idProgrammer]
+            );
+            if (!$trajet) {
+                return false;
+            }
+
+            $doublon = $this->FetchSelectWhere(
+                "idProgrammer",
+                "programmer",
+                "idDepart = :idDepart AND idDestination = :idDestination AND heureDepart = :heureDepart
+                 AND id_compagnie = :id_compagnie AND idProgrammer != :idProgrammer",
+                [
+                    ":idDepart" => $trajet->idDepart,
+                    ":idDestination" => $trajet->idDestination,
+                    ":heureDepart" => $heureDepart,
+                    ":id_compagnie" => $trajet->id_compagnie,
+                    ":idProgrammer" => $idProgrammer,
+                ]
+            );
+            if ($doublon) {
+                return 'doublon';
+            }
+
             $req = "UPDATE programmer
             SET heureDepart = :heureDepart, rdv = :rdv
             WHERE idProgrammer = :idProgrammer";

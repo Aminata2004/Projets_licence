@@ -74,8 +74,15 @@
                             <tbody class="text-center">
                                 <?php foreach ($listeProgrammer as $listeProgrammers): ?>
                                     <?php if ($_SESSION['droit'] === 'Admin' || $listeProgrammers->departLocalite === $_SESSION['ville']): ?>
-                                        <tr>
-                                            <td><?= $listeProgrammers->departLocalite .' ( ' . $listeProgrammers->numeroGare1 . ' ) ' ?></td>
+                                        <tr class="<?= !empty($listeProgrammers->estDoublon) ? 'table-warning' : '' ?>">
+                                            <td>
+                                                <?= $listeProgrammers->departLocalite .' ( ' . $listeProgrammers->numeroGare1 . ' ) ' ?>
+                                                <?php if (!empty($listeProgrammers->estDoublon)): ?>
+                                                    <br><span class="badge bg-warning text-dark" title="Un autre trajet identique (même départ/destination/heure) existe déjà — vérifiez les deux et supprimez celui en trop.">
+                                                        <i class="bx bx-error"></i> Doublon
+                                                    </span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td><?= $listeProgrammers->destinationLocalite  .' ( ' . $listeProgrammers->numeroGare2 . ' ) ' ?></td>
                                             <td><?= $listeProgrammers->rdv ?></td>
                                             <td><?= $listeProgrammers->heureDepart ?></td>
