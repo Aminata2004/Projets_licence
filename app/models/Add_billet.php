@@ -710,39 +710,35 @@
                     }
                 }
 
-                // === Alimentation de la caisse (si une caisse active est ouverte) ===
-                $stmt = $pdo->prepare("
-                    SELECT c.id_caisse, c.montant_billets
-                    FROM caisse c
-                    INNER JOIN agence a ON c.id_agence = a.idAgence
-                    WHERE c.id_compagnie = :id_compagnie
-                      AND a.localite     = :ville
-                      AND a.numeroGare   = :numeroGare
-                      AND c.status_caisse = 1
-                    LIMIT 1
-                ");
-                $stmt->execute([
-                    ':id_compagnie' => $_SESSION['id_compagnie'],
-                    ':ville'        => $departLocalite,
-                    ':numeroGare'   => $numeroGareDepart
-                ]);
-                $caisse = $stmt->fetch(PDO::FETCH_ASSOC);
+                // === Alimentation de la caisse individuelle de l'utilisateur ===
+                $caisseModel = new Caisse_utilisateur();
+                $idBilletCreeTemp = $idBilletCree ?? (int)$pdo->lastInsertId();
+                $creditOk = $caisseModel->crediterBillet(
+                    $pdo,
+                    (int)$_SESSION['id_utilisateur'],
+                    $prixUtilise,
+                    $numeroBillets,
+                    $idBilletCree
+                );
 
-                if ($caisse) {
-                    // Caisse ouverte → alimenter
-                    $stmtUpdate = $pdo->prepare("
-                        UPDATE caisse
-                        SET montant_billets = montant_billets + :montant
-                        WHERE id_caisse = :id_caisse
-                    ");
-                    $stmtUpdate->execute([
-                        ':montant'   => $prixUtilise,
-                        ':id_caisse' => $caisse['id_caisse']
-                    ]);
-                } else {
+                if ($creditOk === false) {
                     $pdo->rollBack();
-                    $this->set_flash("Opération bloquée : Aucune caisse ouverte pour cette gare. Veuillez ouvrir une caisse d'abord.", "danger");
+                    $this->set_flash("Opération bloquée : Aucune caisse ouverte pour votre compte. Veuillez ouvrir votre caisse d'abord.", "danger");
                     return false;
+                }
+
+                // Maintenir la caisse d'agence pour compatibilité (bilan global)
+                $stmtAgence = $pdo->prepare("
+                    SELECT c.id_caisse FROM caisse c
+                    INNER JOIN agence a ON c.id_agence = a.idAgence
+                    WHERE c.id_compagnie = :ic AND a.localite = :ville
+                      AND a.numeroGare = :ng AND c.status_caisse = 1 LIMIT 1
+                ");
+                $stmtAgence->execute([':ic' => $_SESSION['id_compagnie'], ':ville' => $departLocalite, ':ng' => $numeroGareDepart]);
+                $caisseAgence = $stmtAgence->fetch(PDO::FETCH_ASSOC);
+                if ($caisseAgence) {
+                    $pdo->prepare("UPDATE caisse SET montant_billets = montant_billets + :m WHERE id_caisse = :id")
+                        ->execute([':m' => $prixUtilise, ':id' => $caisseAgence['id_caisse']]);
                 }
 
                 $pdo->commit();
