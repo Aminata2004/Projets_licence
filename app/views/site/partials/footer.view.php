@@ -76,7 +76,7 @@
 
         <!-- Footer Bas -->
         <div class="footer-bottom style-2 mt-4 pt-3 border-top d-flex flex-column flex-md-row justify-content-between align-items-center">
-            <p>Copyright © 2026 digitafrika.io. All rights reserved.</p>
+            <p>Copyright © 2026 Computer Service Barry. All rights reserved.</p>
             <ul class="bottom-list d-flex gap-3">
                 <li>Conditions d'utilisation</li>
                 <li>Politique de confidentialité et environnementale</li>

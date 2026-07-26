@@ -38,6 +38,14 @@
                 $errors[] = "Le droit est obligatoire.";
             }
 
+            // Un chef d'escale ou un simple Utilisateur doit être rattaché à une gare :
+            // leurs opérations (billets, colis, caisse) sont scopées dessus, un compte sans
+            // gare ne peut rien faire de cohérent. Seul un Admin (rattaché à une compagnie,
+            // pas une gare précise) échappe à cette règle.
+            if (!empty($droit) && $droit !== 'Admin' && empty($_POST['id_agence'])) {
+                $errors[] = "La gare est obligatoire pour ce type de compte.";
+            }
+
             if (!empty($emailUser) && $this->existe_deja('emailUser', $emailUser, 'utilisateur')) {
                 $errors[] = "Cet email est déjà utilisé.";
             }
@@ -53,11 +61,16 @@
                 $profile = ($droit === 'Utilisateur') ? ($_POST['profile'] ?? null) : null;
 
                 try {
-                    // Utilise une seule connexion PDO
-                    $pdo = $this->connect();
-                    $pdo->beginTransaction();
-
-                    $insertion = $this->insertion_update_simples(
+                    // insertion_update_simples_insert_id() ouvre sa PROPRE connexion PDO et
+                    // renvoie lastInsertId() de CETTE connexion. Avant ce correctif, le code
+                    // ouvrait un $pdo séparé juste pour beginTransaction()/lastInsertId(),
+                    // mais l'INSERT réel passait par insertion_update_simples() sur une AUTRE
+                    // connexion (Model::connect() n'est pas partagée) : $pdo->lastInsertId()
+                    // valait donc toujours 0, et assignPermissionsParDefautPourRole() ci-dessous
+                    // assignait les permissions par défaut à un utilisateur fantôme (id 0) au
+                    // lieu du compte réellement créé — chaque nouvel utilisateur se retrouvait
+                    // sans aucune permission malgré le message de succès.
+                    $result = $this->insertion_update_simples_insert_id(
                         "INSERT INTO utilisateur (utilisateurs, emailUser, motPasse, status, id_agence, id_compagnie, droit, profile)
                         VALUES (:utilisateurs, :emailUser, :motPasse, :status, :id_agence, :id_compagnie, :droit, :profile)",
                         [
@@ -72,17 +85,13 @@
                         ]
                     );
 
-                    if ($insertion) {
-                        $idNouvelUtilisateur = (int) $pdo->lastInsertId();
-                        $pdo->commit();
+                    $idNouvelUtilisateur = (int) $result['lastInsertId'];
 
+                    if ($idNouvelUtilisateur > 0) {
                         // Chaque rôle reçoit directement le jeu de permissions correspondant à ce
-                        // qu'il peut faire (super_admin : tout ; chef_d_escale : tout sauf la
+                        // qu'il peut faire (super_admin/Admin : tout ; chef_d_escale : tout sauf la
                         // programmation fixe et l'affectation des cars ; Utilisateur billet/colis :
                         // uniquement son service), sans passer par l'écran d'assignation manuelle.
-                        // Fait après commit() : assignPermissionToUser() ouvre sa propre connexion
-                        // PDO (Model::connect() n'est pas partagée), donc la ligne utilisateur doit
-                        // déjà être visible pour les autres connexions.
                         $permissionModel = new Permission();
                         $permissionModel->assignPermissionsParDefautPourRole($idNouvelUtilisateur, $droit, $profile);
 
@@ -94,14 +103,9 @@
                             BASE_URL . "/admin/Configurations/add_utilisateurs"
                         );
                     } else {
-                        $pdo->rollBack();
                         $this->set_swal("Erreur", "Échec de l'ajout de l'utilisateur.", "error", "#dc3545");
                     }
                 } catch (Throwable $e) {
-                    // 🚫 rollback sur la même connexion
-                    if ($pdo->inTransaction()) {
-                        $pdo->rollBack();
-                    }
                     $this->set_swal(
                         "Erreur",
                         "L'opération a échoué : " . htmlspecialchars($e->getMessage()),

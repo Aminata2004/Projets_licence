@@ -3,7 +3,7 @@ class Historiques extends Controller
 {
     public function __construct()
     {
-        $this->requireLogin();
+        $this->requirePermission('colis_historique');
     }
 
     public function index()

@@ -3,7 +3,20 @@ class Add_liste_horaire extends  Controller
 {
   public function __construct()
   {
-    $this->requireLogin(); // L'utilisateur doit être connecté pour accéder à n'importe quelle méthode
+    // add_permission() gère la création de permissions elle-même (écran méta), pas les
+    // horaires : réservée à Admin/super_admin comme l'écran d'assignation (Permissions.php),
+    // pas à Configuration_gestion_horaire qui protège les vraies actions horaire.
+    $segments = isset($_GET['url']) ? explode('/', rtrim($_GET['url'], '/')) : [];
+    if (in_array('add_permission', $segments, true)) {
+      $this->requireLogin();
+      if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+        (new Configuration())->set_flash("Accès refusé.", "danger");
+        header("Location: " . BASE_URL . "/admin/Homes/home");
+        exit;
+      }
+    } else {
+      $this->requirePermission('Configuration_gestion_horaire');
+    }
   }
 
   public  function  index()

@@ -1,6 +1,28 @@
 <?php
 class Caisse extends Controller
 {
+    // Ce contrôleur n'avait aucun constructeur : ni requireLogin(), ni contrôle de
+    // permission. N'importe quel utilisateur connaissant l'URL — connecté ou non — pouvait
+    // consulter/manipuler la caisse. Caisse_apercue est la permission qui gate déjà toute
+    // la section "Caisse" dans la sidebar (voir sidebar.view.php).
+    public function __construct()
+    {
+        $this->requirePermission('Caisse_apercue');
+    }
+
+    // bilant_caisse_billets()/bilant_caisse_colis() renvoient les caisses de TOUTE la
+    // compagnie (toutes gares confondues pour un Admin, sa gare pour un chef d'escale) —
+    // aucune scope n'existe pour un simple Utilisateur, qui verrait donc les caisses de
+    // tout le monde. Un Utilisateur ne doit voir que la sienne, via "Ma Caisse".
+    private function refuserBilanPourUtilisateurSimple(): void
+    {
+        if (($_SESSION['droit'] ?? null) === 'Utilisateur') {
+            (new Configuration())->set_flash("Vous ne pouvez consulter que votre propre caisse.", "danger");
+            header("Location: " . BASE_URL . "/admin/Caisse/ma_caisse");
+            exit;
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // VUE PRINCIPALE (caisse d'agence – accès Admin / chef d'escale)
     // ─────────────────────────────────────────────────────────────────────────
@@ -179,6 +201,7 @@ class Caisse extends Controller
 
     public function bilant_caisse_billets()
     {
+        $this->refuserBilanPourUtilisateurSimple();
         $liste_gare = new Liste_gare();
         $id_compagnie = $_SESSION['id_compagnie'];
         $ville        = $_SESSION['ville']; // Agence connectée
@@ -220,6 +243,7 @@ class Caisse extends Controller
 
     public function bilant_caisse_colis()
     {
+        $this->refuserBilanPourUtilisateurSimple();
         $liste_gare = new Liste_gare();
         $id_compagnie = $_SESSION['id_compagnie'];
         $ville        = $_SESSION['ville']; // Agence connectée
@@ -359,6 +383,7 @@ class Caisse extends Controller
     /** Versement de l'opérateur vers le chef d'escale. */
     public function verser()
     {
+        $this->requirePermission('Caisse_modifier');
         $idUser      = (int)($_SESSION['id_utilisateur'] ?? 0);
         $idAgence    = (int)($_SESSION['id_agence'] ?? 0);
         $idCompagnie = (int)($_SESSION['id_compagnie'] ?? 0);
@@ -399,6 +424,7 @@ class Caisse extends Controller
     /** Chef d'escale : valide ou rejette un versement (POST). */
     public function valider_versement()
     {
+        $this->requirePermission('Caisse_modifier');
         $model = new Caisse_utilisateur();
         if (!csrf_verify()) {
             $model->set_flash("Session expirée.", "danger");
@@ -496,6 +522,7 @@ class Caisse extends Controller
     /** Chef d'escale / Admin : clôture la journée et génère le rapport. */
     public function cloture_escale()
     {
+        $this->requirePermission('Caisse_modifier');
         $model = new Caisse_utilisateur();
         [$idAgence, $estAdmin, $listeAgences] = $this->resolveGareEscale($model);
         $date  = $_GET['date'] ?? date('Y-m-d');

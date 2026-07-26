@@ -57,6 +57,24 @@ public function requireLogin()
     }
 }
 
+// Jusqu'ici, userHasPermission() n'était consulté que dans les vues (sidebar, onglets)
+// pour cacher des liens ; les contrôleurs, eux, ne vérifiaient que requireLogin(). Un
+// utilisateur sans la permission voyait le lien disparaître du menu mais pouvait quand
+// même accéder à l'action en tapant l'URL directement. requirePermission() ferme cet
+// accès en vérifiant la même permission que celle utilisée pour afficher le lien
+// correspondant dans la sidebar (voir app/views/admin/partials/sidebar.view.php).
+public function requirePermission($nomPermission)
+{
+    $this->requireLogin();
+
+    $configuration = new Configuration($_SESSION['id_utilisateur']);
+    if (!$configuration->userHasPermission($nomPermission)) {
+        $configuration->set_flash("Accès refusé : vous n'avez pas la permission nécessaire.", "danger");
+        header('Location: ' . BASE_URL . '/admin/Homes/home');
+        exit();
+    }
+}
+
     /**
      * Rendu Dompdf pour imprimante thermique à rouleau (E-POS ECO250, papier 80mm).
      * Largeur de page à 72mm (pas 80) : la zone imprimable réelle d'une imprimante

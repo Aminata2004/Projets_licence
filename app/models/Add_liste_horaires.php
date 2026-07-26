@@ -98,15 +98,18 @@
             extract($_POST);
             $errors = [];
             //$id_compagnie = $_SESSION["id_compagnie"];
+            $nom_permission = trim($nom_permission ?? '');
             // Vérification des champs requis
             if (empty($nom_permission)) {
                 $errors[] = "Permission est obligatoire.";
+            } elseif ($this->existe_deja('nom_permission', $nom_permission, 'permision')) {
+                $errors[] = "Cette permission existe déjà.";
             }
             // Si aucune erreur, on procède à l'insertion
             if (count($errors) === 0) {
 
                 $insertion = $this->insertion_update_simples(
-                    "INSERT INTO permision 
+                    "INSERT INTO permision
                 ( nom_permission ) VALUES(:nom_permission)",
                     [
                         ":nom_permission" => $nom_permission

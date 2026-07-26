@@ -426,8 +426,7 @@ $fromAndWhere = "liaison_car_trajet
     }
 
     // Dernière programmation enregistrée pour ce car vers cette destination : sert à retrouver
-    // l'heure de départ réelle du trajet en cours (pour la règle des 3h avant validation d'arrivée)
-    // et l'id_programmation à proposer en reprogrammation si l'arrivée n'est pas jugée réelle.
+    // le numéro de gare de destination à afficher dans la liste des cars en transit.
     public function getProgrammationActivePourCar($id_car, $destination)
     {
         $sql = "SELECT pv.id_programmation, pv.date_enregistre, pv.id_horaire, a.numeroGare AS numeroGareDestination

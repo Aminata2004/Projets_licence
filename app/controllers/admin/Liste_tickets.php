@@ -4,7 +4,7 @@ class Liste_tickets extends  Controller
 {
     public function __construct()
     {
-        $this->requireLogin(); // L'utilisateur doit être connecté pour accéder à n'importe quelle méthode
+        $this->requirePermission('Billets_apercue');
     }
 
     public  function  index()

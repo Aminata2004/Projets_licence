@@ -213,26 +213,7 @@
                                                                     </div>
                                                                     <div class="card-body">
                                                                         <div class="d-flex flex-wrap gap-3">
-                                                                            <?php
-                                                                            // Permissions sensibles à cacher pour tous sauf SupAdmin
-                                                                            $sensitive = [
-                                                                                'matieres_action',
-                                                                                'matieres_creation',
-                                                                                'matieres_modif',
-                                                                                'matieres_supp',
-                                                                                'programme_activer ou réactiver',
-                                                                                'programme_apercu',
-                                                                                'programme_création',
-                                                                                'programme_modification'
-                                                                            ];
-                                                                            ?>
-
                                                                             <?php foreach ($permissions as $perm):
-                                                                                // Filtre si l'utilisateur n'est pas SupAdmin
-                                                                                if (($utilisateur->droit ?? '') !== 'SupAdmin' && in_array($perm['full_name'], $sensitive)) {
-                                                                                    continue;
-                                                                                }
-
                                                                                 $permId = $perm['id'];
                                                                                 $permAction = ucfirst(str_replace('_', ' ', $perm['action']));
                                                                                 $checked = in_array($permId, $userPermissions) ? 'checked' : '';

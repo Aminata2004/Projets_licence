@@ -57,8 +57,7 @@
                                                     <span class="text-danger">*</span>
                                                 </label>
                                                 <div class="col-lg-8">
-                                                    <select class="form-select" name="idDepart" id="departSelect" required
-                                                        onchange="location.href = '<?= BASE_URL ?>/admin/Add_billets?idDepart=' + this.value">
+                                                    <select class="form-select" name="idDepart" id="departSelect" required>
                                                         <option value="">Choisissez la gare de départ</option>
                                                         <?php foreach (($agences ?? []) as $ag): ?>
                                                             <option value="<?= $ag['idAgence'] ?>"
@@ -270,12 +269,52 @@
             }
         }
 
-        const destinations = <?= json_encode($destinations) ?>;
+        // Pour un Admin, les destinations de TOUTES les gares sont préchargées d'un coup
+        // (destinationsParGare) : changer "Départ (gare)" ne fait qu'échanger quel jeu de
+        // données JS est utilisé, sans recharger la page (avant : location.href complet).
+        <?php if (($_SESSION['droit'] ?? null) === 'Admin'): ?>
+        const destinationsParGare = <?= json_encode($destinationsParGare ?? []) ?>;
+        <?php endif; ?>
+        let destinations = <?= json_encode($destinations) ?>;
         const destinationSelect = document.getElementById('destinationSelect');
         const programmeSelect = document.getElementById('programmeSelect');
         const escalesList = document.getElementById('escalesList');
         const prixManuelInput = document.getElementById('prixManuel');
         const prixManuelBox = document.getElementById('prixManuelBox');
+
+        // Les escales sont des boutons radio : nativement, impossible de revenir à "aucune
+        // escale" une fois qu'on en a coché une. On permet de la décocher en cliquant une
+        // seconde fois sur celle déjà sélectionnée (délégué sur escalesList, qui reste le
+        // même élément même quand son contenu est reconstruit à chaque changement d'heure).
+        escalesList.addEventListener('mousedown', function(event) {
+            const radio = event.target.closest('input[type="radio"][name="escale"]');
+            if (radio) radio.dataset.tgEtaitCoche = radio.checked ? '1' : '0';
+        });
+        escalesList.addEventListener('click', function(event) {
+            const radio = event.target.closest('input[type="radio"][name="escale"]');
+            if (radio && radio.dataset.tgEtaitCoche === '1') {
+                radio.checked = false;
+                radio.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+
+        function rebuildDestinationOptions() {
+            destinationSelect.innerHTML = '<option value="">Choisissez une destination</option>' +
+                destinations.map((dest, i) => {
+                    const nomEchappe = String(dest.nom).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    return `<option value="${i}" data-id="${nomEchappe}">${nomEchappe}</option>`;
+                }).join('');
+            document.getElementById('hiddenDestinationId').value = '';
+            programmeSelect.innerHTML = '<option value="">Sélectionnez une heure</option>';
+            escalesList.innerHTML = '';
+        }
+
+        <?php if (($_SESSION['droit'] ?? null) === 'Admin'): ?>
+        document.getElementById('departSelect').addEventListener('change', function() {
+            destinations = destinationsParGare[this.value] || [];
+            rebuildDestinationOptions();
+        });
+        <?php endif; ?>
 
         escalesList.addEventListener('change', () => {
             const checkedEscale = escalesList.querySelector('input[type="radio"]:checked');

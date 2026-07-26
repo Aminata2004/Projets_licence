@@ -3,7 +3,7 @@ class Add_billets extends Controller
 {
     public function __construct()
     {
-        $this->requireLogin();
+        $this->requirePermission('Billets_creation');
     }
 
     public function index()
@@ -15,6 +15,14 @@ class Add_billets extends Controller
         if (($_SESSION['droit'] ?? null) === 'Admin') {
             $data['agences'] = $model->getAgencesByCompagnie();
             $data['idDepartSelectionne'] = $_POST['idDepart'] ?? $_GET['idDepart'] ?? null;
+
+            // Destinations de TOUTES les gares de la compagnie, préchargées d'un coup :
+            // changer la gare de départ ne fait plus qu'échanger quel jeu de données JS est
+            // utilisé (instantané), au lieu de recharger toute la page (location.href avant).
+            $data['destinationsParGare'] = [];
+            foreach ($data['agences'] as $agence) {
+                $data['destinationsParGare'][$agence['idAgence']] = $model->getDestinationsWithHeuresAndEscales($agence['idAgence']);
+            }
         }
 
         if (isset($_POST['save'])) {

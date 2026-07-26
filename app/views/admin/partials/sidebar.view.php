@@ -78,12 +78,12 @@
           </ul>
           </li>
 
-          <?php if ($user->userHasPermission('Billets_historique')) { ?>
+          <?php if ($user->userHasPermission('colis_historique')) { ?>
             <li>
               <a href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/historique_colis">
                 <div class="font-22"> <i class="bx bx-history"></i>
                 </div>
-                <div class="menu-title">Historique des billets</div>
+                <div class="menu-title">Historique des colis</div>
               </a>
             </li>
           <?php }
@@ -161,7 +161,7 @@
                     <li> <a href="<?= BASE_URL ?>/admin/Caisse/rapport_proprietaire"><i class="bi bi-arrow-right-short"></i>Rapport Compagnie</a></li>
                   <?php endif; ?>
                 <?php } ?>
-                <?php if ($user->userHasPermission('Caisse_billant')) {
+                <?php if ($user->userHasPermission('Caisse_billant') && ($_SESSION['droit'] ?? null) !== 'Utilisateur') {
                 ?>
                   <li> <a href="<?= BASE_URL ?>/admin/Caisse/bilant_caisse_billets"><i class="bi bi-arrow-right-short"></i>Bilan de caisse</a>
                   </li>

@@ -5,19 +5,23 @@ class Depenses extends Controller
     public function __construct()
     {
         $this->requireLogin();
+
+        // Réservé à Admin/chef_d_escale (comme dans la sidebar) : Depenses_gestion seul ne
+        // suffit pas, sinon un Utilisateur simple à qui cette permission serait assignée par
+        // erreur y aurait quand même accès.
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)) {
+            (new Configuration())->set_flash("Accès refusé.", "danger");
+            header("Location: " . BASE_URL . "/admin/Homes/home");
+            exit;
+        }
+
+        $this->requirePermission('Depenses_gestion');
     }
 
     public function index()
     {
         $model = new Depense();
         $id_compagnie = $_SESSION['id_compagnie'];
-        $droit = $_SESSION['droit'] ?? null;
-
-        if (!in_array($droit, ['Admin', 'chef_d_escale'], true)) {
-            $model->set_flash("Accès refusé.", "danger");
-            header("Location: " . BASE_URL . "/admin/Homes/home");
-            exit;
-        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_depense'])) {
             $model->saveDepense();
