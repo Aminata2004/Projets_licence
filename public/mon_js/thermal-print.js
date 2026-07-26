@@ -4,8 +4,40 @@
 // d'impression local (local-print-bridge/), qui tourne sur le poste du comptoir et
 // parle directement à l'imprimante. Si le pont est injoignable, on ouvre le PDF (repli
 // fiable, imprimable via le pilote Windows déjà installé) plutôt que de ne rien faire.
+//
+// Adresse du pont : 127.0.0.1 par défaut (le pont tourne sur CET appareil, cas du PC de
+// comptoir). Un téléphone ne peut pas faire tourner le pont lui-même (pas de serveur local
+// persistant possible) : il doit appeler le pont d'un PC voisin sur le même Wi-Fi via son
+// IP réseau (pont installé avec -AllowLan). Cette adresse est donc mémorisée par appareil
+// (localStorage), modifiable depuis l'écran d'erreur "Pont d'impression injoignable".
 (function () {
-    var BRIDGE_URL = 'http://127.0.0.1:9200/print';
+    function adresseHotePont() {
+        return localStorage.getItem('pontImpressionHote') || '127.0.0.1:9200';
+    }
+
+    function urlPont() {
+        return 'http://' + adresseHotePont() + '/print';
+    }
+
+    function demanderAdressePont(callbackApresEnregistrement) {
+        Swal.fire({
+            title: 'Adresse du pont d\'impression',
+            html: 'Sur le PC de comptoir lui-même, laissez la valeur par défaut. ' +
+                'Sur un téléphone, indiquez l\'adresse IP et le port du PC qui héberge ' +
+                'le pont sur le même Wi-Fi (ex: 192.168.1.50:9200).',
+            input: 'text',
+            inputValue: adresseHotePont(),
+            showCancelButton: true,
+            confirmButtonText: 'Enregistrer',
+            cancelButtonText: 'Annuler'
+        }).then(function (resultat) {
+            if (resultat.isConfirmed && resultat.value) {
+                localStorage.setItem('pontImpressionHote', resultat.value.trim());
+                if (callbackApresEnregistrement) callbackApresEnregistrement();
+            }
+        });
+    }
+    window.configurerAdressePontImpression = demanderAdressePont;
 
     function base() {
         return window.PWA_BASE_URL || '';
@@ -30,7 +62,7 @@
                     return;
                 }
 
-                fetch(BRIDGE_URL, {
+                fetch(urlPont(), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(donnees)
@@ -47,14 +79,24 @@
                         Swal.fire('Erreur d\'impression', resultat.message, 'error');
                     })
                     .catch(function () {
-                        // Pont non lancé sur ce poste : on n'empêche pas la remise du document au
-                        // client pour autant, on retombe sur le PDF (imprimable via le pilote).
+                        // Pont injoignable à l'adresse configurée : on n'empêche pas la remise du
+                        // document au client pour autant (repli PDF), sauf en déclenchement manuel
+                        // où l'on propose de corriger l'adresse (utile sur téléphone) et réessayer.
                         if (auto) { ouvrirPdf(); return; }
-                        Swal.fire(
-                            'Pont d\'impression injoignable',
-                            'Vérifiez que le logiciel d\'impression locale est bien lancé sur ce poste (voir local-print-bridge/).',
-                            'error'
-                        );
+                        Swal.fire({
+                            title: 'Pont d\'impression injoignable',
+                            text: 'Vérifiez que le logiciel d\'impression locale est bien lancé, ou changez l\'adresse du pont si vous imprimez depuis un téléphone.',
+                            icon: 'error',
+                            showCancelButton: true,
+                            confirmButtonText: 'Configurer l\'adresse',
+                            cancelButtonText: 'Fermer'
+                        }).then(function (r) {
+                            if (r.isConfirmed) {
+                                demanderAdressePont(function () {
+                                    imprimerDocumentThermique(urlDonnees, urlPdf, options);
+                                });
+                            }
+                        });
                     });
             })
             .fail(function () {
