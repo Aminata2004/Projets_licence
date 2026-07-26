@@ -228,6 +228,58 @@ class Colis_prise_en_charges extends  Controller
     exit;
   }
 
+  // Export PDF A4 de TOUTE la liste des colis (paysage vu le nombre de colonnes), triable
+  // via ?tri=... : reprend le même perimetre que index() (FetchSelectColis filtre deja par
+  // compagnie/gare selon le role), seul l'ordre change.
+  public function imprimerListeColis(): void
+  {
+    $colisModel = new Colis_prise_en_charge();
+    $liste_colis = $colisModel->FetchSelectColis();
+
+    $colonnesTri = [
+      'date'        => 'date_enregistrement',
+      'nom'         => 'nom_colis',
+      'destination' => 'destination',
+      'statut'      => 'status',
+    ];
+    $tri = $_GET['tri'] ?? 'date';
+    if (!isset($colonnesTri[$tri])) {
+      $tri = 'date';
+    }
+    $colonne = $colonnesTri[$tri];
+
+    usort($liste_colis, function ($a, $b) use ($colonne) {
+      return strcmp((string)($a[$colonne] ?? ''), (string)($b[$colonne] ?? ''));
+    });
+    if ($tri === 'date') {
+      $liste_colis = array_reverse($liste_colis); // plus recent en premier, comme a l'ecran
+    }
+
+    $compagnieModel = new Livraisons_colis();
+    $compagnie = $compagnieModel->infoCompagnie($_SESSION['id_compagnie'] ?? 0);
+
+    $logoPath = null;
+    if (!empty($compagnie['logo'])) {
+      $logoPath = ROOT . '/public/images/logos/' . $compagnie['logo'];
+    }
+
+    ob_start();
+    include ROOT . '/app/views/admin/pdf/liste_colis.php';
+    $html = ob_get_clean();
+
+    $opt = new \Dompdf\Options();
+    $opt->setChroot(ROOT);
+    $opt->setIsRemoteEnabled(true);
+
+    $dompdf = new \Dompdf\Dompdf($opt);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'landscape');
+    $dompdf->render();
+
+    $dompdf->stream('liste_colis_' . date('Ymd_His') . '.pdf', ['Attachment' => false]);
+    exit;
+  }
+
   // Renvoie les données du reçu colis en JSON pour impression thermique ESC/POS
   // (pont local, cf. donneesTicketThermique() dans Liste_du_jours pour les billets).
   public function donneesRecuThermique(int $id_colis): void

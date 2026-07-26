@@ -35,6 +35,19 @@
                         class="btn btn-sm btn-success rounded-pill shadow-sm">
                         <i class="bx bx-plus me-1"></i> Ajouter
                     </a>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill shadow-sm dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bx bx-file-blank me-1"></i> Exporter la liste (PDF)
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">Trier par</h6></li>
+                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis?tri=date" target="_blank">Date</a></li>
+                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis?tri=nom" target="_blank">Nom du colis</a></li>
+                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis?tri=destination" target="_blank">Destination</a></li>
+                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis?tri=statut" target="_blank">Statut</a></li>
+                        </ul>
+                    </div>
                     <a href="javascript:history.back()"
                         class="btn btn-sm btn-outline-primary rounded-pill shadow-sm">
                         <i class="bx bx-left-arrow-alt"></i> Retour
