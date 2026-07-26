@@ -57,10 +57,10 @@
                             <label for="id_destination_colis" class="form-label">Destination</label>
                             <select class="form-select" id="id_destination_colis" name="destination">
                                 <option value="">Toutes les destinations</option>
-                                <?php if (!empty($listes_agences) && is_array($listes_agences)): ?>
+                                <?php if (!empty($listes_agences)): ?>
                                     <?php foreach ($listes_agences as $agence): ?>
-                                        <option value="<?= (int)$agence['idAgence'] ?>">
-                                            <?= htmlspecialchars($agence['localite']) ?>
+                                        <option value="<?= (int)$agence->idAgence ?>">
+                                            <?= htmlspecialchars($agence->localite) ?>
                                         </option>
                                     <?php endforeach ?>
                                 <?php endif ?>
