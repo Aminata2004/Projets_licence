@@ -61,6 +61,92 @@ $(document).ready(function() {
   });
 </script>
 
+<style>
+  /* Spinner générique pour les liens d'action (suppression) qui ne sont pas des boutons
+     de formulaire — ceux-là utilisent déjà .spinner-border (Bootstrap), géré en JS. */
+  .tg-action-busy {
+    pointer-events: none;
+    opacity: .55;
+  }
+  .tg-action-busy::after {
+    content: "";
+    display: inline-block;
+    width: .75em;
+    height: .75em;
+    margin-left: .4em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    vertical-align: -0.15em;
+    animation: tg-spin .6s linear infinite;
+  }
+  @keyframes tg-spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
 
- 
+<script>
+  // Anti double-action générique pour tout l'admin : empêche de déclencher deux fois la
+  // même action (ajouter/modifier/supprimer) sur un double-clic ou un rechargement lent,
+  // et affiche un indicateur de chargement pendant que ça travaille.
+  (function () {
+    // 1) Formulaires (ajouter/modifier/supprimer via POST) : désactive le bouton cliqué
+    // et ajoute un spinner UNIQUEMENT quand le navigateur a réellement décidé de soumettre
+    // (l'event 'submit' ne se déclenche qu'après une validation HTML5/JS réussie — si un
+    // onsubmit="return ..." ou une validation Bootstrap a déjà annulé l'envoi,
+    // event.defaultPrevented est déjà vrai ici et on ne touche à rien).
+    document.addEventListener('submit', function (event) {
+      var form = event.target;
+      if (!(form instanceof HTMLFormElement) || event.defaultPrevented) return;
 
+      // Un second submit du même formulaire avant le rechargement de la page (ex: touche
+      // Entrée pressée deux fois très vite) est bloqué net.
+      if (form.dataset.tgSubmitting === '1') {
+        event.preventDefault();
+        return;
+      }
+
+      var btn = event.submitter
+        || form.querySelector('button[type="submit"], input[type="submit"]');
+      if (!btn || btn.disabled) return;
+
+      form.dataset.tgSubmitting = '1';
+
+      // Important : on NE met JAMAIS btn.disabled = true ici. Un contrôle désactivé est
+      // exclu des données envoyées par le navigateur — son name (ex: name="programmer_car",
+      // utilisé côté serveur via isset($_POST['programmer_car'])) disparaîtrait du POST et
+      // l'action ne se déclencherait plus jamais, tout en rechargeant la page comme si de
+      // rien n'était. On simule juste l'état "occupé" visuellement (spinner + interactions
+      // désactivées en CSS), sans toucher aux données réellement soumises.
+      btn.classList.add('tg-action-busy');
+      if (btn.tagName === 'BUTTON') {
+        btn.insertAdjacentHTML('afterbegin', '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>');
+      }
+    }, false);
+
+    // 2) Liens d'action qui ne passent pas par un formulaire (ex: "Supprimer" avec
+    // confirmation SweetAlert avant navigation GET). On ne touche pas à la logique de
+    // confirmation existante (déjà en place par vue) : on bloque juste un second clic
+    // pendant que la première confirmation/action est en cours.
+    document.addEventListener('click', function (event) {
+      var link = event.target.closest('.delete-button, .supprimer-car-button');
+      if (!link) return;
+
+      if (link.dataset.tgBusy === '1') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
+
+      link.dataset.tgBusy = '1';
+      link.classList.add('tg-action-busy');
+      // Si l'utilisateur annule la confirmation, on ne peut pas le détecter de façon
+      // fiable ici (chaque vue gère sa propre boîte de dialogue) : on redonne la main
+      // après un court délai plutôt que de bloquer le lien définitivement.
+      window.setTimeout(function () {
+        link.dataset.tgBusy = '0';
+        link.classList.remove('tg-action-busy');
+      }, 1500);
+    }, true);
+  })();
+</script>

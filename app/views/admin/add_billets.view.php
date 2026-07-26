@@ -282,6 +282,22 @@
         const prixManuelInput = document.getElementById('prixManuel');
         const prixManuelBox = document.getElementById('prixManuelBox');
 
+        // Les escales sont des boutons radio : nativement, impossible de revenir à "aucune
+        // escale" une fois qu'on en a coché une. On permet de la décocher en cliquant une
+        // seconde fois sur celle déjà sélectionnée (délégué sur escalesList, qui reste le
+        // même élément même quand son contenu est reconstruit à chaque changement d'heure).
+        escalesList.addEventListener('mousedown', function(event) {
+            const radio = event.target.closest('input[type="radio"][name="escale"]');
+            if (radio) radio.dataset.tgEtaitCoche = radio.checked ? '1' : '0';
+        });
+        escalesList.addEventListener('click', function(event) {
+            const radio = event.target.closest('input[type="radio"][name="escale"]');
+            if (radio && radio.dataset.tgEtaitCoche === '1') {
+                radio.checked = false;
+                radio.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+
         function rebuildDestinationOptions() {
             destinationSelect.innerHTML = '<option value="">Choisissez une destination</option>' +
                 destinations.map((dest, i) => {
