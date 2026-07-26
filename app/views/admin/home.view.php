@@ -179,7 +179,7 @@
             <a href="<?= BASE_URL ?>/admin/Add_billets" class="tg-quick-action"><i class="bi bi-plus-circle"></i> Nouvelle vente</a>
           <?php endif; ?>
           <?php if ($showColis): ?>
-            <a href="<?= BASE_URL ?>/admin/Suivis_colis" class="tg-quick-action"><i class="bi bi-truck"></i> Suivi colis</a>
+            <a href="<?= BASE_URL ?>/admin/Mouvement_colis" class="tg-quick-action"><i class="bi bi-truck"></i> Suivi colis</a>
           <?php endif; ?>
         </div>
       <?php endif; ?>
