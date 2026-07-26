@@ -62,7 +62,7 @@ class Depense extends Model
             return false;
         }
 
-        // Dépense locale : rattachée à la caisse ouverte de la gare concernée.
+        // Dépense locale : rattachée à une caisse ouverte.
         // Un chef d'escale ne peut viser que sa propre gare, même si le formulaire est trafiqué.
         if ($droit === 'chef_d_escale') {
             $id_agence = $_SESSION['id_agence'];
@@ -84,27 +84,63 @@ class Depense extends Model
             return false;
         }
 
-        $caisse = $this->FetchSelectWhere(
-            "id_caisse",
-            "caisse",
-            "id_agence = :id_agence AND status_caisse = 1",
-            [":id_agence" => $id_agence]
-        );
+        $id_caisse      = null;
+        $id_caisse_user = null;
 
-        if (!$caisse) {
-            $this->set_flash("Aucune caisse ouverte pour cette gare : impossible d'enregistrer la dépense.", "danger");
-            return false;
+        if ($droit === 'chef_d_escale') {
+            // Le chef d'escale débite toujours SA PROPRE caisse individuelle du jour,
+            // jamais celle d'un collègue.
+            $caisseUser = $this->fetchOne(
+                "SELECT id_caisse_user FROM caisse_utilisateur
+                 WHERE id_utilisateur = :id_utilisateur AND date_service = CURDATE() AND statut = 'ouverte'
+                 LIMIT 1",
+                [':id_utilisateur' => $_SESSION['id_utilisateur']]
+            );
+            if (!$caisseUser) {
+                $this->set_flash("Vous devez avoir votre propre caisse ouverte pour enregistrer une dépense.", "danger");
+                return false;
+            }
+            $id_caisse_user = (int)$caisseUser['id_caisse_user'];
+        } else {
+            // Admin ciblant une gare précise : caisse de gare (ancien système) si ouverte,
+            // sinon caisse individuelle ouverte pour cette gare aujourd'hui.
+            $caisse = $this->FetchSelectWhere(
+                "id_caisse",
+                "caisse",
+                "id_agence = :id_agence AND status_caisse = 1",
+                [":id_agence" => $id_agence]
+            );
+
+            if ($caisse) {
+                $id_caisse = $caisse->id_caisse;
+            } else {
+                $caisseUser = $this->fetchOne(
+                    "SELECT id_caisse_user FROM caisse_utilisateur
+                     WHERE id_agence = :id_agence AND date_service = CURDATE() AND statut = 'ouverte'
+                     LIMIT 1",
+                    [':id_agence' => $id_agence]
+                );
+                if ($caisseUser) {
+                    $id_caisse_user = (int)$caisseUser['id_caisse_user'];
+                }
+            }
+
+            if (!$id_caisse && !$id_caisse_user) {
+                $this->set_flash("Aucune caisse ouverte pour cette gare : impossible d'enregistrer la dépense.", "danger");
+                return false;
+            }
         }
 
         $statut = ($droit === 'Admin') ? 'valide' : 'en_attente';
 
         $insertion = $this->insertion_update_simples(
-            "INSERT INTO depense (id_compagnie, id_agence, id_caisse, categorie, libelle, montant, date_depense, id_utilisateur, statut)
-             VALUES (:id_compagnie, :id_agence, :id_caisse, :categorie, :libelle, :montant, :date_depense, :id_utilisateur, :statut)",
+            "INSERT INTO depense (id_compagnie, id_agence, id_caisse, id_caisse_user, categorie, libelle, montant, date_depense, id_utilisateur, statut)
+             VALUES (:id_compagnie, :id_agence, :id_caisse, :id_caisse_user, :categorie, :libelle, :montant, :date_depense, :id_utilisateur, :statut)",
             [
                 ':id_compagnie'   => $id_compagnie,
                 ':id_agence'      => $id_agence,
-                ':id_caisse'      => $caisse->id_caisse,
+                ':id_caisse'      => $id_caisse,
+                ':id_caisse_user' => $id_caisse_user,
                 ':categorie'      => $categorie,
                 ':libelle'        => $libelle ?? null,
                 ':montant'        => $montant,
@@ -120,15 +156,28 @@ class Depense extends Model
         }
 
         if ($statut === 'valide') {
-            $this->insertion_update_simples(
-                "UPDATE caisse SET montant_depense = montant_depense + :montant WHERE id_caisse = :id_caisse",
-                [':montant' => $montant, ':id_caisse' => $caisse->id_caisse]
-            );
+            $this->deduireCaisse($id_caisse, $id_caisse_user, $montant);
             $this->set_flash("Dépense enregistrée avec succès et déduite de la caisse.", "success");
         } else {
             $this->set_flash("Dépense enregistrée avec succès. Elle est en attente de validation par l'administrateur.", "success");
         }
         return true;
+    }
+
+    // Déduit le montant d'une dépense validée de la caisse concernée (gare ou individuelle).
+    private function deduireCaisse($id_caisse, $id_caisse_user, $montant)
+    {
+        if ($id_caisse) {
+            $this->insertion_update_simples(
+                "UPDATE caisse SET montant_depense = montant_depense + :montant WHERE id_caisse = :id_caisse",
+                [':montant' => $montant, ':id_caisse' => $id_caisse]
+            );
+        } elseif ($id_caisse_user) {
+            $this->insertion_update_simples(
+                "UPDATE caisse_utilisateur SET montant_depense = montant_depense + :montant WHERE id_caisse_user = :id_caisse_user",
+                [':montant' => $montant, ':id_caisse_user' => $id_caisse_user]
+            );
+        }
     }
 
     // Liste des dépenses visibles selon le rôle : le chef d'escale ne voit que
@@ -215,7 +264,7 @@ class Depense extends Model
             "SELECT SUM(depense.montant) AS total
              FROM depense
              INNER JOIN agence a ON depense.id_agence = a.idAgence
-             WHERE depense.id_compagnie = :id_compagnie AND depense.id_caisse IS NOT NULL AND depense.statut = 'valide'"
+             WHERE depense.id_compagnie = :id_compagnie AND depense.statut = 'valide'"
             . ($gareVille ? ' AND a.localite = :gareVille' : '')
             . str_replace('date_col', 'depense.date_depense', $filtreDate)
         );
@@ -224,13 +273,13 @@ class Depense extends Model
         $stmtDepenseLocale->execute($paramsDepenseLocale);
         $totalDepenseLocale = (float)($stmtDepenseLocale->fetchColumn() ?: 0);
 
-        // Les dépenses "globales" (id_caisse IS NULL) ne sont pas rattachées à une gare précise :
+        // Les dépenses "globales" (id_agence IS NULL) ne sont pas rattachées à une gare précise :
         // elles ne doivent pas être imputées à une seule gare quand on filtre par gare.
         $totalDepenseGlobale = 0.0;
         if (!$gareVille) {
             $stmtDepenseGlobale = $pdo->prepare(
                 "SELECT SUM(montant) AS total FROM depense
-                 WHERE id_compagnie = :id_compagnie AND id_caisse IS NULL AND statut = 'valide'"
+                 WHERE id_compagnie = :id_compagnie AND id_agence IS NULL AND statut = 'valide'"
                 . str_replace('date_col', 'date_depense', $filtreDate)
             );
             $stmtDepenseGlobale->execute([':id_compagnie' => $id_compagnie]);
@@ -285,11 +334,9 @@ class Depense extends Model
         }
 
         // Déduire de la caisse si c'est une dépense locale rattachée à une caisse
-        if (!empty($depense->id_caisse)) {
-            $this->insertion_update_simples(
-                "UPDATE caisse SET montant_depense = montant_depense + :montant WHERE id_caisse = :id_caisse",
-                [':montant' => $depense->montant, ':id_caisse' => $depense->id_caisse]
-            );
+        // (de gare ou individuelle).
+        if (!empty($depense->id_caisse) || !empty($depense->id_caisse_user)) {
+            $this->deduireCaisse($depense->id_caisse, $depense->id_caisse_user, $depense->montant);
         }
 
         $this->set_flash("Dépense validée avec succès et déduite de la caisse.", "success");
