@@ -228,31 +228,28 @@ class Colis_prise_en_charges extends  Controller
     exit;
   }
 
-  // Export PDF A4 de TOUTE la liste des colis (paysage vu le nombre de colonnes), triable
-  // via ?tri=... : reprend le même perimetre que index() (FetchSelectColis filtre deja par
-  // compagnie/gare selon le role), seul l'ordre change.
+  // Export PDF A4 de la liste des colis filtree par destination/statut : meme principe que
+  // Liste_du_jours::imprimerListe() (liste d'embarquement filtree par destination/heure).
   public function imprimerListeColis(): void
   {
     $colisModel = new Colis_prise_en_charge();
     $liste_colis = $colisModel->FetchSelectColis();
 
-    $colonnesTri = [
-      'date'        => 'date_enregistrement',
-      'nom'         => 'nom_colis',
-      'destination' => 'destination',
-      'statut'      => 'status',
-    ];
-    $tri = $_GET['tri'] ?? 'date';
-    if (!isset($colonnesTri[$tri])) {
-      $tri = 'date';
-    }
-    $colonne = $colonnesTri[$tri];
+    $idDestination = trim($_GET['destination'] ?? '');
+    $destinationNom = trim($_GET['destination_nom'] ?? '');
+    $statut = trim($_GET['statut'] ?? '');
+    $statutNom = trim($_GET['statut_nom'] ?? '');
 
-    usort($liste_colis, function ($a, $b) use ($colonne) {
-      return strcmp((string)($a[$colonne] ?? ''), (string)($b[$colonne] ?? ''));
-    });
-    if ($tri === 'date') {
-      $liste_colis = array_reverse($liste_colis); // plus recent en premier, comme a l'ecran
+    if ($idDestination !== '') {
+      $liste_colis = array_values(array_filter($liste_colis, function ($colis) use ($idDestination) {
+        return (string)($colis['id_agence'] ?? '') === $idDestination;
+      }));
+    }
+
+    if ($statut !== '') {
+      $liste_colis = array_values(array_filter($liste_colis, function ($colis) use ($statut) {
+        return ($colis['status'] ?? '') === $statut;
+      }));
     }
 
     $compagnieModel = new Livraisons_colis();
@@ -273,7 +270,7 @@ class Colis_prise_en_charges extends  Controller
 
     $dompdf = new \Dompdf\Dompdf($opt);
     $dompdf->loadHtml($html);
-    $dompdf->setPaper('A4', 'landscape');
+    $dompdf->setPaper('A4', 'portrait');
     $dompdf->render();
 
     $dompdf->stream('liste_colis_' . date('Ymd_His') . '.pdf', ['Attachment' => false]);

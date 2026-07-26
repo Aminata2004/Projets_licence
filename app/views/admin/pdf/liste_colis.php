@@ -7,14 +7,6 @@ $statusLabels = [
   'recu'       => 'Colis reçu',
   'livre'      => 'Colis livré',
 ];
-
-$triLabels = [
-  'date'        => 'Date',
-  'nom'         => 'Nom du colis',
-  'destination' => 'Destination',
-  'statut'      => 'Statut',
-];
-$triLabel = $triLabels[$tri] ?? 'Date';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -22,12 +14,12 @@ $triLabel = $triLabels[$tri] ?? 'Date';
   <meta charset="utf-8">
   <style>
     @page {
-      margin: 12mm 10mm;
+      margin: 15mm 10mm;
     }
 
     body {
       font-family: DejaVu Sans, sans-serif;
-      font-size: 10px;
+      font-size: 11px;
       margin: 0;
       padding: 0;
       color: #222;
@@ -36,7 +28,7 @@ $triLabel = $triLabels[$tri] ?? 'Date';
     header {
       border-bottom: 2px solid #333;
       padding-bottom: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     header table {
@@ -44,7 +36,7 @@ $triLabel = $triLabels[$tri] ?? 'Date';
     }
 
     header img {
-      height: 40px;
+      height: 45px;
     }
 
     h2 {
@@ -57,8 +49,8 @@ $triLabel = $triLabels[$tri] ?? 'Date';
 
     h3 {
       text-align: center;
-      font-size: 12px;
-      margin: 4px 0 12px;
+      font-size: 13px;
+      margin: 4px 0 14px;
       color: #333;
       font-weight: normal;
     }
@@ -71,8 +63,8 @@ $triLabel = $triLabels[$tri] ?? 'Date';
     table.liste th,
     table.liste td {
       border: 1px solid #999;
-      padding: 4px 6px;
-      font-size: 10px;
+      padding: 6px 8px;
+      font-size: 11px;
     }
 
     table.liste th {
@@ -81,20 +73,24 @@ $triLabel = $triLabels[$tri] ?? 'Date';
     }
 
     .col-num {
-      width: 25px;
+      width: 30px;
       text-align: center;
     }
 
-    .text-center {
+    .col-remis {
+      width: 70px;
       text-align: center;
     }
 
-    .text-right {
-      text-align: right;
+    .box {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 1px solid #333;
     }
 
     footer {
-      margin-top: 12px;
+      margin-top: 15px;
       font-size: 9px;
       text-align: center;
       color: #777;
@@ -106,7 +102,7 @@ $triLabel = $triLabels[$tri] ?? 'Date';
   <header>
     <table>
       <tr>
-        <td width="55">
+        <td width="60">
           <?php if (!empty($logoPath) && file_exists($logoPath)): ?>
             <img src="file://<?= realpath($logoPath) ?>" alt="Logo">
           <?php endif; ?>
@@ -119,9 +115,9 @@ $triLabel = $triLabels[$tri] ?? 'Date';
   </header>
 
   <h3>
-    Liste des colis — Triée par : <?= htmlspecialchars($triLabel) ?>
-    — Date d'export : <?= date('d/m/Y à H:i') ?>
-    — Total : <?= count($liste_colis) ?> colis
+    Liste des colis — Destination : <?= htmlspecialchars($destinationNom !== '' ? $destinationNom : 'Toutes') ?>
+    — Statut : <?= htmlspecialchars($statutNom !== '' ? $statutNom : 'Tous') ?>
+    — Date : <?= date('d/m/Y') ?>
   </h3>
 
   <table class="liste">
@@ -130,52 +126,33 @@ $triLabel = $triLabels[$tri] ?? 'Date';
         <th class="col-num">#</th>
         <th>Code</th>
         <th>Nom du colis</th>
-        <th>Nature</th>
-        <th>Provenance</th>
-        <th>Destination</th>
-        <th>Valeur</th>
-        <th>Frais</th>
-        <th>Statut</th>
-        <th>Date</th>
-        <th>Expéditeur</th>
         <th>Destinataire</th>
+        <th>Téléphone</th>
+        <th>Destination</th>
+        <th>Statut</th>
+        <th class="col-remis">Remis</th>
       </tr>
     </thead>
     <tbody>
-      <?php $i = 1; $totalValeur = 0; $totalFrais = 0; ?>
+      <?php $i = 1; ?>
       <?php foreach ($liste_colis as $colis): ?>
-        <?php $totalValeur += (float)($colis['valeur'] ?? 0); $totalFrais += (float)($colis['fraix_transaction'] ?? 0); ?>
         <tr>
           <td class="col-num"><?= $i++ ?></td>
           <td><?= htmlspecialchars($colis['code_colis'] ?? '-') ?></td>
           <td><?= htmlspecialchars($colis['nom_colis'] ?? '-') ?></td>
-          <td><?= htmlspecialchars($colis['nature'] ?? '-') ?></td>
-          <td><?= htmlspecialchars($colis['provient_de'] ?? '-') ?></td>
-          <td><?= htmlspecialchars($colis['destination'] ?? '-') ?></td>
-          <td class="text-right"><?= number_format((float)($colis['valeur'] ?? 0), 0, ',', ' ') ?></td>
-          <td class="text-right"><?= number_format((float)($colis['fraix_transaction'] ?? 0), 0, ',', ' ') ?></td>
-          <td class="text-center"><?= htmlspecialchars($statusLabels[$colis['status'] ?? ''] ?? 'En attente') ?></td>
-          <td><?= !empty($colis['date_enregistrement']) ? date('d/m/Y', strtotime($colis['date_enregistrement'])) : '-' ?></td>
-          <td><?= htmlspecialchars($colis['expediteur'] ?? '-') ?></td>
           <td><?= htmlspecialchars($colis['destinataire'] ?? '-') ?></td>
+          <td><?= htmlspecialchars($colis['numero_dest'] ?? '-') ?></td>
+          <td><?= htmlspecialchars($colis['destination'] ?? '-') ?></td>
+          <td><?= htmlspecialchars($statusLabels[$colis['status'] ?? ''] ?? 'En attente') ?></td>
+          <td class="col-remis"><span class="box"></span></td>
         </tr>
       <?php endforeach; ?>
       <?php if (empty($liste_colis)): ?>
         <tr>
-          <td colspan="12" class="text-center">Aucun colis enregistré.</td>
+          <td colspan="8" style="text-align:center;">Aucun colis ne correspond à ce filtre.</td>
         </tr>
       <?php endif; ?>
     </tbody>
-    <?php if (!empty($liste_colis)): ?>
-      <tfoot>
-        <tr>
-          <th colspan="6" class="text-right">Totaux</th>
-          <th class="text-right"><?= number_format($totalValeur, 0, ',', ' ') ?></th>
-          <th class="text-right"><?= number_format($totalFrais, 0, ',', ' ') ?></th>
-          <th colspan="4"></th>
-        </tr>
-      </tfoot>
-    <?php endif; ?>
   </table>
 
   <footer>

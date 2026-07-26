@@ -35,19 +35,6 @@
                         class="btn btn-sm btn-success rounded-pill shadow-sm">
                         <i class="bx bx-plus me-1"></i> Ajouter
                     </a>
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-secondary rounded-pill shadow-sm dropdown-toggle" type="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bx bx-file-blank me-1"></i> Exporter la liste (PDF)
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">Trier par</h6></li>
-                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis?tri=date" target="_blank">Date</a></li>
-                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis?tri=nom" target="_blank">Nom du colis</a></li>
-                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis?tri=destination" target="_blank">Destination</a></li>
-                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis?tri=statut" target="_blank">Statut</a></li>
-                        </ul>
-                    </div>
                     <a href="javascript:history.back()"
                         class="btn btn-sm btn-outline-primary rounded-pill shadow-sm">
                         <i class="bx bx-left-arrow-alt"></i> Retour
@@ -56,6 +43,49 @@
             </div>
 
             <!-- End Breadcrumb -->
+
+            <!-- Filtrage : meme principe que la liste d'embarquement (admin/Liste_du_jours) -->
+            <div class="card border-top border-primary border-1">
+                <div class="bg-light border-bottom rounded-top px-3 py-2 d-flex align-items-center mb-0 mt-1" style="gap:8px;">
+                    <i class="bx bx-filter-alt text-primary" style="font-size:1.3rem;"></i>
+                    <h6 class="mb-0 fw-bold text-primary" style="letter-spacing:1px;">Filtrage</h6>
+                </div>
+
+                <div class="card-body p-4 border-1">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="id_destination_colis" class="form-label">Destination</label>
+                            <select class="form-select" id="id_destination_colis" name="destination">
+                                <option value="">Toutes les destinations</option>
+                                <?php if (!empty($listes_agences) && is_array($listes_agences)): ?>
+                                    <?php foreach ($listes_agences as $agence): ?>
+                                        <option value="<?= (int)$agence['idAgence'] ?>">
+                                            <?= htmlspecialchars($agence['localite']) ?>
+                                        </option>
+                                    <?php endforeach ?>
+                                <?php endif ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="selectstatut_colis" class="form-label">Statut</label>
+                            <select class="form-select" id="selectstatut_colis" name="statut">
+                                <option value="">Tous les statuts</option>
+                                <option value="enregistre">Prise en charge</option>
+                                <option value="en_cours">En cours</option>
+                                <option value="recu">Colis reçu</option>
+                                <option value="livre">Colis livré</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mt-3 d-none" id="printBtnWrapperColis">
+                            <button type="button" class="btn btn-success" id="btnImprimerListeColis">
+                                <i class="bx bx-printer"></i> Imprimer la liste filtrée
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="card shadow-lg border-0 rounded-3">
                 <div class="card-header bg-primary text-white fw-bold">
@@ -314,6 +344,23 @@
                 document.getElementById('edit_valeur').value = this.dataset.valeur || '';
                 document.getElementById('edit_fraix_transaction').value = this.dataset.frais || '';
             });
+        });
+
+        $('#id_destination_colis, #selectstatut_colis').on('change', function() {
+            $('#printBtnWrapperColis').removeClass('d-none');
+        });
+
+        $('#btnImprimerListeColis').on('click', function() {
+            const destination = $('#id_destination_colis').val();
+            const destinationNom = $('#id_destination_colis option:selected').text();
+            const statut = $('#selectstatut_colis').val();
+            const statutNom = $('#selectstatut_colis option:selected').text();
+            const url = '<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis'
+                + '?destination=' + encodeURIComponent(destination)
+                + '&destination_nom=' + encodeURIComponent(destinationNom)
+                + '&statut=' + encodeURIComponent(statut)
+                + '&statut_nom=' + encodeURIComponent(statutNom);
+            window.open(url, '_blank');
         });
     </script>
 
