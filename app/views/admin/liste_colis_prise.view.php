@@ -346,22 +346,6 @@
             });
         });
 
-        $('#id_destination_colis, #selectstatut_colis').on('change', function() {
-            $('#printBtnWrapperColis').removeClass('d-none');
-        });
-
-        $('#btnImprimerListeColis').on('click', function() {
-            const destination = $('#id_destination_colis').val();
-            const destinationNom = $('#id_destination_colis option:selected').text();
-            const statut = $('#selectstatut_colis').val();
-            const statutNom = $('#selectstatut_colis option:selected').text();
-            const url = '<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis'
-                + '?destination=' + encodeURIComponent(destination)
-                + '&destination_nom=' + encodeURIComponent(destinationNom)
-                + '&statut=' + encodeURIComponent(statut)
-                + '&statut_nom=' + encodeURIComponent(statutNom);
-            window.open(url, '_blank');
-        });
     </script>
 
     <style>
@@ -411,6 +395,25 @@
 
     <?php $this->view('admin/partials/foot') ?>
     <script src="<?= BASE_URL ?>/mon_js/thermal-print.js"></script>
+
+    <script>
+        $('#id_destination_colis, #selectstatut_colis').on('change', function() {
+            $('#printBtnWrapperColis').removeClass('d-none');
+        });
+
+        $('#btnImprimerListeColis').on('click', function() {
+            const destination = $('#id_destination_colis').val();
+            const destinationNom = $('#id_destination_colis option:selected').text();
+            const statut = $('#selectstatut_colis').val();
+            const statutNom = $('#selectstatut_colis option:selected').text();
+            const url = '<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis'
+                + '?destination=' + encodeURIComponent(destination)
+                + '&destination_nom=' + encodeURIComponent(destinationNom)
+                + '&statut=' + encodeURIComponent(statut)
+                + '&statut_nom=' + encodeURIComponent(statutNom);
+            window.open(url, '_blank');
+        });
+    </script>
 
 </body>
 
