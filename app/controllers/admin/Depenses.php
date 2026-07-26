@@ -31,7 +31,7 @@ class Depenses extends Controller
 
         // Liste des gares, utilisée par l'Admin pour choisir la gare d'une dépense locale
         $listeAgences = [];
-        if ($droit === 'Admin') {
+        if ($_SESSION['droit'] === 'Admin') {
             $listeAgences = $model->FetchSelectWheres(
                 '*',
                 'agence',
