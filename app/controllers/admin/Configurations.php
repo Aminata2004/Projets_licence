@@ -3,7 +3,7 @@ class Configurations extends Controller
 {
     public function __construct()
     {
-        $this->requireLogin(); // L'utilisateur doit être connecté pour accéder à n'importe quelle méthode
+        $this->requirePermission('utilisateur_apercu');
     }
 
     // public function index()
@@ -127,6 +127,7 @@ class Configurations extends Controller
 
         // Gestion du POST : changement de statut
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idUser'], $_POST['newStatut'])) {
+            $this->requirePermission('utilisateur_active/desactive');
             $id = (int)$_POST['idUser'];
             $status = (int)$_POST['newStatut'];
 
@@ -155,6 +156,7 @@ class Configurations extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editUtilisateur'])) {
+            $this->requirePermission('utilisateur_modifier');
             $idUser = (int)$_POST['idUser'];
             $utilisateurs = $_POST['utilisateurs'];
             $emailUser = $_POST['emailUser'];
@@ -240,6 +242,7 @@ class Configurations extends Controller
 
     public function add_utilisateurs()
     {
+        $this->requirePermission('utilisateur_creation');
         $configuration = new Configuration();
 
         // Récupérer les données des filières

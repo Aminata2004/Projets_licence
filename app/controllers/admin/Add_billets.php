@@ -3,7 +3,7 @@ class Add_billets extends Controller
 {
     public function __construct()
     {
-        $this->requireLogin();
+        $this->requirePermission('Billets_creation');
     }
 
     public function index()

@@ -186,8 +186,8 @@
 
                                     <!-- Champ Gare -->
                                     <div class="col-md-6" id="gareField">
-                                        <label for="gareSelect" class="form-label fw-semibold">Gare</label>
-                                        <select class="form-select single-select" id="gareSelect" name="id_agence" data-placeholder="Choisissez une gare">
+                                        <label for="gareSelect" class="form-label fw-semibold">Gare <span class="text-danger">*</span></label>
+                                        <select class="form-select single-select" id="gareSelect" name="id_agence" data-placeholder="Choisissez une gare" required>
                                             <option selected disabled value="">Choisissez une gare</option>
                                             <?php foreach ($listeGares as $listeGare): ?>
                                                 <option value="<?= htmlspecialchars($listeGare->idAgence); ?>">
@@ -258,12 +258,19 @@
             const serviceField = document.getElementById('serviceField');
             const serviceSelect = document.getElementById('serviceSelect');
 
+            const gareSelect = document.getElementById('gareSelect');
+
             if (droit === 'Admin') {
                 compagnieField.style.display = 'block';
                 gareField.style.display = 'none';
+                gareSelect.removeAttribute('required');
+                gareSelect.value = '';
             } else {
                 compagnieField.style.display = 'none';
                 gareField.style.display = 'block';
+                // Chef d'escale / Utilisateur : rattachés à une gare précise, obligatoire
+                // pour que leurs opérations (billets, colis, caisse) soient scopées dessus.
+                gareSelect.setAttribute('required', 'required');
             }
 
             if (droit === 'Utilisateur') {

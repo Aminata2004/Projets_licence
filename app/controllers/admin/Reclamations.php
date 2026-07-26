@@ -3,7 +3,7 @@ class Reclamations extends  Controller
 {
   public function __construct()
   {
-    $this->requireLogin(); // L'utilisateur doit être connecté pour accéder à n'importe quelle méthode
+    $this->requirePermission('colis_reclamation');
   }
 
   public function index()

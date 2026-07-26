@@ -4,7 +4,7 @@ class Programmation_cars extends  Controller
 {
   public function __construct()
   {
-    $this->requireLogin(); // L'utilisateur doit être connecté pour accéder à n'importe quelle méthode
+    $this->requirePermission('Programme_programmer_car');
   }
 
   public  function  index()

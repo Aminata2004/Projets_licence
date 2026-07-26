@@ -9,6 +9,9 @@ class Permission extends Model
     // pas ajouté manuellement via l'écran "Ajouter permission". On la seed donc ici.
     private const NOMS_PERMISSIONS_PAR_DEFAUT = [
         'utilisateur_apercu',
+        'utilisateur_creation',
+        'utilisateur_modifier',
+        'utilisateur_active/desactive',
         'Configuration_apercu',
         'Configuration_gestion_gare',
         'Configuration_gestion_escale',
@@ -19,17 +22,23 @@ class Permission extends Model
         'Caisse_creation',
         'Caisse_apercue',
         'Caisse_billant',
+        'Caisse_modifier',
         'Billets_creation',
         'Billets_apercue',
         'Billets_validation',
         'Billets_historique',
         'Billets_notification',
+        'Billets_annulation',
+        'Billets_impression',
+        'Billets_rapport',
+        'Billets_reporte',
         'colis_creation',
         'colis_envoi',
         'colis_mouvement',
         'colis_livraison',
         'colis_reclamation',
         'colis_historique',
+        'colis_apercue',
         'Depenses_gestion',
         'Programme_Creation',
         'Programme_programmer_car',
@@ -53,33 +62,44 @@ class Permission extends Model
         'Caisse_creation',
         'Caisse_apercue',
         'Caisse_billant',
+        'Caisse_modifier',
         'Billets_creation',
         'Billets_apercue',
         'Billets_validation',
         'Billets_historique',
         'Billets_notification',
+        'Billets_annulation',
+        'Billets_impression',
+        'Billets_rapport',
+        'Billets_reporte',
         'colis_creation',
         'colis_envoi',
         'colis_mouvement',
         'colis_livraison',
         'colis_reclamation',
         'colis_historique',
+        'colis_apercue',
         'Depenses_gestion',
         'Programme_programmation_voyage',
         'Programme_hors_programme',
     ];
 
     // Utilisateur simple, service "Billetterie" : uniquement les écrans billets + la
-    // caisse (indispensable pour encaisser une vente de billet).
+    // caisse (indispensable pour encaisser une vente de billet). Pas de Caisse_billant :
+    // le "Bilan de caisse" est une vue consolidée toutes gares/toute la compagnie, un
+    // simple Utilisateur ne doit voir que sa propre caisse ("Ma Caisse").
     private const NOMS_PERMISSIONS_BILLET = [
         'Billets_creation',
         'Billets_apercue',
         'Billets_validation',
         'Billets_historique',
         'Billets_notification',
+        'Billets_impression',
+        'Billets_rapport',
+        'Billets_reporte',
         'Caisse_creation',
         'Caisse_apercue',
-        'Caisse_billant',
+        'Caisse_modifier',
     ];
 
     // Utilisateur simple, service "Colis / Courrier" : uniquement les écrans colis.
@@ -90,6 +110,7 @@ class Permission extends Model
         'colis_livraison',
         'colis_reclamation',
         'colis_historique',
+        'colis_apercue',
     ];
 
     public function getAll()
@@ -97,17 +118,19 @@ class Permission extends Model
         return $this->FetchSelectAllWhere("id_permision, nom_permission", "permision", "1", []);
     }
 
-    // Seede le catalogue par défaut si la table permision est vide (base neuve, vidage
-    // total...). N'écrase rien si des permissions existent déjà, même partiellement.
+    // Synchronise le catalogue par défaut vers la table permision : insère les noms qui n'y
+    // sont pas encore (base neuve, vidage total, ou catalogue enrichi après coup dans le
+    // code sans que la table ait été mise à jour), sans toucher aux permissions déjà
+    // présentes ni à celles ajoutées manuellement via l'écran "Ajouter permission".
     public function seedPermissionsParDefautSiVide(): void
     {
-        if (!empty($this->getAll())) {
-            return;
-        }
+        $existants = array_map(fn($p) => $p->nom_permission, $this->getAll());
 
         $sql = "INSERT INTO permision (nom_permission) VALUES (:nom_permission)";
         foreach (self::NOMS_PERMISSIONS_PAR_DEFAUT as $nom) {
-            $this->insertion_update_simples($sql, [':nom_permission' => $nom]);
+            if (!in_array($nom, $existants, true)) {
+                $this->insertion_update_simples($sql, [':nom_permission' => $nom]);
+            }
         }
     }
 
@@ -117,7 +140,7 @@ class Permission extends Model
     // Ne fait rien pour les droits non concernés (ex: Admin, géré autrement).
     public function assignPermissionsParDefautPourRole($idUtilisateur, $droit, $profile = null): void
     {
-        if ($droit === 'super_admin') {
+        if ($droit === 'super_admin' || $droit === 'Admin') {
             $noms = self::NOMS_PERMISSIONS_PAR_DEFAUT;
         } elseif ($droit === 'chef_d_escale') {
             $noms = self::NOMS_PERMISSIONS_CHEF_ESCALE;

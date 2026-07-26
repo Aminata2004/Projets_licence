@@ -5,7 +5,7 @@ class Rapport_billets extends Controller
 
     public function __construct()
     {
-        $this->requireLogin();
+        $this->requirePermission('Billets_rapport');
         $this->rapportBilletModel = new Rapport_billet;
     }
 

@@ -3,7 +3,7 @@ class Programmer_voyages extends  Controller
 {
   public function __construct()
   {
-    $this->requireLogin(); // L'utilisateur doit être connecté pour accéder à n'importe quelle méthode
+    $this->requirePermission('Programme_Creation');
   }
 
   public  function  index()

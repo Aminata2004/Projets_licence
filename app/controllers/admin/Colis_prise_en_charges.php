@@ -12,7 +12,31 @@ class Colis_prise_en_charges extends  Controller
 {
   public function __construct()
   {
-    $this->requireLogin(); // L'utilisateur doit être connecté pour accéder à n'importe quelle méthode
+    // historique_colis() était gaté dans la sidebar par 'Billets_historique' (nom hérité
+    // d'une confusion billets/colis) alors qu'il affiche des données colis : corrigé pour
+    // utiliser 'colis_historique', cohérent avec le reste du module colis.
+    $segments = isset($_GET['url']) ? explode('/', rtrim($_GET['url'], '/')) : [];
+
+    if (in_array('historique_colis', $segments, true)) {
+      $this->requirePermission('colis_historique');
+      return;
+    }
+
+    if (in_array('ajouter_colis', $segments, true)) {
+      $this->requirePermission('colis_creation');
+      return;
+    }
+
+    // index() (liste + mise à jour) : colis_apercue (lecture seule prévue pour ce cas)
+    // suffit, colis_creation reste accepté pour ne pas retirer l'accès à qui gère déjà
+    // la création de colis.
+    $this->requireLogin();
+    $configuration = new Configuration($_SESSION['id_utilisateur']);
+    if (!$configuration->userHasPermission('colis_apercue') && !$configuration->userHasPermission('colis_creation')) {
+      $configuration->set_flash("Accès refusé : vous n'avez pas la permission nécessaire.", "danger");
+      header('Location: ' . BASE_URL . '/admin/Homes/home');
+      exit();
+    }
   }
 
   public  function  index()

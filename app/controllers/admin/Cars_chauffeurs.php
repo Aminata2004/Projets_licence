@@ -3,7 +3,7 @@ class Cars_chauffeurs extends  Controller
 {
   public function __construct()
   {
-    $this->requireLogin(); // L'utilisateur doit être connecté pour accéder à n'importe quelle méthode
+    $this->requirePermission('Configuration_gestion_car/chauffeur');
   }
 
   public  function  index()

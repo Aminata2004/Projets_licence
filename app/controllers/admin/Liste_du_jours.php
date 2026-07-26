@@ -11,7 +11,7 @@ class Liste_du_jours extends  Controller
 {
   public function __construct()
   {
-    $this->requireLogin(); // L'utilisateur doit être connecté pour accéder à n'importe quelle méthode
+    $this->requirePermission('Billets_apercue');
   }
 
 
@@ -87,6 +87,7 @@ class Liste_du_jours extends  Controller
 
   public function recu($idBillets)
   {
+    $this->requirePermission('Billets_impression');
     $colisModel = new Livraisons_colis();
     $billets = new Liste_du_jour();
 
@@ -123,6 +124,7 @@ class Liste_du_jours extends  Controller
   // et qui seul peut réellement parler à l'imprimante (cf. ThermalPrinter::printBillet()).
   public function donneesTicketThermique($idBillets)
   {
+    $this->requirePermission('Billets_impression');
     // Tampon dédié : si un warning/notice PHP s'imprime avant le JSON (APP_ENV=local
     // affiche les erreurs à l'écran), il casserait le parsing JSON côté navigateur sans
     // qu'on comprenne pourquoi. On l'intercepte ici et on ne garde que le JSON final.
@@ -168,6 +170,7 @@ class Liste_du_jours extends  Controller
 
   public function imprimerListe()
   {
+    $this->requirePermission('Billets_impression');
     date_default_timezone_set('Africa/Bamako');
     $id_compagnie = $_SESSION['id_compagnie'];
     // Admin n'a pas de gare fixe en session : il voit les billets de toute la compagnie.
@@ -253,6 +256,7 @@ class Liste_du_jours extends  Controller
 
   public function reporter()
   {
+    $this->requirePermission('Billets_reporte');
     $billets = new Liste_du_jour();
 
     if (isset($_POST['edit'])) {
@@ -329,6 +333,7 @@ class Liste_du_jours extends  Controller
   // (ou super_admin) peut annuler directement — c'est déjà l'équivalent d'une confirmation.
   public function annuler()
   {
+    $this->requirePermission('Billets_annulation');
     if (isset($_POST['annuler_billet'])) {
       $billets = new Liste_du_jour();
       $idBillets = $_POST['idBillets'] ?? null;
@@ -351,6 +356,7 @@ class Liste_du_jours extends  Controller
   // Admin/super_admin : demandes d'annulation en attente, pour toute la compagnie.
   public function demandesAnnulation()
   {
+    $this->requirePermission('Billets_annulation');
     $billets = new Liste_du_jour();
 
     if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
@@ -366,6 +372,7 @@ class Liste_du_jours extends  Controller
 
   public function confirmerAnnulation($idBillets)
   {
+    $this->requirePermission('Billets_annulation');
     $billets = new Liste_du_jour();
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
       $billets->confirmerAnnulationBillet($idBillets);
@@ -376,6 +383,7 @@ class Liste_du_jours extends  Controller
 
   public function rejeterAnnulation($idBillets)
   {
+    $this->requirePermission('Billets_annulation');
     $billets = new Liste_du_jour();
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
       $billets->rejeterAnnulationBillet($idBillets);

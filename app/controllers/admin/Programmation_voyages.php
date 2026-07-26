@@ -5,7 +5,7 @@ class Programmation_voyages extends Controller
 
     public function __construct()
     {
-        $this->requireLogin(); // L'utilisateur doit être connecté pour accéder à n'importe quelle méthode
+        $this->requirePermission('Programme_programmation_voyage');
     }
 
     // Affiche la page avec la table, les horaires, etc.

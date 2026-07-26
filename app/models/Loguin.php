@@ -101,6 +101,13 @@ class Loguin extends Model
         }
 
         if (password_verify($motPasse, $utilisateur->motPasse)) {
+            // Compte désactivé par un admin (status = 0) : mot de passe correct
+            // mais connexion refusée, sinon la désactivation n'a aucun effet.
+            if ((int)$utilisateur->status !== 1) {
+                $this->set_flash("Ce compte a été désactivé. Contactez votre administrateur.", 'danger');
+                return;
+            }
+
             // Connexion réussie : on efface le compteur de tentatives
             $this->reinitialiserTentatives($emailUser);
 
