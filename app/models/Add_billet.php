@@ -92,9 +92,17 @@
             return [$_SESSION['id_agence'] ?? null, $_SESSION['ville'] ?? null, $_SESSION['numero_gare'] ?? null];
         }
 
-        public function getDestinationsWithHeuresAndEscales()
+        // $idAgenceDepartOverride permet de calculer les destinations d'une gare précise sans
+        // dépendre de $_GET/$_POST (utilisé par le contrôleur pour précharger la liste de
+        // TOUTES les gares d'un coup, cf. Add_billets::index()). Sans override, se comporte
+        // comme avant : déduit la gare depuis la session/requête via resolveDepart().
+        public function getDestinationsWithHeuresAndEscales($idAgenceDepartOverride = null)
         {
-            [$idAgenceDepart, , ] = $this->resolveDepart();
+            if ($idAgenceDepartOverride !== null) {
+                $idAgenceDepart = $idAgenceDepartOverride;
+            } else {
+                [$idAgenceDepart, , ] = $this->resolveDepart();
+            }
             $idCompagnie = $_SESSION['id_compagnie'] ?? null;
 
             if (!$idAgenceDepart || !$idCompagnie) return [];
