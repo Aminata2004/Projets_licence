@@ -33,6 +33,12 @@
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
+                    <div class="kpi-mini" style="border-left-color: var(--success);">
+                        <div class="text-secondary small">Revenus location de cars</div>
+                        <div class="fs-4 fw-bold text-success"><?= number_format($benefice['revenus_location'], 0, ',', ' ') ?> F</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
                     <div class="kpi-mini" style="border-left-color: var(--danger);">
                         <div class="text-secondary small">Remboursements</div>
                         <div class="fs-4 fw-bold text-danger">-<?= number_format($benefice['remboursements'], 0, ',', ' ') ?> F</div>

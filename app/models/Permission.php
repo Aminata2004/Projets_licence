@@ -40,6 +40,7 @@ class Permission extends Model
         'colis_historique',
         'colis_apercue',
         'Depenses_gestion',
+        'Location_gestion',
         'Programme_Creation',
         'Programme_programmer_car',
         'Programme_programmation_voyage',
@@ -80,6 +81,7 @@ class Permission extends Model
         'colis_historique',
         'colis_apercue',
         'Depenses_gestion',
+        'Location_gestion',
         'Programme_programmation_voyage',
         'Programme_hors_programme',
     ];

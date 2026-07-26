@@ -186,6 +186,17 @@
                     <?php endif; ?>
                   </ul>
                 </li>
+                <li>
+                  <a href="javascript:;" class="has-arrow">
+                    <div class="parent-icon"><i class="bx bx-car"></i>
+                    </div>
+                    <div class="menu-title">Location des cars</div>
+                  </a>
+                  <ul>
+                    <li> <a href="<?= BASE_URL ?>/admin/Locations_cars"><i class="bi bi-arrow-right-short"></i>Gérer les locations</a>
+                    </li>
+                  </ul>
+                </li>
               <?php endif; ?>
 
               <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)): ?>

@@ -286,11 +286,25 @@ class Depense extends Model
             $totalDepenseGlobale = (float)($stmtDepenseGlobale->fetchColumn() ?: 0);
         }
 
-        $benefice = $totalBillets + $totalColis - $totalRembourse - $totalDepenseLocale - $totalDepenseGlobale;
+        $stmtLocation = $pdo->prepare(
+            "SELECT SUM(l.frais_location) AS total
+             FROM location_car l
+             INNER JOIN agence a ON l.id_agence_depart = a.idAgence
+             WHERE l.id_compagnie = :id_compagnie AND l.statut = 'valide'"
+            . ($gareVille ? ' AND a.localite = :gareVille' : '')
+            . str_replace('date_col', 'l.date_depart', $filtreDate)
+        );
+        $paramsLocation = [':id_compagnie' => $id_compagnie];
+        if ($gareVille) $paramsLocation[':gareVille'] = $gareVille;
+        $stmtLocation->execute($paramsLocation);
+        $totalLocation = (float)($stmtLocation->fetchColumn() ?: 0);
+
+        $benefice = $totalBillets + $totalColis + $totalLocation - $totalRembourse - $totalDepenseLocale - $totalDepenseGlobale;
 
         return [
             'revenus_billets'   => $totalBillets,
             'revenus_colis'     => $totalColis,
+            'revenus_location'  => $totalLocation,
             'remboursements'    => $totalRembourse,
             'depenses_locales'  => $totalDepenseLocale,
             'depenses_globales' => $totalDepenseGlobale,
