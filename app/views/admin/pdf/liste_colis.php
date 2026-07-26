@@ -1,12 +1,5 @@
 <?php
 date_default_timezone_set('Africa/Bamako');
-
-$statusLabels = [
-  'enregistre' => 'Prise en charge',
-  'en_cours'   => 'En cours',
-  'recu'       => 'Colis reçu',
-  'livre'      => 'Colis livré',
-];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -14,12 +7,12 @@ $statusLabels = [
   <meta charset="utf-8">
   <style>
     @page {
-      margin: 15mm 10mm;
+      margin: 12mm 10mm;
     }
 
     body {
       font-family: DejaVu Sans, sans-serif;
-      font-size: 11px;
+      font-size: 10px;
       margin: 0;
       padding: 0;
       color: #222;
@@ -36,7 +29,7 @@ $statusLabels = [
     }
 
     header img {
-      height: 45px;
+      height: 40px;
     }
 
     h2 {
@@ -49,8 +42,8 @@ $statusLabels = [
 
     h3 {
       text-align: center;
-      font-size: 13px;
-      margin: 4px 0 14px;
+      font-size: 12px;
+      margin: 4px 0 12px;
       color: #333;
       font-weight: normal;
     }
@@ -63,8 +56,8 @@ $statusLabels = [
     table.liste th,
     table.liste td {
       border: 1px solid #999;
-      padding: 6px 8px;
-      font-size: 11px;
+      padding: 5px 6px;
+      font-size: 10px;
     }
 
     table.liste th {
@@ -73,24 +66,12 @@ $statusLabels = [
     }
 
     .col-num {
-      width: 30px;
+      width: 25px;
       text-align: center;
-    }
-
-    .col-remis {
-      width: 70px;
-      text-align: center;
-    }
-
-    .box {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 1px solid #333;
     }
 
     footer {
-      margin-top: 15px;
+      margin-top: 12px;
       font-size: 9px;
       text-align: center;
       color: #777;
@@ -102,7 +83,7 @@ $statusLabels = [
   <header>
     <table>
       <tr>
-        <td width="60">
+        <td width="55">
           <?php if (!empty($logoPath) && file_exists($logoPath)): ?>
             <img src="file://<?= realpath($logoPath) ?>" alt="Logo">
           <?php endif; ?>
@@ -126,11 +107,14 @@ $statusLabels = [
         <th class="col-num">#</th>
         <th>Code</th>
         <th>Nom du colis</th>
+        <th>Nature</th>
+        <th>Expéditeur</th>
+        <th>Tél. expéditeur</th>
         <th>Destinataire</th>
-        <th>Téléphone</th>
-        <th>Destination</th>
-        <th>Statut</th>
-        <th class="col-remis">Remis</th>
+        <th>Tél. destinataire</th>
+        <th>Gare de départ</th>
+        <th>Gare de destination</th>
+        <th>Enregistré par</th>
       </tr>
     </thead>
     <tbody>
@@ -140,16 +124,19 @@ $statusLabels = [
           <td class="col-num"><?= $i++ ?></td>
           <td><?= htmlspecialchars($colis['code_colis'] ?? '-') ?></td>
           <td><?= htmlspecialchars($colis['nom_colis'] ?? '-') ?></td>
+          <td><?= htmlspecialchars($colis['nature'] ?? '-') ?></td>
+          <td><?= htmlspecialchars($colis['expediteur'] ?? '-') ?></td>
+          <td><?= htmlspecialchars($colis['numero_exp'] ?? '-') ?></td>
           <td><?= htmlspecialchars($colis['destinataire'] ?? '-') ?></td>
           <td><?= htmlspecialchars($colis['numero_dest'] ?? '-') ?></td>
+          <td><?= htmlspecialchars($colis['provient_de'] ?? '-') ?></td>
           <td><?= htmlspecialchars($colis['destination'] ?? '-') ?></td>
-          <td><?= htmlspecialchars($statusLabels[$colis['status'] ?? ''] ?? 'En attente') ?></td>
-          <td class="col-remis"><span class="box"></span></td>
+          <td><?= htmlspecialchars($colis['agent_nom'] ?? '-') ?></td>
         </tr>
       <?php endforeach; ?>
       <?php if (empty($liste_colis)): ?>
         <tr>
-          <td colspan="8" style="text-align:center;">Aucun colis ne correspond à ce filtre.</td>
+          <td colspan="11" style="text-align:center;">Aucun colis ne correspond à ce filtre.</td>
         </tr>
       <?php endif; ?>
     </tbody>

@@ -78,10 +78,11 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12 mt-3 d-none" id="printBtnWrapperColis">
+                        <div class="col-md-12 mt-3" id="printBtnWrapperColis">
                             <button type="button" class="btn btn-success" id="btnImprimerListeColis">
-                                <i class="bx bx-printer"></i> Imprimer la liste filtrée
+                                <i class="bx bx-printer"></i> Exporter la liste en PDF
                             </button>
+                            <small class="text-muted ms-2">Laissez "Toutes" pour exporter tous les colis, ou choisissez un filtre pour n'exporter que la liste filtrée.</small>
                         </div>
                     </div>
                 </div>
@@ -164,13 +165,6 @@
                                                     <li>
                                                         <a class="dropdown-item thermal-print-colis-btn" href="#" data-id="<?= $colis['id_colis'] ?>">
                                                             <i class="bx bx-printer me-2"></i>Imprimer (imprimante WiFi)
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item"
-                                                            href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimer_colis_pdf/<?= $colis['id_colis'] ?>"
-                                                            target="_blank">
-                                                            <i class="bx bx-file-blank me-2"></i>Exporter en PDF (A4)
                                                         </a>
                                                     </li>
                                                 </ul>
@@ -397,10 +391,6 @@
     <script src="<?= BASE_URL ?>/mon_js/thermal-print.js"></script>
 
     <script>
-        $('#id_destination_colis, #selectstatut_colis').on('change', function() {
-            $('#printBtnWrapperColis').removeClass('d-none');
-        });
-
         $('#btnImprimerListeColis').on('click', function() {
             const destination = $('#id_destination_colis').val();
             const destinationNom = $('#id_destination_colis option:selected').text();

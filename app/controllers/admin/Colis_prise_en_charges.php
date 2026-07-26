@@ -173,63 +173,10 @@ class Colis_prise_en_charges extends  Controller
     $this->streamThermalPdf($html, "recu_colis_{$colis['id_colis']}.pdf");
   }
 
-  // Fiche colis complète au format A4 (à distinguer du reçu 80mm ci-dessus) : utile pour
-  // archiver/joindre au colis physique ou l'envoyer par email/WhatsApp.
-  public function imprimer_colis_pdf(int $id_colis): void
-  {
-    $colisModel = new Livraisons_colis();
 
-    $colis = $colisModel->getById($id_colis);
-    $compagnie = $colisModel->infoCompagnie($_SESSION['id_compagnie'] ?? 0);
-
-    if (!$colis || !$compagnie) {
-      $colisModel->set_flash('Colis ou compagnie introuvable.', 'danger');
-      header('Location: ' . BASE_URL . 'admin/livraison_colis');
-      exit;
-    }
-
-    $logoPath = null;
-    if (!empty($compagnie['logo'])) {
-      $logoPath = ROOT . '/public/images/logos/' . $compagnie['logo'];
-    }
-
-    $qrData = "Nom du colis : {$colis['nom_colis']}\n" .
-      "Nature       : {$colis['nature']}\n" .
-      "Code         : {$colis['code_colis']}\n" .
-      "Depart       : {$colis['provient_de']}\n" .
-      "Destination  : {$colis['localite']}\n" .
-      "Enregistre par : {$colis['agent_nom']}\n" .
-      "Valeur       : " . number_format($colis['valeur'], 0, ',', ' ') . " FCFA\n" .
-      "Frais        : " . number_format($colis['fraix_transaction'], 0, ',', ' ') . " FCFA";
-
-    $qrResult = Builder::create()
-      ->writer(new PngWriter())
-      ->data($qrData)
-      ->size(200)
-      ->margin(6)
-      ->build();
-
-    $qrPath = "data:image/png;base64," . base64_encode($qrResult->getString());
-
-    ob_start();
-    include ROOT . '/app/views/admin/pdf/colis_a4.php';
-    $html = ob_get_clean();
-
-    $opt = new \Dompdf\Options();
-    $opt->setChroot(ROOT);
-    $opt->setIsRemoteEnabled(true);
-
-    $dompdf = new \Dompdf\Dompdf($opt);
-    $dompdf->loadHtml($html);
-    $dompdf->setPaper('A4', 'portrait');
-    $dompdf->render();
-
-    $dompdf->stream("fiche_colis_{$colis['id_colis']}.pdf", ['Attachment' => false]);
-    exit;
-  }
-
-  // Export PDF A4 de la liste des colis filtree par destination/statut : meme principe que
-  // Liste_du_jours::imprimerListe() (liste d'embarquement filtree par destination/heure).
+  // Export PDF A4 de la liste des colis (tous, ou filtres par destination/statut si
+  // renseignes) : meme principe que Liste_du_jours::imprimerListe() (liste d'embarquement),
+  // avec les memes informations que le recu colis (cf. recu_colis.php) pour chaque ligne.
   public function imprimerListeColis(): void
   {
     $colisModel = new Colis_prise_en_charge();
@@ -270,7 +217,7 @@ class Colis_prise_en_charges extends  Controller
 
     $dompdf = new \Dompdf\Dompdf($opt);
     $dompdf->loadHtml($html);
-    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->setPaper('A4', 'landscape'); // nombreuses colonnes (infos du recu pour chaque colis)
     $dompdf->render();
 
     $dompdf->stream('liste_colis_' . date('Ymd_His') . '.pdf', ['Attachment' => false]);
