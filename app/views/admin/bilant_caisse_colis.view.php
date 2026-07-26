@@ -101,7 +101,8 @@
                                             <td>
                                                 <a href="javascript:void(0);"
                                                     class="btn btn-sm btn-primary btn-voir-mouvements"
-                                                    data-id="<?= (int)$caisse->id_caisse ?>">
+                                                    data-id="<?= (int)$caisse->id_caisse ?>"
+                                                    data-type="colis">
                                                     <i class="bx bx-show"></i> Voir
                                                 </a>
                                             </td>

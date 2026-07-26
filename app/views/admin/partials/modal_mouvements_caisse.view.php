@@ -28,32 +28,32 @@
                 <div id="mvtCaisseContenu" class="d-none">
                     <div class="row g-3 mb-3">
                         <div class="col-6">
-                            <div class="p-2 rounded bg-success bg-opacity-10 text-success text-center fw-bold">
+                            <div class="p-2 rounded bg-light border text-center fw-bold">
                                 Entrées : <span id="mvtTotalEntrees">0</span> FCFA
                             </div>
                         </div>
                         <div class="col-6">
-                            <div class="p-2 rounded bg-danger bg-opacity-10 text-danger text-center fw-bold">
+                            <div class="p-2 rounded bg-light border text-center fw-bold">
                                 Sorties : <span id="mvtTotalSorties">0</span> FCFA
                             </div>
                         </div>
                     </div>
 
-                    <h6 class="fw-bold text-success"><i class="bx bx-down-arrow-circle"></i> Entrées</h6>
+                    <h6 class="fw-bold"><i class="bx bx-down-arrow-circle"></i> Entrées</h6>
                     <div class="table-responsive mb-3">
                         <table class="table table-sm table-hover align-middle">
                             <thead class="table-light">
-                                <tr><th>Type</th><th>Référence</th><th>Date</th><th class="text-end">Montant</th></tr>
+                                <tr><th>Type</th><th>Référence</th><th>Utilisateur</th><th>Date</th><th class="text-end">Montant</th></tr>
                             </thead>
                             <tbody id="mvtCorpsEntrees"></tbody>
                         </table>
                     </div>
 
-                    <h6 class="fw-bold text-danger"><i class="bx bx-up-arrow-circle"></i> Sorties</h6>
+                    <h6 class="fw-bold"><i class="bx bx-up-arrow-circle"></i> Sorties</h6>
                     <div class="table-responsive">
                         <table class="table table-sm table-hover align-middle">
                             <thead class="table-light">
-                                <tr><th>Type</th><th>Référence</th><th>Date</th><th class="text-end">Montant</th></tr>
+                                <tr><th>Type</th><th>Référence</th><th>Utilisateur</th><th>Date</th><th class="text-end">Montant</th></tr>
                             </thead>
                             <tbody id="mvtCorpsSorties"></tbody>
                         </table>
@@ -81,19 +81,20 @@
     }
 
     function ligne(m) {
-        return '<tr><td>' + m.type + '</td><td>' + (m.reference ?? '-') + '</td><td>' +
+        return '<tr><td>' + m.type + '</td><td>' + (m.reference ?? '-') + '</td><td>' + (m.agent ?? '-') + '</td><td>' +
             formatDate(m.date) + '</td><td class="text-end">' + formatMontant(m.montant) + ' F</td></tr>';
     }
 
     var caisseCourante = null;
     var periodeCourante = 'jour';
+    var typeCourant = 'tout';
 
-    function chargerMouvements(id, periode) {
+    function chargerMouvements(id, periode, type) {
         document.getElementById('mvtCaisseLoading').classList.remove('d-none');
         document.getElementById('mvtCaisseErreur').classList.add('d-none');
         document.getElementById('mvtCaisseContenu').classList.add('d-none');
 
-        fetch('<?= BASE_URL ?>/admin/Caisse/mouvements/' + id + '?periode=' + periode)
+        fetch('<?= BASE_URL ?>/admin/Caisse/mouvements/' + id + '?periode=' + periode + '&type=' + type)
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 document.getElementById('mvtCaisseLoading').classList.add('d-none');
@@ -116,11 +117,11 @@
 
                 corpsEntrees.innerHTML = data.entrees.length
                     ? data.entrees.map(ligne).join('')
-                    : '<tr><td colspan="4" class="text-center text-muted">Aucune entrée</td></tr>';
+                    : '<tr><td colspan="5" class="text-center text-muted">Aucune entrée</td></tr>';
 
                 corpsSorties.innerHTML = data.sorties.length
                     ? data.sorties.map(ligne).join('')
-                    : '<tr><td colspan="4" class="text-center text-muted">Aucune sortie</td></tr>';
+                    : '<tr><td colspan="5" class="text-center text-muted">Aucune sortie</td></tr>';
 
                 document.getElementById('mvtCaisseContenu').classList.remove('d-none');
             })
@@ -135,6 +136,7 @@
         btn.addEventListener('click', function () {
             caisseCourante = btn.getAttribute('data-id');
             periodeCourante = 'jour';
+            typeCourant = btn.getAttribute('data-type') || 'tout';
 
             document.querySelectorAll('#mvtPeriodeSelecteur button').forEach(function (b) {
                 b.classList.toggle('mvt-periode-active', b.getAttribute('data-periode') === 'jour');
@@ -142,7 +144,7 @@
             document.getElementById('mvtCaisseInfos').textContent = '';
 
             modal.show();
-            chargerMouvements(caisseCourante, periodeCourante);
+            chargerMouvements(caisseCourante, periodeCourante, typeCourant);
         });
     });
 
@@ -155,7 +157,7 @@
                 b.classList.toggle('mvt-periode-active', b === btn);
             });
 
-            chargerMouvements(caisseCourante, periodeCourante);
+            chargerMouvements(caisseCourante, periodeCourante, typeCourant);
         });
     });
 })();
