@@ -230,16 +230,17 @@ class Model extends Database
         $ville = $_SESSION['ville'] ?? null;
         $numero_gare = $_SESSION['numero_gare'] ?? null;
 
-        $sql = "SELECT 
-                colis.*, 
-                a.localite AS destination, 
+        $sql = "SELECT
+                colis.*,
+                a.localite AS destination,
                 expediteurs.expediteur, expediteurs.numero_exp, expediteurs.whatsapp_exp,
-                destinataires.destinataire, destinataires.numero_dest, destinataires.whatsapp_dest
+                destinataires.destinataire, destinataires.numero_dest, destinataires.whatsapp_dest,
+                utilisateur.utilisateurs AS agent_nom
             FROM colis
             JOIN expediteurs ON colis.id_expediteur = expediteurs.id_expediteur
             JOIN destinataires ON colis.id_destinataire = destinataires.id_destinataire
             JOIN agence a ON colis.id_agence = a.idAgence
-            
+            LEFT JOIN utilisateur ON utilisateur.idUser = colis.id_utilisateur
             WHERE colis.id_compagnie = :id_compagnie";
 
         $params = [':id_compagnie' => $id_compagnie];

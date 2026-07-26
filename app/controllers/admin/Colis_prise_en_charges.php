@@ -173,6 +173,57 @@ class Colis_prise_en_charges extends  Controller
     $this->streamThermalPdf($html, "recu_colis_{$colis['id_colis']}.pdf");
   }
 
+
+  // Export PDF A4 de la liste des colis (tous, ou filtres par destination/statut si
+  // renseignes) : meme principe que Liste_du_jours::imprimerListe() (liste d'embarquement),
+  // avec les memes informations que le recu colis (cf. recu_colis.php) pour chaque ligne.
+  public function imprimerListeColis(): void
+  {
+    $colisModel = new Colis_prise_en_charge();
+    $liste_colis = $colisModel->FetchSelectColis();
+
+    $idDestination = trim($_GET['destination'] ?? '');
+    $destinationNom = trim($_GET['destination_nom'] ?? '');
+    $statut = trim($_GET['statut'] ?? '');
+    $statutNom = trim($_GET['statut_nom'] ?? '');
+
+    if ($idDestination !== '') {
+      $liste_colis = array_values(array_filter($liste_colis, function ($colis) use ($idDestination) {
+        return (string)($colis['id_agence'] ?? '') === $idDestination;
+      }));
+    }
+
+    if ($statut !== '') {
+      $liste_colis = array_values(array_filter($liste_colis, function ($colis) use ($statut) {
+        return ($colis['status'] ?? '') === $statut;
+      }));
+    }
+
+    $compagnieModel = new Livraisons_colis();
+    $compagnie = $compagnieModel->infoCompagnie($_SESSION['id_compagnie'] ?? 0);
+
+    $logoPath = null;
+    if (!empty($compagnie['logo'])) {
+      $logoPath = ROOT . '/public/images/logos/' . $compagnie['logo'];
+    }
+
+    ob_start();
+    include ROOT . '/app/views/admin/pdf/liste_colis.php';
+    $html = ob_get_clean();
+
+    $opt = new \Dompdf\Options();
+    $opt->setChroot(ROOT);
+    $opt->setIsRemoteEnabled(true);
+
+    $dompdf = new \Dompdf\Dompdf($opt);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'landscape'); // nombreuses colonnes (infos du recu pour chaque colis)
+    $dompdf->render();
+
+    $dompdf->stream('liste_colis_' . date('Ymd_His') . '.pdf', ['Attachment' => false]);
+    exit;
+  }
+
   // Renvoie les données du reçu colis en JSON pour impression thermique ESC/POS
   // (pont local, cf. donneesTicketThermique() dans Liste_du_jours pour les billets).
   public function donneesRecuThermique(int $id_colis): void

@@ -44,6 +44,50 @@
 
             <!-- End Breadcrumb -->
 
+            <!-- Filtrage : meme principe que la liste d'embarquement (admin/Liste_du_jours) -->
+            <div class="card border-top border-primary border-1">
+                <div class="bg-light border-bottom rounded-top px-3 py-2 d-flex align-items-center mb-0 mt-1" style="gap:8px;">
+                    <i class="bx bx-filter-alt text-primary" style="font-size:1.3rem;"></i>
+                    <h6 class="mb-0 fw-bold text-primary" style="letter-spacing:1px;">Filtrage</h6>
+                </div>
+
+                <div class="card-body p-4 border-1">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="id_destination_colis" class="form-label">Destination</label>
+                            <select class="form-select" id="id_destination_colis" name="destination">
+                                <option value="">Toutes les destinations</option>
+                                <?php if (!empty($listes_agences)): ?>
+                                    <?php foreach ($listes_agences as $agence): ?>
+                                        <option value="<?= (int)$agence->idAgence ?>">
+                                            <?= htmlspecialchars($agence->localite) ?>
+                                        </option>
+                                    <?php endforeach ?>
+                                <?php endif ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="selectstatut_colis" class="form-label">Statut</label>
+                            <select class="form-select" id="selectstatut_colis" name="statut">
+                                <option value="">Tous les statuts</option>
+                                <option value="enregistre">Prise en charge</option>
+                                <option value="en_cours">En cours</option>
+                                <option value="recu">Colis reçu</option>
+                                <option value="livre">Colis livré</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mt-3" id="printBtnWrapperColis">
+                            <button type="button" class="btn btn-success" id="btnImprimerListeColis">
+                                <i class="bx bx-printer"></i> Exporter la liste en PDF
+                            </button>
+                            <small class="text-muted ms-2">Laissez "Toutes" pour exporter tous les colis, ou choisissez un filtre pour n'exporter que la liste filtrée.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card shadow-lg border-0 rounded-3">
                 <div class="card-header bg-primary text-white fw-bold">
                     <i class="bx bx-list-ul me-1"></i> Liste des colis enregistrés
@@ -295,6 +339,7 @@
                 document.getElementById('edit_fraix_transaction').value = this.dataset.frais || '';
             });
         });
+
     </script>
 
     <style>
@@ -344,6 +389,21 @@
 
     <?php $this->view('admin/partials/foot') ?>
     <script src="<?= BASE_URL ?>/mon_js/thermal-print.js"></script>
+
+    <script>
+        $('#btnImprimerListeColis').on('click', function() {
+            const destination = $('#id_destination_colis').val();
+            const destinationNom = $('#id_destination_colis option:selected').text();
+            const statut = $('#selectstatut_colis').val();
+            const statutNom = $('#selectstatut_colis option:selected').text();
+            const url = '<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimerListeColis'
+                + '?destination=' + encodeURIComponent(destination)
+                + '&destination_nom=' + encodeURIComponent(destinationNom)
+                + '&statut=' + encodeURIComponent(statut)
+                + '&statut_nom=' + encodeURIComponent(statutNom);
+            window.open(url, '_blank');
+        });
+    </script>
 
 </body>
 
