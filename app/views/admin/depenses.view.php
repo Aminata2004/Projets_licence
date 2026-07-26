@@ -97,11 +97,15 @@
                                 <th>Gare</th>
                                 <th>Montant</th>
                                 <th>Enregistré par</th>
+                                <th>Statut</th>
+                                <?php if (($_SESSION['droit'] ?? null) === 'Admin'): ?>
+                                    <th>Actions</th>
+                                <?php endif; ?>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($listeDepenses)): ?>
-                                <tr><td colspan="6" class="text-center text-muted py-4">Aucune dépense enregistrée.</td></tr>
+                                <tr><td colspan="<?= (($_SESSION['droit'] ?? null) === 'Admin') ? '8' : '7' ?>" class="text-center text-muted py-4">Aucune dépense enregistrée.</td></tr>
                             <?php else: ?>
                                 <?php foreach ($listeDepenses as $d): ?>
                                     <tr>
@@ -117,6 +121,37 @@
                                         </td>
                                         <td class="fw-bold text-danger">-<?= number_format($d->montant, 0, ',', ' ') ?> F</td>
                                         <td><?= htmlspecialchars($d->agent ?? '-') ?></td>
+                                        <td>
+                                            <?php if (($d->statut ?? 'valide') === 'valide'): ?>
+                                                <span class="badge bg-success">Validée</span>
+                                            <?php elseif ($d->statut === 'en_attente'): ?>
+                                                <span class="badge bg-warning text-dark">En attente</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-danger">Rejetée</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <?php if (($_SESSION['droit'] ?? null) === 'Admin'): ?>
+                                            <td>
+                                                <?php if (($d->statut ?? 'valide') === 'en_attente'): ?>
+                                                    <a href="javascript:void(0);" 
+                                                       class="btn btn-sm btn-success py-0 px-2 btn-valider-depense"
+                                                       data-url="<?= BASE_URL ?>/admin/Depenses/valider/<?= $d->id_depense ?>"
+                                                       data-libelle="<?= htmlspecialchars($d->libelle ?? $d->categorie) ?>"
+                                                       data-montant="<?= number_format($d->montant, 0, ',', ' ') ?>">
+                                                        <i class="bx bx-check"></i> Valider
+                                                    </a>
+                                                    <a href="javascript:void(0);" 
+                                                       class="btn btn-sm btn-danger py-0 px-2 btn-rejeter-depense"
+                                                       data-url="<?= BASE_URL ?>/admin/Depenses/rejeter/<?= $d->id_depense ?>"
+                                                       data-libelle="<?= htmlspecialchars($d->libelle ?? $d->categorie) ?>"
+                                                       data-montant="<?= number_format($d->montant, 0, ',', ' ') ?>">
+                                                        <i class="bx bx-x"></i> Rejeter
+                                                    </a>
+                                                <?php else: ?>
+                                                    -
+                                                <?php endif; ?>
+                                            </td>
+                                        <?php endif; ?>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -150,6 +185,67 @@
         categorieSelect?.addEventListener('change', toggleLibelleHint);
         toggleChampGare();
         toggleLibelleHint();
+
+        // SweetAlert2 Confirmation Modals for Validate / Reject
+        document.querySelectorAll('.btn-valider-depense').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = this.getAttribute('data-url');
+                const libelle = this.getAttribute('data-libelle');
+                const montant = this.getAttribute('data-montant');
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Valider la dépense ?',
+                        text: `Voulez-vous valider la dépense "${libelle}" de ${montant} FCFA ? Elle sera déduite de la caisse.`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#198754',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Oui, valider',
+                        cancelButtonText: 'Annuler'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = url;
+                        }
+                    });
+                } else {
+                    if (confirm(`Voulez-vous valider la dépense "${libelle}" de ${montant} FCFA ? Elle sera déduite de la caisse.`)) {
+                        window.location.href = url;
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-rejeter-depense').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = this.getAttribute('data-url');
+                const libelle = this.getAttribute('data-libelle');
+                const montant = this.getAttribute('data-montant');
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Rejeter la dépense ?',
+                        text: `Voulez-vous rejeter la dépense "${libelle}" de ${montant} FCFA ?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Oui, rejeter',
+                        cancelButtonText: 'Annuler'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = url;
+                        }
+                    });
+                } else {
+                    if (confirm(`Voulez-vous rejeter la dépense "${libelle}" de ${montant} FCFA ?`)) {
+                        window.location.href = url;
+                    }
+                }
+            });
+        });
     </script>
 
     <?php $this->view('admin/partials/foot') ?>

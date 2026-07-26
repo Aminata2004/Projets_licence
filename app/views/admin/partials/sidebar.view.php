@@ -169,7 +169,7 @@
               </ul>
               </li>
 
-              <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true) && $user->userHasPermission('Depenses_gestion')): ?>
+              <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)): ?>
                 <li class="menu-label">Finances</li>
                 <li>
                   <a href="javascript:;" class="has-arrow">

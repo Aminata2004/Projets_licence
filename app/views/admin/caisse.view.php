@@ -14,7 +14,7 @@
                 <div class="d-flex gap-2 mt-2 mt-sm-0">
                     <a href="<?= BASE_URL ?>/admin/Caisse/bilant_caisse_billets" class="btn btn-outline-primary btn-sm rounded-pill">📊 Bilan Billets</a>
                     <a href="<?= BASE_URL ?>/admin/Caisse/bilant_caisse_colis" class="btn btn-outline-secondary btn-sm rounded-pill">📦 Bilan Colis</a>
-                    <?php if ($user->userHasPermission('Caisse_creation')): ?>
+                    <?php if ($user->userHasPermission('Caisse_creation') || in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)): ?>
                         <a href="<?= BASE_URL ?>/admin/Caisse/add_caisse" class="btn btn-primary btn-sm rounded-pill px-3">+ Ouvrir une caisse</a>
                     <?php endif; ?>
                 </div>

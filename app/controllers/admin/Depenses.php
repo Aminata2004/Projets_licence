@@ -63,4 +63,42 @@ class Depenses extends Controller
             'benefice' => $model->getBenefice($periode)
         ]);
     }
+
+    public function valider($id = null)
+    {
+        if ($id === null) {
+            header("Location: " . BASE_URL . "/admin/Depenses");
+            exit;
+        }
+
+        $model = new Depense();
+        if (($_SESSION['droit'] ?? null) !== 'Admin') {
+            $model->set_flash("Accès réservé à l'Admin de la compagnie.", "danger");
+            header("Location: " . BASE_URL . "/admin/Homes/home");
+            exit;
+        }
+
+        $model->validerDepense($id);
+        header("Location: " . BASE_URL . "/admin/Depenses");
+        exit;
+    }
+
+    public function rejeter($id = null)
+    {
+        if ($id === null) {
+            header("Location: " . BASE_URL . "/admin/Depenses");
+            exit;
+        }
+
+        $model = new Depense();
+        if (($_SESSION['droit'] ?? null) !== 'Admin') {
+            $model->set_flash("Accès réservé à l'Admin de la compagnie.", "danger");
+            header("Location: " . BASE_URL . "/admin/Homes/home");
+            exit;
+        }
+
+        $model->rejeterDepense($id);
+        header("Location: " . BASE_URL . "/admin/Depenses");
+        exit;
+    }
 }

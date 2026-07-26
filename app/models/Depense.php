@@ -42,8 +42,8 @@ class Depense extends Model
             }
 
             $insertion = $this->insertion_update_simples(
-                "INSERT INTO depense (id_compagnie, categorie, libelle, montant, date_depense, id_utilisateur)
-                 VALUES (:id_compagnie, :categorie, :libelle, :montant, :date_depense, :id_utilisateur)",
+                "INSERT INTO depense (id_compagnie, categorie, libelle, montant, date_depense, id_utilisateur, statut)
+                 VALUES (:id_compagnie, :categorie, :libelle, :montant, :date_depense, :id_utilisateur, 'valide')",
                 [
                     ':id_compagnie'   => $id_compagnie,
                     ':categorie'      => $categorie,
@@ -96,9 +96,11 @@ class Depense extends Model
             return false;
         }
 
+        $statut = ($droit === 'Admin') ? 'valide' : 'en_attente';
+
         $insertion = $this->insertion_update_simples(
-            "INSERT INTO depense (id_compagnie, id_agence, id_caisse, categorie, libelle, montant, date_depense, id_utilisateur)
-             VALUES (:id_compagnie, :id_agence, :id_caisse, :categorie, :libelle, :montant, :date_depense, :id_utilisateur)",
+            "INSERT INTO depense (id_compagnie, id_agence, id_caisse, categorie, libelle, montant, date_depense, id_utilisateur, statut)
+             VALUES (:id_compagnie, :id_agence, :id_caisse, :categorie, :libelle, :montant, :date_depense, :id_utilisateur, :statut)",
             [
                 ':id_compagnie'   => $id_compagnie,
                 ':id_agence'      => $id_agence,
@@ -107,7 +109,8 @@ class Depense extends Model
                 ':libelle'        => $libelle ?? null,
                 ':montant'        => $montant,
                 ':date_depense'   => $date_depense,
-                ':id_utilisateur' => $_SESSION['id_utilisateur']
+                ':id_utilisateur' => $_SESSION['id_utilisateur'],
+                ':statut'         => $statut
             ]
         );
 
@@ -116,12 +119,15 @@ class Depense extends Model
             return false;
         }
 
-        $this->insertion_update_simples(
-            "UPDATE caisse SET montant_depense = montant_depense + :montant WHERE id_caisse = :id_caisse",
-            [':montant' => $montant, ':id_caisse' => $caisse->id_caisse]
-        );
-
-        $this->set_flash("Dépense enregistrée avec succès et déduite de la caisse.", "success");
+        if ($statut === 'valide') {
+            $this->insertion_update_simples(
+                "UPDATE caisse SET montant_depense = montant_depense + :montant WHERE id_caisse = :id_caisse",
+                [':montant' => $montant, ':id_caisse' => $caisse->id_caisse]
+            );
+            $this->set_flash("Dépense enregistrée avec succès et déduite de la caisse.", "success");
+        } else {
+            $this->set_flash("Dépense enregistrée avec succès. Elle est en attente de validation par l'administrateur.", "success");
+        }
         return true;
     }
 
@@ -209,7 +215,7 @@ class Depense extends Model
             "SELECT SUM(depense.montant) AS total
              FROM depense
              INNER JOIN agence a ON depense.id_agence = a.idAgence
-             WHERE depense.id_compagnie = :id_compagnie AND depense.id_caisse IS NOT NULL"
+             WHERE depense.id_compagnie = :id_compagnie AND depense.id_caisse IS NOT NULL AND depense.statut = 'valide'"
             . ($gareVille ? ' AND a.localite = :gareVille' : '')
             . str_replace('date_col', 'depense.date_depense', $filtreDate)
         );
@@ -224,7 +230,7 @@ class Depense extends Model
         if (!$gareVille) {
             $stmtDepenseGlobale = $pdo->prepare(
                 "SELECT SUM(montant) AS total FROM depense
-                 WHERE id_compagnie = :id_compagnie AND id_caisse IS NULL"
+                 WHERE id_compagnie = :id_compagnie AND id_caisse IS NULL AND statut = 'valide'"
                 . str_replace('date_col', 'date_depense', $filtreDate)
             );
             $stmtDepenseGlobale->execute([':id_compagnie' => $id_compagnie]);
@@ -241,5 +247,91 @@ class Depense extends Model
             'depenses_globales' => $totalDepenseGlobale,
             'benefice'          => $benefice
         ];
+    }
+
+    // Valide une dépense en attente et la déduit de la caisse associée
+    public function validerDepense($id)
+    {
+        $id = (int)$id;
+        $id_compagnie = $_SESSION['id_compagnie'];
+
+        // Récupérer la dépense
+        $depense = $this->FetchSelectWhere(
+            "*",
+            "depense",
+            "id_depense = :id AND id_compagnie = :id_compagnie",
+            [":id" => $id, ":id_compagnie" => $id_compagnie]
+        );
+
+        if (!$depense) {
+            $this->set_flash("Dépense introuvable.", "danger");
+            return false;
+        }
+
+        if ($depense->statut !== 'en_attente') {
+            $this->set_flash("Cette dépense a déjà été traitée (validée ou rejetée).", "warning");
+            return false;
+        }
+
+        // Mettre à jour le statut
+        $update = $this->insertion_update_simples(
+            "UPDATE depense SET statut = 'valide' WHERE id_depense = :id",
+            [":id" => $id]
+        );
+
+        if (!$update) {
+            $this->set_flash("Erreur lors de la validation de la dépense.", "danger");
+            return false;
+        }
+
+        // Déduire de la caisse si c'est une dépense locale rattachée à une caisse
+        if (!empty($depense->id_caisse)) {
+            $this->insertion_update_simples(
+                "UPDATE caisse SET montant_depense = montant_depense + :montant WHERE id_caisse = :id_caisse",
+                [':montant' => $depense->montant, ':id_caisse' => $depense->id_caisse]
+            );
+        }
+
+        $this->set_flash("Dépense validée avec succès et déduite de la caisse.", "success");
+        return true;
+    }
+
+    // Rejette une dépense en attente
+    public function rejeterDepense($id)
+    {
+        $id = (int)$id;
+        $id_compagnie = $_SESSION['id_compagnie'];
+
+        // Récupérer la dépense
+        $depense = $this->FetchSelectWhere(
+            "*",
+            "depense",
+            "id_depense = :id AND id_compagnie = :id_compagnie",
+            [":id" => $id, ":id_compagnie" => $id_compagnie]
+        );
+
+        if (!$depense) {
+            $this->set_flash("Dépense introuvable.", "danger");
+            return false;
+        }
+
+        if ($depense->statut !== 'en_attente') {
+            $this->set_flash("Cette dépense a déjà été traitée.", "warning");
+            return false;
+        }
+
+        // Mettre à jour le statut
+        $update = $this->insertion_update_simples(
+            "UPDATE depense SET statut = 'rejete' WHERE id_depense = :id",
+            [":id" => $id]
+        );
+
+        if ($update) {
+            $this->set_flash("Dépense rejetée avec succès.", "success");
+            return true;
+        }
+
+        $this->set_flash("Erreur lors du rejet de la dépense.", "danger");
+        return false;
     }
 }
