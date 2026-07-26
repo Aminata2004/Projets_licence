@@ -123,30 +123,71 @@ class Location_car extends Model
 
         $statut = in_array($droit, ['Admin', 'super_admin'], true) ? 'valide' : 'en_attente';
 
-        // Une location validee immediatement (Admin) doit pouvoir etre creditee tout de
-        // suite : comme pour un billet, on bloque l'enregistrement si aucune caisse n'est
-        // ouverte pour cette gare, plutot que d'accepter une location dont le montant ne
-        // sera jamais verse nulle part.
-        if ($statut === 'valide' && !$this->caisseOuverte($id_agence_depart)) {
-            $this->set_flash(
-                "Aucune caisse n'est ouverte pour cette gare. Merci d'ouvrir une caisse avant d'enregistrer cette location.",
-                "danger"
+        // Meme logique a deux niveaux que Depense::saveDepense() : un chef d'escale credite
+        // toujours SA PROPRE caisse individuelle du jour (jamais celle d'un collegue) ; un
+        // Admin utilise la caisse de gare (ancien systeme) si elle est ouverte, sinon une
+        // caisse individuelle ouverte pour cette gare aujourd'hui. La reference resolue ici
+        // est stockee sur la location des sa creation (id_caisse / id_caisse_user), pour que
+        // la validation ulterieure credite exactement la bonne caisse sans avoir a la
+        // re-detecter (et donc sans risquer de dire "aucune caisse ouverte" a tort si elle a
+        // ete ouverte apres coup, ou fermee entre-temps).
+        $id_caisse = null;
+        $id_caisse_user = null;
+
+        if ($droit === 'chef_d_escale') {
+            $caisseUser = $this->fetchOne(
+                "SELECT id_caisse_user FROM caisse_utilisateur
+                 WHERE id_utilisateur = :id_utilisateur AND date_service = CURDATE() AND statut = 'ouverte'
+                 LIMIT 1",
+                [':id_utilisateur' => $_SESSION['id_utilisateur']]
             );
-            return false;
+            if (!$caisseUser) {
+                $this->set_flash("Vous devez avoir votre propre caisse ouverte pour enregistrer une location.", "danger");
+                return false;
+            }
+            $id_caisse_user = (int)$caisseUser['id_caisse_user'];
+        } else {
+            $caisse = $this->FetchSelectWhere(
+                "id_caisse",
+                "caisse",
+                "id_agence = :id_agence AND status_caisse = 1",
+                [":id_agence" => $id_agence_depart]
+            );
+
+            if ($caisse) {
+                $id_caisse = $caisse->id_caisse;
+            } else {
+                $caisseUser = $this->fetchOne(
+                    "SELECT id_caisse_user FROM caisse_utilisateur
+                     WHERE id_agence = :id_agence AND date_service = CURDATE() AND statut = 'ouverte'
+                     LIMIT 1",
+                    [':id_agence' => $id_agence_depart]
+                );
+                if ($caisseUser) {
+                    $id_caisse_user = (int)$caisseUser['id_caisse_user'];
+                }
+            }
+
+            if (!$id_caisse && !$id_caisse_user) {
+                $this->set_flash("Aucune caisse ouverte pour cette gare : impossible d'enregistrer la location.", "danger");
+                return false;
+            }
         }
 
         $insertion = $this->insertion_update_simples(
             "INSERT INTO location_car
-                (id_compagnie, id_agence_depart, destination, id_car, nom_client, prenom_client,
+                (id_compagnie, id_agence_depart, destination, id_car, id_caisse, id_caisse_user, nom_client, prenom_client,
                  telephone_client, date_depart, date_retour_prevu, frais_location, statut, id_utilisateur)
              VALUES
-                (:id_compagnie, :id_agence_depart, :destination, :id_car, :nom_client, :prenom_client,
+                (:id_compagnie, :id_agence_depart, :destination, :id_car, :id_caisse, :id_caisse_user, :nom_client, :prenom_client,
                  :telephone_client, :date_depart, :date_retour_prevu, :frais_location, :statut, :id_utilisateur)",
             [
                 ':id_compagnie'      => $id_compagnie,
                 ':id_agence_depart'  => $id_agence_depart,
                 ':destination'       => trim($destination),
                 ':id_car'            => $id_car,
+                ':id_caisse'         => $id_caisse,
+                ':id_caisse_user'    => $id_caisse_user,
                 ':nom_client'        => trim($nom_client),
                 ':prenom_client'     => trim($prenom_client),
                 ':telephone_client'  => trim($telephone_client),
@@ -164,9 +205,7 @@ class Location_car extends Model
         }
 
         if ($statut === 'valide') {
-            // La caisse ouverte a deja ete verifiee plus haut : cet appel ne peut
-            // normalement pas echouer ici (sauf fermeture de caisse entre-temps, cas rare).
-            $this->crediterCaisse($id_agence_depart, (float)$frais_location);
+            $this->crediterCaisse($id_caisse, $id_caisse_user, (float)$frais_location);
             $this->set_flash("Location enregistrée avec succès et créditée à la caisse.", "success");
         } else {
             $this->set_flash("Location enregistrée avec succès. Elle est en attente de validation par l'administrateur.", "success");
@@ -174,33 +213,21 @@ class Location_car extends Model
         return true;
     }
 
-    // Retourne la caisse ouverte de la gare, ou null si aucune ne l'est.
-    private function caisseOuverte($id_agence_depart)
+    // Credite le montant a la caisse (de gare ou individuelle) determinee et stockee des
+    // la creation de la location.
+    private function crediterCaisse($id_caisse, $id_caisse_user, $montant)
     {
-        return $this->FetchSelectWhere(
-            "id_caisse",
-            "caisse",
-            "id_agence = :id_agence AND status_caisse = 1",
-            [":id_agence" => $id_agence_depart]
-        );
-    }
-
-    // Credite le montant a la caisse ouverte de la gare de depart. Retourne false si
-    // aucune caisse n'est ouverte (l'appelant decide alors quoi faire).
-    private function crediterCaisse($id_agence_depart, $montant)
-    {
-        $caisse = $this->caisseOuverte($id_agence_depart);
-
-        if (!$caisse) {
-            return false;
+        if ($id_caisse) {
+            $this->insertion_update_simples(
+                "UPDATE caisse SET montant_location = montant_location + :montant WHERE id_caisse = :id_caisse",
+                [':montant' => $montant, ':id_caisse' => $id_caisse]
+            );
+        } elseif ($id_caisse_user) {
+            $this->insertion_update_simples(
+                "UPDATE caisse_utilisateur SET montant_location = montant_location + :montant WHERE id_caisse_user = :id_caisse_user",
+                [':montant' => $montant, ':id_caisse_user' => $id_caisse_user]
+            );
         }
-
-        $this->insertion_update_simples(
-            "UPDATE caisse SET montant_location = montant_location + :montant WHERE id_caisse = :id_caisse",
-            [':montant' => $montant, ':id_caisse' => $caisse->id_caisse]
-        );
-
-        return true;
     }
 
     public function infoCompagnie(int $id): ?array
@@ -226,7 +253,7 @@ class Location_car extends Model
         }
 
         $rows = $this->FetchSelectWheres(
-            'l.*, a.localite, a.numeroGare, c.numero_car, c.matriculle, u.utilisateurs AS agent',
+            'l.*, a.localite, a.numeroGare, c.numero_car, c.matriculle, u.utilisateurs AS agent, u.droit AS agent_droit',
             'location_car l
                 LEFT JOIN agence a ON l.id_agence_depart = a.idAgence
                 LEFT JOIN car c ON l.id_car = c.id_car
@@ -285,17 +312,6 @@ class Location_car extends Model
             return false;
         }
 
-        // Comme a la creation par l'Admin : on bloque la validation si aucune caisse n'est
-        // ouverte pour la gare de depart, plutot que de valider une location dont le
-        // montant ne sera jamais credite.
-        if (!$this->caisseOuverte($location->id_agence_depart)) {
-            $this->set_flash(
-                "Impossible de valider : aucune caisse n'est ouverte pour la gare de départ de cette location. Ouvrez-la d'abord.",
-                "danger"
-            );
-            return false;
-        }
-
         $update = $this->insertion_update_simples(
             "UPDATE location_car SET statut = 'valide' WHERE id_location = :id",
             [":id" => $id]
@@ -305,7 +321,10 @@ class Location_car extends Model
             return false;
         }
 
-        $this->crediterCaisse($location->id_agence_depart, (float)$location->frais_location);
+        // La caisse (de gare ou individuelle) a deja ete determinee et stockee sur la
+        // location au moment de sa creation par le chef d'escale (cf. saveLocation) : on
+        // credite cette meme reference, sans la re-detecter a la validation.
+        $this->crediterCaisse($location->id_caisse, $location->id_caisse_user, (float)$location->frais_location);
 
         $this->set_flash("Location validée avec succès et créditée à la caisse.", "success");
         return true;

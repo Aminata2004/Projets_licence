@@ -7,6 +7,16 @@ $statutLabels = [
     'rejete'     => 'Rejetée',
 ];
 $statutLabel = $statutLabels[$location->statut] ?? $location->statut;
+
+// Une location creee par un chef d'escale n'est effective qu'apres validation par
+// l'Admin : la signature doit alors porter la mention "P.O." (pour ordre), le chef
+// d'escale signant par delegation de l'Admin qui a valide. Une location creee
+// directement par l'Admin (toujours "validee" des sa creation) n'a pas besoin de
+// cette mention : il signe en son nom propre.
+$creeParChefEscale = ($location->agent_droit ?? null) === 'chef_d_escale';
+$mentionSignature = ($creeParChefEscale && $location->statut === 'valide')
+    ? 'Signature (P.O. Admin)'
+    : 'Signature';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -84,6 +94,25 @@ $statutLabel = $statutLabels[$location->statut] ?? $location->statut;
     .montant .label { font-size: 12px; color: #555; }
     .montant .valeur { font-size: 22px; font-weight: bold; color: #2c3e50; }
 
+    .signature-wrap {
+      margin-top: 40px;
+      text-align: right;
+    }
+
+    .signature {
+      display: inline-block;
+      width: 240px;
+      text-align: center;
+    }
+
+    .signature .ligne {
+      margin-top: 50px;
+      border-top: 1px solid #333;
+      padding-top: 4px;
+      font-size: 11px;
+      color: #444;
+    }
+
     footer {
       margin-top: 20px;
       font-size: 9px;
@@ -157,6 +186,12 @@ $statutLabel = $statutLabels[$location->statut] ?? $location->statut;
   <div class="montant">
     <div class="label">Frais de location</div>
     <div class="valeur"><?= number_format($location->frais_location, 0, ',', ' ') ?> FCFA</div>
+  </div>
+
+  <div class="signature-wrap">
+    <div class="signature">
+      <div class="ligne"><?= htmlspecialchars($mentionSignature) ?></div>
+    </div>
   </div>
 
   <footer>
