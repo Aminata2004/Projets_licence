@@ -81,6 +81,7 @@
       white-space: nowrap;
       padding-right: 6px;
     }
+    
 
     table.infos td.value {
       text-align: right;
