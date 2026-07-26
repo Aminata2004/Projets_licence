@@ -65,7 +65,22 @@
           $stmt->execute($params);
 
           $billets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-          $notifCount = count($billets);
+
+          // Locations de cars en attente : uniquement pertinent pour l'Admin, qui est le
+          // seul a pouvoir les valider (creees par un chef d'escale).
+          $locationsEnAttente = [];
+          if ($_SESSION['droit'] === 'Admin') {
+            $stmtLoc = $pdo->prepare(
+              "SELECT id_location, destination, frais_location, a.localite
+               FROM location_car l
+               LEFT JOIN agence a ON l.id_agence_depart = a.idAgence
+               WHERE l.statut = 'en_attente' AND l.id_compagnie = :id_compagnie"
+            );
+            $stmtLoc->execute([':id_compagnie' => $_SESSION['id_compagnie']]);
+            $locationsEnAttente = $stmtLoc->fetchAll(PDO::FETCH_ASSOC);
+          }
+
+          $notifCount = count($billets) + count($locationsEnAttente);
 
           ?>
      
@@ -101,8 +116,22 @@
                       </div>
                     </a>
                   <?php endforeach; ?>
+                  <?php foreach ($locationsEnAttente as $location): ?>
+                    <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Locations_cars">
+                      <div class="d-flex align-items-center">
+                        <div class="notification-box"><i class="bx bx-car"></i></div>
+                        <div class="ms-3 flex-grow-1">
+                          <h6 class="mb-0 dropdown-msg-user">Location de car en attente</h6>
+                          <small class="mb-0 dropdown-msg-text text-secondary">
+                            <span class="badge bg-secondary me-1"><?= htmlspecialchars($location['localite'] ?? '-'); ?></span>
+                            <?= htmlspecialchars($location['destination']); ?> - <?= number_format($location['frais_location'], 0, ',', ' ') ?> F
+                          </small>
+                        </div>
+                      </div>
+                    </a>
+                  <?php endforeach; ?>
                 <?php else: ?>
-                  <p class="text-center text-secondary p-2">Aucun billet en attente</p>
+                  <p class="text-center text-secondary p-2">Aucune notification</p>
                 <?php endif; ?>
               </div>
             </div>

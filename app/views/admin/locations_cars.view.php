@@ -113,14 +113,12 @@
                                 <th>Frais</th>
                                 <th>Enregistré par</th>
                                 <th>Statut</th>
-                                <?php if (($_SESSION['droit'] ?? null) === 'Admin'): ?>
-                                    <th>Actions</th>
-                                <?php endif; ?>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($listeLocations)): ?>
-                                <tr><td colspan="<?= (($_SESSION['droit'] ?? null) === 'Admin') ? '9' : '8' ?>" class="text-center text-muted py-4">Aucune location enregistrée.</td></tr>
+                                <tr><td colspan="9" class="text-center text-muted py-4">Aucune location enregistrée.</td></tr>
                             <?php else: ?>
                                 <?php foreach ($listeLocations as $l): ?>
                                     <tr>
@@ -140,28 +138,28 @@
                                                 <span class="badge bg-danger">Rejetée</span>
                                             <?php endif; ?>
                                         </td>
-                                        <?php if (($_SESSION['droit'] ?? null) === 'Admin'): ?>
-                                            <td>
-                                                <?php if ($l->statut === 'en_attente'): ?>
-                                                    <a href="javascript:void(0);"
-                                                       class="btn btn-sm btn-success py-0 px-2 btn-valider-location"
-                                                       data-url="<?= BASE_URL ?>/admin/Locations_cars/valider/<?= $l->id_location ?>"
-                                                       data-destination="<?= htmlspecialchars($l->destination) ?>"
-                                                       data-frais="<?= number_format($l->frais_location, 0, ',', ' ') ?>">
-                                                        <i class="bx bx-check"></i> Valider
-                                                    </a>
-                                                    <a href="javascript:void(0);"
-                                                       class="btn btn-sm btn-danger py-0 px-2 btn-rejeter-location"
-                                                       data-url="<?= BASE_URL ?>/admin/Locations_cars/rejeter/<?= $l->id_location ?>"
-                                                       data-destination="<?= htmlspecialchars($l->destination) ?>"
-                                                       data-frais="<?= number_format($l->frais_location, 0, ',', ' ') ?>">
-                                                        <i class="bx bx-x"></i> Rejeter
-                                                    </a>
-                                                <?php else: ?>
-                                                    -
-                                                <?php endif; ?>
-                                            </td>
-                                        <?php endif; ?>
+                                        <td>
+                                            <a href="<?= BASE_URL ?>/admin/Locations_cars/imprimerFacture/<?= $l->id_location ?>"
+                                               class="btn btn-sm btn-outline-secondary py-0 px-2" target="_blank">
+                                                <i class="bx bx-printer"></i> Facture
+                                            </a>
+                                            <?php if (($_SESSION['droit'] ?? null) === 'Admin' && $l->statut === 'en_attente'): ?>
+                                                <a href="javascript:void(0);"
+                                                   class="btn btn-sm btn-success py-0 px-2 btn-valider-location"
+                                                   data-url="<?= BASE_URL ?>/admin/Locations_cars/valider/<?= $l->id_location ?>"
+                                                   data-destination="<?= htmlspecialchars($l->destination) ?>"
+                                                   data-frais="<?= number_format($l->frais_location, 0, ',', ' ') ?>">
+                                                    <i class="bx bx-check"></i> Valider
+                                                </a>
+                                                <a href="javascript:void(0);"
+                                                   class="btn btn-sm btn-danger py-0 px-2 btn-rejeter-location"
+                                                   data-url="<?= BASE_URL ?>/admin/Locations_cars/rejeter/<?= $l->id_location ?>"
+                                                   data-destination="<?= htmlspecialchars($l->destination) ?>"
+                                                   data-frais="<?= number_format($l->frais_location, 0, ',', ' ') ?>">
+                                                    <i class="bx bx-x"></i> Rejeter
+                                                </a>
+                                            <?php endif; ?>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>

@@ -123,6 +123,18 @@ class Location_car extends Model
 
         $statut = in_array($droit, ['Admin', 'super_admin'], true) ? 'valide' : 'en_attente';
 
+        // Une location validee immediatement (Admin) doit pouvoir etre creditee tout de
+        // suite : comme pour un billet, on bloque l'enregistrement si aucune caisse n'est
+        // ouverte pour cette gare, plutot que d'accepter une location dont le montant ne
+        // sera jamais verse nulle part.
+        if ($statut === 'valide' && !$this->caisseOuverte($id_agence_depart)) {
+            $this->set_flash(
+                "Aucune caisse n'est ouverte pour cette gare. Merci d'ouvrir une caisse avant d'enregistrer cette location.",
+                "danger"
+            );
+            return false;
+        }
+
         $insertion = $this->insertion_update_simples(
             "INSERT INTO location_car
                 (id_compagnie, id_agence_depart, destination, id_car, nom_client, prenom_client,
@@ -152,14 +164,9 @@ class Location_car extends Model
         }
 
         if ($statut === 'valide') {
-            $crediteOk = $this->crediterCaisse($id_agence_depart, (float)$frais_location);
-            if (!$crediteOk) {
-                $this->set_flash(
-                    "Location enregistrée, mais aucune caisse n'est ouverte pour cette gare : le montant n'a pas pu être crédité. Ouvrez une caisse puis validez à nouveau si besoin.",
-                    "warning"
-                );
-                return true;
-            }
+            // La caisse ouverte a deja ete verifiee plus haut : cet appel ne peut
+            // normalement pas echouer ici (sauf fermeture de caisse entre-temps, cas rare).
+            $this->crediterCaisse($id_agence_depart, (float)$frais_location);
             $this->set_flash("Location enregistrée avec succès et créditée à la caisse.", "success");
         } else {
             $this->set_flash("Location enregistrée avec succès. Elle est en attente de validation par l'administrateur.", "success");
@@ -167,16 +174,22 @@ class Location_car extends Model
         return true;
     }
 
-    // Credite le montant a la caisse ouverte de la gare de depart. Retourne false si
-    // aucune caisse n'est ouverte (l'appelant decide alors quoi faire).
-    private function crediterCaisse($id_agence_depart, $montant)
+    // Retourne la caisse ouverte de la gare, ou null si aucune ne l'est.
+    private function caisseOuverte($id_agence_depart)
     {
-        $caisse = $this->FetchSelectWhere(
+        return $this->FetchSelectWhere(
             "id_caisse",
             "caisse",
             "id_agence = :id_agence AND status_caisse = 1",
             [":id_agence" => $id_agence_depart]
         );
+    }
+
+    // Credite le montant a la caisse ouverte de la gare de depart. Retourne false si
+    // aucune caisse n'est ouverte (l'appelant decide alors quoi faire).
+    private function crediterCaisse($id_agence_depart, $montant)
+    {
+        $caisse = $this->caisseOuverte($id_agence_depart);
 
         if (!$caisse) {
             return false;
@@ -188,6 +201,41 @@ class Location_car extends Model
         );
 
         return true;
+    }
+
+    public function infoCompagnie(int $id): ?array
+    {
+        $sql = "SELECT id_compagnie, nom_compagnie AS nom, slogant, logo, libele
+                FROM compagnie WHERE id_compagnie = :id";
+        return $this->query($sql, [':id' => $id], true);
+    }
+
+    // Une seule location, pour la facture A4. Filtre par compagnie (IDOR) et, pour un
+    // chef d'escale, par sa propre gare de depart (comme getLocations()).
+    public function getById($id)
+    {
+        $id_compagnie = $_SESSION['id_compagnie'];
+        $droit        = $_SESSION['droit'] ?? null;
+
+        $condition = 'l.id_location = :id AND l.id_compagnie = :id_compagnie';
+        $params    = [':id' => (int)$id, ':id_compagnie' => $id_compagnie];
+
+        if ($droit === 'chef_d_escale') {
+            $condition .= ' AND l.id_agence_depart = :id_agence';
+            $params[':id_agence'] = $_SESSION['id_agence'];
+        }
+
+        $rows = $this->FetchSelectWheres(
+            'l.*, a.localite, a.numeroGare, c.numero_car, c.matriculle, u.utilisateurs AS agent',
+            'location_car l
+                LEFT JOIN agence a ON l.id_agence_depart = a.idAgence
+                LEFT JOIN car c ON l.id_car = c.id_car
+                LEFT JOIN utilisateur u ON l.id_utilisateur = u.idUser',
+            $condition,
+            $params
+        );
+
+        return $rows[0] ?? null;
     }
 
     // Liste des locations visibles selon le role : le chef d'escale ne voit que celles de
@@ -237,6 +285,17 @@ class Location_car extends Model
             return false;
         }
 
+        // Comme a la creation par l'Admin : on bloque la validation si aucune caisse n'est
+        // ouverte pour la gare de depart, plutot que de valider une location dont le
+        // montant ne sera jamais credite.
+        if (!$this->caisseOuverte($location->id_agence_depart)) {
+            $this->set_flash(
+                "Impossible de valider : aucune caisse n'est ouverte pour la gare de départ de cette location. Ouvrez-la d'abord.",
+                "danger"
+            );
+            return false;
+        }
+
         $update = $this->insertion_update_simples(
             "UPDATE location_car SET statut = 'valide' WHERE id_location = :id",
             [":id" => $id]
@@ -246,14 +305,7 @@ class Location_car extends Model
             return false;
         }
 
-        $crediteOk = $this->crediterCaisse($location->id_agence_depart, (float)$location->frais_location);
-        if (!$crediteOk) {
-            $this->set_flash(
-                "Location validée, mais aucune caisse n'est ouverte pour cette gare : le montant n'a pas pu être crédité.",
-                "warning"
-            );
-            return true;
-        }
+        $this->crediterCaisse($location->id_agence_depart, (float)$location->frais_location);
 
         $this->set_flash("Location validée avec succès et créditée à la caisse.", "success");
         return true;
