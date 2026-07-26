@@ -775,7 +775,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>Copyright &copy; 2026 digitafrika.io. All rights reserved.</p>
+            <p>Copyright &copy; 2026 Computer Service Barry. All rights reserved.</p>
         </div>
     </div>
 </footer>
