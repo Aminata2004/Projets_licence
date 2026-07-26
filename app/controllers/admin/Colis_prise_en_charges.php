@@ -173,6 +173,61 @@ class Colis_prise_en_charges extends  Controller
     $this->streamThermalPdf($html, "recu_colis_{$colis['id_colis']}.pdf");
   }
 
+  // Fiche colis complète au format A4 (à distinguer du reçu 80mm ci-dessus) : utile pour
+  // archiver/joindre au colis physique ou l'envoyer par email/WhatsApp.
+  public function imprimer_colis_pdf(int $id_colis): void
+  {
+    $colisModel = new Livraisons_colis();
+
+    $colis = $colisModel->getById($id_colis);
+    $compagnie = $colisModel->infoCompagnie($_SESSION['id_compagnie'] ?? 0);
+
+    if (!$colis || !$compagnie) {
+      $colisModel->set_flash('Colis ou compagnie introuvable.', 'danger');
+      header('Location: ' . BASE_URL . 'admin/livraison_colis');
+      exit;
+    }
+
+    $logoPath = null;
+    if (!empty($compagnie['logo'])) {
+      $logoPath = ROOT . '/public/images/logos/' . $compagnie['logo'];
+    }
+
+    $qrData = "Nom du colis : {$colis['nom_colis']}\n" .
+      "Nature       : {$colis['nature']}\n" .
+      "Code         : {$colis['code_colis']}\n" .
+      "Depart       : {$colis['provient_de']}\n" .
+      "Destination  : {$colis['localite']}\n" .
+      "Enregistre par : {$colis['agent_nom']}\n" .
+      "Valeur       : " . number_format($colis['valeur'], 0, ',', ' ') . " FCFA\n" .
+      "Frais        : " . number_format($colis['fraix_transaction'], 0, ',', ' ') . " FCFA";
+
+    $qrResult = Builder::create()
+      ->writer(new PngWriter())
+      ->data($qrData)
+      ->size(200)
+      ->margin(6)
+      ->build();
+
+    $qrPath = "data:image/png;base64," . base64_encode($qrResult->getString());
+
+    ob_start();
+    include ROOT . '/app/views/admin/pdf/colis_a4.php';
+    $html = ob_get_clean();
+
+    $opt = new \Dompdf\Options();
+    $opt->setChroot(ROOT);
+    $opt->setIsRemoteEnabled(true);
+
+    $dompdf = new \Dompdf\Dompdf($opt);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    $dompdf->stream("fiche_colis_{$colis['id_colis']}.pdf", ['Attachment' => false]);
+    exit;
+  }
+
   // Renvoie les données du reçu colis en JSON pour impression thermique ESC/POS
   // (pont local, cf. donneesTicketThermique() dans Liste_du_jours pour les billets).
   public function donneesRecuThermique(int $id_colis): void

@@ -123,6 +123,13 @@
                                                             <i class="bx bx-printer me-2"></i>Imprimer (imprimante WiFi)
                                                         </a>
                                                     </li>
+                                                    <li>
+                                                        <a class="dropdown-item"
+                                                            href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimer_colis_pdf/<?= $colis['id_colis'] ?>"
+                                                            target="_blank">
+                                                            <i class="bx bx-file-blank me-2"></i>Exporter en PDF (A4)
+                                                        </a>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </td>
