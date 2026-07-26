@@ -282,6 +282,166 @@ class Caisse extends Controller
         $this->view('admin/bilant_caisse_colis', ['liste_caisse' => $liste_caisse]);
     }
 
+    /**
+     * Détail des mouvements (entrées/sorties) d'une caisse de gare, pour le bouton "Voir"
+     * des bilans billets/colis. Répond en JSON (appelé en AJAX).
+     *
+     * Les ventes de billets/colis ne sont pas liées à la caisse de gare (elles le sont à la
+     * caisse individuelle de l'opérateur) : elles sont donc reconstituées par gare + période
+     * d'activité de la caisse (ouverture → fermeture, ou aujourd'hui si toujours ouverte).
+     * Les dépenses et remboursements, eux, sont directement liés via id_caisse.
+     */
+    public function mouvements($id = null)
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        $id           = (int)$id;
+        $id_compagnie = $_SESSION['id_compagnie'];
+        $model        = new Liste_gare();
+        $pdo          = $model->connect();
+
+        $caisse = $model->FetchSelectWhere(
+            "c.*, a.localite, a.numeroGare, a.idAgence",
+            "caisse c INNER JOIN agence a ON c.id_agence = a.idAgence",
+            "c.id_caisse = :id AND c.id_compagnie = :id_compagnie",
+            [":id" => $id, ":id_compagnie" => $id_compagnie]
+        );
+
+        if (!$caisse) {
+            http_response_code(404);
+            echo json_encode(['error' => "Caisse introuvable."]);
+            exit;
+        }
+
+        // Un chef d'escale ne peut consulter que la caisse de sa propre gare.
+        if (($_SESSION['droit'] ?? null) === 'chef_d_escale' && (int)$caisse->idAgence !== (int)($_SESSION['id_agence'] ?? 0)) {
+            http_response_code(403);
+            echo json_encode(['error' => "Accès refusé."]);
+            exit;
+        }
+
+        // Une caisse peut rester ouverte longtemps (beaucoup de billets/colis) : par défaut
+        // on ne montre que le jour, avec la possibilité de basculer sur le mois ou tout
+        // l'historique depuis l'ouverture (mêmes conventions que les colonnes "Situation
+        // Journalière/Mensuelle" déjà affichées dans le tableau des bilans).
+        $periode = $_GET['periode'] ?? 'jour';
+        if (!in_array($periode, ['jour', 'mois', 'tout'], true)) {
+            $periode = 'jour';
+        }
+
+        if ($periode === 'jour') {
+            $debut = $fin = date('Y-m-d');
+        } elseif ($periode === 'mois') {
+            $debut = date('Y-m-01');
+            $fin   = date('Y-m-t');
+        } else {
+            $debut = $caisse->date_enregistrement;
+            $fin   = $caisse->date_fermeture ?? date('Y-m-d');
+        }
+
+        $entrees = [];
+        $sorties = [];
+
+        // Billets vendus pour cette gare précise pendant la période d'activité de la caisse.
+        $stmt = $pdo->prepare(
+            "SELECT b.numeroBillets AS reference,
+                    CAST(REPLACE(REPLACE(c.montant_payer, ' ', ''), 'FCFA', '') AS DECIMAL(12,2)) AS montant,
+                    b.date_reservation AS date_mvt
+             FROM billets b
+             INNER JOIN client c ON b.id_client = c.idClient
+             WHERE b.id_compagnie = :id_compagnie AND b.departId = :localite AND b.num_gare = :numeroGare
+               AND b.validation_billets = 'valider'
+               AND (b.status_billets IS NULL OR b.status_billets != 'annule')
+               AND b.date_reservation BETWEEN :debut AND :fin
+             ORDER BY b.date_reservation DESC"
+        );
+        $stmt->execute([
+            ':id_compagnie' => $id_compagnie,
+            ':localite'     => $caisse->localite,
+            ':numeroGare'   => $caisse->numeroGare,
+            ':debut'        => $debut,
+            ':fin'          => $fin
+        ]);
+        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $b) {
+            $entrees[] = ['type' => 'Billet', 'reference' => $b->reference, 'montant' => (float)$b->montant, 'date' => $b->date_mvt];
+        }
+
+        // Colis enregistrés pour cette gare précise pendant la période.
+        $stmt = $pdo->prepare(
+            "SELECT code_colis AS reference, fraix_transaction AS montant, date_enregistrement AS date_mvt
+             FROM colis
+             WHERE id_compagnie = :id_compagnie AND id_agence = :id_agence
+               AND date_enregistrement BETWEEN :debut AND :fin
+             ORDER BY date_enregistrement DESC"
+        );
+        $stmt->execute([':id_compagnie' => $id_compagnie, ':id_agence' => $caisse->idAgence, ':debut' => $debut, ':fin' => $fin]);
+        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $c) {
+            $entrees[] = ['type' => 'Colis', 'reference' => $c->reference, 'montant' => (float)$c->montant, 'date' => $c->date_mvt];
+        }
+
+        // Versements reçus des caisses individuelles des opérateurs de cette gare.
+        $stmt = $pdo->prepare(
+            "SELECT v.id_versement, v.montant, v.date_versement, u.utilisateurs AS emetteur
+             FROM versements_caisse v
+             INNER JOIN utilisateur u ON v.id_emetteur = u.idUser
+             WHERE v.id_agence = :id_agence AND v.id_compagnie = :id_compagnie AND v.statut = 'valide'
+               AND DATE(v.date_versement) BETWEEN :debut AND :fin
+             ORDER BY v.date_versement DESC"
+        );
+        $stmt->execute([':id_agence' => $caisse->idAgence, ':id_compagnie' => $id_compagnie, ':debut' => $debut, ':fin' => $fin]);
+        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $v) {
+            $entrees[] = [
+                'type'      => 'Versement',
+                'reference' => "VRS-{$v->id_versement} ({$v->emetteur})",
+                'montant'   => (float)$v->montant,
+                'date'      => $v->date_versement
+            ];
+        }
+
+        // Dépenses déduites directement de cette caisse.
+        $stmt = $pdo->prepare(
+            "SELECT categorie, libelle, montant, date_depense
+             FROM depense
+             WHERE id_caisse = :id_caisse AND statut = 'valide'
+               AND date_depense BETWEEN :debut AND :fin
+             ORDER BY date_depense DESC"
+        );
+        $stmt->execute([':id_caisse' => $id, ':debut' => $debut, ':fin' => $fin]);
+        foreach ($stmt->fetchAll(PDO::FETCH_OBJ) as $d) {
+            $sorties[] = ['type' => 'Dépense', 'reference' => $d->libelle ?: $d->categorie, 'montant' => (float)$d->montant, 'date' => $d->date_depense];
+        }
+
+        // Remboursements colis : aucun lien individuel fiable vers une caisse ni date de
+        // traitement en base (colis n'a ni id_caisse, ni date de remboursement) — seul le
+        // cumul déjà déduit de CETTE caisse (Reclamations.php) est fiable à afficher, donc
+        // uniquement visible sur "tout l'historique" (pas de ventilation jour/mois possible).
+        if ($periode === 'tout' && (float)$caisse->montant_rembourse > 0) {
+            $sorties[] = [
+                'type'      => 'Remboursement',
+                'reference' => 'Cumul des remboursements colis sur cette caisse',
+                'montant'   => (float)$caisse->montant_rembourse,
+                'date'      => null
+            ];
+        }
+
+        echo json_encode([
+            'periode' => $periode,
+            'caisse' => [
+                'reference'  => $caisse->reference_caise,
+                'localite'   => $caisse->localite,
+                'numeroGare' => $caisse->numeroGare,
+                'debut'      => $debut,
+                'fin'        => $fin,
+                'ouverte'    => (int)$caisse->status_caisse === 1
+            ],
+            'entrees'       => $entrees,
+            'sorties'       => $sorties,
+            'total_entrees' => array_sum(array_column($entrees, 'montant')),
+            'total_sorties' => array_sum(array_column($sorties, 'montant')),
+        ]);
+        exit;
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // CAISSE INDIVIDUELLE – OPÉRATEUR (billettère / agent colis)
     // ─────────────────────────────────────────────────────────────────────────

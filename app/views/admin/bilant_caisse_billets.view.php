@@ -99,8 +99,9 @@
                                                 <?= number_format($caisse->montant_billets ?? 0, 0, ',', ' ') ?> FCFA
                                             </td>
                                             <td>
-                                                <a href="#"
-                                                    class="btn btn-sm btn-primary">
+                                                <a href="javascript:void(0);"
+                                                    class="btn btn-sm btn-primary btn-voir-mouvements"
+                                                    data-id="<?= (int)$caisse->id_caisse ?>">
                                                     <i class="bx bx-show"></i> Voir
                                                 </a>
                                             </td>
@@ -136,8 +137,7 @@
     <!--end wrapper-->
 
     <?php $this->view('admin/partials/foot') ?>
-
-
+    <?php $this->view('admin/partials/modal_mouvements_caisse') ?>
 
 </body>
 
