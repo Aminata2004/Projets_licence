@@ -43,6 +43,67 @@ class Liste_du_jours extends  Controller
     ]);
   }
 
+  // Historique des billets : consulter et imprimer/reimprimer les billets d'une date
+  // passee precise (contrairement a index()/Liste_de_demains, qui ne montrent que les
+  // billets du jour/du lendemain). Le recu (recu()/donneesTicketThermique()) fonctionne
+  // deja pour n'importe quel billet peu importe sa date, seule cette liste manquait.
+  public function historique()
+  {
+    date_default_timezone_set('Africa/Bamako');
+    $id_compagnie = $_SESSION['id_compagnie'];
+    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
+    $idDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
+    $numeroGare = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
+    $model = new Liste_du_jour();
+
+    $date = $_GET['date'] ?? date('Y-m-d', strtotime('-1 day'));
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || $date > date('Y-m-d')) {
+      $date = date('Y-m-d', strtotime('-1 day'));
+    }
+
+    $where = 'billets.id_compagnie = :id_compagnie AND billets.jourVoyage = :jour';
+    $params = ['id_compagnie' => $id_compagnie, 'jour' => $date];
+
+    if ($idDepart !== null) {
+      $where .= ' AND billets.departId = :depart';
+      $params['depart'] = $idDepart;
+    }
+    if ($numeroGare !== null) {
+      $where .= ' AND billets.num_gare = :numeroGare';
+      $params['numeroGare'] = $numeroGare;
+    }
+    if (!empty($_GET['destination'])) {
+      $where .= ' AND billets.destinationId = :destination';
+      $params['destination'] = $_GET['destination'];
+    }
+    if (!empty($_GET['heure'])) {
+      $where .= ' AND billets.Heur_departs = :heure';
+      $params['heure'] = $_GET['heure'];
+    }
+
+    $resultats = $model->FetchSelectWheres(
+      '*',
+      'billets inner join client on billets.id_client = client.idClient',
+      $where . ' ORDER BY billets.Heur_departs',
+      $params
+    );
+
+    $liste_horaires = $model->FetchSelectWheres(
+      '*',
+      'horaire',
+      'id_compagnie = :id_compagnie',
+      ['id_compagnie' => $id_compagnie]
+    );
+    $destinations = $model->getDestinations($idDepart, $id_compagnie, $numeroGare);
+
+    $this->view('admin/historique_billets', [
+      'liste_historique' => $resultats,
+      'liste_horaires' => $liste_horaires,
+      'destinations' => $destinations,
+      'date' => $date,
+    ]);
+  }
+
   // public function recu($idBillets)
   // {
   //   $colisModel = new Livraisons_colis();
@@ -179,7 +240,12 @@ class Liste_du_jours extends  Controller
     $numeroGare   = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $destination  = trim($_GET['destination'] ?? '');
     $heure        = trim($_GET['heure'] ?? '');
-    $aujourdhui   = date('Y-m-d');
+    // Accepte une date passee (depuis l'onglet Historique) : sans ce parametre, le
+    // comportement reste identique a avant (aujourd'hui), utilise par Liste du jour.
+    $aujourdhui   = trim($_GET['date'] ?? '');
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $aujourdhui) || $aujourdhui > date('Y-m-d')) {
+      $aujourdhui = date('Y-m-d');
+    }
 
     $model = new Liste_du_jour();
     $colisModel = new Livraisons_colis();

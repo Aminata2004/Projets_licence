@@ -69,6 +69,17 @@
                             </a>
                         </li>
 
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" href="<?= BASE_URL ?>/admin/Liste_du_jours/historique" role="tab" aria-selected="false">
+                                <div class="d-flex align-items-center">
+                                    <div class="tab-icon">
+                                        <i class="fadeIn animated bx bx-history font-19"></i>
+                                    </div>
+                                    <div class="tab-title">Historique</div>
+                                </div>
+                            </a>
+                        </li>
+
                     </ul>
                 </div>
             </div>

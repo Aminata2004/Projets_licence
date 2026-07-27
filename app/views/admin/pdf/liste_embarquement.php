@@ -108,7 +108,7 @@
     Liste d'embarquement — Départ : <?= htmlspecialchars($_SESSION['ville'] ?? '-') ?>
     — Destination : <?= htmlspecialchars($destination !== '' ? $destination : 'Toutes') ?>
     — Heure : <?= htmlspecialchars($heure !== '' ? $heure : 'Toutes') ?>
-    — Date : <?= date('d/m/Y') ?>
+    — Date : <?= date('d/m/Y', strtotime($aujourdhui)) ?>
   </h3>
 
   <table class="liste">

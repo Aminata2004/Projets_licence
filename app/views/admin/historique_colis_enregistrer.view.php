@@ -101,6 +101,7 @@
                                     <th>Fraix de transaction</th>
                                     <th>Code colis</th>
                                     <th>Status</th>
+                                    <th>Action</th>
 
                                 </tr>
                             </thead>
@@ -133,6 +134,7 @@
     <!-- Modal -->
 
     <?php $this->view('admin/partials/foot') ?>
+    <script src="<?= BASE_URL ?>/mon_js/thermal-print.js"></script>
     <script>
         $(document).ready(function() {
             $('#date, #jour').change(function() {

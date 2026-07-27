@@ -41,6 +41,8 @@
           <?php if ($user->userHasPermission('Billets_apercue')) { ?>
             <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours"><i class="bi bi-arrow-right-short"></i>Liste des ticket</a>
             </li>
+            <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours/historique"><i class="bi bi-arrow-right-short"></i>Historique des billets</a>
+            </li>
           <?php }
           ?>
           <?php if ($user->userHasPermission('Billets_validation')) { ?>

@@ -64,6 +64,13 @@ class Historiques extends Controller
                     echo '<td data-label="Frais de transaction">' . number_format($item->fraix_transaction, 0, ',', ' ') . ' FCFA</td>';
                     echo '<td data-label="Code colis">' . htmlspecialchars($item->code_colis) . '</td>';
                     echo '<td data-label="Status">' . htmlspecialchars($item->status) . '</td>';
+                    echo '<td data-label="Action">';
+                    echo '<div class="dropdown"><a href="#" class="text-dark fs-5" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></a>';
+                    echo '<ul class="dropdown-menu dropdown-menu-end">';
+                    echo '<li><a class="dropdown-item" href="' . BASE_URL . '/admin/Colis_prise_en_charges/imprimer_recu/' . (int)$item->id_colis . '" target="_blank"><i class="bx bx-printer me-2"></i>Imprimer (câble/USB)</a></li>';
+                    echo '<li><a class="dropdown-item thermal-print-colis-btn" href="#" data-id="' . (int)$item->id_colis . '"><i class="bx bx-printer me-2"></i>Imprimer (WiFi)</a></li>';
+                    echo '</ul></div>';
+                    echo '</td>';
                     echo '</tr>';
                 }
                 $tbody = ob_get_clean();
@@ -121,6 +128,13 @@ class Historiques extends Controller
                     echo '<td data-label="Frais de transaction">' . number_format($item->fraix_transaction, 0, ',', ' ') . ' FCFA</td>';
                     echo '<td data-label="Code colis">' . htmlspecialchars($item->code_colis) . '</td>';
                     echo '<td data-label="Status"><span class="badge bg-success">Livré</span></td>';
+                    echo '<td data-label="Action">';
+                    echo '<div class="dropdown"><a href="#" class="text-dark fs-5" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></a>';
+                    echo '<ul class="dropdown-menu dropdown-menu-end">';
+                    echo '<li><a class="dropdown-item" href="' . BASE_URL . '/admin/Colis_prise_en_charges/imprimer_recu/' . (int)$item->id_colis . '" target="_blank"><i class="bx bx-printer me-2"></i>Imprimer (câble/USB)</a></li>';
+                    echo '<li><a class="dropdown-item thermal-print-colis-btn" href="#" data-id="' . (int)$item->id_colis . '"><i class="bx bx-printer me-2"></i>Imprimer (WiFi)</a></li>';
+                    echo '</ul></div>';
+                    echo '</td>';
                     echo '</tr>';
                 }
                 $tbody = ob_get_clean();
