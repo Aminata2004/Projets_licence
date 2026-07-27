@@ -2,7 +2,14 @@
 
 // Les valeurs par défaut ci-dessous ne sont utilisées que si la variable n'est pas définie
 // dans le fichier .env à la racine du projet (voir .env.example).
-define("BASE_URL", getenv('BASE_URL') ?: "http://localhost:8080/Gestion_compagnie_mcv/public"); // OK pour Apache
+// Détection automatique de la BASE_URL (s'adapte au port XAMPP et au nom du dossier)
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || ($_SERVER['SERVER_PORT'] ?? 80) == 443) ? "https://" : "http://";
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$script_dir = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])) : '';
+$base_dir = rtrim($script_dir, '/');
+$dynamic_url = $protocol . $host . $base_dir . '/public';
+
+define("BASE_URL", getenv('BASE_URL') ?: $dynamic_url);
 // define('ROOT', dirname(__DIR__));  // ou un chemin absolu local
 define("DBNAME", getenv('DB_NAME') ?: "db_compagnies_mvc");
 define("DBHOST", getenv('DB_HOST') ?: "localhost");
