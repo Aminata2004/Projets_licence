@@ -288,8 +288,8 @@ class Home extends Model
         ];
 
         if ($role === 'Utilisateur') {
-            $sql .= " AND ((colis.status <> 'enregistre' AND agence.localite = :ville AND colis.num_gare = :num_gare)
-                        OR (colis.status = 'enregistre' AND colis.provient_de = :ville_prov))";
+            $sql .= " AND ((colis.status <> 'enregistre' AND agence.localite = :ville AND agence.numeroGare = :num_gare)
+                        OR (colis.status = 'enregistre' AND colis.provient_de = :ville_prov AND colis.num_gare = :num_gare))";
             $params[':ville'] = $ville;
             $params[':num_gare'] = $num_gare;
             $params[':ville_prov'] = $ville;

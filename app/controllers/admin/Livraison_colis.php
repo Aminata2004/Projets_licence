@@ -36,7 +36,7 @@ class Livraison_colis extends Controller
 
             $peutLivrer = match ($droit) {
                 'chef_d_escale' => $memeVille && $bonStatut,
-                'Utilisateur'     => $memeVille && $memeGare && $bonStatut,
+                'utilisateur'     => $memeVille && $memeGare && $bonStatut,
                 default           => false,
             };
             if (!$peutLivrer) {
@@ -97,7 +97,7 @@ if ($recherche !== null) {
 
             $peutLivrer = match ($droit) {
                 'chef_d_escale' => $memeVille && $bonStatut,
-                'Utilisateur'     => $memeVille && $memeGare && $bonStatut,
+                'utilisateur'     => $memeVille && $memeGare && $bonStatut,
                 default           => false,
             };
         }
