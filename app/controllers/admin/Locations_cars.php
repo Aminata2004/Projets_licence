@@ -117,4 +117,44 @@ class Locations_cars extends Controller
         header("Location: " . BASE_URL . "/admin/Locations_cars");
         exit;
     }
+
+    // Facture A4 imprimable d'une location (peu importe son statut).
+    public function imprimerFacture($id = null)
+    {
+        if ($id === null) {
+            header("Location: " . BASE_URL . "/admin/Locations_cars");
+            exit;
+        }
+
+        $model = new Location_car();
+        $location = $model->getById($id);
+        $compagnie = $model->infoCompagnie($_SESSION['id_compagnie'] ?? 0);
+
+        if (!$location || !$compagnie) {
+            $model->set_flash("Location ou compagnie introuvable.", "danger");
+            header("Location: " . BASE_URL . "/admin/Locations_cars");
+            exit;
+        }
+
+        $logoPath = null;
+        if (!empty($compagnie['logo'])) {
+            $logoPath = ROOT . '/public/images/logos/' . $compagnie['logo'];
+        }
+
+        ob_start();
+        include ROOT . '/app/views/admin/pdf/facture_location.php';
+        $html = ob_get_clean();
+
+        $opt = new \Dompdf\Options();
+        $opt->setChroot(ROOT);
+        $opt->setIsRemoteEnabled(true);
+
+        $dompdf = new \Dompdf\Dompdf($opt);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $dompdf->stream("facture_location_{$location->id_location}.pdf", ['Attachment' => false]);
+        exit;
+    }
 }
