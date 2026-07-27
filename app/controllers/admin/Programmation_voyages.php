@@ -165,13 +165,18 @@ class Programmation_voyages extends Controller
             ? $programmation_voyage->getProgrammationParDate($_SESSION['id_compagnie'], $derniere_date, $localite_filtre)
             : [];
 
+        // Tous les trajets de la compagnie : le select Destination de chaque car ne doit pas
+        // se limiter aux seuls trajets deja affectes a CE car via "Affectation des cars".
+        $tousLesTrajets = $programmation_voyage->getTousLesTrajets();
+
         // Envoi à la vue
         $this->view('admin/programmation_voyage', [
             'listehoraire' => $listehoraire,
             'cars_destinations' => $cars_destinations,
             'cars_en_transit' => $cars_en_transit,
             'programmation_veille' => $programmation_veille,
-            'derniere_date' => $derniere_date
+            'derniere_date' => $derniere_date,
+            'tousLesTrajets' => $tousLesTrajets
         ]);
     }
 

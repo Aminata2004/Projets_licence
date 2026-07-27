@@ -88,6 +88,25 @@ $fromAndWhere = "liaison_car_trajet
         return $this->SelectAllDatas($select, $fromAndWhere, $params);
     }
 
+    // Tous les trajets de la compagnie (toutes gares confondues), independamment de leur
+    // affectation a un car particulier (liaison_car_trajet) : utilise pour le select
+    // Destination de "Nouvelle programmation de voyage", qui ne doit pas se limiter aux
+    // seuls trajets deja affectes a CE car precis via "Affectation des cars".
+    public function getTousLesTrajets()
+    {
+        $select = "programmer.idDepart, programmer.idDestination, programmer.heureDepart,
+                   a1.localite AS departLocalite, a1.numeroGare AS numeroGareDepart,
+                   a2.localite AS destinationLocalite, a2.numeroGare AS numeroGareDestination";
+
+        $fromAndWhere = "programmer
+            LEFT JOIN agence a1 ON programmer.idDepart = a1.idAgence
+            LEFT JOIN agence a2 ON programmer.idDestination = a2.idAgence
+            WHERE programmer.id_compagnie = :compagnie
+            ORDER BY a1.localite, a2.localite, programmer.heureDepart";
+
+        return $this->SelectAllDatas($select, $fromAndWhere, [':compagnie' => $_SESSION['id_compagnie'] ?? null]);
+    }
+
     // Insertion programmation avec ta méthode d'insertion
     // public function insertProgrammation($id_care, $id_horaire, $id_destination, $localite_user, $date_enregistre)
     // {

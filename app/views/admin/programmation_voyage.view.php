@@ -102,8 +102,11 @@
                                                 <td>
                                                     <select class="form-select shadow-sm" name="id_destination[]" required>
                                                         <option selected disabled value="">Choisir une destination</option>
-                                                        <?php foreach ($destinations as $d): ?>
+                                                        <?php foreach ($tousLesTrajets as $d): ?>
                                                             <?php
+                                                            // Tous les trajets de la compagnie sont proposes ici (pas seulement ceux
+                                                            // deja affectes a ce car via "Affectation des cars") : voir
+                                                            // Programmation_voyage::getTousLesTrajets().
                                                             // Cas 1 : Admin => il voit tout
                                                             if ($_SESSION['droit'] === 'Admin') {
                                                                 $afficher = true;
