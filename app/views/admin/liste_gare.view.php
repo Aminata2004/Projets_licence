@@ -27,9 +27,11 @@
                 </div>
                 <div class="ms-auto">
                     <div class="d-flex gap-2">
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <button type="button" id="btnOuvrirAjouterGare" class="btn btn-success d-flex align-items-center gap-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAjouterGare">
                             <i class="bx bx-plus-circle fs-5"></i> Ajouter
                         </button>
+                        <?php endif; ?>
                         <a href="javascript:history.back()"
                             class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm">
                             <i class="bx bx-left-arrow-alt fs-5"></i> Retour
@@ -170,6 +172,7 @@
                                                             &#8943; <!-- Trois points horizontaux -->
                                                         </a>
                                                         <div class="dropdown-menu dropdown-menu">
+                                                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                             <a class="dropdown-item edit-btn"
                                                                 data-bs-toggle="modal" data-bs-target="#exampleDangerModal1"
                                                                 data-numeros="<?= htmlspecialchars($liste->idAgence, ENT_QUOTES) ?>"
@@ -182,6 +185,7 @@
                                                                 <?= (isset($liste->status) && $liste->status == 0) ? 'Activer' : 'Suspendre' ?>
                                                             </a>
                                                             <a class="dropdown-item text-danger delete-button" href="<?= BASE_URL ?>/admin/Liste_gares/delete/<?= $liste->idAgence ?>">Supprimer</a>
+                                                            <?php endif; ?>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -254,8 +258,10 @@
                         </div>
                         <div class="col-md-12">
                             <div class="d-md-flex d-grid align-items-center gap-3">
+                                <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                 <button type="submit" name="edit"
                                     class="btn btn-primary px-4">Modifier</button>
+                                <?php endif; ?>
                                 <a href="" class="btn btn-info">Annuler</a>
                             </div>
                         </div>
@@ -332,10 +338,12 @@
 
                         <div class="modal-footer border-0 px-0">
                             <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                             <button class="btn btn-primary fw-semibold d-flex align-items-center" type="submit" id="submitGareBtn">
                                 <span class="spinner-border spinner-border-sm me-2 d-none" id="submitGareSpinner" role="status" aria-hidden="true"></span>
                                 <i class="bx bx-save fs-5 me-2" id="submitGareIcon"></i> Enregistrer
                             </button>
+                            <?php endif; ?>
                         </div>
                     </form>
                 </div>

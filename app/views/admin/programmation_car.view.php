@@ -38,9 +38,11 @@
 
                 <!-- Boutons -->
                 <div class="btn-group">
+                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                     <button type="button" class="btn btn-sm btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#exampleDangerModal">
                         <i class="bx bx-bus me-1"></i> Programmer un car
                     </button>
+                    <?php endif; ?>
                     <a href="javascript:history.back()" class="btn btn-sm btn-outline-primary shadow-sm ms-2">
                         <i class="bx bx-left-arrow-alt"></i> Retour
                     </a>
@@ -78,6 +80,7 @@
                                                             &#8943; <!-- Trois points horizontaux -->
                                                         </a>
                                                         <div class="dropdown-menu dropdown-menu-end">
+                                                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                             <a class="dropdown-item ajouter-trajet-button"
                                                                 href="#"
                                                                 data-bs-toggle="modal"
@@ -91,6 +94,7 @@
                                                                 href="<?= BASE_URL ?>/admin/Programmation_cars/supprimer/<?= $Select_cars->id_car ?>">
                                                                 Supprimer
                                                             </a>
+                                                            <?php endif; ?>
                                                             <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Programmation_cars/details/<?= $Select_cars->id_car ?>">Details</a>
                                                         </div>
                                                     </div>
@@ -167,7 +171,9 @@
                                     <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
                                         Annuler
                                     </button>
+                                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                     <button type="submit" class="btn btn-primary" name="programmer_car">Enregistre</button>
+                                    <?php endif; ?>
                                 </div>
                             </form>
                         </div>
@@ -202,7 +208,9 @@
                                 <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
                                     Annuler
                                 </button>
+                                <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                 <button type="submit" class="btn btn-primary" name="ajouter_trajet">Enregistrer</button>
+                                <?php endif; ?>
                             </div>
                         </form>
                     </div>

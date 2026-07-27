@@ -194,10 +194,12 @@
                                     </button>
 
                                     <div class="mt-2 d-flex gap-3">
+                                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                         <button class="btn btn-primary fw-semibold d-flex align-items-center" type="submit" name="enregistre" id="submitGareBtn">
                                             <span class="spinner-border spinner-border-sm me-2 d-none" id="submitGareSpinner" role="status" aria-hidden="true"></span>
                                             <i class="bx bx-save fs-5 me-2" id="submitGareIcon"></i> Enregistrer
                                         </button>
+                                        <?php endif; ?>
                                         <a href="<?= BASE_URL ?>/admin/Liste_gares" class="btn btn-light fw-semibold border shadow-sm d-flex align-items-center" style="border-radius: 12px; padding: 0.6rem 1.5rem;">
                                             <i class="bx bx-list-ul fs-5 me-2"></i> Voir la liste
                                         </a>

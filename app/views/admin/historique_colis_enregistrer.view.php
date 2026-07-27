@@ -25,9 +25,11 @@
                     </nav>
                 </div>
                <div class="ms-sm-auto mt-2 mt-sm-0">
+                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                     <a href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/ajouter_colis" class="btn btn-sm btn-primary rounded-pill shadow-sm me-2">
                          + Ajouter
                     </a>
+                    <?php endif; ?>
                     <a href="javascript:history.back()" class="btn btn-sm btn-outline-primary rounded-pill shadow-sm">
                         <i class="bx bx-left-arrow-alt me-1"></i> Retour
                     </a>

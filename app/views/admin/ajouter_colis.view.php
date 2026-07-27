@@ -216,9 +216,11 @@
                                                         <div class="d-flex align-items-center gap-3">
                                                             <button type="button" class="btn btn-outline-secondary px-4" onclick="stepper1.previous()"><i class='bx bx-left-arrow-alt me-2'></i>Previous</button>
 
+                                                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                             <button type="submit" class="btn btn-success rounded-pill shadow-sm" name="envoi">
                                                                 <i class="bx bx-check me-1"></i> Enregistrer
                                                             </button>
+                                                            <?php endif; ?>
 
                                                         </div>
                                                     </div>

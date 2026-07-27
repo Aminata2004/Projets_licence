@@ -32,10 +32,12 @@
                 </div>
                 <div class="ms-sm-auto mt-2 mt-sm-0">
                     <div class="btn-group">
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <a href="<?= BASE_URL ?>/admin/Programmation_voyages"
                             class="btn btn-sm btn-info text-white rounded-pill shadow-sm">
                             <i class="bx bx-plus me-1"></i> Ajouter
                         </a>
+                        <?php endif; ?>
                         <a href="javascript:history.back()"
                             class="btn btn-sm btn-outline-primary rounded-pill shadow-sm ms-2">
                             <i class="bx bx-left-arrow-alt"></i>
@@ -105,6 +107,7 @@
                                                     <i class="bx bx-dots-vertical-rounded"></i>
                                                 </a>
                                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Programmation_voyages/edit/<?= $listeProgrammers->id_programmation ?>"><i class="bx bx-edit me-2"></i>Modifier</a></li>
                                                     <?php if ((int)$listeProgrammers->place_disponible > 0): ?>
                                                         <li><a class="dropdown-item transfer-btn" href="#"
@@ -113,6 +116,7 @@
                                                                 <i class="bx bx-transfer me-2"></i>Transférer les passagers</a></li>
                                                     <?php endif; ?>
                                                     <li><a class="dropdown-item text-danger" href="#"><i class="bx bx-x-circle me-2"></i>Désactiver</a></li>
+                                                    <?php endif; ?>
                                                 </ul>
                                             </div>
                                         </td>

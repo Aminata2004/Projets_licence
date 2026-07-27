@@ -61,12 +61,14 @@
                                         <td><?= htmlspecialchars($colis->fraix_transaction) ?></td>
                                         <td><?= date('d/m/Y H:i', strtotime($colis->date_enregistre)) ?></td>
                                         <td>
+                                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                             <button type="button" class="btn btn-sm btn-outline-primary changer-car-btn"
                                                 data-bs-toggle="modal" data-bs-target="#modalChangerCar"
                                                 data-id-colis="<?= htmlspecialchars($colis->id_colis) ?>"
                                                 data-nom-colis="<?= htmlspecialchars($colis->nom_colis) ?>">
                                                 <i class="bx bx-transfer-alt me-1"></i> Changer de car
                                             </button>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

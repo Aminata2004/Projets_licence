@@ -30,8 +30,11 @@ class Mouvements_colis extends  Model
             $sql .= " AND a.localite = :ville";
             $params[':ville'] = $ville;
         } elseif ($droit === 'Utilisateur') {
-            // Filtre par localité et par gare
-            $sql .= " AND a.localite = :ville AND colis.num_gare = :numero_gare";
+            // Filtre par localité et par gare de la DESTINATION (agence a) : colis.num_gare
+            // est la gare d'ORIGINE (celle où l'expéditeur a déposé le colis), pas celle du
+            // destinataire. La comparer au numero_gare de l'utilisateur courant excluait donc
+            // systématiquement les colis qui lui étaient destinés depuis une autre gare.
+            $sql .= " AND a.localite = :ville AND a.numeroGare = :numero_gare";
             $params[':ville'] = $ville;
             $params[':numero_gare'] = $numero_gare;
         }
@@ -76,8 +79,9 @@ class Mouvements_colis extends  Model
             $sql .= " AND a.localite = :ville";
             $params[':ville'] = $ville;
         } elseif ($droit === 'Utilisateur') {
-            // Filtre par localité et par gare
-            $sql .= " AND a.localite = :ville AND colis.num_gare = :numero_gare";
+            // Filtre par localité et par gare de la DESTINATION (agence a), voir le même
+            // correctif dans FetchSelectColisEncours() ci-dessus.
+            $sql .= " AND a.localite = :ville AND a.numeroGare = :numero_gare";
             $params[':ville'] = $ville;
             $params[':numero_gare'] = $numero_gare;
         }
@@ -120,8 +124,9 @@ class Mouvements_colis extends  Model
             $sql .= " AND a.localite = :ville";
             $params[':ville'] = $ville;
         } elseif ($droit === 'Utilisateur') {
-            // Filtre par localité et par gare
-            $sql .= " AND a.localite = :ville AND colis.num_gare = :numero_gare";
+            // Filtre par localité et par gare de la DESTINATION (agence a), voir le même
+            // correctif dans FetchSelectColisEncours() ci-dessus.
+            $sql .= " AND a.localite = :ville AND a.numeroGare = :numero_gare";
             $params[':ville'] = $ville;
             $params[':numero_gare'] = $numero_gare;
         }

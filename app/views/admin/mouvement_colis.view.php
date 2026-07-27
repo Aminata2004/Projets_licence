@@ -132,7 +132,7 @@
                                                 <table id="table-attente" class="table table-striped table-hover align-middle mb-0 mobile-card-table">
                                                     <thead class="table-light">
                                                         <tr>
-                                                            <th><input type="checkbox" id="selectAll"></th>
+                                                            <th><?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?><input type="checkbox" id="selectAll"><?php endif; ?></th>
                                                             <th>Nom colis</th>
                                                             <th>Nature</th>
                                                             <th>Valeur</th>
@@ -146,7 +146,7 @@
                                                     <tbody>
                                                         <?php foreach ($liste_colis as $c): ?>
                                                             <tr>
-                                                                <td data-label="Sélection"><input type="checkbox" name="selected_colis[]" value="<?= (int)$c['id_colis'] ?>" class="form-check-input checkbox-car"></td>
+                                                                <td data-label="Sélection"><?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?><input type="checkbox" name="selected_colis[]" value="<?= (int)$c['id_colis'] ?>" class="form-check-input checkbox-car"><?php endif; ?></td>
                                                                 <td data-label="Nom colis" class="fw-medium"><?= htmlspecialchars($c['nom_colis']) ?></td>
                                                                 <td data-label="Nature"><?= htmlspecialchars($c['nature']) ?></td>
                                                                 <td data-label="Valeur"><?= number_format($c['valeur'], 0, ',', ' ') ?> FCFA</td>
@@ -180,7 +180,9 @@
                                                                                     <i class="bx bx-show-alt me-1"></i> Détails
                                                                                 </a>
                                                                             </li>
-                                                                            <li><a class="dropdown-item" href="#"><i class="bx bx-block me-1"></i> Désactiver</a></li>
+                                                                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
+                                                            <li><a class="dropdown-item" href="#"><i class="bx bx-block me-1"></i> Désactiver</a></li>
+                                                            <?php endif; ?>
                                                                         </ul>
                                                                     </div>
                                                                 </td>
@@ -195,7 +197,7 @@
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
-                                            <?php if (!empty($liste_colis)): ?>
+                                            <?php if (!empty($liste_colis) && ($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                 <div class="d-flex justify-content-end mt-3">
                                                     <button class="btn btn-success rounded-pill px-4" type="submit" name="reception">
                                                         <i class="bx bx-check me-1"></i> Réception
@@ -265,12 +267,14 @@
                                                                                 <i class="bx bx-show-alt me-1"></i> Détails
                                                                             </a>
                                                                         </li>
+                                                                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                                         <li>
                                                                             <a class="dropdown-item"
                                                                                 href="<?= BASE_URL ?>/admin/Livraison_colis?code=<?= urlencode($colis['code_colis']) ?>">
                                                                                 <i class="bx bx-truck me-2"></i>Livrer
                                                                             </a>
                                                                         </li>
+                                                                        <?php endif; ?>
                                                                         <?php
                                                                         $msgRecu = "Bonjour " . ($colis['destinataire'] ?? '') . ", votre colis (code "
                                                                             . ($colis['code_colis'] ?? '') . ") est arrivé à " . ($colis['destination'] ?? '')

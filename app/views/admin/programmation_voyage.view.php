@@ -53,7 +53,7 @@
                             <div class="col-sm-4">
                                 <input type="date" class="form-control shadow-sm" id="jourVoyage" name="jourVoyage" required>
                             </div>
-                            <?php if (!empty($programmation_veille)): ?>
+                            <?php if (!empty($programmation_veille) && ($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                 <div class="col-sm-6">
                                     <button type="button" id="btnReproduireHier" class="btn btn-outline-primary shadow-sm">
                                         <i class="bx bx-repeat me-1"></i> Reproduire la programmation du <?= date('d/m/Y', strtotime($derniere_date)) ?>
@@ -67,7 +67,7 @@
                             <table class="table table-hover table-bordered align-middle shadow-sm rounded">
                                 <thead class="table-primary text-center">
                                     <tr>
-                                        <th><input type="checkbox" id="selectAll"></th>
+                                        <th><?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?><input type="checkbox" id="selectAll"><?php endif; ?></th>
                                         <th>Numéro Car</th>
                                         <th>Horaire</th>
                                         <?php if ($_SESSION['droit'] === 'Admin'): ?>
@@ -81,7 +81,7 @@
                                         <?php $indexRow = 0; ?>
                                         <?php foreach ($cars_destinations as $numero_car => $destinations ) : ?>
                                             <tr data-id-car="<?= htmlspecialchars($destinations[0]->id_car) ?>">
-                                                <td><input type="checkbox" name="select_car[]" value="<?= $indexRow ?>" class="form-check-input checkbox-car"></td>
+                                                <td><?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?><input type="checkbox" name="select_car[]" value="<?= $indexRow ?>" class="form-check-input checkbox-car"><?php endif; ?></td>
                                                 <td>
                                                     <input type="text" name="numero_car[]" class="form-control text-center shadow-sm" value="<?= htmlspecialchars($numero_car) ?>" readonly>
                                                     <input type="hidden" name="id_care[]" value="<?= htmlspecialchars($destinations[0]->id_car) ?>">
@@ -149,9 +149,11 @@
 
                         <!-- Boutons -->
                         <div class="mt-4 d-flex gap-2">
+                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                             <button class="btn btn-success shadow-sm" type="submit" name="programmer">
                                 <i class="bx bx-save me-1"></i> Enregistrer
                             </button>
+                            <?php endif; ?>
                             <a href="<?= BASE_URL ?>/admin/Programmation_voyages/liste_programmer_voyage"
                                 class="btn btn-info text-white shadow-sm">
                                 <i class="bx bx-list-ul me-1"></i> Voir la liste
@@ -194,6 +196,7 @@
                                             ?>
                                         </td>
                                         <td>
+                                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                             <form action="" method="post" class="d-inline form-valider-arrivee"
                                                 data-depart-datetime="<?= htmlspecialchars($car->depart_datetime ?? '') ?>"
                                                 data-id-programmation="<?= htmlspecialchars($car->id_programmation ?? '') ?>">
@@ -203,6 +206,7 @@
                                                     <i class="bx bx-check-double me-1"></i> Valider l'arrivée
                                                 </button>
                                             </form>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

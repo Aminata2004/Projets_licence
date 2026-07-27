@@ -26,7 +26,9 @@
                 </div>
                 <div class="ms-sm-auto mt-2 mt-sm-0">
                     <div class="btn-group">
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <a href="<?= BASE_URL ?>/admin/Add_billets" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
+                        <?php endif; ?>
                         <a href="javascript:history.back()" class="btn btn-primary "><i
                                 class="fadeIn animated bx bx-left-arrow-alt"></i></a>
 

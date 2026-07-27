@@ -26,7 +26,9 @@
                 </div>
                 <div class="ms-sm-auto mt-2 mt-sm-0">
                     <div class="btn-group">
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <a href="<?= BASE_URL ?>/admin/Add_billets" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
+                        <?php endif; ?>
                         <a href="javascript:history.back()" class="btn btn-primary "><i
                                 class="fadeIn animated bx bx-left-arrow-alt"></i></a>
 
@@ -168,6 +170,7 @@
                                                     </a>
                                                     <div class="dropdown-menu dropdown-menu-end">
                                                         <a class="dropdown-item" href="#">Details</a>
+                                                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                         <a class="dropdown-item" href="#">Modifier</a>
                                                         <a href="#" class="dropdown-item report-btn"
                                                             data-idclient="<?= $item->idBillets ?>"
@@ -178,6 +181,7 @@
                                                             data-bs-toggle="modal" data-bs-target="#exampleDangerModal">
                                                             Reporter le voyage
                                                         </a>
+                                                        <?php endif; ?>
 
                                                         <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Liste_du_jours/recu/<?= $item->idBillets ?>" target="_blank">
                                                             Imprimer (imprimante câble/USB)
@@ -194,6 +198,7 @@
                                                         $droitUser = $_SESSION['droit'] ?? null;
                                                         $statutAnnulation = $item->status_billets ?? null;
                                                         ?>
+                                                        <?php if ($droitUser !== 'PDG'): ?>
                                                         <?php if ($statutAnnulation === 'annule'): ?>
                                                             <span class="dropdown-item text-muted">Billet annulé</span>
                                                         <?php elseif ($statutAnnulation === 'annulation_demandee'): ?>
@@ -203,6 +208,7 @@
                                                                 data-idbillets="<?= $item->idBillets ?>">
                                                                 <?= in_array($droitUser, ['Admin', 'super_admin'], true) ? "Annuler le billet" : "Demander l'annulation" ?>
                                                             </a>
+                                                        <?php endif; ?>
                                                         <?php endif; ?>
 
                                                     </div>
@@ -271,7 +277,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                     <button type="submit" class="btn btn-primary" name="edit">Modifier</button>
+                    <?php endif; ?>
                 </div>
                 </form>
             </div>
@@ -303,7 +311,9 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <button type="submit" class="btn btn-danger" name="annuler_billet"><?= $estAdminAnnulation ? "Confirmer l'annulation" : "Envoyer la demande" ?></button>
+                        <?php endif; ?>
                     </div>
                 </form>
             </div>

@@ -161,9 +161,11 @@
 
                         <!-- Boutons -->
                         <div class="mt-4 d-flex gap-2">
+                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                             <button class="btn btn-success shadow-sm" type="submit" name="modifier">
                                 <i class="bx bx-save me-1"></i> Enregistrer
                             </button>
+                            <?php endif; ?>
                             <a href="<?= BASE_URL ?>/admin/Programmation_voyages/liste_programmer_voyage"
                                 class="btn btn-info text-white shadow-sm">
                                 <i class="bx bx-list-ul me-1"></i> Voir la liste

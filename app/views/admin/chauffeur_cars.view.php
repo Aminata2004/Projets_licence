@@ -29,9 +29,11 @@
                 <div class="ms-auto">
                     <div class="d-flex gap-2">
                         <!-- Button trigger modal -->
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <button type="button" class="btn btn-transgest" data-bs-toggle="modal" data-bs-target="#addChauffeurModal">
                             + Ajouter
                         </button>
+                        <?php endif; ?>
 
                         <!-- Modal -->
                         <div class="modal fade" id="addChauffeurModal" tabindex="-1" aria-hidden="true">
@@ -69,7 +71,9 @@
 
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+                                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                         <button type="submit" class="btn btn-primary" name="save">Enregistrer</button>
+                                        <?php endif; ?>
                                     </div>
                                     </form>
                                 </div>
@@ -230,6 +234,7 @@
                                                                     &#8943;
                                                                 </a>
                                                                 <ul class="dropdown-menu shadow-sm">
+                                                                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                                     <li>
                                                                         <a class="dropdown-item edit-btn"
                                                                             data-bs-toggle="modal"
@@ -248,6 +253,7 @@
                                                                             🗑 Supprimer
                                                                         </a>
                                                                     </li>
+                                                                    <?php endif; ?>
                                                                 </ul>
                                                             </div>
                                                         </td>
@@ -316,7 +322,9 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        <?php endif; ?>
                     </div>
                 </form>
             </div>

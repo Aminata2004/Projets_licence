@@ -39,10 +39,12 @@
 
                 <!-- Boutons -->
                 <div class="btn-group gap-1">
+                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                     <a href="<?= BASE_URL ?>/admin/Programmer_voyages/add_programmer"
                         class="btn btn-sm btn-success shadow-sm">
                         <i class="bx bx-plus-circle me-1"></i> Ajouter
                     </a>
+                    <?php endif; ?>
 
                     <a href="javascript:history.back()"
                         class="btn btn-sm btn-outline-primary shadow-sm">
@@ -98,6 +100,7 @@
                                                         <i class="bi bi-three-dots-vertical"></i>
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-end shadow">
+                                                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                         <li>
                                                             <a class="dropdown-item add-button"
                                                                 data-bs-toggle="modal"
@@ -119,6 +122,7 @@
                                                                 <i class="bi bi-trash3 me-2"></i>Supprimer
                                                             </a>
                                                         </li>
+                                                        <?php endif; ?>
                                                     </ul>
                                                 </div>
                                             </td>
@@ -190,7 +194,9 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <button type="submit" class="btn btn-primary" name="edit"><i class="bi bi-check-circle me-1"></i>Enregistrer</button>
+                        <?php endif; ?>
                     </div>
                 </form>
             </div>
