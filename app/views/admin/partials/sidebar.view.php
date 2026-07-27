@@ -323,7 +323,19 @@
                   <?php endif; ?>
    <?php } ?>
                 <?php endif; ?>
-                
+
+                <!-- Accessible a TOUT compte connecte, quel que soit le role ou les permissions
+                     (documentation, pas un ecran metier) : volontairement hors de tout if de
+                     role/permission ci-dessus, et placee tout en bas du menu. -->
+                <li class="menu-label">Aide</li>
+                <li>
+                  <a href="<?= BASE_URL ?>/admin/Documentations">
+                    <div class="parent-icon"><i class="bx bx-book-open"></i>
+                    </div>
+                    <div class="menu-title">Documentation</div>
+                  </a>
+                </li>
+
     </ul>
     <!--end navigation-->
   </aside>
