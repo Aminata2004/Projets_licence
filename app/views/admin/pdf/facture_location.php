@@ -15,7 +15,7 @@ $statutLabel = $statutLabels[$location->statut] ?? $location->statut;
 // cette mention : il signe en son nom propre.
 $creeParChefEscale = ($location->agent_droit ?? null) === 'chef_d_escale';
 $mentionSignature = ($creeParChefEscale && $location->statut === 'valide')
-    ? 'Signature (P.O. Admin)'
+    ? 'Signature (P.O. ' . ($location->valide_par_nom ?? 'Admin') . ')'
     : 'Signature';
 ?>
 <!DOCTYPE html>

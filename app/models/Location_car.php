@@ -253,11 +253,13 @@ class Location_car extends Model
         }
 
         $rows = $this->FetchSelectWheres(
-            'l.*, a.localite, a.numeroGare, c.numero_car, c.matriculle, u.utilisateurs AS agent, u.droit AS agent_droit',
+            'l.*, a.localite, a.numeroGare, c.numero_car, c.matriculle, u.utilisateurs AS agent, u.droit AS agent_droit,
+             v.utilisateurs AS valide_par_nom',
             'location_car l
                 LEFT JOIN agence a ON l.id_agence_depart = a.idAgence
                 LEFT JOIN car c ON l.id_car = c.id_car
-                LEFT JOIN utilisateur u ON l.id_utilisateur = u.idUser',
+                LEFT JOIN utilisateur u ON l.id_utilisateur = u.idUser
+                LEFT JOIN utilisateur v ON l.id_valide_par = v.idUser',
             $condition,
             $params
         );
@@ -313,8 +315,8 @@ class Location_car extends Model
         }
 
         $update = $this->insertion_update_simples(
-            "UPDATE location_car SET statut = 'valide' WHERE id_location = :id",
-            [":id" => $id]
+            "UPDATE location_car SET statut = 'valide', id_valide_par = :id_valide_par WHERE id_location = :id",
+            [":id" => $id, ":id_valide_par" => $_SESSION['id_utilisateur']]
         );
         if (!$update) {
             $this->set_flash("Erreur lors de la validation de la location.", "danger");
