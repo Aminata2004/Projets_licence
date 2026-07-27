@@ -165,13 +165,29 @@ class Programmer_voyages extends  Controller
       return;
     }
 
+    // Tous les trajets deja programmes (toutes gares confondues) : affiches en reference
+    // a cote du choix de la Destination, pour voir d'un coup d'oeil ce qui existe deja
+    // avant d'en creer un nouveau (evite les doublons, aide a fixer un prix coherent).
+    $tousLesTrajets = $programmer_voyage->FetchSelectCustom(
+      "SELECT a1.localite AS departLocalite, a1.numeroGare AS departNumeroGare,
+              a2.localite AS destinationLocalite, a2.numeroGare AS destinationNumeroGare,
+              p.heureDepart, p.prix
+       FROM programmer p
+       INNER JOIN agence a1 ON p.idDepart = a1.idAgence
+       INNER JOIN agence a2 ON p.idDestination = a2.idAgence
+       WHERE p.id_compagnie = :id_compagnie
+       ORDER BY a1.localite, a2.localite, p.heureDepart",
+      ['id_compagnie' => $id_compagnie]
+    );
+
     // Envoi des données à la vue
     $this->view('admin/add_programmer', [
 
       'listeEscale' => $listeEscale,
       'listehoraire' => $listehoraire,
       'liste_agence' => $liste_agence,
-      'liste_agence_depart' => $liste_agence_depart
+      'liste_agence_depart' => $liste_agence_depart,
+      'tousLesTrajets' => $tousLesTrajets
     ]);
   }
 

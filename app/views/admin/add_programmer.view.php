@@ -154,6 +154,40 @@
                                                         <small class="form-text text-muted">
                                                             <i class="bx bx-info-circle"></i> Les gares de la même localité que le départ sont masquées (voyage interne impossible).
                                                         </small>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" data-bs-toggle="collapse" data-bs-target="#trajetsExistants">
+                                                            <i class="bx bx-list-ul"></i> Voir tous les trajets déjà programmés (<?= count($tousLesTrajets ?? []) ?>)
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="col-12">
+                                                        <div class="collapse" id="trajetsExistants">
+                                                            <div class="card card-body shadow-sm" style="max-height: 260px; overflow-y: auto;">
+                                                                <?php if (empty($tousLesTrajets)): ?>
+                                                                    <p class="text-muted small mb-0">Aucun trajet programmé pour le moment.</p>
+                                                                <?php else: ?>
+                                                                    <table class="table table-sm table-striped mb-0">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Départ</th>
+                                                                                <th>Destination</th>
+                                                                                <th>Heure</th>
+                                                                                <th>Prix</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <?php foreach ($tousLesTrajets as $trajet): ?>
+                                                                                <tr>
+                                                                                    <td><?= htmlspecialchars($trajet->departLocalite . ' (' . $trajet->departNumeroGare . ')') ?></td>
+                                                                                    <td><?= htmlspecialchars($trajet->destinationLocalite . ' (' . $trajet->destinationNumeroGare . ')') ?></td>
+                                                                                    <td><?= htmlspecialchars($trajet->heureDepart) ?></td>
+                                                                                    <td><?= number_format((float)$trajet->prix, 0, ',', ' ') ?> FCFA</td>
+                                                                                </tr>
+                                                                            <?php endforeach; ?>
+                                                                        </tbody>
+                                                                    </table>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        </div>
                                                     </div>
 
                                                     <div class="col-12">
