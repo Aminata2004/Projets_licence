@@ -77,7 +77,9 @@ class ThermalPrinter
 
         $r = $ESC . "@"; // init imprimante
 
+        // En-tête centré : logo (comme sur le PDF cable/USB) puis nom/slogan de la compagnie.
         $r .= $ESC . "a" . "\x01";
+        $r .= self::imageRaster($colis['logo'] ?? null);
         $r .= $ESC . "!" . "\x30";
         $r .= self::clean($colis['compagnie'] ?? '') . "\n";
         $r .= $ESC . "!" . "\x00";
@@ -85,32 +87,44 @@ class ThermalPrinter
             $r .= self::clean($colis['slogan']) . "\n";
         }
         $r .= $sep;
-        $r .= $ESC . "!" . "\x10";
-        $r .= "RECU DE COLIS\n";
-        $r .= $ESC . "!" . "\x00";
-        $r .= self::clean($colis['nom'] ?? '-') . "\n";
-        $r .= $sep;
 
+        // Reprend exactement les mêmes blocs, dans le même ordre, que le reçu PDF
+        // cable/USB (cf. app/views/admin/pdf/recu_colis.php) : Colis, Expéditeur,
+        // Destinataire, Trajet, puis le QR code et le code rappelé en dessous.
         $r .= $ESC . "a" . "\x00";
-        $r .= sprintf("%-13s%s\n", "Code", self::clean($colis['code'] ?? '-'));
-        $r .= sprintf("%-13s%s\n", "Expediteur", self::clean($colis['expediteur'] ?? '-'));
-        $r .= sprintf("%-13s%s\n", "Tel", self::clean($colis['numeroExp'] ?? '-'));
-        $r .= sprintf("%-13s%s\n", "Destinataire", self::clean($colis['destinataire'] ?? '-'));
-        $r .= sprintf("%-13s%s\n", "Tel", self::clean($colis['numeroDest'] ?? '-'));
-        $r .= sprintf("%-13s%s\n", "Depart", self::clean($colis['depart'] ?? '-'));
-        $r .= sprintf("%-13s%s\n", "Destination", self::clean($colis['destination'] ?? '-'));
+        $r .= $ESC . "!" . "\x10" . "COLIS\n" . $ESC . "!" . "\x00";
+        $r .= self::champ("Nom", $colis['nom'] ?? '-');
+        $r .= self::champ("Nature", $colis['nature'] ?? '-');
         $r .= $sep;
 
-        $r .= $ESC . "!" . "\x10";
-        $r .= "VALEUR   " . self::clean($colis['valeur'] ?? '-') . " FCFA\n";
-        $r .= "FRAIS    " . self::clean($colis['frais'] ?? '-') . " FCFA\n";
-        $r .= $ESC . "!" . "\x00";
+        $r .= $ESC . "!" . "\x10" . "EXPEDITEUR\n" . $ESC . "!" . "\x00";
+        $r .= self::champ("Nom", $colis['expediteur'] ?? '-');
+        $r .= self::champ("Tel", $colis['numeroExp'] ?? '-');
         $r .= $sep;
 
-        // QR code (vérification/suivi), centré, avec le code du colis rappelé en dessous
+        $r .= $ESC . "!" . "\x10" . "DESTINATAIRE\n" . $ESC . "!" . "\x00";
+        $r .= self::champ("Nom", $colis['destinataire'] ?? '-');
+        $r .= self::champ("Tel", $colis['numeroDest'] ?? '-');
+        $r .= $sep;
+
+        $r .= $ESC . "!" . "\x10" . "TRAJET\n" . $ESC . "!" . "\x00";
+        $r .= self::champ("Depart", $colis['depart'] ?? '-');
+        $r .= self::champ("Destination", $colis['destination'] ?? '-');
+        $r .= $sep;
+
+        // QR code (vérification/suivi) : encode les mêmes informations que celui du PDF
+        // (pas seulement le code), centré, avec le code du colis rappelé en dessous.
         $r .= $ESC . "a" . "\x01";
-        $r .= self::qrCode(self::clean($colis['code'] ?? '-'));
-        $r .= self::clean($colis['code'] ?? '-') . "\n";
+        $qrData = "Nom du colis : " . self::clean($colis['nom'] ?? '-') . "\n"
+            . "Nature       : " . self::clean($colis['nature'] ?? '-') . "\n"
+            . "Code         : " . self::clean($colis['code'] ?? '-') . "\n"
+            . "Depart       : " . self::clean($colis['depart'] ?? '-') . "\n"
+            . "Destination  : " . self::clean($colis['destination'] ?? '-') . "\n"
+            . "Enregistre par : " . self::clean($colis['agent'] ?? '-') . "\n"
+            . "Valeur       : " . self::clean($colis['valeur'] ?? '-') . " FCFA\n"
+            . "Frais        : " . self::clean($colis['frais'] ?? '-') . " FCFA";
+        $r .= self::qrCode($qrData);
+        $r .= "Code : " . self::clean($colis['code'] ?? '-') . "\n";
         $r .= $sep;
 
         $r .= "Enregistre par " . self::clean($colis['agent'] ?? '-') . "\n";

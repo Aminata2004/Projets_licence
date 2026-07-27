@@ -240,11 +240,23 @@ class Colis_prise_en_charges extends  Controller
       exit;
     }
 
+    // Logo envoye en base64, meme principe que pour le billet (cf. Liste_du_jours::
+    // donneesTicketThermique()) : le pont n'a acces a aucun fichier du site.
+    $logoBase64 = null;
+    if (!empty($compagnie['logo'])) {
+      $logoPath = ROOT . '/public/images/logos/' . $compagnie['logo'];
+      if (file_exists($logoPath)) {
+        $logoBase64 = base64_encode(file_get_contents($logoPath));
+      }
+    }
+
     $json = json_encode([
       'type' => 'colis',
       'compagnie' => $compagnie['nom'] ?? 'Nom Compagnie',
       'slogan' => $compagnie['slogant'] ?? '',
+      'logo' => $logoBase64,
       'nom' => $colis['nom_colis'] ?? '-',
+      'nature' => $colis['nature'] ?? '-',
       'code' => $colis['code_colis'] ?? '-',
       'expediteur' => $colis['expediteur'] ?? '-',
       'numeroExp' => $colis['numero_exp'] ?? '-',
