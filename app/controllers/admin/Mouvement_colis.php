@@ -14,6 +14,18 @@ class Mouvement_colis extends Controller
         // Traitement de la réception de colis (formulaire envoyé)
         if (isset($_POST['reception'])) {
 
+            // Verrou PDG : cette action passe par index() (pas par une méthode nommée
+            // add/modifier/... ), donc le garde-fou central App::isEcritureBloqueePourPDG()
+            // ne la détecte pas comme une écriture. On bloque donc explicitement ici.
+            if (($_SESSION['droit'] ?? null) === 'PDG') {
+                $mouvement_colis->set_flash(
+                    "Votre rôle est en lecture seule : vous ne pouvez pas réceptionner de colis.",
+                    'danger'
+                );
+                header('Location: ' . BASE_URL . '/admin/mouvement_colis');
+                exit;
+            }
+
             if (empty($_POST['selected_colis'])) {
                 $mouvement_colis->set_flash("Aucun colis sélectionné !", 'danger');
                 header('Location: ' . BASE_URL . '/admin/mouvement_colis');

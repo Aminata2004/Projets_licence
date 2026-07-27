@@ -84,22 +84,26 @@
                                                     <i class="bx bx-dots-vertical-rounded"></i>
                                                 </a>
                                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                     <li>
                                                         <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Envoi_colis/envoi_colis?id_car=<?= $colis->numero_car ?>">
                                                             <i class="bx bx-plus me-2"></i> Ajouter
                                                         </a>
                                                     </li>
+                                                    <?php endif; ?>
                                                     <li>
                                                         <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Envoi_colis/details_colis_envoyer?id_car=<?= $colis->numero_car ?>&date=<?= $colis->dates ?>">
                                                             <i class="bx bx-info-circle me-2"></i> Détails / Changer de car
                                                         </a>
                                                     </li>
+                                                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                     <li>
                                                         <a class="dropdown-item text-danger annuler-envoi-btn"
                                                             href="<?= BASE_URL ?>/admin/Envoi_colis/annuler_envoi?id_car=<?= $colis->numero_car ?>&date=<?= $colis->dates ?>">
                                                             <i class="bx bx-trash me-2"></i> Annuler l'envoi
                                                         </a>
                                                     </li>
+                                                    <?php endif; ?>
                                                 </ul>
                                             </div>
                                         </td>

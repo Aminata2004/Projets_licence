@@ -105,7 +105,9 @@
 
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                 <button type="submit" class="btn btn-primary" name="save">Enregistrer</button>
+                                                <?php endif; ?>
                                             </div>
                                         </form>
                                     </div>
@@ -116,10 +118,12 @@
                                  <div class="d-flex gap-2">
 
                         <!-- Bouton Ajouter -->
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <button type="button" class="btn btn-success d-flex align-items-center gap-2 shadow-sm"
                             data-bs-toggle="modal" data-bs-target="#exampleDangerModal">
                             <i class="bx bx-plus-circle fs-5"></i> Ajouter
                         </button>
+                        <?php endif; ?>
 
                         <!-- Bouton Retour -->
                         <a href="javascript:history.back()"
@@ -262,16 +266,17 @@
                                                             &#8943; <!-- Trois points horizontaux -->
                                                         </a>
                                                         <div class="dropdown-menu dropdown-menu-end">
-                                                            <a class="dropdown-item details-btn" href="#" data-bs-toggle="modal" data-bs-target="#detailsTrajetModal" 
-                                                               data-depart="<?= htmlspecialchars($listes->depart, ENT_QUOTES) ?>" 
-                                                               data-destination="<?= htmlspecialchars($listes->destination, ENT_QUOTES) ?>" 
+                                                            <a class="dropdown-item details-btn" href="#" data-bs-toggle="modal" data-bs-target="#detailsTrajetModal"
+                                                               data-depart="<?= htmlspecialchars($listes->depart, ENT_QUOTES) ?>"
+                                                               data-destination="<?= htmlspecialchars($listes->destination, ENT_QUOTES) ?>"
                                                                data-escales="<?= htmlspecialchars($listes->escales_names, ENT_QUOTES) ?>">
                                                                 👁️ Details
                                                             </a>
-                                                            <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal" data-bs-target="#editTrajetModal" 
-                                                               data-id="<?= $listes->idTrajet ?>" 
-                                                               data-depart="<?= htmlspecialchars($listes->depart, ENT_QUOTES) ?>" 
-                                                               data-destination="<?= htmlspecialchars($listes->destination, ENT_QUOTES) ?>" 
+                                                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
+                                                            <a class="dropdown-item edit-btn" href="#" data-bs-toggle="modal" data-bs-target="#editTrajetModal"
+                                                               data-id="<?= $listes->idTrajet ?>"
+                                                               data-depart="<?= htmlspecialchars($listes->depart, ENT_QUOTES) ?>"
+                                                               data-destination="<?= htmlspecialchars($listes->destination, ENT_QUOTES) ?>"
                                                                data-escales-ids="<?= htmlspecialchars(json_encode($listes->escales_ids), ENT_QUOTES) ?>">
                                                                 ✏️ Modifier
                                                             </a>
@@ -279,6 +284,7 @@
                                                                 href="<?= BASE_URL ?>/admin/Add_liste_trajets/delete/<?= $listes->idTrajet ?>">
                                                                 🗑 Supprimer
                                                             </a>
+                                                            <?php endif; ?>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -380,7 +386,9 @@
 
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                 <button type="submit" class="btn btn-primary" name="update">Enregistrer les modifications</button>
+                                <?php endif; ?>
                             </div>
                         </form>
                     </div>

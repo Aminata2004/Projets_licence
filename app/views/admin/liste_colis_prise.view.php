@@ -31,10 +31,12 @@
                 </div>
 
                 <div class="ms-auto mt-2 mt-sm-0 d-flex gap-2">
+                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                     <a href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/ajouter_colis/"
                         class="btn btn-sm btn-success rounded-pill shadow-sm">
                         <i class="bx bx-plus me-1"></i> Ajouter
                     </a>
+                    <?php endif; ?>
                     <a href="javascript:history.back()"
                         class="btn btn-sm btn-outline-primary rounded-pill shadow-sm">
                         <i class="bx bx-left-arrow-alt"></i> Retour
@@ -143,6 +145,7 @@
                                                             <i class="bx bx-show-alt me-2"></i>Détails
                                                         </a>
                                                     </li>
+                                                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                     <li>
                                                         <a class="dropdown-item edit-colis-btn" href="#"
                                                             data-bs-toggle="modal" data-bs-target="#editColisModal"
@@ -155,6 +158,7 @@
                                                             <i class="bx bx-edit me-2"></i>Modifier
                                                         </a>
                                                     </li>
+                                                    <?php endif; ?>
                                                     <li>
                                                         <a class="dropdown-item"
                                                             href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/imprimer_recu/<?= $colis['id_colis'] ?>"
@@ -300,7 +304,9 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                             <button type="submit" class="btn btn-primary" name="update_colis">Enregistrer les modifications</button>
+                            <?php endif; ?>
                         </div>
                     </form>
                 </div>

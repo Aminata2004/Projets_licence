@@ -64,7 +64,7 @@
                         <table class="table table-hover table-striped table-bordered align-middle shadow-sm">
                             <thead class="table-primary text-center">
                                 <tr>
-                                    <th><input type="checkbox" id="selectAll"></th>
+                                    <th><?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?><input type="checkbox" id="selectAll"><?php endif; ?></th>
                                     <th>Nom colis</th>
                                     <th>Nature</th>
                                     <th>Valeur</th>
@@ -76,7 +76,7 @@
                                 <?php foreach ($liste_colis as $colis) : ?>
                                     <?php if ($colis['status'] === 'enregistre') : ?>
                                         <tr>
-                                            <td><input type="checkbox" name="selected_colis[]" class="checkbox-car" value="<?= htmlspecialchars($colis['id_colis']) ?>"></td>
+                                            <td><?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?><input type="checkbox" name="selected_colis[]" class="checkbox-car" value="<?= htmlspecialchars($colis['id_colis']) ?>"><?php endif; ?></td>
                                             <td><?= htmlspecialchars($colis['nom_colis']) ?></td>
                                             <td><?= htmlspecialchars($colis['nature']) ?></td>
                                             <td><?= htmlspecialchars($colis['valeur']) ?></td>
@@ -89,11 +89,13 @@
                             </tbody>
                         </table>
                         <!-- Bouton enregistrer -->
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <div class="mt-4 text-end">
                             <button class="btn btn-success rounded-pill shadow-sm px-4" type="submit" name="submit">
                                 <i class="bx bx-save me-1"></i> Enregistrer
                             </button>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </form>
             </div>

@@ -26,7 +26,9 @@
                 </div>
                 <div class="ms-auto">
                     <div class="btn-group">
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <a href="<?= BASE_URL ?>/admin/Add_billets" class="btn btn-primary split-bg-primary text-white"> + Ajouter</a> &nbsp;
+                        <?php endif; ?>
                         <a href="javascript:history.back()" class="btn btn-primary "><i
                                 class="fadeIn animated bx bx-left-arrow-alt"></i></a>
 
@@ -104,6 +106,7 @@
                                             <td data-label="Jour de voyage"><?= $listeClient->jourVoyage ?></td>
                                             <td data-label="Date d'expiration"><?= $listeClient->date_expiration ?></td>
                                             <td data-label="Action">
+                                                <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                 <i class="bx bx-edit text-primary fs-4 cursor-pointer edit-billet-btn"
                                                     title="Modifier"
                                                     data-bs-toggle="modal"
@@ -113,6 +116,7 @@
                                                     data-client="<?= htmlspecialchars($listeClient->Client, ENT_QUOTES) ?>"
                                                     data-expiration="<?= htmlspecialchars($listeClient->date_expiration, ENT_QUOTES) ?>">
                                                 </i>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                 <?php
@@ -166,7 +170,9 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <button type="submit" class="btn btn-primary" name="edit">Enregistrer</button>
+                        <?php endif; ?>
                     </div>
                 </form>
             </div>

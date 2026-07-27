@@ -31,10 +31,12 @@
                     <div class="d-flex gap-2">
 
 
+                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                         <button type="button" class="btn btn-success d-flex align-items-center gap-2 shadow-sm"
                             data-bs-toggle="modal" data-bs-target="#exampleDangerModal">
                             <i class="bx bx-plus-circle fs-5"></i> Ajouter
                         </button>
+                        <?php endif; ?>
                         &nbsp;
                         <a href="javascript:history.back()"
                             class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm">
@@ -162,12 +164,14 @@
                                                             &#8943; <!-- Trois points horizontaux -->
                                                         </a>
                                                         <div class="dropdown-menu dropdown-menu-end">
+                                                            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                             <a class="dropdown-item edit-horaire-btn" href="#"
                                                                 data-bs-toggle="modal" data-bs-target="#modalModificationHoraire"
                                                                 data-id="<?= htmlspecialchars($listes->id_heure, ENT_QUOTES) ?>"
                                                                 data-heuredepart="<?= htmlspecialchars($listes->heuredepart, ENT_QUOTES) ?>">Modifier</a>
                                                             <a class="dropdown-item text-danger delete-button"
                                                                 href="<?= BASE_URL ?>/admin/Add_liste_horaire/delete/<?= $listes->id_heure ?>">Supprimer</a>
+                                                            <?php endif; ?>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -208,7 +212,9 @@
                                 </button>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                     <button type="submit" class="btn btn-primary" name="save">Enregistre</button>
+                                    <?php endif; ?>
                                 </div>
                             </form>
                         </div>
@@ -235,7 +241,9 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                 <button type="submit" class="btn btn-primary" name="edit">Enregistrer</button>
+                                <?php endif; ?>
                             </div>
                         </form>
                     </div>

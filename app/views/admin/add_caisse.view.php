@@ -114,7 +114,9 @@
                                     </div> -->
 
                                     <div class="col-12 mt-3 d-flex gap-2">
+                                        <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                         <button class="btn btn-outline-primary fw-semibold" type="submit" name="saveAgence">Enregistrer</button>
+                                        <?php endif; ?>
                                         <a href="<?= BASE_URL ?>/admin/Caisse" class="btn btn-outline-secondary fw-semibold">Voir la liste</a>
                                     </div>
 
