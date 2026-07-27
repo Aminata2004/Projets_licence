@@ -208,9 +208,23 @@ class Liste_du_jours extends  Controller
     $heureTs = !empty($billet->Heur_departs) ? strtotime($billet->Heur_departs) : false;
     $montantNet = preg_replace('/[^\d.]/', '', $billet->montant_payer ?? '');
 
+    // Logo envoye en base64 : le pont d'impression tourne sur le poste du comptoir et n'a
+    // aucun acces a la base de donnees ni aux fichiers du site (cf. bridge.php), donc c'est
+    // au site d'envoyer l'image elle-meme pour que le ticket WiFi reprenne exactement la
+    // meme presentation que le ticket imprime en cable/USB (qui, lui, lit le fichier
+    // directement puisqu'il tourne cote serveur).
+    $logoBase64 = null;
+    if (!empty($compagnie['logo'])) {
+      $logoPath = ROOT . '/public/images/logos/' . $compagnie['logo'];
+      if (file_exists($logoPath)) {
+        $logoBase64 = base64_encode(file_get_contents($logoPath));
+      }
+    }
+
     $json = json_encode([
       'compagnie' => $compagnie['nom'] ?? 'Nom Compagnie',
       'slogan' => $compagnie['slogant'] ?? '',
+      'logo' => $logoBase64,
       'numero' => $billet->numeroBillets ?? '-',
       'client' => $billet->Client ?? '-',
       'date' => !empty($billet->jourVoyage) ? date('d/m/Y', strtotime($billet->jourVoyage)) : '-',

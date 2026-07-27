@@ -19,8 +19,9 @@ class ThermalPrinter
 
         $r = $ESC . "@"; // init imprimante
 
-        // En-tête centré
+        // En-tête centré : logo (comme sur le PDF cable/USB) puis nom/slogan de la compagnie.
         $r .= $ESC . "a" . "\x01";
+        $r .= self::imageRaster($billet['logo'] ?? null);
         $r .= $ESC . "!" . "\x30";
         $r .= self::clean($billet['compagnie'] ?? '') . "\n";
         $r .= $ESC . "!" . "\x00";
@@ -34,14 +35,15 @@ class ThermalPrinter
         $r .= $ESC . "!" . "\x00";
         $r .= $sep;
 
-        // Détails alignés à gauche
+        // Détails : libellé à gauche, valeur alignée à droite (comme le tableau du PDF
+        // cable/USB), une ligne par champ — les mêmes six champs, dans le même ordre.
         $r .= $ESC . "a" . "\x00";
-        $r .= sprintf("%-12s%s\n", "Client", self::clean($billet['client'] ?? '-'));
-        $r .= sprintf("%-12s%s\n", "Date", self::clean($billet['date'] ?? '-'));
-        $r .= sprintf("%-12s%s\n", "Depart", self::clean($billet['depart'] ?? '-'));
-        $r .= sprintf("%12s%s\n", "", self::clean($billet['heure'] ?? '-'));
-        $r .= sprintf("%-12s%s\n", "Destination", self::clean($billet['destination'] ?? '-'));
-        $r .= sprintf("%-12s%s\n", "Place(s)", self::clean($billet['places'] ?? '-'));
+        $r .= self::champ("Client", $billet['client'] ?? '-');
+        $r .= self::champ("Date", $billet['date'] ?? '-');
+        $r .= self::champ("Depart", $billet['depart'] ?? '-');
+        $r .= self::champ("Heure", $billet['heure'] ?? '-');
+        $r .= self::champ("Destination", $billet['destination'] ?? '-');
+        $r .= self::champ("Place(s)", $billet['places'] ?? '-');
         $r .= $sep;
 
         // Montant en gras/agrandi
@@ -142,6 +144,85 @@ class ThermalPrinter
     {
         $sansAccents = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $texte);
         return $sansAccents !== false ? $sansAccents : $texte;
+    }
+
+    // Une ligne "libelle + valeur alignee a droite" sur la largeur du papier, pour
+    // reproduire la mise en page en colonnes du ticket PDF (cable/USB) : le libelle
+    // reste a gauche, la valeur colle au bord droit au lieu d'etre juste accolee au
+    // libelle.
+    private static function champ(string $label, string $valeur): string
+    {
+        $valeur = self::clean($valeur);
+        $largeurRestante = max(1, self::LARGEUR_COLONNES - strlen($label));
+        return $label . sprintf("%{$largeurRestante}s", $valeur) . "\n";
+    }
+
+    // Imprime une image (logo de la compagnie) en mode matriciel (commande ESC/POS
+    // GS v 0), pour que le ticket WiFi affiche le meme logo que le PDF cable/USB (qui,
+    // lui, embarque directement le fichier image dans le PDF). Le pont ne stocke aucune
+    // image lui-meme : c'est le site qui l'envoie en base64 dans les donnees du ticket
+    // (cf. Liste_du_jours::donneesTicketThermique()), puisque ce pont tourne sur le poste
+    // du comptoir et n'a pas acces aux fichiers du site.
+    private static function imageRaster(?string $base64): string
+    {
+        if (empty($base64) || !function_exists('imagecreatefromstring')) {
+            return '';
+        }
+
+        $binaire = base64_decode($base64, true);
+        if ($binaire === false) {
+            return '';
+        }
+
+        $source = @imagecreatefromstring($binaire);
+        if ($source === false) {
+            return '';
+        }
+
+        // 384 points ~ 48mm a 203dpi : tient dans la zone imprimable des papiers 58mm et
+        // 80mm les plus courants, sans avoir besoin de connaitre le modele exact.
+        $largeurCible = 384;
+        $largeurSource = imagesx($source);
+        $hauteurSource = imagesy($source);
+        if ($largeurSource <= 0 || $hauteurSource <= 0) {
+            imagedestroy($source);
+            return '';
+        }
+        $hauteurCible = (int) round($hauteurSource * ($largeurCible / $largeurSource));
+
+        $redim = imagecreatetruecolor($largeurCible, $hauteurCible);
+        imagefill($redim, 0, 0, imagecolorallocate($redim, 255, 255, 255));
+        imagecopyresampled($redim, $source, 0, 0, 0, 0, $largeurCible, $hauteurCible, $largeurSource, $hauteurSource);
+        imagedestroy($source);
+
+        // Conversion en bitmap 1 bit/pixel (noir/blanc), format attendu par GS v 0 :
+        // chaque octet code 8 pixels horizontaux, bit a 1 = point noir imprime.
+        $largeurOctets = (int) ceil($largeurCible / 8);
+        $bitmap = '';
+        for ($y = 0; $y < $hauteurCible; $y++) {
+            for ($xOctet = 0; $xOctet < $largeurOctets; $xOctet++) {
+                $octet = 0;
+                for ($bit = 0; $bit < 8; $bit++) {
+                    $x = $xOctet * 8 + $bit;
+                    $noir = 0;
+                    if ($x < $largeurCible) {
+                        $couleurs = imagecolorsforindex($redim, imagecolorat($redim, $x, $y));
+                        $gris = ($couleurs['red'] + $couleurs['green'] + $couleurs['blue']) / 3;
+                        $noir = $gris < 128 ? 1 : 0;
+                    }
+                    $octet = ($octet << 1) | $noir;
+                }
+                $bitmap .= chr($octet);
+            }
+        }
+        imagedestroy($redim);
+
+        $xL = $largeurOctets % 256;
+        $xH = intdiv($largeurOctets, 256);
+        $yL = $hauteurCible % 256;
+        $yH = intdiv($hauteurCible, 256);
+
+        return "\x1D" . "v0" . chr(0) . chr($xL) . chr($xH) . chr($yL) . chr($yH) . $bitmap . "\n";
     }
 
     // --- Envoi réseau : imprimante avec IP fixe, écoute TCP/IP (port 9100 en général) ---
