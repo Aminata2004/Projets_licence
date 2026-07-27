@@ -14,7 +14,7 @@
                 <div class="d-flex gap-2 mt-2 mt-sm-0">
                     <a href="<?= BASE_URL ?>/admin/Caisse/bilant_caisse_billets" class="btn btn-outline-primary btn-sm rounded-pill">📊 Bilan Billets</a>
                     <a href="<?= BASE_URL ?>/admin/Caisse/bilant_caisse_colis" class="btn btn-outline-secondary btn-sm rounded-pill">📦 Bilan Colis</a>
-                    <?php if ($user->userHasPermission('Caisse_creation') || in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)): ?>
+                    <?php if (!$user->estLectureSeule() && ($user->userHasPermission('Caisse_creation') || in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true))): ?>
                         <a href="<?= BASE_URL ?>/admin/Caisse/add_caisse" class="btn btn-primary btn-sm rounded-pill px-3">+ Ouvrir une caisse</a>
                     <?php endif; ?>
                 </div>
@@ -31,7 +31,7 @@
                     $ic = $_SESSION['id_compagnie'] ?? null;
                     $vi = $_SESSION['ville'] ?? null;
                     $ng = $_SESSION['numero_gare'] ?? null;
-                    if ($dr === 'Admin' && $c->id_compagnie != $ic) continue;
+                    if (($dr === 'Admin' || $dr === 'PDG') && $c->id_compagnie != $ic) continue;
                     // Un chef d'escale ne voit que sa gare précise : une ville peut avoir plusieurs gares.
                     if ($dr === 'chef_d_escale' && ($c->id_compagnie != $ic || $c->localite != $vi || (string)$c->numeroGare !== (string)$ng)) continue;
 
@@ -74,7 +74,7 @@
                     $id_compagnie = $_SESSION['id_compagnie'] ?? null;
                     $ville        = $_SESSION['ville'] ?? null;
                     $numeroGareSession = $_SESSION['numero_gare'] ?? null;
-                    if ($droit === 'Admin' && $caisse->id_compagnie != $id_compagnie) continue;
+                    if (($droit === 'Admin' || $droit === 'PDG') && $caisse->id_compagnie != $id_compagnie) continue;
                     // Un chef d'escale ne voit que sa gare précise : une ville peut avoir plusieurs gares.
                     if ($droit === 'chef_d_escale' && ($caisse->id_compagnie != $id_compagnie || $caisse->localite != $ville || (string)$caisse->numeroGare !== (string)$numeroGareSession)) continue;
 
@@ -125,7 +125,7 @@
                             <div><i class="bx bx-time"></i> Fermé le <?= date('d/m/Y', strtotime($caisse->date_fermeture)) ?></div>
                             <?php endif; ?>
                         </div>
-                        <?php if ($user->userHasPermission('Caisse_apercue') && $isOpen): ?>
+                        <?php if (!$user->estLectureSeule() && $user->userHasPermission('Caisse_apercue') && $isOpen): ?>
                         <div class="footer-card">
                             <form method="post" action="<?= BASE_URL ?>/admin/Caisse" id="form-fermer-<?= $caisse->id_caisse ?>">
                                 <?= csrf_field() ?>

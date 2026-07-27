@@ -15,7 +15,7 @@ class Envoi_colis extends  Controller
     $id_compagnie = $_SESSION['id_compagnie'];
     $ville_user = $_SESSION['ville'] ?? null;
     $id_agence_user = $_SESSION['id_agence'] ?? null;
-    $isAdmin = ($_SESSION['droit'] ?? null) === 'Admin';
+    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
     $liste_colis = $envoie_colis->FetchSelectcolis();
 
     // Filtre par id_agence (pas seulement localite_user) : deux gares d'une même compagnie

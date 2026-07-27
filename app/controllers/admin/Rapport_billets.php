@@ -27,7 +27,7 @@ class Rapport_billets extends Controller
         $statsParMois = $this->rapportBilletModel->getParMois($compagnieId);
 
         // Récupération billets par localité et gare selon le rôle
-        if ($_SESSION['droit'] === 'Admin') {
+        if (in_array($_SESSION['droit'], ['Admin', 'PDG'], true)) {
             // Admin voit toutes les localités
             $billetsParGare = $this->rapportBilletModel->getSommeBilletsParLocaliteEtGare($compagnieId, null, $mois);
         } elseif ($_SESSION['droit'] === 'chef_d_escale') {
@@ -78,7 +78,7 @@ class Rapport_billets extends Controller
         $statsParAnnee = $this->rapportBilletModel->getParAnnee($compagnieId, $annee);
 
         // Billets par gare et localité
-        if ($_SESSION['droit'] === 'Admin') {
+        if (in_array($_SESSION['droit'], ['Admin', 'PDG'], true)) {
             $billetsParGare = $this->rapportBilletModel->getSommeBilletsParLocaliteEtGareAnnuel($compagnieId, null, $annee);
         } elseif ($_SESSION['droit'] === 'chef_d_escale') {
             $localite = $_SESSION['ville'];

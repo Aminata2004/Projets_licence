@@ -48,7 +48,7 @@
             </li>
           <?php }
           ?>
-          <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)): ?>
+          <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin', 'PDG'], true)): ?>
             <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours/demandesAnnulation"><i class="bi bi-arrow-right-short"></i>Demandes d'annulation</a>
             </li>
           <?php endif; ?>
@@ -153,11 +153,11 @@
                     <li> <a href="<?= BASE_URL ?>/admin/Caisse/ma_caisse"><i class="bi bi-arrow-right-short"></i>Ma Caisse</a></li>
                   <?php endif; ?>
 
-                  <?php if (in_array($_SESSION['droit'] ?? null, ['chef_d_escale', 'Admin'], true)): ?>
+                  <?php if (in_array($_SESSION['droit'] ?? null, ['chef_d_escale', 'Admin', 'PDG'], true)): ?>
                     <li> <a href="<?= BASE_URL ?>/admin/Caisse/caisses_escale"><i class="bi bi-arrow-right-short"></i>Supervision Escale</a></li>
                   <?php endif; ?>
 
-                  <?php if ($_SESSION['droit'] === 'Admin'): ?>
+                  <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true)): ?>
                     <li> <a href="<?= BASE_URL ?>/admin/Caisse/rapport_proprietaire"><i class="bi bi-arrow-right-short"></i>Rapport Compagnie</a></li>
                   <?php endif; ?>
                 <?php } ?>
@@ -169,7 +169,7 @@
               </ul>
               </li>
 
-              <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)): ?>
+              <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale', 'PDG'], true)): ?>
                 <li class="menu-label">Finances</li>
                 <li>
                   <a href="javascript:;" class="has-arrow">
@@ -180,7 +180,7 @@
                   <ul>
                     <li> <a href="<?= BASE_URL ?>/admin/Depenses"><i class="bi bi-arrow-right-short"></i>Gérer les dépenses</a>
                     </li>
-                    <?php if ($_SESSION['droit'] === 'Admin'): ?>
+                    <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true)): ?>
                       <li> <a href="<?= BASE_URL ?>/admin/Depenses/benefice"><i class="bi bi-arrow-right-short"></i>Bénéfice de la compagnie</a>
                       </li>
                     <?php endif; ?>
@@ -199,7 +199,7 @@
                 </li>
               <?php endif; ?>
 
-              <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)): ?>
+              <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale', 'PDG'], true)): ?>
                 <li class="menu-label">Banque</li>
                 <li>
                   <a href="javascript:;" class="has-arrow">
@@ -208,14 +208,16 @@
                     <div class="menu-title">Dépôt en banque</div>
                   </a>
                   <ul>
-                    <?php if ($_SESSION['droit'] === 'Admin'): ?>
+                    <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true)): ?>
                       <li> <a href="<?= BASE_URL ?>/admin/Banques"><i class="bi bi-arrow-right-short"></i>Comptes banque</a>
                       </li>
                       <li> <a href="<?= BASE_URL ?>/admin/Depots_banque/enAttente"><i class="bi bi-arrow-right-short"></i>Demandes en attente</a>
                       </li>
                     <?php endif; ?>
-                    <li> <a href="<?= BASE_URL ?>/admin/Depots_banque"><i class="bi bi-arrow-right-short"></i>Faire un dépôt</a>
-                    </li>
+                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
+                      <li> <a href="<?= BASE_URL ?>/admin/Depots_banque"><i class="bi bi-arrow-right-short"></i>Faire un dépôt</a>
+                      </li>
+                    <?php endif; ?>
                     <li> <a href="<?= BASE_URL ?>/admin/Depots_banque/historique"><i class="bi bi-arrow-right-short"></i>Historique des dépôts</a>
                     </li>
                   </ul>
@@ -249,7 +251,7 @@
                     <li> <a href="<?= BASE_URL ?>/admin/Programmation_voyages/liste_programmer_voyage"><i class="bi bi-arrow-right-short"></i>Programmation du voyage</a>
                     </li>
                   <?php } ?>
-                  <?php if ($user->userHasPermission('Programme_programmation_voyage') && in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale', 'super_admin'], true)): ?>
+                  <?php if ($user->userHasPermission('Programme_programmation_voyage') && in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale', 'super_admin', 'PDG'], true)): ?>
                     <li> <a href="<?= BASE_URL ?>/admin/Transferts_gares/historique"><i class="bi bi-arrow-right-short"></i>Transferts entre gares</a>
                     </li>
                   <?php endif; ?>
@@ -285,7 +287,7 @@
 
                 <?php endif; // Fin du if !== 'super_admin' ?>
 
-                <?php if (isset($_SESSION['droit']) && ($_SESSION['droit'] === 'Admin' || $_SESSION['droit'] === 'super_admin')): ?>
+                <?php if (isset($_SESSION['droit']) && in_array($_SESSION['droit'], ['Admin', 'super_admin', 'PDG'], true)): ?>
                 <?php if ($user->userHasPermission('Configuration_apercu')) { ?>
                   <li class="menu-label">Paramètre</li>
                   <li>

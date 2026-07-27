@@ -18,7 +18,7 @@ class Chauffeurs_cars extends  Controller
     }
     // la recuperation 
     // recuperation des cars
-    if (isset($_SESSION['droit']) && $_SESSION['droit'] === 'Admin' && isset($_SESSION['id_compagnie'])) {
+    if (isset($_SESSION['droit']) && in_array($_SESSION['droit'], ['Admin', 'PDG'], true) && isset($_SESSION['id_compagnie'])) {
       $id_compagnie = $_SESSION['id_compagnie'];
 
       // Admin → uniquement les cars de sa compagnie

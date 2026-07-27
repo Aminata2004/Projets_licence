@@ -40,9 +40,9 @@
 
             // Un chef d'escale ou un simple Utilisateur doit être rattaché à une gare :
             // leurs opérations (billets, colis, caisse) sont scopées dessus, un compte sans
-            // gare ne peut rien faire de cohérent. Seul un Admin (rattaché à une compagnie,
-            // pas une gare précise) échappe à cette règle.
-            if (!empty($droit) && $droit !== 'Admin' && empty($_POST['id_agence'])) {
+            // gare ne peut rien faire de cohérent. Seuls un Admin et un PDG (rattachés à une
+            // compagnie entière, pas une gare précise) échappent à cette règle.
+            if (!empty($droit) && !in_array($droit, ['Admin', 'PDG'], true) && empty($_POST['id_agence'])) {
                 $errors[] = "La gare est obligatoire pour ce type de compte.";
             }
 
@@ -57,7 +57,7 @@
                 $motPasseHash = password_hash(self::MOT_DE_PASSE_PAR_DEFAUT, PASSWORD_DEFAULT);
 
                 $id_agence = $_POST['id_agence'] ?? null;
-                $id_compagnie = ($droit === 'Admin') ? ($_POST['id_compagnie'] ?? null) : $id_compagnie_session;
+                $id_compagnie = in_array($droit, ['Admin', 'PDG'], true) ? ($_POST['id_compagnie'] ?? null) : $id_compagnie_session;
                 $profile = ($droit === 'Utilisateur') ? ($_POST['profile'] ?? null) : null;
 
                 try {
@@ -167,6 +167,16 @@
             }
 
             return in_array($userPermissionName, $_SESSION['permissions_cache'], true);
+        }
+
+        // PDG : superviseur lecture seule d'une compagnie. Reçoit le catalogue complet de
+        // permissions (pour voir tous les écrans, cf. Permission::assignPermissionsParDefautPourRole())
+        // mais ne doit jamais voir un bouton créer/modifier/valider/annuler. Les vues s'appuient
+        // sur ce helper pour cacher ces boutons ; l'interdiction réelle est appliquée par
+        // App::isEcritureBloqueePourPDG() (verrou central, indépendant de l'affichage).
+        public function estLectureSeule(): bool
+        {
+            return ($_SESSION['droit'] ?? null) === 'PDG';
         }
 
         // Récupérer les infos d’un utilisateur

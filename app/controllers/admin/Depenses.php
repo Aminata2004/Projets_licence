@@ -6,10 +6,10 @@ class Depenses extends Controller
     {
         $this->requireLogin();
 
-        // Réservé à Admin/chef_d_escale (comme dans la sidebar) : Depenses_gestion seul ne
-        // suffit pas, sinon un Utilisateur simple à qui cette permission serait assignée par
-        // erreur y aurait quand même accès.
-        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)) {
+        // Réservé à Admin/chef_d_escale/PDG (comme dans la sidebar) : Depenses_gestion seul
+        // ne suffit pas, sinon un Utilisateur simple à qui cette permission serait assignée
+        // par erreur y aurait quand même accès.
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale', 'PDG'], true)) {
             (new Configuration())->set_flash("Accès refusé.", "danger");
             header("Location: " . BASE_URL . "/admin/Homes/home");
             exit;
@@ -51,7 +51,7 @@ class Depenses extends Controller
     {
         $model = new Depense();
 
-        if (($_SESSION['droit'] ?? null) !== 'Admin') {
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true)) {
             $model->set_flash("Accès réservé à l'Admin de la compagnie.", "danger");
             header("Location: " . BASE_URL . "/admin/Homes/home");
             exit;

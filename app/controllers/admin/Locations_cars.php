@@ -6,10 +6,10 @@ class Locations_cars extends Controller
     {
         $this->requireLogin();
 
-        // Reserve a Admin/chef_d_escale (comme Depenses) : Location_gestion seul ne suffit
-        // pas, sinon un Utilisateur simple a qui cette permission serait assignee par
+        // Reserve a Admin/chef_d_escale/PDG (comme Depenses) : Location_gestion seul ne
+        // suffit pas, sinon un Utilisateur simple a qui cette permission serait assignee par
         // erreur y aurait quand meme acces.
-        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)) {
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale', 'PDG'], true)) {
             (new Configuration())->set_flash("Accès refusé.", "danger");
             header("Location: " . BASE_URL . "/admin/Homes/home");
             exit;

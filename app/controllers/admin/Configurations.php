@@ -80,10 +80,8 @@ class Configurations extends Controller
         $id_compagnie = $_SESSION['id_compagnie'] ?? null;
 
         // Un Admin ne peut agir que sur les utilisateurs de sa propre compagnie ; jamais
-        // se/les promouvoir Admin ou super_admin (seul un super_admin peut attribuer ces droits).
-        $droitsAutorises = $role === 'super_admin'
-            ? ['super_admin', 'Admin', 'Utilisateur', 'chef_d_escale']
-            : ['Utilisateur', 'chef_d_escale'];
+        // se/les promouvoir Admin, PDG ou super_admin (seul un super_admin peut attribuer ces droits).
+        $droitsAutorises = $this->droitsAutorisesPour($role);
 
         // Suppression d'un compte : réservée au super_admin, confirmation façon GitHub
         // (il faut saisir l'email exact du compte ciblé, pas juste cliquer "Oui").
@@ -237,6 +235,17 @@ class Configurations extends Controller
         return $cible && (int)($cible['id_compagnie'] ?? 0) === (int)$id_compagnie;
     }
 
+    // Liste des droits qu'un rôle a le droit d'attribuer à un compte (création ou modification).
+    // Un Admin ne peut jamais s'attribuer, ni attribuer à un autre compte, Admin/PDG/super_admin :
+    // seul un super_admin distribue ces rôles (PDG supervise une compagnie, il ne doit pas
+    // pouvoir être créé par celui qu'il supervise).
+    private function droitsAutorisesPour($role)
+    {
+        return $role === 'super_admin'
+            ? ['super_admin', 'Admin', 'PDG', 'Utilisateur', 'chef_d_escale']
+            : ['Utilisateur', 'chef_d_escale'];
+    }
+
 
 
 
@@ -249,8 +258,16 @@ class Configurations extends Controller
         $listeCompagnie = $configuration->SelectAllData("*", "compagnie");
 
         if (isset($_POST["saveutilisateur"])) {
-            // var_dump($_POST);exit;
-            $configuration->saveUtilisateur();
+            // Sans ce contrôle, un Admin pouvait poster droit=super_admin (ou droit=PDG,
+            // le rôle superviseur qui doit rester exclusif au super_admin) sur ce même
+            // endpoint : saveUtilisateur() ne validait pas le droit demandé contre le rôle
+            // du créateur (seul le <select> du formulaire le limitait, contournable via un POST direct).
+            $droitsAutorises = $this->droitsAutorisesPour($_SESSION['droit'] ?? null);
+            if (!in_array($_POST['droit'] ?? null, $droitsAutorises, true)) {
+                $configuration->set_flash("Action non autorisée.", "danger");
+            } else {
+                $configuration->saveUtilisateur();
+            }
         }
 
         $listeGares = [];

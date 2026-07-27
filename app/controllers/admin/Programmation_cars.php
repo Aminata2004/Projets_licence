@@ -16,7 +16,7 @@ class Programmation_cars extends  Controller
 
       $programmation_car->Programmer_car();
     }
-    if (isset($_SESSION['droit']) && $_SESSION['droit'] === 'Admin' && isset($_SESSION['id_compagnie'])) {
+    if (isset($_SESSION['droit']) && in_array($_SESSION['droit'], ['Admin', 'PDG'], true) && isset($_SESSION['id_compagnie'])) {
       $id_compagnie = $_SESSION['id_compagnie'];
 
       // Admin : liste des cars non programmés appartenant à sa compagnie

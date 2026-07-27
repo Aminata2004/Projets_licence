@@ -25,9 +25,11 @@
         </div>
         <div class="ms-auto">
           <div class="d-flex gap-2">
+            <?php if (!$user->estLectureSeule()): ?>
             <a href="<?= BASE_URL ?>/admin/Configurations/add_utilisateurs" class="btn btn-success d-flex align-items-center gap-2 shadow-sm">
                             <i class="bx bx-plus-circle fs-5"></i> Ajouter
                         </a>
+                        <?php endif; ?>
                         <a href="javascript:history.back()"
                             class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm">
                             <i class="bx bx-left-arrow-alt fs-5"></i> Retour
@@ -187,6 +189,7 @@
                           </div>
                         </td> -->
                         <td class="text-center" data-label="Action">
+                          <?php if (!$user->estLectureSeule()): ?>
                           <a href="<?= BASE_URL ?>/admin/Permissions/assigner/<?= htmlspecialchars($listes->idUser) ?>"
                             title="Permission">
                             <i class="bx bx-lock-open text-primary fs-4 cursor-pointer"></i>
@@ -221,6 +224,7 @@
                               data-bs-toggle="modal"
                               data-bs-target="#animationModal<?= $listes->idUser ?>">
                             </i>
+                          <?php endif; ?>
                           <?php endif; ?>
 
                           <?php if (($_SESSION['droit'] ?? null) === 'super_admin'): ?>
@@ -364,6 +368,7 @@
                   <?php endif; ?>
                   <?php if(isset($_SESSION['droit']) && $_SESSION['droit'] === 'super_admin'): ?>
                       <option value="Admin">Admin</option>
+                      <option value="PDG">PDG (superviseur, lecture seule)</option>
                   <?php endif; ?>
               </select>
             </div>

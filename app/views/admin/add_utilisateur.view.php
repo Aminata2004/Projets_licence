@@ -180,6 +180,7 @@
                                             <?php endif; ?>
                                             <?php if(isset($_SESSION['droit']) && $_SESSION['droit'] === 'super_admin'): ?>
                                                 <option value="Admin">Admin</option>
+                                                <option value="PDG">PDG (superviseur, lecture seule)</option>
                                             <?php endif; ?>
                                         </select>
                                     </div>
@@ -260,7 +261,7 @@
 
             const gareSelect = document.getElementById('gareSelect');
 
-            if (droit === 'Admin') {
+            if (droit === 'Admin' || droit === 'PDG') {
                 compagnieField.style.display = 'block';
                 gareField.style.display = 'none';
                 gareSelect.removeAttribute('required');

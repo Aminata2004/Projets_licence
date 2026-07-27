@@ -11,7 +11,7 @@ class Liste_de_demains extends  Controller
     $id_compagnie = $_SESSION['id_compagnie'];
     // Admin n'a pas de gare fixe en session : il voit les billets de toute la compagnie.
     // numeroGare précise la gare exacte (une ville peut avoir plusieurs gares).
-    $isAdmin = ($_SESSION['droit'] ?? null) === 'Admin';
+    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
     $idDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
     $numeroGare = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $model = new Liste_du_jour();

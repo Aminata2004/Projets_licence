@@ -142,7 +142,10 @@ class Permission extends Model
     // Ne fait rien pour les droits non concernés (ex: Admin, géré autrement).
     public function assignPermissionsParDefautPourRole($idUtilisateur, $droit, $profile = null): void
     {
-        if ($droit === 'super_admin' || $droit === 'Admin') {
+        // PDG : superviseur lecture seule d'une compagnie. Reçoit le catalogue complet pour
+        // que tous les écrans lui soient accessibles ; l'interdiction d'écrire est appliquée
+        // ailleurs par un verrou central (App::isEcritureBloqueePourPDG()), pas ici.
+        if ($droit === 'super_admin' || $droit === 'Admin' || $droit === 'PDG') {
             $noms = self::NOMS_PERMISSIONS_PAR_DEFAUT;
         } elseif ($droit === 'chef_d_escale') {
             $noms = self::NOMS_PERMISSIONS_CHEF_ESCALE;

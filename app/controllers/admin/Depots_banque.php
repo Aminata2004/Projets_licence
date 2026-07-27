@@ -18,7 +18,7 @@ class Depots_banque extends Controller
         $model = new Banque();
         $droit = $_SESSION['droit'] ?? null;
 
-        if (!in_array($droit, ['chef_d_escale', 'Admin'], true)) {
+        if (!in_array($droit, ['chef_d_escale', 'Admin', 'PDG'], true)) {
             $model->set_flash("Accès refusé.", "danger");
             header("Location: " . BASE_URL . "/admin/Homes/home");
             exit;
@@ -52,7 +52,7 @@ class Depots_banque extends Controller
     {
         $model = new Banque();
 
-        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin', 'PDG'], true)) {
             $model->set_flash("Accès refusé.", "danger");
             header("Location: " . BASE_URL . "/admin/Homes/home");
             exit;
@@ -89,7 +89,7 @@ class Depots_banque extends Controller
     {
         $model = new Banque();
 
-        if (!in_array($_SESSION['droit'] ?? null, ['chef_d_escale', 'Admin', 'super_admin'], true)) {
+        if (!in_array($_SESSION['droit'] ?? null, ['chef_d_escale', 'Admin', 'super_admin', 'PDG'], true)) {
             $model->set_flash("Accès refusé.", "danger");
             header("Location: " . BASE_URL . "/admin/Homes/home");
             exit;

@@ -132,7 +132,49 @@ class App {
             $this->redirectToHome(); // 🔁 Redirection si méthode introuvable
         }
 
+        // 11. Rôle PDG (superviseur lecture seule d'une compagnie) : verrou central qui
+        // bloque toute action d'écriture, quel que soit le contrôleur. Ce projet n'a pas de
+        // convention fiable (POST vs GET, nommage des méthodes) pour distinguer lecture et
+        // écriture au niveau des contrôleurs eux-mêmes — voir isEcritureBloqueePourPDG() —
+        // donc ce garde-fou est posé une seule fois ici, au point de passage unique de toutes
+        // les requêtes admin, plutôt que d'être dupliqué (et oublié) dans chaque contrôleur.
+        if ($this->isEcritureBloqueePourPDG()) {
+            $this->refuserEcriturePDG();
+        }
+
         call_user_func_array([$this->controller, $this->action], $this->params);
+    }
+
+    private function isEcritureBloqueePourPDG(): bool
+    {
+        if (($_SESSION['droit'] ?? null) !== 'PDG') {
+            return false;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            return true;
+        }
+
+        // Beaucoup d'actions destructrices de ce projet sont des liens GET (ex: delete($id),
+        // valider($id)) plutôt que des formulaires POST : le nom de l'action est donc la
+        // seule information disponible pour les repérer.
+        return (bool) preg_match(
+            '/^(add|ajouter|create|creer|save|enregistrer|insert|delete|supprimer|'
+            . 'update|modifier|edit|valider|rejeter|refuser|confirmer|annuler|changer|'
+            . 'assigner|desactiver|activer|cloturer|verser|rembourser|repporter)/i',
+            $this->action
+        );
+    }
+
+    // Reproduit le format attendu par le mécanisme de notification existant
+    // (cf. Model::set_flash()), auquel cette classe n'a pas accès (App n'étend pas Model).
+    private function refuserEcriturePDG(): void {
+        $_SESSION['notification']['message'] = "Votre rôle est en lecture seule : vous ne pouvez ni créer ni modifier de données.";
+        $_SESSION['notification']['type'] = 'danger';
+        $_SESSION['notification']['class'] = '#e11d48';
+        $_SESSION['notification']['icon'] = 'bx bx-error';
+        header("Location: " . BASE_URL . "/admin/Homes/home");
+        exit;
     }
 
     private function redirectToHome() {

@@ -12,6 +12,7 @@
 
             <?php $this->view("admin/set_flash") ?>
 
+            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
             <div class="card shadow-sm border-0 rounded-3 mb-4">
                 <div class="card-header bg-primary text-white fw-bold">
                     <i class="bx bx-plus-circle me-1"></i> Nouvelle location
@@ -96,6 +97,7 @@
                     </form>
                 </div>
             </div>
+            <?php endif; ?>
 
             <div class="card shadow-sm border-0 rounded-3">
                 <div class="card-header fw-bold">

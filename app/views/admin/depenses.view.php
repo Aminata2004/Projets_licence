@@ -8,13 +8,14 @@
 
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold mb-0">💸 Gestion des dépenses</h4>
-                <?php if (($_SESSION['droit'] ?? null) === 'Admin'): ?>
+                <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true)): ?>
                     <a href="<?= BASE_URL ?>/admin/Depenses/benefice" class="btn btn-outline-success btn-sm rounded-pill">📈 Voir le bénéfice</a>
                 <?php endif; ?>
             </div>
 
             <?php $this->view("admin/set_flash") ?>
 
+            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
             <div class="card shadow-sm border-0 rounded-3 mb-4">
                 <div class="card-header bg-primary text-white fw-bold">
                     <i class="bx bx-plus-circle me-1"></i> Enregistrer une dépense
@@ -82,6 +83,7 @@
                     </form>
                 </div>
             </div>
+            <?php endif; ?>
 
             <div class="card shadow-sm border-0 rounded-3">
                 <div class="card-header fw-bold">

@@ -12,9 +12,11 @@
                     <a href="<?= BASE_URL ?>/admin/Depots_banque/enAttente" class="btn btn-outline-primary btn-sm rounded-pill">
                         <i class="bx bx-time"></i> Demandes en attente
                     </a>
+                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                     <button type="button" class="btn btn-primary btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#modalNouvelleBanque">
                         <i class="bx bx-plus me-1"></i> Nouveau compte
                     </button>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -78,6 +80,7 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Banques/mouvement/<?= $b->id_banque ?>">
                                                             <i class="bx bx-transfer-alt me-2"></i>Mouvement</a></li>
+                                                    <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                     <li><a class="dropdown-item" href="#"
                                                             data-bs-toggle="modal" data-bs-target="#modalEditBanque"
                                                             data-id="<?= $b->id_banque ?>"
@@ -85,6 +88,7 @@
                                                             data-numero="<?= htmlspecialchars($b->numero_compte ?? '') ?>"
                                                             data-statut="<?= $b->statut ?>">
                                                             <i class="bx bx-edit me-2"></i>Modifier</a></li>
+                                                    <?php endif; ?>
                                                 </ul>
                                             </div>
                                         </td>

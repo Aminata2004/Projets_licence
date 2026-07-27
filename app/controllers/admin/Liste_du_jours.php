@@ -22,7 +22,7 @@ class Liste_du_jours extends  Controller
     // Admin n'a pas de gare fixe en session : il voit les billets de toute la compagnie.
     // Pour les autres rôles, numeroGare précise la gare exacte : une ville peut avoir
     // plusieurs gares (ex. "Segou" Gare I et Gare II), le nom de ville seul ne suffit pas.
-    $isAdmin = ($_SESSION['droit'] ?? null) === 'Admin';
+    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
     $idDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
     $numeroGare = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $model = new Liste_du_jour();
@@ -174,7 +174,7 @@ class Liste_du_jours extends  Controller
     date_default_timezone_set('Africa/Bamako');
     $id_compagnie = $_SESSION['id_compagnie'];
     // Admin n'a pas de gare fixe en session : il voit les billets de toute la compagnie.
-    $isAdmin      = ($_SESSION['droit'] ?? null) === 'Admin';
+    $isAdmin      = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
     $idDepart     = $isAdmin ? null : ($_SESSION['ville'] ?? null);
     $numeroGare   = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $destination  = trim($_GET['destination'] ?? '');
@@ -244,7 +244,7 @@ class Liste_du_jours extends  Controller
   {
     $destinationId = $_POST['destination_id'];
     // Admin n'a pas de gare fixe en session : il voit les heures de toute la compagnie.
-    $isAdmin = ($_SESSION['droit'] ?? null) === 'Admin';
+    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
     $villeDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
     $numeroGare  = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $billets = new Liste_du_jour();
@@ -359,7 +359,7 @@ class Liste_du_jours extends  Controller
     $this->requirePermission('Billets_annulation');
     $billets = new Liste_du_jour();
 
-    if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+    if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin', 'PDG'], true)) {
       $billets->set_flash("Accès refusé.", "danger");
       header("Location: " . BASE_URL . "/admin/Homes/home");
       exit;
