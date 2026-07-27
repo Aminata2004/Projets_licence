@@ -149,13 +149,17 @@
 
     <?php else: ?>
 
-      <!-- FILTRE PAR GARE (Admin uniquement) -->
-      <?php if ($_SESSION['droit'] === 'Admin' && !empty($listeGares)): ?>
-        <div class="tg-filter-bar mb-4">
-          <label for="gareSelectFiltre" class="fw-semibold small text-muted mb-0">
-            <i class="bi bi-funnel-fill me-1"></i> Filtrer par gare
-          </label>
-          <form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-0">
+      <?php $dateLabel = ($date === date('Y-m-d')) ? "Aujourd'hui" : date('d/m/Y', strtotime($date)); ?>
+
+      <!-- FILTRE PAR GARE (Admin) ET PAR DATE (tous les roles) : les indicateurs "du jour"
+           ci-dessous montrent par defaut aujourd'hui, mais restent consultables pour un jour
+           passe, comme deja possible sur Rapport Compagnie/Supervision Escale. -->
+      <div class="tg-filter-bar mb-4">
+        <label for="dateFiltre" class="fw-semibold small text-muted mb-0">
+          <i class="bi bi-funnel-fill me-1"></i> Chiffres du <?= date('d/m/Y', strtotime($date)) ?>
+        </label>
+        <form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-0">
+          <?php if ($_SESSION['droit'] === 'Admin' && !empty($listeGares)): ?>
             <select name="gare" id="gareSelectFiltre" class="form-select form-select-sm" onchange="this.form.submit()">
               <option value="">Toutes les gares (vue globale)</option>
               <?php foreach ($listeGares as $gare): ?>
@@ -164,12 +168,14 @@
                 </option>
               <?php endforeach; ?>
             </select>
-          </form>
-          <?php if (!empty($gareId)): ?>
-            <a href="?" class="tg-reset-pill"><i class="bi bi-x-circle me-1"></i>Réinitialiser</a>
           <?php endif; ?>
-        </div>
-      <?php endif; ?>
+          <input type="date" name="date" id="dateFiltre" class="form-control form-control-sm"
+              value="<?= htmlspecialchars($date) ?>" max="<?= date('Y-m-d') ?>" onchange="this.form.submit()">
+        </form>
+        <?php if (!empty($gareId) || $date !== date('Y-m-d')): ?>
+          <a href="?" class="tg-reset-pill"><i class="bi bi-x-circle me-1"></i>Réinitialiser</a>
+        <?php endif; ?>
+      </div>
 
       <!-- ACTIONS RAPIDES -->
       <?php if ($showBillets || $showColis): ?>
@@ -186,7 +192,7 @@
 
       <!-- KPI BILLETS -->
       <?php if ($showBillets): ?>
-        <div class="tg-section-label"><i class="bi bi-ticket-perforated me-1"></i>Billetterie — Aujourd'hui</div>
+        <div class="tg-section-label"><i class="bi bi-ticket-perforated me-1"></i>Billetterie — <?= htmlspecialchars($dateLabel) ?></div>
         <div class="tg-stat-grid mb-4">
           <a href="<?= BASE_URL ?>/admin/Liste_du_jours" class="tg-stat-card" style="--tg-stat-color: var(--accent);">
             <div class="tg-stat-card__top">
@@ -228,7 +234,7 @@
           <?php endif; ?>
         </div>
       <?php elseif ($showVoyages): ?>
-        <div class="tg-section-label"><i class="bi bi-bus-front me-1"></i>Voyages — Aujourd'hui</div>
+        <div class="tg-section-label"><i class="bi bi-bus-front me-1"></i>Voyages — <?= htmlspecialchars($dateLabel) ?></div>
         <div class="tg-stat-grid mb-4">
           <a href="<?= BASE_URL ?>/admin/Programmation_voyages/liste_programmer_voyage" class="tg-stat-card" style="--tg-stat-color: var(--info);">
             <div class="tg-stat-card__top">
@@ -244,7 +250,7 @@
 
       <!-- KPI COLIS -->
       <?php if ($showColis): ?>
-        <div class="tg-section-label"><i class="bi bi-box-seam me-1"></i>Colis & courrier — Aujourd'hui</div>
+        <div class="tg-section-label"><i class="bi bi-box-seam me-1"></i>Colis & courrier — <?= htmlspecialchars($dateLabel) ?></div>
         <div class="tg-stat-grid mb-4">
           <a href="<?= BASE_URL ?>/admin/Colis_prise_en_charges" class="tg-stat-card" style="--tg-stat-color: var(--accent);">
             <div class="tg-stat-card__top">
@@ -294,7 +300,7 @@
               <div class="tg-stat-card__top">
                 <div>
                   <div class="tg-stat-card__value"><?= number_format($beneficeJour['benefice'], 0, ',', ' ') ?> F</div>
-                  <div class="tg-stat-card__label">Bénéfice aujourd'hui</div>
+                  <div class="tg-stat-card__label">Bénéfice — <?= htmlspecialchars($dateLabel) ?></div>
                 </div>
                 <div class="tg-stat-card__icon"><i class="bi bi-graph-up-arrow"></i></div>
               </div>
@@ -410,13 +416,13 @@
                 <span class="tg-panel__icon" style="background: rgba(16,185,129,0.14); color: var(--tg-success);"><i class="bi bi-pie-chart-fill"></i></span>
                 <div>
                   <h5 class="tg-panel__title">Répartition colis</h5>
-                  <p class="tg-panel__subtitle">Aujourd'hui</p>
+                  <p class="tg-panel__subtitle"><?= htmlspecialchars($dateLabel) ?></p>
                 </div>
               </div>
               <?php if ($totalColis === 0): ?>
                 <div class="tg-empty">
                   <i class="bi bi-inbox"></i>
-                  Aucun colis enregistré aujourd'hui.
+                  Aucun colis enregistré pour cette date.
                 </div>
               <?php else: ?>
                 <div class="tg-donut-wrap">

@@ -209,14 +209,19 @@ class Depense extends Model
     // moins remboursements moins dépenses (locales + globales). Se base sur les caisses
     // fermées ET ouvertes (le statut d'une caisse ne concerne que son activité courante,
     // pas l'historique qui doit rester compté dans le bénéfice).
-    public function getBenefice($periode = 'jour', $gareVille = null)
+    // $jourDate : date precise pour periode='jour' (defaut aujourd'hui). Permet au tableau
+    // de bord de consulter le benefice d'un jour passe, comme Rapport Compagnie/Supervision
+    // Escale le font deja pour les caisses.
+    public function getBenefice($periode = 'jour', $gareVille = null, $jourDate = null)
     {
         $id_compagnie = $_SESSION['id_compagnie'];
         $pdo = $this->connect();
 
-        $filtreDate = '';
+        $filtreDate  = '';
+        $paramsDate  = [];
         if ($periode === 'jour') {
-            $filtreDate = ' AND date_col = CURDATE()';
+            $filtreDate = ' AND date_col = :jourDate';
+            $paramsDate[':jourDate'] = $jourDate ?? date('Y-m-d');
         } elseif ($periode === 'mois') {
             $filtreDate = ' AND MONTH(date_col) = MONTH(CURDATE()) AND YEAR(date_col) = YEAR(CURDATE())';
         }
@@ -230,7 +235,7 @@ class Depense extends Model
             . ($gareVille ? ' AND b.departId = :gareVille' : '')
             . str_replace('date_col', 'b.date_reservation', $filtreDate)
         );
-        $paramsBillets = [':id_compagnie' => $id_compagnie];
+        $paramsBillets = [':id_compagnie' => $id_compagnie] + $paramsDate;
         if ($gareVille) $paramsBillets[':gareVille'] = $gareVille;
         $stmtBillets->execute($paramsBillets);
         $totalBillets = (float)($stmtBillets->fetchColumn() ?: 0);
@@ -243,7 +248,7 @@ class Depense extends Model
             . ($gareVille ? ' AND agence.localite = :gareVille' : '')
             . str_replace('date_col', 'colis.date_enregistrement', $filtreDate)
         );
-        $paramsColis = [':id_compagnie' => $id_compagnie];
+        $paramsColis = [':id_compagnie' => $id_compagnie] + $paramsDate;
         if ($gareVille) $paramsColis[':gareVille'] = $gareVille;
         $stmtColis->execute($paramsColis);
         $totalColis = (float)($stmtColis->fetchColumn() ?: 0);
@@ -268,7 +273,7 @@ class Depense extends Model
             . ($gareVille ? ' AND a.localite = :gareVille' : '')
             . str_replace('date_col', 'depense.date_depense', $filtreDate)
         );
-        $paramsDepenseLocale = [':id_compagnie' => $id_compagnie];
+        $paramsDepenseLocale = [':id_compagnie' => $id_compagnie] + $paramsDate;
         if ($gareVille) $paramsDepenseLocale[':gareVille'] = $gareVille;
         $stmtDepenseLocale->execute($paramsDepenseLocale);
         $totalDepenseLocale = (float)($stmtDepenseLocale->fetchColumn() ?: 0);
@@ -282,7 +287,7 @@ class Depense extends Model
                  WHERE id_compagnie = :id_compagnie AND id_agence IS NULL AND statut = 'valide'"
                 . str_replace('date_col', 'date_depense', $filtreDate)
             );
-            $stmtDepenseGlobale->execute([':id_compagnie' => $id_compagnie]);
+            $stmtDepenseGlobale->execute([':id_compagnie' => $id_compagnie] + $paramsDate);
             $totalDepenseGlobale = (float)($stmtDepenseGlobale->fetchColumn() ?: 0);
         }
 
@@ -294,7 +299,7 @@ class Depense extends Model
             . ($gareVille ? ' AND a.localite = :gareVille' : '')
             . str_replace('date_col', 'l.date_depart', $filtreDate)
         );
-        $paramsLocation = [':id_compagnie' => $id_compagnie];
+        $paramsLocation = [':id_compagnie' => $id_compagnie] + $paramsDate;
         if ($gareVille) $paramsLocation[':gareVille'] = $gareVille;
         $stmtLocation->execute($paramsLocation);
         $totalLocation = (float)($stmtLocation->fetchColumn() ?: 0);

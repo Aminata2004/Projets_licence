@@ -187,9 +187,9 @@ class Home extends Model
      * scopé selon le rôle (compagnie / gare / utilisateur).
      * $gareVille permet à un Admin de filtrer sur une gare précise (localite).
      */
-    public function getBilletsJournalier($gareVille = null)
+    public function getBilletsJournalier($gareVille = null, $date = null)
     {
-        $today = date('Y-m-d');
+        $today = $date ?? date('Y-m-d');
 
         $sql = "SELECT
                 SUM(CASE WHEN status_reservation = 'presentiel' THEN 1 ELSE 0 END) AS total_presentiel,
@@ -229,9 +229,9 @@ class Home extends Model
     // $gareId (id_agence) desambiguise deux gares d'une meme compagnie partageant la meme
     // ville (ex. Segou Gare I et II) : localite_user (nom de ville) seul ne suffit pas, cf.
     // ajout_id_agence_programmation_voyage.sql et le meme correctif dans Envoi_colis.php.
-    public function getVoyagesProgrammes($gareVille = null, $gareId = null)
+    public function getVoyagesProgrammes($gareVille = null, $gareId = null, $date = null)
     {
-        $today = date('Y-m-d');
+        $today = $date ?? date('Y-m-d');
 
         $sql = "SELECT COUNT(*) AS total
             FROM programmation_voyage
@@ -268,13 +268,13 @@ class Home extends Model
      * (avant, le filtre compagnie manquait pour chef_d_escale/Utilisateur : fuite
      * possible entre compagnies partageant une même ville).
      */
-    public function getColisJournalier($gareVille = null)
+    public function getColisJournalier($gareVille = null, $date = null)
     {
         $role     = $_SESSION['droit'];
         $ville    = $_SESSION['ville'] ?? null;
         $num_gare = $_SESSION['numero_gare'] ?? null;
 
-        $today = date('Y-m-d');
+        $today = $date ?? date('Y-m-d');
 
         $sql = "SELECT colis.status, COUNT(*) AS total
                 FROM colis
