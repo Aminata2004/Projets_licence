@@ -21,8 +21,8 @@ class  Liste_gares extends  Controller
             if ($role === 'super_admin') {
                 $listes = $liste_gare->SelectAllData('*', "agence");
 
-                // Admin → affiche uniquement les gares de sa compagnie
-            } elseif ($role === 'Admin' && isset($_SESSION['id_compagnie'])) {
+                // Admin (et PDG) → affiche uniquement les gares de sa compagnie
+            } elseif (in_array($role, ['Admin', 'PDG'], true) && isset($_SESSION['id_compagnie'])) {
                 $id_compagnie = $_SESSION['id_compagnie'];
 
                 $listes = $liste_gare->FetchSelectWheres(

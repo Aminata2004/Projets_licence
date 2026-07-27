@@ -32,7 +32,7 @@
         <?php }
         ?>
         <ul>
-          <?php if ($user->userHasPermission('Billets_creation')) { ?>
+          <?php if ($user->userHasPermission('Billets_creation') && !$user->estLectureSeule()) { ?>
             <li> <a href="<?= BASE_URL ?>/admin/Add_billets"><i class="bi bi-arrow-right-short"></i>Achat de ticket</a>
             </li>
           <?php }

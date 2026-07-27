@@ -49,7 +49,7 @@ class Homes extends Controller
         $showBillets  = ($droit !== 'Utilisateur') || $profile === 'billet';
         $showColis    = ($droit !== 'Utilisateur') || $profile === 'colis';
         $showVoyages  = ($droit !== 'Utilisateur');
-        $showTopGares = ($droit === 'Admin' && !$gareId);
+        $showTopGares = (in_array($droit, ['Admin', 'PDG'], true) && !$gareId);
 
         $data = [
             'mode'         => 'compagnie',
@@ -79,7 +79,7 @@ class Homes extends Controller
         }
 
         // Aperçu du bénéfice du jour, cliquable vers le tableau de bord financier détaillé
-        if ($droit === 'Admin') {
+        if (in_array($droit, ['Admin', 'PDG'], true)) {
             $data['beneficeJour'] = (new Depense())->getBenefice('jour', $gareLabel);
         }
 

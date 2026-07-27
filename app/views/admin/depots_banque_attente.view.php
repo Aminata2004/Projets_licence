@@ -55,6 +55,9 @@
                                         <td><?= htmlspecialchars($d->reference ?? '-') ?></td>
                                         <td><?= htmlspecialchars($d->demandeur) ?></td>
                                         <td class="d-flex gap-2">
+                                            <?php if (($_SESSION['droit'] ?? null) === 'PDG'): ?>
+                                                <span class="text-muted small">Lecture seule</span>
+                                            <?php else: ?>
                                             <form method="post" action="<?= BASE_URL ?>/admin/Depots_banque/confirmer/<?= $d->id_depot ?>" id="form-confirmer-<?= $d->id_depot ?>">
                                                 <?= csrf_field() ?>
                                                 <button type="button" class="btn btn-sm btn-success"
@@ -66,6 +69,7 @@
                                                 data-bs-toggle="modal" data-bs-target="#modalRejet<?= $d->id_depot ?>">
                                                 <i class="bx bx-x"></i> Rejeter
                                             </button>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

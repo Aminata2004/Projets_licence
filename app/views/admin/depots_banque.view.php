@@ -15,6 +15,7 @@
 
             <?php $this->view("admin/set_flash") ?>
 
+            <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
             <div class="card border-0 shadow rounded-4 overflow-hidden mb-4">
                 <div class="card-header border-0 py-3 px-4 d-flex align-items-center gap-2"
                      style="background: linear-gradient(135deg, #0f3b5e, #1d6fa5); color: #fff;">
@@ -75,6 +76,7 @@
                     <?php endif; ?>
                 </div>
             </div>
+            <?php endif; ?>
 
             <div class="card border-0 shadow rounded-4 overflow-hidden">
                 <div class="card-header border-0 py-3 px-4 d-flex align-items-center gap-2"

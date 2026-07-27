@@ -161,7 +161,7 @@ class App {
         return (bool) preg_match(
             '/^(add|ajouter|create|creer|save|enregistrer|insert|delete|supprimer|'
             . 'update|modifier|edit|valider|rejeter|refuser|confirmer|annuler|changer|'
-            . 'assigner|desactiver|activer|cloturer|verser|rembourser|repporter)/i',
+            . 'assigner|desactiver|activer|suspend|cloture|verser|rembourser|repporter)/i',
             $this->action
         );
     }

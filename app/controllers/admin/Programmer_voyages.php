@@ -12,7 +12,7 @@ class Programmer_voyages extends  Controller
 
     if (isset($_SESSION['droit'])) {
       $role = $_SESSION['droit'];
-      if ($role === 'Admin' || $role === 'chef_d_escale' && isset($_SESSION['id_compagnie'])) {
+      if (in_array($role, ['Admin', 'PDG'], true) || $role === 'chef_d_escale' && isset($_SESSION['id_compagnie'])) {
         // Admin : voit seulement ce qui est lié à sa compagnie
         $id_compagnie = $_SESSION['id_compagnie'];
 
@@ -122,7 +122,7 @@ class Programmer_voyages extends  Controller
         $liste_agence = $add_liste_trajet->SelectAllData('*', "agence");
         $liste_agence_depart = $liste_agence;
         $listeEscale = $add_liste_trajet->SelectAllData("*", "escale");
-      } elseif ($role === 'Admin' || $role === 'chef_d_escale' && isset($_SESSION['id_compagnie'])) {
+      } elseif (in_array($role, ['Admin', 'PDG'], true) || $role === 'chef_d_escale' && isset($_SESSION['id_compagnie'])) {
         // Admin : voit seulement ce qui est lié à sa compagnie
         $id_compagnie = $_SESSION['id_compagnie'];
 

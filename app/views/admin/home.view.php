@@ -285,11 +285,11 @@
         </div>
       <?php endif; ?>
 
-      <!-- FINANCES : aperçu bénéfice (Admin) / état de la caisse (chef d'escale) -->
-      <?php if (($_SESSION['droit'] === 'Admin' && !empty($beneficeJour)) || ($_SESSION['droit'] === 'chef_d_escale')): ?>
+      <!-- FINANCES : aperçu bénéfice (Admin/PDG) / état de la caisse (chef d'escale) -->
+      <?php if ((in_array($_SESSION['droit'], ['Admin', 'PDG'], true) && !empty($beneficeJour)) || ($_SESSION['droit'] === 'chef_d_escale')): ?>
         <div class="tg-section-label"><i class="bi bi-cash-coin me-1"></i>Finances</div>
         <div class="tg-stat-grid mb-4">
-          <?php if ($_SESSION['droit'] === 'Admin' && !empty($beneficeJour)): ?>
+          <?php if (in_array($_SESSION['droit'], ['Admin', 'PDG'], true) && !empty($beneficeJour)): ?>
             <a href="<?= BASE_URL ?>/admin/Depenses/benefice" class="tg-stat-card" style="--tg-stat-color: <?= $beneficeJour['benefice'] >= 0 ? 'var(--success)' : 'var(--danger)' ?>;">
               <div class="tg-stat-card__top">
                 <div>
@@ -302,7 +302,7 @@
             </a>
           <?php endif; ?>
 
-          <?php if (in_array($_SESSION['droit'], ['Admin', 'chef_d_escale']) && !empty($beneficeJour)): ?>
+          <?php if (in_array($_SESSION['droit'], ['Admin', 'chef_d_escale', 'PDG'], true) && !empty($beneficeJour)): ?>
             <div class="tg-stat-card" style="--tg-stat-color: var(--primary);">
               <div class="tg-stat-card__top">
                 <div>
