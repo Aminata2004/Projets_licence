@@ -18,6 +18,11 @@ class Documentations extends Controller
 
     public function pdf()
     {
+        // Une trentaine d'images a assembler : marge de securite au cas ou l'hebergement
+        // serait plus lent qu'en local (les images sont deja redimensionnees/compressees
+        // cote source, voir docPdfImg() dans la vue, ce qui est la vraie correction).
+        set_time_limit(240);
+
         ob_start();
         include ROOT . '/app/views/admin/pdf/documentation.php';
         $html = ob_get_clean();

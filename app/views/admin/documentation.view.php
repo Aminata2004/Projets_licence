@@ -1,5 +1,27 @@
 <?php $this->view('admin/partials/headers') ?>
 
+<?php
+// Capture d'ecran annotee : cercle(s)/fleche(s) en SVG superposes en coordonnees natives
+// de l'image (viewBox = dimensions reelles du fichier), donc precises quelle que soit la
+// taille d'affichage. $marks : liste de ['type'=>'circle','cx','cy','rx','ry'] ou
+// ['type'=>'arrow','x1','y1','x2','y2'].
+function docShot($file, $w, $h, $alt, $marks = [])
+{
+    $uid = md5($file);
+    echo '<div class="doc-shot-img"><img src="' . BASE_URL . '/images/documentation/' . $file . '" alt="' . htmlspecialchars($alt) . '" loading="lazy">';
+    echo '<svg class="doc-mark-svg" viewBox="0 0 ' . $w . ' ' . $h . '" preserveAspectRatio="none">';
+    echo '<defs><marker id="arrow-' . $uid . '" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#ff6a00"/></marker></defs>';
+    foreach ($marks as $m) {
+        if ($m['type'] === 'circle') {
+            echo '<ellipse cx="' . $m['cx'] . '" cy="' . $m['cy'] . '" rx="' . $m['rx'] . '" ry="' . $m['ry'] . '" class="doc-mark-circle" />';
+        } elseif ($m['type'] === 'arrow') {
+            echo '<line x1="' . $m['x1'] . '" y1="' . $m['y1'] . '" x2="' . $m['x2'] . '" y2="' . $m['y2'] . '" class="doc-mark-arrow" marker-end="url(#arrow-' . $uid . ')" />';
+        }
+    }
+    echo '</svg></div>';
+}
+?>
+
 <body>
     <div class="wrapper">
         <?php $this->view('admin/partials/navbar') ?>
@@ -59,7 +81,10 @@
                     <li>Valider — en cas d'erreur (compte inconnu, mot de passe incorrect, compte désactivé), un message explicite s'affiche.</li>
                     <li>Une fois connecté, vous arrivez sur <strong>Accueil</strong>, le tableau de bord. Le menu de gauche s'adapte automatiquement à votre rôle et à vos permissions&nbsp;: vous ne voyez que ce que vous êtes autorisé à utiliser.</li>
                 </ol>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — écran de connexion</div>
+                <?php docShot('login.png', 1902, 901, "Écran de connexion TransGest", [
+                    ['type' => 'circle', 'cx' => 1467, 'cy' => 698, 'rx' => 250, 'ry' => 35],
+                    ['type' => 'arrow', 'x1' => 1467, 'y1' => 600, 'x2' => 1467, 'y2' => 660],
+                ]); ?>
 
                 <div class="doc-callout">
                     <div class="doc-callout-label">Les rôles du système</div>
@@ -79,7 +104,10 @@
 
                 <h3>Utilisateurs & permissions</h3>
                 <p>Création des comptes de la compagnie (nom, e-mail, mot de passe, rôle, gare d'affectation pour un chef d'escale/Utilisateur). Chaque compte reçoit automatiquement les permissions par défaut de son rôle&nbsp;; elles restent ensuite ajustables individuellement sur l'écran d'assignation des permissions.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — liste des utilisateurs et formulaire de création</div>
+                <?php docShot('gares.png', 1920, 1080, "Onglets de la Configuration, avec l'onglet Utilisateur", [
+                    ['type' => 'circle', 'cx' => 544, 'cy' => 418, 'rx' => 140, 'ry' => 30],
+                ]); ?>
+                <p class="text-muted" style="font-size:13px;">Ci-dessus&nbsp;: l'onglet « Utilisateur » (menu vertical à gauche du panneau Configuration) donne accès à la liste des comptes et au formulaire de création.</p>
                 <div class="doc-callout">
                     <div class="doc-callout-label">Nouveau module ajouté au système</div>
                     <p class="mb-0">Une nouvelle permission n'est automatiquement donnée qu'aux comptes créés <em>après</em> son ajout. Pour un compte existant, il faut la cocher manuellement sur cet écran.</p>
@@ -87,19 +115,27 @@
 
                 <h3>Gares</h3>
                 <p>Les points de départ/arrivée de la compagnie (localité + numéro de gare). Saisie possible en plusieurs lignes à la fois via des cases à cocher, tout ou rien&nbsp;: si une ligne est invalide, aucune n'est enregistrée.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — liste et ajout de gares</div>
+                <?php docShot('gares.png', 1920, 1080, "Liste des gares", [
+                    ['type' => 'circle', 'cx' => 1747, 'cy' => 540, 'rx' => 62, 'ry' => 26],
+                ]); ?>
 
                 <h3>Escale</h3>
                 <p>Les arrêts intermédiaires possibles entre deux gares, utilisés ensuite lors de la création d'un trajet (section Programmation).</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — liste des escales</div>
+                <?php docShot('escale.png', 1920, 1080, "Liste des escales, bouton Ajouter", [
+                    ['type' => 'circle', 'cx' => 1620, 'cy' => 238, 'rx' => 83, 'ry' => 28],
+                ]); ?>
 
                 <h3>Horaire</h3>
                 <p>Les créneaux horaires de départ proposés lors de la programmation d'un voyage (ex&nbsp;: 06h00, 14h00, 20h00).</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — liste des horaires</div>
+                <?php docShot('horaire.png', 1920, 1080, "Liste des horaires", [
+                    ['type' => 'circle', 'cx' => 1560, 'cy' => 448, 'rx' => 40, 'ry' => 18],
+                ]); ?>
 
                 <h3>Cars & Chauffeurs</h3>
                 <p>Le parc de véhicules de la compagnie (numéro de car, matricule, nombre de places) et les chauffeurs qui leur sont associés.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — liste des cars et chauffeurs</div>
+                <?php docShot('cars-chauffeurs.png', 1920, 1080, "Liste des cars, onglet Chauffeurs", [
+                    ['type' => 'circle', 'cx' => 989, 'cy' => 351, 'rx' => 110, 'ry' => 28],
+                ]); ?>
 
                 <h3>Place limite</h3>
                 <p>Le nombre de places par défaut appliqué lors de la création d'un trajet/voyage.</p>
@@ -113,7 +149,9 @@
 
                 <h3>Programme du voyage</h3>
                 <p>Création d'un <strong>trajet</strong>&nbsp;: gare de départ, destination, une ou plusieurs escales et horaires (sélection multiple par cases à cocher), et le tarif. Le trajet retour (destination → départ) est créé automatiquement pour chaque horaire choisi. Le système détecte et signale les doublons (même départ/destination/horaire déjà existant).</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — création d'un trajet avec escales/horaires en cases à cocher</div>
+                <?php docShot('programme-voyage.png', 1920, 1080, "Liste des programmes de voyage, bouton Ajouter", [
+                    ['type' => 'circle', 'cx' => 1654, 'cy' => 282, 'rx' => 83, 'ry' => 28],
+                ]); ?>
 
                 <h3>Affectation des cars</h3>
                 <p>Association d'un ou plusieurs cars à un ou plusieurs trajets déjà créés (cases à cocher également, avec raccourci « Tout cocher »). Un car déjà affecté à un trajet est grisé pour éviter un doublon.</p>
@@ -125,7 +163,9 @@
 
                 <h3>Transferts entre gares</h3>
                 <p>En cas de voyage annulé ou perturbé, permet de transférer les passagers concernés vers un autre voyage/gare, avec le mouvement de caisse correspondant (montant déplacé de la caisse source vers la caisse destination).</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — écran de transfert entre gares</div>
+                <?php docShot('transferts-gares.png', 1920, 1080, "Historique des transferts, lien Programmation du voyage", [
+                    ['type' => 'circle', 'cx' => 182, 'cy' => 596, 'rx' => 155, 'ry' => 50],
+                ]); ?>
             </section>
 
             <!-- ================= 03. CAISSE ================= -->
@@ -136,18 +176,27 @@
 
                 <h3>Ma Caisse</h3>
                 <p>Chaque utilisateur (Utilisateur, chef d'escale, Admin) ouvre sa <strong>propre caisse individuelle</strong> en début de service (montant initial en espèces), et la ferme en fin de journée (comptage réel, écart éventuel avec le montant attendu). Tant qu'elle n'est pas ouverte, aucune vente ni aucune dépense ne peut lui être imputée.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — ouverture/fermeture de Ma Caisse</div>
+                <?php docShot('ma-caisse.png', 1573, 882, "Ma Caisse, bouton Ouvrir ma caisse", [
+                    ['type' => 'circle', 'cx' => 789, 'cy' => 570, 'rx' => 145, 'ry' => 35],
+                ]); ?>
 
                 <h3>Supervision Escale <span class="doc-role role-chef">chef d'escale · Admin</span></h3>
                 <p>Vue d'ensemble de toutes les caisses individuelles ouvertes à une gare&nbsp;: qui a ouvert, quel montant, permet aussi de clôturer une escale (ensemble des caisses de la gare) en fin de journée.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — supervision des caisses d'une escale</div>
+                <?php docShot('supervision-escale.png', 1920, 1080, "Supervision Escale, bouton Procéder à la clôture", [
+                    ['type' => 'circle', 'cx' => 1641, 'cy' => 614, 'rx' => 220, 'ry' => 28],
+                ]); ?>
 
                 <h3>Rapport Compagnie <span class="doc-role role-admin">Admin</span></h3>
                 <p>Vue consolidée de toutes les caisses, toutes gares confondues, pour l'Admin.</p>
+                <?php docShot('rapport-compagnie.png', 1920, 1080, "Rapport Compagnie, chiffre d'affaires global", [
+                    ['type' => 'circle', 'cx' => 612, 'cy' => 382, 'rx' => 235, 'ry' => 165],
+                ]); ?>
 
                 <h3>Bilan de caisse</h3>
                 <p>Bilans détaillés des recettes billets et colis par caisse.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — bilan de caisse</div>
+                <?php docShot('bilan-caisse.png', 1920, 1080, "Bilan de caisse, onglets Billets / Colis", [
+                    ['type' => 'circle', 'cx' => 783, 'cy' => 378, 'rx' => 390, 'ry' => 38],
+                ]); ?>
             </section>
 
             <!-- ================= 04. BILLETS ================= -->
@@ -157,22 +206,36 @@
 
                 <h3>Achat de ticket</h3>
                 <p>Vente d'un billet&nbsp;: gare de départ, destination, horaire, informations du client, numéro de place. Les champs se mettent à jour dynamiquement (sans recharger la page) au fur et à mesure des choix.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — formulaire d'achat de ticket</div>
+                <?php docShot('achat-ticket.png', 1920, 1080, "Formulaire d'achat de ticket", [
+                    ['type' => 'circle', 'cx' => 1362, 'cy' => 362, 'rx' => 480, 'ry' => 30],
+                    ['type' => 'circle', 'cx' => 969, 'cy' => 968, 'rx' => 95, 'ry' => 28],
+                    ['type' => 'arrow', 'x1' => 300, 'y1' => 400, 'x2' => 300, 'y2' => 940],
+                ]); ?>
 
                 <h3>Liste des tickets</h3>
                 <p>Liste d'embarquement du jour (et de demain, onglet séparé)&nbsp;: qui doit embarquer, sur quel car, à quelle heure. Depuis cette liste&nbsp;: impression du reçu (câble/USB ou imprimante WiFi), report du voyage, demande/validation d'annulation, et export PDF A4 de la liste filtrée par destination/heure.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — liste d'embarquement du jour</div>
+                <?php docShot('liste-tickets.png', 1920, 1080, "Liste des tickets du jour, onglet Liste de demain", [
+                    ['type' => 'circle', 'cx' => 679, 'cy' => 364, 'rx' => 150, 'ry' => 28],
+                    ['type' => 'circle', 'cx' => 1767, 'cy' => 820, 'rx' => 75, 'ry' => 25],
+                ]); ?>
 
                 <h3>Ticket en entente</h3>
                 <p>Validation des réservations faites en ligne (site public) ou en attente de confirmation de paiement, avant qu'elles n'apparaissent comme billets définitifs.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — tickets en entente</div>
+                <?php docShot('ticket-entente.png', 1920, 1080, "Liste des tickets en entente", [
+                    ['type' => 'circle', 'cx' => 1776, 'cy' => 452, 'rx' => 75, 'ry' => 25],
+                ]); ?>
 
                 <h3>Demandes d'annulation <span class="doc-role role-admin">Admin</span></h3>
                 <p>Un chef d'escale ne peut que <em>demander</em> l'annulation d'un billet&nbsp;; c'est l'Admin qui valide (ou refuse) définitivement ici. L'Admin, lui, peut annuler directement sans passer par cette étape.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — demandes d'annulation en attente</div>
+                <?php docShot('demandes-annulation.png', 1920, 1080, "Demandes d'annulation en attente", [
+                    ['type' => 'circle', 'cx' => 650, 'cy' => 341, 'rx' => 265, 'ry' => 22],
+                ]); ?>
 
                 <h3>Rapport billets</h3>
                 <p>Rapport mensuel et rapport annuel des ventes de billets.</p>
+                <?php docShot('rapport-billets.png', 1920, 1080, "Rapport mensuel, lien Rapport annuel", [
+                    ['type' => 'circle', 'cx' => 168, 'cy' => 623, 'rx' => 130, 'ry' => 32],
+                ]); ?>
             </section>
 
             <!-- ================= 05. COLIS ================= -->
@@ -182,24 +245,43 @@
 
                 <h3>Liste des colis</h3>
                 <p>Prise en charge d'un nouveau colis (expéditeur, destinataire, nature, valeur, frais de transport, gare de destination) — génère un code unique. Export possible en PDF A4, avec filtre par destination/statut, reprenant les informations du reçu.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — liste et prise en charge d'un colis</div>
+                <?php docShot('liste-colis.png', 1920, 1080, "Liste des colis, boutons Ajouter et Exporter en PDF", [
+                    ['type' => 'circle', 'cx' => 1648, 'cy' => 264, 'rx' => 105, 'ry' => 32],
+                    ['type' => 'circle', 'cx' => 570, 'cy' => 557, 'rx' => 165, 'ry' => 32],
+                ]); ?>
 
                 <h3>Envoi des colis</h3>
                 <p>Affectation d'un colis pris en charge à un car/trajet précis pour l'expédier réellement.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — envoi des colis</div>
+                <?php docShot('envoi-colis.png', 1920, 1080, "Envoi des colis, choix du car et bouton Enregistrer", [
+                    ['type' => 'circle', 'cx' => 640, 'cy' => 422, 'rx' => 245, 'ry' => 30],
+                    ['type' => 'circle', 'cx' => 1756, 'cy' => 616, 'rx' => 95, 'ry' => 32],
+                    ['type' => 'arrow', 'x1' => 640, 'y1' => 460, 'x2' => 1700, 'y2' => 600],
+                ]); ?>
 
                 <h3>Mouvement des colis</h3>
                 <p>Suivi des colis actuellement en transit entre deux gares.</p>
+                <?php docShot('mouvement-colis.png', 1920, 1080, "Mouvement des colis, onglets En attente / Reçu / Livré", [
+                    ['type' => 'circle', 'cx' => 727, 'cy' => 506, 'rx' => 335, 'ry' => 30],
+                ]); ?>
 
                 <h3>Livraison des colis</h3>
                 <p>Remise du colis au destinataire à l'arrivée&nbsp;: recherche par code, marquage comme livré.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — livraison d'un colis</div>
+                <?php docShot('livraison-colis.png', 1920, 1080, "Livraison des colis, champ code et bouton Valider", [
+                    ['type' => 'circle', 'cx' => 1128, 'cy' => 421, 'rx' => 730, 'ry' => 28],
+                    ['type' => 'circle', 'cx' => 463, 'cy' => 498, 'rx' => 70, 'ry' => 28],
+                ]); ?>
 
                 <h3>Réclamation</h3>
                 <p>Suivi des réclamations liées à un colis (perte, retard, dommage).</p>
+                <?php docShot('reclamation.png', 1920, 1080, "Réclamation, recherche d'un colis", [
+                    ['type' => 'circle', 'cx' => 888, 'cy' => 459, 'rx' => 75, 'ry' => 25],
+                ]); ?>
 
                 <h3>Historique</h3>
                 <p>Historique complet des colis enregistrés et des colis livrés.</p>
+                <?php docShot('historique-colis.png', 1920, 1080, "Historique des colis, onglet colis livré", [
+                    ['type' => 'circle', 'cx' => 869, 'cy' => 348, 'rx' => 128, 'ry' => 24],
+                ]); ?>
             </section>
 
             <!-- ================= 06. FINANCES ================= -->
@@ -209,15 +291,26 @@
 
                 <h3>Dépenses</h3>
                 <p>Enregistrement d'une dépense, <strong>locale</strong> (rattachée à une gare et déduite de sa caisse) ou <strong>globale</strong> (à l'échelle de la compagnie, Admin uniquement). Une dépense créée par un chef d'escale reste <strong>en attente</strong> jusqu'à validation par l'Admin&nbsp;; créée par l'Admin, elle est déduite immédiatement.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — enregistrement d'une dépense</div>
+                <?php docShot('depenses.png', 1920, 1080, "Gestion des dépenses, catégorie et bouton Enregistrer", [
+                    ['type' => 'circle', 'cx' => 629, 'cy' => 466, 'rx' => 235, 'ry' => 28],
+                    ['type' => 'circle', 'cx' => 501, 'cy' => 652, 'rx' => 105, 'ry' => 30],
+                ]); ?>
 
                 <h3>Bénéfice de la compagnie <span class="doc-role role-admin">Admin</span></h3>
                 <p>Vue consolidée&nbsp;: revenus billets + colis + location de cars, moins les remboursements et les dépenses, sur une période (jour / mois / depuis le début).</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — écran du bénéfice</div>
+                <?php docShot('benefice-compagnie.png', 1920, 1080, "Bénéfice de la compagnie, revenus location de cars et bénéfice net", [
+                    ['type' => 'circle', 'cx' => 1306, 'cy' => 477, 'rx' => 180, 'ry' => 58],
+                    ['type' => 'circle', 'cx' => 1117, 'cy' => 848, 'rx' => 280, 'ry' => 60],
+                ]); ?>
 
                 <h3>Location des cars</h3>
                 <p>Location ponctuelle d'un car à un client, en dehors des trajets programmés (destination libre, dates, coordonnées client, frais). Un chef d'escale peut créer une demande (en attente de validation), l'Admin crée directement une location effective. Un manuel dédié, plus détaillé, existe pour ce module précis.</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — formulaire et liste des locations</div>
+                <?php docShot('location-cars.png', 1920, 1080, "Formulaire et liste des locations de cars", [
+                    ['type' => 'circle', 'cx' => 1604, 'cy' => 467, 'rx' => 230, 'ry' => 28],
+                    ['type' => 'circle', 'cx' => 501, 'cy' => 654, 'rx' => 105, 'ry' => 30],
+                    ['type' => 'circle', 'cx' => 1775, 'cy' => 881, 'rx' => 58, 'ry' => 18],
+                    ['type' => 'arrow', 'x1' => 1604, 'y1' => 495, 'x2' => 550, 'y2' => 630],
+                ]); ?>
             </section>
 
             <!-- ================= 07. BANQUE ================= -->
@@ -227,16 +320,25 @@
 
                 <h3>Comptes banque <span class="doc-role role-admin">Admin</span></h3>
                 <p>Gestion des comptes bancaires de la compagnie, vers lesquels les recettes en espèces sont déposées.</p>
+                <?php docShot('comptes-banque.png', 1920, 1080, "Comptes banque, boutons Demandes en attente et Nouveau compte", [
+                    ['type' => 'circle', 'cx' => 1758, 'cy' => 282, 'rx' => 90, 'ry' => 24],
+                    ['type' => 'circle', 'cx' => 1502, 'cy' => 282, 'rx' => 125, 'ry' => 24],
+                ]); ?>
 
                 <h3>Faire un dépôt</h3>
                 <p>Enregistrement d'un dépôt en banque (montant retiré de la caisse physique, versé sur un compte).</p>
-                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — formulaire de dépôt</div>
+                <?php docShot('depot-banque.png', 1920, 1080, "Nouvelle demande de dépôt, bouton Envoyer la demande", [
+                    ['type' => 'circle', 'cx' => 545, 'cy' => 569, 'rx' => 150, 'ry' => 30],
+                ]); ?>
 
                 <h3>Demandes en attente <span class="doc-role role-admin">Admin</span></h3>
                 <p>Confirmation ou rejet des dépôts déclarés par les gares, avant qu'ils ne soient définitivement comptabilisés.</p>
 
                 <h3>Historique des dépôts</h3>
                 <p>Historique de tous les dépôts effectués.</p>
+                <?php docShot('historique-depots.png', 1920, 1080, "Historique des dépôts en banque", [
+                    ['type' => 'circle', 'cx' => 735, 'cy' => 342, 'rx' => 360, 'ry' => 22],
+                ]); ?>
             </section>
 
             <!-- ================= 08. IMPRESSION ================= -->
@@ -246,9 +348,18 @@
 
                 <h3>Imprimante câble/USB</h3>
                 <p>Ouvre un PDF classique, imprimable via le pilote Windows habituel de l'imprimante branchée au PC.</p>
+                <?php docShot('impression-billet.png', 1920, 1080, "Menu d'impression d'un billet : câble/USB ou WiFi", [
+                    ['type' => 'circle', 'cx' => 1604, 'cy' => 705, 'rx' => 190, 'ry' => 20],
+                ]); ?>
 
                 <h3>Imprimante thermique WiFi</h3>
                 <p>Nécessite d'avoir installé une fois le « pont d'impression » sur le PC connecté à l'imprimante réseau (script <code>install-windows.ps1</code>, fourni séparément à l'équipe technique).</p>
+                <?php docShot('impression-billet.png', 1920, 1080, "Menu d'impression, option imprimante WiFi", [
+                    ['type' => 'circle', 'cx' => 1573, 'cy' => 747, 'rx' => 160, 'ry' => 22],
+                ]); ?>
+                <?php docShot('impression-billet-2.png', 1908, 897, "Menu d'impression d'un colis, option imprimante WiFi", [
+                    ['type' => 'circle', 'cx' => 1548, 'cy' => 818, 'rx' => 220, 'ry' => 24],
+                ]); ?>
 
                 <h3>Impression depuis un téléphone</h3>
                 <p>Le PC hébergeant le pont doit être installé avec l'option réseau local activée. Sur le téléphone (même Wi-Fi), la première tentative d'impression échoue et propose « Configurer l'adresse »&nbsp;: y saisir l'adresse affichée par le PC (ex&nbsp;: <code>192.168.1.50:9200</code>). Elle est ensuite mémorisée sur ce téléphone pour les prochaines impressions.</p>
@@ -364,6 +475,37 @@
             border-radius: 4px;
             margin: 6px 0 16px;
             color: #1e4d6b;
+        }
+
+        .doc-shot-img {
+            position: relative;
+            display: block;
+            max-width: 100%;
+            margin: 10px 0 6px;
+            border: 1px solid #e5e8ec;
+            border-radius: 6px;
+            overflow: hidden;
+            line-height: 0;
+        }
+
+        .doc-shot-img img { display: block; width: 100%; height: auto; }
+
+        .doc-mark-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .doc-mark-circle {
+            fill: none;
+            stroke: #ff6a00;
+            stroke-width: 7;
+        }
+
+        .doc-mark-arrow {
+            stroke: #ff6a00;
+            stroke-width: 6;
         }
 
         .doc-shot {
