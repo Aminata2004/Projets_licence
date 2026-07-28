@@ -109,6 +109,10 @@
                             <div class="progress-bar bg-success" id="progressEmbarquement" style="width: <?= $total ? round($embarques / $total * 100) : 0 ?>%"></div>
                         </div>
                     <?php endif; ?>
+                    <div class="form-check d-flex align-items-center gap-2 mb-0">
+                        <input type="checkbox" class="form-check-input mt-0" id="checkAll">
+                        <label class="form-check-label" for="checkAll">Tout sélectionner</label>
+                    </div>
                     <button type="button" class="btn btn-success" id="btnEmbarquerSelection" disabled>
                         <i class="bx bx-check-double"></i> Embarquer la sélection (<span id="nbSelection">0</span>)
                     </button>
@@ -121,7 +125,7 @@
                         <table class="table table-striped table-bordered mobile-card-table" style="width:100%">
                             <thead>
                                 <tr class="text-center">
-                                    <th><input type="checkbox" id="checkAll"></th>
+                                    <th>Sélection</th>
                                     <th>Client</th>
                                     <th>Destination</th>
                                     <th>N° de place</th>
@@ -134,7 +138,7 @@
                                 <?php foreach ($liste as $b): ?>
                                     <?php $estEmbarque = ($b['statut_embarquement'] ?? null) === 'embarque'; ?>
                                     <tr class="text-center" data-id="<?= $b['idBillets'] ?>">
-                                        <td>
+                                        <td data-label="Sélection">
                                             <input type="checkbox" class="chk-billet" value="<?= $b['idBillets'] ?>" <?= $estEmbarque ? 'disabled' : '' ?>>
                                         </td>
                                         <td data-label="Client"><?= htmlspecialchars($b['Client'] ?? '-') ?></td>
