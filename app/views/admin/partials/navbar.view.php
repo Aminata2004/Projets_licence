@@ -96,6 +96,28 @@
 
           $notifCount = count($billets) + count($locationsEnAttente) + count($billetsEnRetard);
 
+          // Identite affichee (nav du haut) : le role seul ("chef_d_escale") ne dit pas de
+          // quelle gare il s'agit, ce qui devient ambigu des qu'un compte Admin visite
+          // plusieurs gares/compagnies (mode support) ou qu'il y a plusieurs "Utilisateur"
+          // (billetterie/colis) sur des gares differentes. On affiche donc role + gare (et,
+          // pour un simple Utilisateur, son service — meme intitules que Configurations::index()).
+          $libellesRole = [
+            'Utilisateur'   => 'Utilisateur',
+            'chef_d_escale' => "Chef d'escale",
+            'Admin'         => 'Admin',
+            'super_admin'   => 'Super Admin',
+            'PDG'           => 'PDG',
+          ];
+          $libellesService = ['billet' => 'Billetterie', 'colis' => 'Colis / Courrier'];
+
+          $roleAffiche = $libellesRole[$_SESSION['droit'] ?? ''] ?? ($_SESSION['droit'] ?? '');
+          if (($_SESSION['droit'] ?? null) === 'Utilisateur' && !empty($_SESSION['profile']) && isset($libellesService[$_SESSION['profile']])) {
+            $roleAffiche = $libellesService[$_SESSION['profile']];
+          }
+
+          $gareAffichee = trim(($_SESSION['ville'] ?? '') . (!empty($_SESSION['numero_gare']) ? ' (' . $_SESSION['numero_gare'] . ')' : ''));
+          $identiteAffichee = $roleAffiche . ($gareAffichee !== '' ? ' — ' . $gareAffichee : '');
+
           ?>
      
           <?php if ($user->userHasPermission('Billets_notification')) { ?>
@@ -171,7 +193,7 @@
               <a class="nav-link " href="#" data-bs-toggle="dropdown">
                 <div class="user-setting d-flex align-items-center gap-1">
                   <img src="<?= BASE_URL ?>/assets_site/img/reservation.png" class="user-img" alt="">
-                  <div class="user-name"><?= $_SESSION['nom']?> <small style="font-size: 0.75rem; color: #f59e0b; display: block; line-height: 1;"><?= $_SESSION["droit"] ?></small></div>
+                  <div class="user-name"><?= htmlspecialchars($_SESSION['nom'] ?? '') ?> <small style="font-size: 0.75rem; color: #f59e0b; display: block; line-height: 1;"><?= htmlspecialchars($identiteAffichee) ?></small></div>
                 </div>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
