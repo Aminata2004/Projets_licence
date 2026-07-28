@@ -164,6 +164,7 @@
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-outline-danger btn-demander-report"
                                                     data-id="<?= $b['idBillets'] ?>" data-client="<?= htmlspecialchars($b['Client'] ?? '-') ?>"
+                                                    data-destination="<?= htmlspecialchars($b['destinationId'] ?? '') ?>"
                                                     data-bs-toggle="modal" data-bs-target="#modalDemanderReport">
                                                     <i class="bx bx-calendar-x"></i> Demander le report
                                                 </button>
@@ -218,7 +219,9 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Nouvelle heure de départ</label>
-                            <input type="time" class="form-control" name="nouvelle_heure" required>
+                            <select class="form-select" name="nouvelle_heure" id="reportHeureSelect" required>
+                                <option value="" disabled selected>Choisissez une heure de départ</option>
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -282,13 +285,15 @@
         function appliquerLigneNonEmbarquee(tr) {
             const id = tr.dataset.id;
             const client = tr.querySelector('[data-label="Client"]').textContent.trim();
+            const destination = tr.querySelector('[data-label="Destination"]').textContent.trim();
             tr.querySelector('.cell-statut').innerHTML =
                 '<span class="badge bg-warning text-dark">En attente</span>';
             tr.querySelector('.cell-action').innerHTML =
                 '<button type="button" class="btn btn-sm btn-success btn-marquer-embarque" data-id="' + id + '">' +
                 '<i class="bx bx-check"></i> Embarquer</button> ' +
                 '<button type="button" class="btn btn-sm btn-outline-danger btn-demander-report" data-id="' + id + '" ' +
-                'data-client="' + client + '" data-bs-toggle="modal" data-bs-target="#modalDemanderReport">' +
+                'data-client="' + client + '" data-destination="' + destination + '" ' +
+                'data-bs-toggle="modal" data-bs-target="#modalDemanderReport">' +
                 '<i class="bx bx-calendar-x"></i> Demander le report</button>';
             tr.querySelector('.chk-billet').disabled = false;
             attacherBoutonsLigne(tr);
@@ -352,8 +357,44 @@
                 btnReport.addEventListener('click', function() {
                     document.getElementById('reportIdBillets').value = this.dataset.id;
                     document.getElementById('reportClientNom').textContent = this.dataset.client;
+                    chargerHeuresReport(this.dataset.destination);
                 });
             }
+        }
+
+        // Au lieu de laisser saisir n'importe quelle heure, on ne propose que les heures
+        // reellement programmees pour cette destination (meme logique que le report classique
+        // de Liste_du_jours::getHeuresDisponibles, deja utilise ailleurs dans l'appli) : elles
+        // s'appliquent aussi bien a "aujourd'hui" qu'a "demain", l'horaire type ne change pas.
+        function chargerHeuresReport(destinationId) {
+            const select = document.getElementById('reportHeureSelect');
+            select.innerHTML = '<option value="" disabled selected>Chargement...</option>';
+            select.disabled = true;
+
+            fetch(baseUrl + '/admin/Liste_du_jours/getHeuresDisponibles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: 'destination_id=' + encodeURIComponent(destinationId)
+                })
+                .then(r => r.json())
+                .then(heures => {
+                    select.innerHTML = '<option value="" disabled selected>Choisissez une heure de départ</option>';
+                    if (!Array.isArray(heures) || heures.length === 0) {
+                        select.innerHTML += '<option value="" disabled>Aucune heure programmée pour cette destination</option>';
+                    } else {
+                        heures.forEach(h => {
+                            select.innerHTML += '<option value="' + h + '">' + h + '</option>';
+                        });
+                    }
+                    select.disabled = false;
+                })
+                .catch(() => {
+                    select.innerHTML = '<option value="" disabled selected>Erreur de chargement</option>';
+                    select.disabled = false;
+                });
         }
 
         tbody.querySelectorAll('tr[data-id]').forEach(attacherBoutonsLigne);
