@@ -19,6 +19,10 @@
                 $numeroGare = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
                 date_default_timezone_set('Africa/Bamako');
                 $aujourd = date('Y-m-d');
+                // Heure PHP (Africa/Bamako), pas NOW() cote MySQL : le serveur de base de
+                // donnees (hebergement distant) peut avoir une horloge/fuseau different, ce
+                // qui ferait disparaitre a tort un depart pas encore passe.
+                $maintenant = date('Y-m-d H:i:s');
 
                 if ($heure && $destination) {
                     $model = new Liste_du_jour();
@@ -26,12 +30,13 @@
                     // Une fois l'heure de depart passee, le billet n'a plus rien a faire dans
                     // la liste "a voir" du jour (meme regle que liste_du_jours.view.php).
                     $where = 'billets.id_compagnie = :id_compagnie AND billets.destinationId = :destination AND billets.Heur_departs = :heure AND billets.jourVoyage = :jour
-                              AND TIMESTAMP(billets.jourVoyage, billets.Heur_departs) >= NOW()';
+                              AND TIMESTAMP(billets.jourVoyage, billets.Heur_departs) >= :maintenant';
                     $params = [
                         'id_compagnie' => $id_compagnie,
                         'destination' => $destination,
                         'heure' => $heure,
-                        'jour' => $aujourd // ici, la clé doit correspondre au token SQL
+                        'jour' => $aujourd, // ici, la clé doit correspondre au token SQL
+                        'maintenant' => $maintenant
                     ];
                     if ($idDepart !== null) {
                         $where .= ' AND billets.departId = :depart';

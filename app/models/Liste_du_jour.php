@@ -765,10 +765,18 @@
     // un client qui n'a pas ete pris en charge.
     public function getBilletsPourEmbarquement($idDepart, $numeroGare, $jourVoyage, $destination = '', $heure = '')
     {
+      // Comparaison faite avec l'heure PHP (Africa/Bamako), jamais avec NOW()/CURDATE() cote
+      // MySQL : le serveur de base de donnees (hebergement distant LWS) peut tourner sur un
+      // fuseau/horloge different, ce qui ferait disparaitre des billets pas encore partis
+      // (ex. depart 20h00 deja considere "passe" alors qu'il n'est que 19h55 a Bamako).
+      date_default_timezone_set('Africa/Bamako');
+      $maintenant = date('Y-m-d H:i:s');
+
       $where = 'b.id_compagnie = :id_compagnie AND b.jourVoyage = :jour
                  AND (b.status_billets IS NULL OR b.status_billets = \'\')
-                 AND NOT (b.statut_embarquement = \'embarque\' AND TIMESTAMP(b.jourVoyage, b.Heur_departs) < NOW())';
-      $params = [':id_compagnie' => $_SESSION['id_compagnie'] ?? null, ':jour' => $jourVoyage];
+                 AND (b.statut_embarquement IS NULL OR b.statut_embarquement != \'embarque\'
+                      OR TIMESTAMP(b.jourVoyage, b.Heur_departs) >= :maintenant)';
+      $params = [':id_compagnie' => $_SESSION['id_compagnie'] ?? null, ':jour' => $jourVoyage, ':maintenant' => $maintenant];
 
       if ($idDepart !== null) {
         $where .= ' AND b.departId = :depart';
@@ -806,11 +814,17 @@
     // pense a verifier manuellement la liste d'embarquement.
     public function getBilletsEnRetard($idDepart, $numeroGare, $id_compagnie)
     {
-      $where = "b.id_compagnie = :id_compagnie AND b.jourVoyage = CURDATE()
+      // Heure PHP (Africa/Bamako), pas NOW()/CURDATE() cote MySQL : voir le commentaire de
+      // getBilletsPourEmbarquement() sur le decalage possible avec l'horloge du serveur DB.
+      date_default_timezone_set('Africa/Bamako');
+      $aujourdhui = date('Y-m-d');
+      $seuilRetard = date('Y-m-d H:i:s', strtotime('-30 minutes'));
+
+      $where = "b.id_compagnie = :id_compagnie AND b.jourVoyage = :jour
                  AND (b.status_billets IS NULL OR b.status_billets = '')
                  AND (b.statut_embarquement IS NULL OR b.statut_embarquement != 'embarque')
-                 AND TIMESTAMP(b.jourVoyage, b.Heur_departs) < NOW() - INTERVAL 30 MINUTE";
-      $params = [':id_compagnie' => $id_compagnie];
+                 AND TIMESTAMP(b.jourVoyage, b.Heur_departs) < :seuil";
+      $params = [':id_compagnie' => $id_compagnie, ':jour' => $aujourdhui, ':seuil' => $seuilRetard];
 
       if ($idDepart !== null) {
         $where .= ' AND b.departId = :depart';
