@@ -219,6 +219,14 @@ function docShot($file, $w, $h, $alt, $marks = [])
                     ['type' => 'circle', 'cx' => 1767, 'cy' => 820, 'rx' => 75, 'ry' => 25],
                 ]); ?>
 
+                <h3>Historique des billets</h3>
+                <p>Consulter et réimprimer (câble/USB ou WiFi) un billet à <strong>n'importe quelle date passée</strong>&nbsp;: filtre par date, destination et heure. Permet aussi d'imprimer la liste d'embarquement PDF d'une date passée (pas seulement aujourd'hui).</p>
+                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — historique des billets</div>
+
+                <h3>Embarquement</h3>
+                <p>Remplace la case à cocher papier de la liste d'embarquement&nbsp;: pour un trajet/date donné, marquer chaque client comme <strong>embarqué</strong> (horodaté, avec l'agent qui l'a fait), avec un compteur en direct (X / Y embarqués). Un embarquement fait par erreur peut être annulé.</p>
+                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — écran Embarquement</div>
+
                 <h3>Ticket en entente</h3>
                 <p>Validation des réservations faites en ligne (site public) ou en attente de confirmation de paiement, avant qu'elles n'apparaissent comme billets définitifs.</p>
                 <?php docShot('ticket-entente.png', 1920, 1080, "Liste des tickets en entente", [
@@ -230,6 +238,10 @@ function docShot($file, $w, $h, $alt, $marks = [])
                 <?php docShot('demandes-annulation.png', 1920, 1080, "Demandes d'annulation en attente", [
                     ['type' => 'circle', 'cx' => 650, 'cy' => 341, 'rx' => 265, 'ry' => 22],
                 ]); ?>
+
+                <h3>Demandes de report<span class="doc-role role-chef">chef d'escale · Admin</span></h3>
+                <p>Pour un client <strong>non embarqué</strong> (depuis l'écran Embarquement), une demande de report vers une nouvelle date/heure peut être envoyée. Le circuit s'adapte à qui la fait&nbsp;: un agent simple envoie d'abord au <strong>chef d'escale de sa gare</strong>, qui transmet ensuite à l'Admin&nbsp;; un chef d'escale (ou l'Admin) qui fait la demande lui-même l'envoie <strong>directement</strong> à l'Admin. Seul l'Admin valide définitivement (le billet est réellement reprogrammé) ou rejette, à n'importe quelle étape.</p>
+                <div class="doc-shot"><i class="bx bx-image-alt"></i>Capture d'écran à ajouter — demandes de report</div>
 
                 <h3>Rapport billets</h3>
                 <p>Rapport mensuel et rapport annuel des ventes de billets.</p>

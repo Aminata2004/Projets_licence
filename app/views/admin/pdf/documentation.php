@@ -168,6 +168,12 @@ if (!function_exists('docPdfImg')) {
 
 <?php docPdfImg('liste-tickets.png'); ?>
 
+<h3>Historique des billets</h3>
+<p>Consulter et réimprimer (câble/USB ou WiFi) un billet à n'importe quelle date passée : filtre par date, destination et heure. Permet aussi d'imprimer la liste d'embarquement PDF d'une date passée.</p>
+
+<h3>Embarquement</h3>
+<p>Remplace la case à cocher papier de la liste d'embarquement : pour un trajet/date donné, marquer chaque client comme embarqué (horodaté, avec l'agent), compteur en direct. Annulation possible en cas d'erreur.</p>
+
 <h3>Ticket en entente</h3>
 <p>Validation des réservations faites en ligne, avant qu'elles n'apparaissent comme billets définitifs.</p>
 
@@ -177,6 +183,9 @@ if (!function_exists('docPdfImg')) {
 <p>Un chef d'escale ne peut que demander l'annulation d'un billet ; l'Admin valide (ou refuse) définitivement. L'Admin peut annuler directement.</p>
 
 <?php docPdfImg('demandes-annulation.png'); ?>
+
+<h3>Demandes de report <span class="role">chef d'escale · Admin</span></h3>
+<p>Pour un client non embarqué, une demande de report peut être envoyée. Un agent simple envoie d'abord au chef d'escale de sa gare, qui transmet à l'Admin ; un chef d'escale (ou l'Admin) qui fait la demande lui-même l'envoie directement à l'Admin. Seul l'Admin valide (le billet est réellement reprogrammé) ou rejette.</p>
 
 <h3>Rapport billets</h3>
 <p>Rapport mensuel et rapport annuel des ventes de billets.</p>
