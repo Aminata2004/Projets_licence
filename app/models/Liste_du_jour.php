@@ -237,6 +237,18 @@
         $demain      = date('Y-m-d', strtotime('+1 day'));
         $ancienJour  = date('Y-m-d', strtotime($billet['jourVoyage']));
         $nouveauJour = date('Y-m-d', strtotime($data['jourVoyage']));
+
+        // Idempotence anti double-soumission : si le billet est DEJA sur exactement ce
+        // creneau (double-clic sur "Modifier", ou deux appels concurrents avec la meme
+        // cible - confirmerReportBillet() et reporter() passent tous les deux par ici),
+        // la 2e execution, une fois debloquee par le verrou FOR UPDATE ci-dessus, verrait
+        // ce creneau comme "l'ancien" et le libererait une seconde fois a tort (la place
+        // n'a jamais ete occupee deux fois). On s'arrete ici, sans toucher aux compteurs.
+        if ($ancienJour === $nouveauJour && $billet['Heur_departs'] === $data['Heur_departs']) {
+          $pdo->commit();
+          $this->set_flash("Le billet est déjà programmé sur cette date et cette heure.", "info");
+          return true;
+        }
         $nombrePassages = (int)$billet['nombrePassages'];
 
         $mainDest = $this->resolveDestinationPrincipale(
