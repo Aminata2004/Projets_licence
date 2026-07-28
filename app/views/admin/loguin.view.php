@@ -443,8 +443,9 @@
 
                 <?php $this->view("admin/set_flash"); ?>
 
-                <form method="post" action="">
+                <form method="post" action="" id="formLogin">
                     <?= csrf_field() ?>
+                    <input type="hidden" name="connexion" value="1">
 
                     <div class="form-group">
                         <label>Adresse e-mail</label>
@@ -473,9 +474,10 @@
                         </a>
                     </div>
 
-                    <button type="submit" name="connexion" class="btn-submit">
-                        <i class="bi bi-box-arrow-in-right"></i>
-                        Se connecter
+                    <button type="submit" name="connexion" class="btn-submit" id="btnLogin">
+                        <span class="spinner-border spinner-border-sm d-none" id="loginSpinner" role="status" aria-hidden="true"></span>
+                        <i class="bi bi-box-arrow-in-right" id="loginIcon"></i>
+                        <span id="loginLabel">Se connecter</span>
                     </button>
 
                 </form>
@@ -498,6 +500,17 @@
         pwd.type = isText ? 'password' : 'text';
         this.classList.toggle('bi-eye',       isText);
         this.classList.toggle('bi-eye-slash', !isText);
+    });
+
+    // Spinner sur le bouton le temps que la connexion se traite, pour eviter les
+    // doubles clics et montrer que quelque chose se passe (surtout utile si le
+    // serveur met un peu de temps a repondre).
+    document.getElementById('formLogin').addEventListener('submit', function () {
+        const btn = document.getElementById('btnLogin');
+        document.getElementById('loginSpinner').classList.remove('d-none');
+        document.getElementById('loginIcon').classList.add('d-none');
+        document.getElementById('loginLabel').textContent = 'Connexion en cours...';
+        btn.disabled = true;
     });
 </script>
 
