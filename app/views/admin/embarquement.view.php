@@ -78,7 +78,7 @@
 
             <?php
                 $total = count($liste);
-                $embarques = count(array_filter($liste, fn($b) => ($b->statut_embarquement ?? null) === 'embarque'));
+                $embarques = count(array_filter($liste, fn($b) => ($b['statut_embarquement'] ?? null) === 'embarque'));
             ?>
             <div class="card shadow-sm border-0 rounded-3 mb-3">
                 <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -111,27 +111,27 @@
                             <tbody>
                                 <?php foreach ($liste as $b): ?>
                                     <tr class="text-center">
-                                        <td data-label="Client"><?= htmlspecialchars($b->Client) ?></td>
-                                        <td data-label="Destination"><?= htmlspecialchars($b->destinationId) ?></td>
-                                        <td data-label="N° de place">Chaisse N°<?= htmlspecialchars($b->numeroPlace) ?></td>
-                                        <td data-label="Heure de départ"><?= htmlspecialchars($b->Heur_departs) ?></td>
+                                        <td data-label="Client"><?= htmlspecialchars($b['Client'] ?? '-') ?></td>
+                                        <td data-label="Destination"><?= htmlspecialchars($b['destinationId'] ?? '-') ?></td>
+                                        <td data-label="N° de place">Chaisse N°<?= htmlspecialchars($b['numeroPlace'] ?? '-') ?></td>
+                                        <td data-label="Heure de départ"><?= htmlspecialchars($b['Heur_departs'] ?? '-') ?></td>
                                         <td data-label="Statut">
-                                            <?php if (($b->statut_embarquement ?? null) === 'embarque'): ?>
+                                            <?php if (($b['statut_embarquement'] ?? null) === 'embarque'): ?>
                                                 <span class="badge bg-success">
-                                                    Embarqué <?= $b->embarque_le ? '(' . date('H:i', strtotime($b->embarque_le)) . ')' : '' ?>
+                                                    Embarqué <?= !empty($b['embarque_le']) ? '(' . date('H:i', strtotime($b['embarque_le'])) . ')' : '' ?>
                                                 </span>
-                                                <?php if (!empty($b->embarque_par_nom)): ?>
-                                                    <br><small class="text-muted">par <?= htmlspecialchars($b->embarque_par_nom) ?></small>
+                                                <?php if (!empty($b['embarque_par_nom'])): ?>
+                                                    <br><small class="text-muted">par <?= htmlspecialchars($b['embarque_par_nom']) ?></small>
                                                 <?php endif; ?>
                                             <?php else: ?>
                                                 <span class="badge bg-warning text-dark">En attente</span>
                                             <?php endif; ?>
                                         </td>
                                         <td data-label="Action">
-                                            <?php if (($b->statut_embarquement ?? null) === 'embarque'): ?>
+                                            <?php if (($b['statut_embarquement'] ?? null) === 'embarque'): ?>
                                                 <form action="<?= BASE_URL ?>/admin/Liste_du_jours/annulerEmbarquement" method="post" class="d-inline">
                                                     <?= csrf_field() ?>
-                                                    <input type="hidden" name="idBillets" value="<?= $b->idBillets ?>">
+                                                    <input type="hidden" name="idBillets" value="<?= $b['idBillets'] ?>">
                                                     <button type="submit" class="btn btn-sm btn-outline-secondary">
                                                         <i class="bx bx-undo"></i> Annuler
                                                     </button>
@@ -139,13 +139,13 @@
                                             <?php else: ?>
                                                 <form action="<?= BASE_URL ?>/admin/Liste_du_jours/marquerEmbarque" method="post" class="d-inline">
                                                     <?= csrf_field() ?>
-                                                    <input type="hidden" name="idBillets" value="<?= $b->idBillets ?>">
+                                                    <input type="hidden" name="idBillets" value="<?= $b['idBillets'] ?>">
                                                     <button type="submit" class="btn btn-sm btn-success">
                                                         <i class="bx bx-check"></i> Embarquer
                                                     </button>
                                                 </form>
                                                 <button type="button" class="btn btn-sm btn-outline-danger btn-demander-report"
-                                                    data-id="<?= $b->idBillets ?>" data-client="<?= htmlspecialchars($b->Client) ?>"
+                                                    data-id="<?= $b['idBillets'] ?>" data-client="<?= htmlspecialchars($b['Client'] ?? '-') ?>"
                                                     data-bs-toggle="modal" data-bs-target="#modalDemanderReport">
                                                     <i class="bx bx-calendar-x"></i> Demander le report
                                                 </button>
