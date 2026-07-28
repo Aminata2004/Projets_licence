@@ -264,27 +264,34 @@ public function saveCaisse()
     // garantir l'unicité même si deux caisses sont ouvertes le même jour.
     $reference_caise = 'RF' . date('md') . '-' . $id_agence . '-' . random_int(100, 999);
 
-    // ⚡ Vérifier si une caisse active existe déjà pour cette agence
-    $sql = "SELECT COUNT(*) as total 
-            FROM caisse 
-            WHERE id_agence = :id_agence 
-              AND status_caisse = 1";
+    // ⚡ Vérifier si une caisse active existe déjà pour cette agence, en verrouillant la
+    // ligne agence (FOR UPDATE) le temps de la transaction : sans ça, deux ouvertures de
+    // caisse soumises en même temps pour la même agence peuvent toutes les deux lire "aucune
+    // caisse active" avant qu'aucune n'écrive, et créer deux caisses actives en parallèle
+    // (les encaissements suivants se répartiraient alors au hasard entre les deux).
+    $pdo = $this->connect();
+    $pdo->beginTransaction();
+    try {
+        $pdo->prepare("SELECT idAgence FROM agence WHERE idAgence = :id_agence FOR UPDATE")
+            ->execute([":id_agence" => $id_agence]);
 
-    $stmt = $this->connect()->prepare($sql);
-    $stmt->execute([":id_agence" => $id_agence]);
-    $check = $stmt->fetch(PDO::FETCH_OBJ);
+        $stmt = $pdo->prepare(
+            "SELECT COUNT(*) as total FROM caisse WHERE id_agence = :id_agence AND status_caisse = 1"
+        );
+        $stmt->execute([":id_agence" => $id_agence]);
+        $check = $stmt->fetch(PDO::FETCH_OBJ);
 
-    if ($check && $check->total > 0) {
-        // Une caisse active existe déjà → refus
-        $this->set_flash("Impossible d’ouvrir une nouvelle caisse : une caisse active existe déjà pour cette localité.", "danger");
-        return false;
-    }
+        if ($check && $check->total > 0) {
+            $pdo->rollBack();
+            $this->set_flash("Impossible d’ouvrir une nouvelle caisse : une caisse active existe déjà pour cette localité.", "danger");
+            return false;
+        }
 
-    // ✅ Sinon on insère
-    $insertion = $this->insertion_update_simples(
-        "INSERT INTO caisse(id_compagnie, id_agence, montant_initial, montant_billets, montant_colis, date_enregistrement, reference_caise, status_caisse) 
-         VALUES(:id_compagnie, :id_agence, :montant_initial, :montant_billets, :montant_colis, :date_enregistrement, :reference_caise, :status_caisse)",
-        [
+        $stmtInsert = $pdo->prepare(
+            "INSERT INTO caisse(id_compagnie, id_agence, montant_initial, montant_billets, montant_colis, date_enregistrement, reference_caise, status_caisse)
+             VALUES(:id_compagnie, :id_agence, :montant_initial, :montant_billets, :montant_colis, :date_enregistrement, :reference_caise, :status_caisse)"
+        );
+        $insertion = $stmtInsert->execute([
             ":id_compagnie"       => $id_compagnie,
             ":id_agence"          => $id_agence,
             ":montant_initial"    => $montant_initial,
@@ -293,14 +300,20 @@ public function saveCaisse()
             ":date_enregistrement"=> $date_enregistrement,
             ":reference_caise"    => $reference_caise,
             ":status_caisse"      => 1
-        ]
-    );
+        ]);
 
-    if ($insertion == true) {
-        $this->set_flash("Caisse ouverte avec succès.", "success");
-        return true;
-    } else {
+        if ($insertion) {
+            $pdo->commit();
+            $this->set_flash("Caisse ouverte avec succès.", "success");
+            return true;
+        }
+
+        $pdo->rollBack();
         $this->set_flash("Erreur lors de l'ajout de la caisse.", "danger");
+        return false;
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        $this->set_flash("Erreur lors de l'ouverture de la caisse.", "danger");
         return false;
     }
 }

@@ -206,57 +206,88 @@ $fromAndWhere = "liaison_car_trajet
         // reprogrammé une seconde fois, écrasant le compteur de places du trajet en cours.
         // Un car peut légitimement faire plusieurs tournées par jour, mais seulement après
         // que son arrivée ait été validée (validerArrivee() le rend de nouveau disponible).
-        $car = $this->fetchOne(
-            "SELECT status_car FROM car WHERE id_car = :id_car AND id_compagnie = :id_compagnie",
-            [':id_car' => $id_care, ':id_compagnie' => $id_compagnie]
-        );
+        //
+        // Verrouillé (FOR UPDATE) le temps de la transaction : sans ça, deux programmations
+        // du MEME car vers deux trajets différents, soumises à quelques millisecondes
+        // d'intervalle, pourraient toutes les deux lire "disponible" avant qu'aucune n'écrive,
+        // affectant un seul car physique à deux trajets simultanés.
+        $pdo = $this->connect();
+        $pdo->beginTransaction();
+        try {
+            $stmtCar = $pdo->prepare(
+                "SELECT status_car FROM car WHERE id_car = :id_car AND id_compagnie = :id_compagnie FOR UPDATE"
+            );
+            $stmtCar->execute([':id_car' => $id_care, ':id_compagnie' => $id_compagnie]);
+            $car = $stmtCar->fetch(PDO::FETCH_ASSOC);
 
-        if (!$car) {
+            if (!$car) {
+                $pdo->rollBack();
+                return false;
+            }
+
+            $statusCar = $car['status_car'];
+            if ($statusCar !== null && strpos($statusCar, 'En_transit_') === 0) {
+                $pdo->rollBack();
+                return false;
+            }
+
+            // chef_d_escale (pas d'id_depart fourni) : le car doit être physiquement dans sa
+            // gare. Admin (id_depart fourni) : peut réaffecter un car présent ailleurs dans sa
+            // compagnie (choix déjà assumé dans getProgrammationCars() pour ce rôle).
+            if ($id_depart === null && $statusCar !== $localite_user) {
+                $pdo->rollBack();
+                return false;
+            }
+
+            // Revérifie qu'aucune programmation n'existe déjà pour ce car sur CE créneau
+            // exact (même horaire, même jour) : le check de statut ci-dessus couvre "car en
+            // route", mais pas deux programmations pour le même créneau avant tout départ.
+            $stmtDoublon = $pdo->prepare(
+                "SELECT COUNT(*) FROM programmation_voyage
+                 WHERE id_car_programmer = :id_car AND id_horaire = :h AND date_enregistre = :d AND id_compagnie = :ic"
+            );
+            $stmtDoublon->execute([
+                ':id_car' => $id_care, ':h' => $id_horaire, ':d' => $date_enregistre, ':ic' => $id_compagnie,
+            ]);
+            if ((int)$stmtDoublon->fetchColumn() > 0) {
+                $pdo->rollBack();
+                return false;
+            }
+
+            // 1. Insertion dans programmation_voyage
+            $stmtInsert = $pdo->prepare(
+                "INSERT INTO programmation_voyage (
+                    id_car_programmer, id_horaire, id_trajet, localite_user, id_agence, id_agence_destination, date_enregistre, id_compagnie
+               ) VALUES (
+                    :id_car_programmer, :id_horaire, :id_trajet, :localite_user, :id_agence, :id_agence_destination, :date_enregistre, :id_compagnie
+               )"
+            );
+            $result = $stmtInsert->execute([
+                ':id_car_programmer' => $id_care,
+                ':id_horaire' => $id_horaire,
+                ':id_trajet' => $id_destination,
+                ':localite_user' => $localite_user,
+                ':id_agence' => $id_agence,
+                ':id_agence_destination' => $id_agence_destination,
+                ':date_enregistre' => $date_enregistre,
+                ':id_compagnie' => $id_compagnie
+            ]);
+
+            // 2. Recalculer (jamais remettre à 0 aveuglément) le nombre de places déjà réservées
+            //    sur ce créneau exact : une reprogrammation ne doit jamais faire "disparaître" des
+            //    billets déjà vendus (aujourd'hui ou demain), sinon les places redeviennent
+            //    disponibles alors que des tickets existent déjà dessus (risque de survente).
+            $placesDejaVendues = $this->countPlacesVendues($id_horaire, $id_destination, $localite_user, $date_enregistre, $id_compagnie, $id_agence);
+
+            $pdo->prepare("UPDATE car SET nbr_place_reserve = :n WHERE id_car = :id_car")
+                ->execute([':n' => $placesDejaVendues, ':id_car' => $id_care]);
+
+            $pdo->commit();
+            return $result;
+        } catch (Throwable $e) {
+            $pdo->rollBack();
             return false;
         }
-
-        $statusCar = $car['status_car'];
-        if ($statusCar !== null && strpos($statusCar, 'En_transit_') === 0) {
-            return false;
-        }
-
-        // chef_d_escale (pas d'id_depart fourni) : le car doit être physiquement dans sa gare.
-        // Admin (id_depart fourni) : peut réaffecter un car présent ailleurs dans sa compagnie
-        // (choix déjà assumé dans getProgrammationCars() pour ce rôle).
-        if ($id_depart === null && $statusCar !== $localite_user) {
-            return false;
-        }
-
-        // 1. Insertion dans programmation_voyage
-        $insert = "INSERT INTO programmation_voyage (
-            id_car_programmer, id_horaire, id_trajet, localite_user, id_agence, id_agence_destination, date_enregistre, id_compagnie
-       ) VALUES (
-            :id_car_programmer, :id_horaire, :id_trajet, :localite_user, :id_agence, :id_agence_destination, :date_enregistre, :id_compagnie
-       )";
-
-        $params = [
-            ':id_car_programmer' => $id_care,
-            ':id_horaire' => $id_horaire,
-            ':id_trajet' => $id_destination,
-            ':localite_user' => $localite_user,
-            ':id_agence' => $id_agence,
-            ':id_agence_destination' => $id_agence_destination,
-            ':date_enregistre' => $date_enregistre,
-            ':id_compagnie' => $id_compagnie
-        ];
-
-        $result = $this->insertion_update_simples($insert, $params);
-
-        // 2. Recalculer (jamais remettre à 0 aveuglément) le nombre de places déjà réservées
-        //    sur ce créneau exact : une reprogrammation ne doit jamais faire "disparaître" des
-        //    billets déjà vendus (aujourd'hui ou demain), sinon les places redeviennent
-        //    disponibles alors que des tickets existent déjà dessus (risque de survente).
-        $placesDejaVendues = $this->countPlacesVendues($id_horaire, $id_destination, $localite_user, $date_enregistre, $id_compagnie, $id_agence);
-
-        $update = "UPDATE car SET nbr_place_reserve = :n WHERE id_car = :id_car";
-        $this->insertion_update_simples($update, [':n' => $placesDejaVendues, ':id_car' => $id_care]);
-
-        return $result;
     }
 
     // Toutes les valeurs de destinationId qui correspondent à un créneau donné : la destination

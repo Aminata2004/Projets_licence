@@ -341,14 +341,17 @@ class Depense extends Model
             return false;
         }
 
-        // Mettre à jour le statut
+        // Reservation atomique du statut ("compare-and-swap") : sans le "AND statut =
+        // 'en_attente'" ici, deux validations (ou une validation + un rejet) lancees en
+        // meme temps pourraient toutes les deux passer le test ci-dessus avant qu'aucune
+        // n'ecrive, et deduireCaisse() serait alors appelee deux fois pour la meme depense.
         $update = $this->insertion_update_simples(
-            "UPDATE depense SET statut = 'valide' WHERE id_depense = :id",
+            "UPDATE depense SET statut = 'valide' WHERE id_depense = :id AND statut = 'en_attente'",
             [":id" => $id]
         );
 
-        if (!$update) {
-            $this->set_flash("Erreur lors de la validation de la dépense.", "danger");
+        if ($update->rowCount() === 0) {
+            $this->set_flash("Cette dépense a déjà été traitée entre-temps par quelqu'un d'autre.", "warning");
             return false;
         }
 
@@ -386,18 +389,19 @@ class Depense extends Model
             return false;
         }
 
-        // Mettre à jour le statut
+        // Meme garde que validerDepense() : empeche un rejet d'ecraser une depense deja
+        // validee (et donc deja deduite de la caisse) par une validation concurrente.
         $update = $this->insertion_update_simples(
-            "UPDATE depense SET statut = 'rejete' WHERE id_depense = :id",
+            "UPDATE depense SET statut = 'rejete' WHERE id_depense = :id AND statut = 'en_attente'",
             [":id" => $id]
         );
 
-        if ($update) {
+        if ($update->rowCount() > 0) {
             $this->set_flash("Dépense rejetée avec succès.", "success");
             return true;
         }
 
-        $this->set_flash("Erreur lors du rejet de la dépense.", "danger");
+        $this->set_flash("Cette dépense a déjà été traitée entre-temps par quelqu'un d'autre.", "warning");
         return false;
     }
 }

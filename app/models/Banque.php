@@ -356,16 +356,26 @@ class Banque extends Model
             return false;
         }
 
-        $this->insertion_update_simples(
+        // Compare-and-swap : sans le "AND statut = 'en_attente'" ici, un rejet lance juste
+        // apres qu'un Admin (dans un autre onglet) a confirme ce meme depot (confirmerDemande,
+        // qui a deja deplace l'argent caisse -> banque) pourrait ecraser son statut en
+        // "rejete" alors que l'argent a bel et bien deja bouge — dangereux pour la
+        // reconciliation comptable.
+        $update = $this->insertion_update_simples(
             "UPDATE depots_banque
              SET statut = 'rejete', motif_rejet = :motif, id_utilisateur_validateur = :u, date_validation = NOW()
-             WHERE id_depot = :id",
+             WHERE id_depot = :id AND statut = 'en_attente'",
             [
                 ':motif' => trim($_POST['motif_rejet'] ?? '') ?: null,
                 ':u'     => $_SESSION['id_utilisateur'],
                 ':id'    => $id_depot
             ]
         );
+
+        if ($update->rowCount() === 0) {
+            $this->set_flash("Cette demande a déjà été traitée entre-temps par quelqu'un d'autre.", "warning");
+            return false;
+        }
 
         $this->set_flash("Demande rejetée.", "success");
         return true;

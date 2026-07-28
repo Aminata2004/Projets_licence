@@ -88,18 +88,26 @@ class Caisse_utilisateur extends Model
             return false;
         }
 
-        // Vérifier qu'il n'y a pas déjà une caisse ouverte aujourd'hui
-        $existante = $this->getCaisseOuverte($idUser);
-        if ($existante) {
-            $this->set_flash("Vous avez déjà une caisse ouverte aujourd'hui (Réf : {$existante->reference}).", "warning");
-            return false;
-        }
-
         $reference = 'CU' . date('Ymd') . '-' . $idUser . '-' . random_int(100, 999);
         $pdo       = $this->connect();
 
         try {
             $pdo->beginTransaction();
+
+            // Verrouille l'utilisateur le temps de la transaction : sans ça, deux clics rapides
+            // (ou deux onglets) sur "Ouvrir ma caisse" peuvent tous les deux lire "aucune caisse
+            // ouverte" avant qu'aucun n'écrive, et créer deux caisses ouvertes en parallèle pour
+            // le même utilisateur le même jour (les crédits de vente iraient alors au hasard sur
+            // l'une ou l'autre).
+            $pdo->prepare("SELECT idUser FROM utilisateur WHERE idUser = :id FOR UPDATE")
+                ->execute([':id' => $idUser]);
+
+            $existante = $this->getCaisseOuverte($idUser);
+            if ($existante) {
+                $pdo->rollBack();
+                $this->set_flash("Vous avez déjà une caisse ouverte aujourd'hui (Réf : {$existante->reference}).", "warning");
+                return false;
+            }
 
             $stmt = $pdo->prepare("
                 INSERT INTO caisse_utilisateur
@@ -242,18 +250,29 @@ class Caisse_utilisateur extends Model
         try {
             $pdo->beginTransaction();
 
-            $pdo->prepare("
+            // Compare-and-swap : sans le "AND statut = 'ouverte'" ici, deux clics sur
+            // "Fermer la caisse" pourraient tous les deux passer le check ci-dessus (fait
+            // avant la transaction) et créer deux entrées de journal "fermeture" pour la
+            // même caisse.
+            $stmtFermer = $pdo->prepare("
                 UPDATE caisse_utilisateur
                 SET statut           = 'fermee',
                     heure_fermeture  = NOW(),
                     montant_compte   = :montant_compte,
                     ecart            = :ecart
-                WHERE id_caisse_user = :id
-            ")->execute([
+                WHERE id_caisse_user = :id AND statut = 'ouverte'
+            ");
+            $stmtFermer->execute([
                 ':montant_compte' => $montantCompte,
                 ':ecart'          => $ecart,
                 ':id'             => $idCaisseUser,
             ]);
+
+            if ($stmtFermer->rowCount() === 0) {
+                $pdo->rollBack();
+                $this->set_flash("Cette caisse a déjà été fermée entre-temps.", "warning");
+                return false;
+            }
 
             $this->insererJournal($pdo, $idCaisseUser, $idUser, 'fermeture', $caisse->reference, $montantCompte,
                 "Fermeture – attendu: {$montantAttendu} FCFA, compté: {$montantCompte} FCFA, écart: {$ecart} FCFA");
@@ -335,16 +354,23 @@ class Caisse_utilisateur extends Model
             return false;
         }
 
-        // Vérifier qu'il n'existe pas déjà un versement pour cette caisse
-        $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM versements_caisse WHERE id_caisse_user = :id AND statut != 'rejete'");
-        $stmtCheck->execute([':id' => $idCaisseUser]);
-        if ($stmtCheck->fetchColumn() > 0) {
-            $this->set_flash("Un versement existe déjà pour cette caisse.", "warning");
-            return false;
-        }
-
         try {
             $pdo->beginTransaction();
+
+            // Verrouille la caisse le temps de la transaction, puis revérifie qu'aucun
+            // versement n'existe déjà : sans ça, deux soumissions rapides du même formulaire
+            // (double-clic) pouvaient toutes les deux passer ce contrôle avant qu'aucune
+            // n'écrive, et créer deux versements pour la même caisse.
+            $pdo->prepare("SELECT id_caisse_user FROM caisse_utilisateur WHERE id_caisse_user = :id FOR UPDATE")
+                ->execute([':id' => $idCaisseUser]);
+
+            $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM versements_caisse WHERE id_caisse_user = :id AND statut != 'rejete'");
+            $stmtCheck->execute([':id' => $idCaisseUser]);
+            if ($stmtCheck->fetchColumn() > 0) {
+                $pdo->rollBack();
+                $this->set_flash("Un versement existe déjà pour cette caisse.", "warning");
+                return false;
+            }
 
             $pdo->prepare("
                 INSERT INTO versements_caisse
@@ -424,11 +450,21 @@ class Caisse_utilisateur extends Model
         try {
             $pdo->beginTransaction();
 
-            $pdo->prepare("
+            // Compare-and-swap : sans le "AND statut = 'en_attente'" ici, valider et rejeter
+            // lancés au même moment (deux onglets, double-clic) pourraient tous les deux
+            // passer le SELECT ci-dessus avant qu'aucun n'écrive.
+            $stmtValider = $pdo->prepare("
                 UPDATE versements_caisse
                 SET statut = :statut, date_validation = NOW()
-                WHERE id_versement = :id
-            ")->execute([':statut' => $action, ':id' => $idVersement]);
+                WHERE id_versement = :id AND statut = 'en_attente'
+            ");
+            $stmtValider->execute([':statut' => $action, ':id' => $idVersement]);
+
+            if ($stmtValider->rowCount() === 0) {
+                $pdo->rollBack();
+                $this->set_flash("Ce versement a déjà été traité entre-temps.", "warning");
+                return false;
+            }
 
             $pdo->commit();
 

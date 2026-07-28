@@ -121,6 +121,39 @@ class Location_car extends Model
             return false;
         }
 
+        // Le check ci-dessus n'est pas suffisant seul : deux locations pour LE MEME car sur
+        // des periodes qui se chevauchent, soumises a quelques millisecondes d'intervalle,
+        // peuvent toutes les deux le lire comme disponible avant qu'aucune n'ecrive. On
+        // reverrouille ce car precis (FOR UPDATE) et on rejoue le test de chevauchement dans
+        // la transaction : la 2e requete, bloquee le temps de la 1ere, le retrouvera alors
+        // pris et sera rejetee proprement au lieu de doubler la reservation.
+        $pdo = $this->connect();
+        $pdo->beginTransaction();
+        try {
+            $pdo->prepare("SELECT id_car FROM car WHERE id_car = :id_car FOR UPDATE")
+                ->execute([':id_car' => $id_car]);
+
+            $stmtConflit = $pdo->prepare(
+                "SELECT COUNT(*) FROM location_car
+                 WHERE id_car = :id_car AND statut IN ('en_attente', 'valide')
+                   AND date_depart <= :date_retour AND date_retour_prevu >= :date_depart"
+            );
+            $stmtConflit->execute([
+                ':id_car' => $id_car,
+                ':date_depart' => $date_depart,
+                ':date_retour' => $date_retour_prevu,
+            ]);
+            if ((int)$stmtConflit->fetchColumn() > 0) {
+                $pdo->rollBack();
+                $this->set_flash("Ce car vient d'être réservé sur cette période par quelqu'un d'autre. Veuillez en choisir un autre.", "danger");
+                return false;
+            }
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            $this->set_flash("Erreur lors de la vérification de disponibilité du car.", "danger");
+            return false;
+        }
+
         $statut = in_array($droit, ['Admin', 'super_admin'], true) ? 'valide' : 'en_attente';
 
         // Meme logique a deux niveaux que Depense::saveDepense() : un chef d'escale credite
@@ -142,6 +175,7 @@ class Location_car extends Model
                 [':id_utilisateur' => $_SESSION['id_utilisateur']]
             );
             if (!$caisseUser) {
+                $pdo->rollBack();
                 $this->set_flash("Vous devez avoir votre propre caisse ouverte pour enregistrer une location.", "danger");
                 return false;
             }
@@ -169,40 +203,44 @@ class Location_car extends Model
             }
 
             if (!$id_caisse && !$id_caisse_user) {
+                $pdo->rollBack();
                 $this->set_flash("Aucune caisse ouverte pour cette gare : impossible d'enregistrer la location.", "danger");
                 return false;
             }
         }
 
-        $insertion = $this->insertion_update_simples(
+        $stmtInsert = $pdo->prepare(
             "INSERT INTO location_car
                 (id_compagnie, id_agence_depart, destination, id_car, id_caisse, id_caisse_user, nom_client, prenom_client,
                  telephone_client, date_depart, date_retour_prevu, frais_location, statut, id_utilisateur)
              VALUES
                 (:id_compagnie, :id_agence_depart, :destination, :id_car, :id_caisse, :id_caisse_user, :nom_client, :prenom_client,
-                 :telephone_client, :date_depart, :date_retour_prevu, :frais_location, :statut, :id_utilisateur)",
-            [
-                ':id_compagnie'      => $id_compagnie,
-                ':id_agence_depart'  => $id_agence_depart,
-                ':destination'       => trim($destination),
-                ':id_car'            => $id_car,
-                ':id_caisse'         => $id_caisse,
-                ':id_caisse_user'    => $id_caisse_user,
-                ':nom_client'        => trim($nom_client),
-                ':prenom_client'     => trim($prenom_client),
-                ':telephone_client'  => trim($telephone_client),
-                ':date_depart'       => $date_depart,
-                ':date_retour_prevu' => $date_retour_prevu,
-                ':frais_location'    => $frais_location,
-                ':statut'            => $statut,
-                ':id_utilisateur'    => $_SESSION['id_utilisateur']
-            ]
+                 :telephone_client, :date_depart, :date_retour_prevu, :frais_location, :statut, :id_utilisateur)"
         );
+        $insertion = $stmtInsert->execute([
+            ':id_compagnie'      => $id_compagnie,
+            ':id_agence_depart'  => $id_agence_depart,
+            ':destination'       => trim($destination),
+            ':id_car'            => $id_car,
+            ':id_caisse'         => $id_caisse,
+            ':id_caisse_user'    => $id_caisse_user,
+            ':nom_client'        => trim($nom_client),
+            ':prenom_client'     => trim($prenom_client),
+            ':telephone_client'  => trim($telephone_client),
+            ':date_depart'       => $date_depart,
+            ':date_retour_prevu' => $date_retour_prevu,
+            ':frais_location'    => $frais_location,
+            ':statut'            => $statut,
+            ':id_utilisateur'    => $_SESSION['id_utilisateur']
+        ]);
 
         if (!$insertion) {
+            $pdo->rollBack();
             $this->set_flash("Erreur lors de l'enregistrement de la location.", "danger");
             return false;
         }
+
+        $pdo->commit();
 
         if ($statut === 'valide') {
             $this->crediterCaisse($id_caisse, $id_caisse_user, (float)$frais_location);
@@ -314,12 +352,16 @@ class Location_car extends Model
             return false;
         }
 
+        // Compare-and-swap : sans "AND statut = 'en_attente'" ici, deux validations (ou une
+        // validation + un rejet) concurrentes pourraient toutes les deux passer le test
+        // ci-dessus avant qu'aucune n'ecrive, et crediterCaisse() serait appelee deux fois.
         $update = $this->insertion_update_simples(
-            "UPDATE location_car SET statut = 'valide', id_valide_par = :id_valide_par WHERE id_location = :id",
+            "UPDATE location_car SET statut = 'valide', id_valide_par = :id_valide_par
+             WHERE id_location = :id AND statut = 'en_attente'",
             [":id" => $id, ":id_valide_par" => $_SESSION['id_utilisateur']]
         );
-        if (!$update) {
-            $this->set_flash("Erreur lors de la validation de la location.", "danger");
+        if ($update->rowCount() === 0) {
+            $this->set_flash("Cette location a déjà été traitée entre-temps par quelqu'un d'autre.", "warning");
             return false;
         }
 
@@ -353,17 +395,19 @@ class Location_car extends Model
             return false;
         }
 
+        // Meme garde que validerLocation() : empeche un rejet d'ecraser une location deja
+        // validee (et donc deja creditee a la caisse) par une validation concurrente.
         $update = $this->insertion_update_simples(
-            "UPDATE location_car SET statut = 'rejete' WHERE id_location = :id",
+            "UPDATE location_car SET statut = 'rejete' WHERE id_location = :id AND statut = 'en_attente'",
             [":id" => $id]
         );
 
-        if ($update) {
+        if ($update->rowCount() > 0) {
             $this->set_flash("Location rejetée avec succès.", "success");
             return true;
         }
 
-        $this->set_flash("Erreur lors du rejet de la location.", "danger");
+        $this->set_flash("Cette location a déjà été traitée entre-temps par quelqu'un d'autre.", "warning");
         return false;
     }
 }
