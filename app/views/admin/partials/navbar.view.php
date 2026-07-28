@@ -80,7 +80,21 @@
             $locationsEnAttente = $stmtLoc->fetchAll(PDO::FETCH_ASSOC);
           }
 
-          $notifCount = count($billets) + count($locationsEnAttente);
+          // Passagers non embarques, en retard de plus de 30 minutes sur leur depart du
+          // jour : pertinent uniquement pour le chef d'escale (sa gare) et l'Admin (toute
+          // la compagnie), pas pour un simple Utilisateur.
+          $billetsEnRetard = [];
+          if ($_SESSION['droit'] === 'chef_d_escale') {
+            $billetsEnRetard = (new Liste_du_jour())->getBilletsEnRetard(
+              $_SESSION['ville'] ?? null,
+              $_SESSION['numero_gare'] ?? null,
+              $_SESSION['id_compagnie']
+            );
+          } elseif ($_SESSION['droit'] === 'Admin') {
+            $billetsEnRetard = (new Liste_du_jour())->getBilletsEnRetard(null, null, $_SESSION['id_compagnie']);
+          }
+
+          $notifCount = count($billets) + count($locationsEnAttente) + count($billetsEnRetard);
 
           ?>
      
@@ -125,6 +139,20 @@
                           <small class="mb-0 dropdown-msg-text text-secondary">
                             <span class="badge bg-secondary me-1"><?= htmlspecialchars($location['localite'] ?? '-'); ?></span>
                             <?= htmlspecialchars($location['destination']); ?> - <?= number_format($location['frais_location'], 0, ',', ' ') ?> F
+                          </small>
+                        </div>
+                      </div>
+                    </a>
+                  <?php endforeach; ?>
+                  <?php foreach ($billetsEnRetard as $billetRetard): ?>
+                    <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Liste_du_jours/embarquement?destination=<?= urlencode($billetRetard['destinationId']) ?>&heure=<?= urlencode($billetRetard['Heur_departs']) ?>">
+                      <div class="d-flex align-items-center">
+                        <div class="notification-box"><i class="bx bx-time-five text-danger"></i></div>
+                        <div class="ms-3 flex-grow-1">
+                          <h6 class="mb-0 dropdown-msg-user">Client non embarqué (retard)</h6>
+                          <small class="mb-0 dropdown-msg-text text-secondary">
+                            <?= htmlspecialchars($billetRetard['Client']); ?> —
+                            <?= htmlspecialchars($billetRetard['destinationId']); ?> - <?= htmlspecialchars($billetRetard['Heur_departs']); ?>
                           </small>
                         </div>
                       </div>

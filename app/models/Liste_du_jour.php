@@ -756,10 +756,18 @@
 
     // Billets d'un trajet/date donnes, pour l'ecran Embarquement. Les billets annules ou en
     // attente de traitement (annulation/report) sont exclus : rien a embarquer pour eux.
+    //
+    // Un billet deja embarque disparait de la liste une fois son heure de depart passee
+    // (le bus est parti, plus rien a faire dessus) : comportement historique de la liste
+    // papier, repris ici. Un billet NON embarque, lui, reste toujours visible meme apres
+    // l'heure de depart — on laisse une marge de retard (cf. getBilletsEnRetard(), qui
+    // alerte via la cloche apres 30 minutes) plutot que de faire disparaitre silencieusement
+    // un client qui n'a pas ete pris en charge.
     public function getBilletsPourEmbarquement($idDepart, $numeroGare, $jourVoyage, $destination = '', $heure = '')
     {
       $where = 'b.id_compagnie = :id_compagnie AND b.jourVoyage = :jour
-                 AND (b.status_billets IS NULL OR b.status_billets = \'\')';
+                 AND (b.status_billets IS NULL OR b.status_billets = \'\')
+                 AND NOT (b.statut_embarquement = \'embarque\' AND TIMESTAMP(b.jourVoyage, b.Heur_departs) < NOW())';
       $params = [':id_compagnie' => $_SESSION['id_compagnie'] ?? null, ':jour' => $jourVoyage];
 
       if ($idDepart !== null) {
@@ -786,6 +794,37 @@
          FROM billets b
          INNER JOIN client c ON b.id_client = c.idClient
          LEFT JOIN utilisateur ue ON ue.idUser = b.embarque_par
+         WHERE $where
+         ORDER BY b.Heur_departs, c.Client",
+        $params
+      );
+    }
+
+    // Billets du jour non embarques dont l'heure de depart est passee depuis plus de 30
+    // minutes (marge de retard). Alimente la cloche de notification (chef d'escale/Admin) :
+    // sans ca, un client absent au depart passerait inapercu une fois que personne n'a
+    // pense a verifier manuellement la liste d'embarquement.
+    public function getBilletsEnRetard($idDepart, $numeroGare, $id_compagnie)
+    {
+      $where = "b.id_compagnie = :id_compagnie AND b.jourVoyage = CURDATE()
+                 AND (b.status_billets IS NULL OR b.status_billets = '')
+                 AND (b.statut_embarquement IS NULL OR b.statut_embarquement != 'embarque')
+                 AND TIMESTAMP(b.jourVoyage, b.Heur_departs) < NOW() - INTERVAL 30 MINUTE";
+      $params = [':id_compagnie' => $id_compagnie];
+
+      if ($idDepart !== null) {
+        $where .= ' AND b.departId = :depart';
+        $params[':depart'] = $idDepart;
+      }
+      if ($numeroGare !== null) {
+        $where .= ' AND b.num_gare = :numeroGare';
+        $params[':numeroGare'] = $numeroGare;
+      }
+
+      return $this->fetchAll(
+        "SELECT b.idBillets, b.destinationId, b.Heur_departs, c.Client
+         FROM billets b
+         INNER JOIN client c ON b.id_client = c.idClient
          WHERE $where
          ORDER BY b.Heur_departs, c.Client",
         $params
