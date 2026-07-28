@@ -89,16 +89,6 @@
           </ul>
           </li>
 
-          <?php if ($user->userHasPermission('colis_historique')) { ?>
-            <li>
-              <a href="<?= BASE_URL ?>/admin/Colis_prise_en_charges/historique_colis">
-                <div class="font-22"> <i class="bx bx-history"></i>
-                </div>
-                <div class="menu-title">Historique des colis</div>
-              </a>
-            </li>
-          <?php }
-          ?>
           <?php if ($user->userHasPermission('colis_creation')) { ?>
             <li class="menu-label">Gestion des colis</li>
             <li>
@@ -184,7 +174,7 @@
                 <li class="menu-label">Finances</li>
                 <li>
                   <a href="javascript:;" class="has-arrow">
-                    <div class="parent-icon"><i class="bx bx-money-withdraw"></i>
+                    <div class="parent-icon"><i class="bx bx-money"></i>
                     </div>
                     <div class="menu-title">Dépenses</div>
                   </a>
@@ -207,6 +197,21 @@
                     <li> <a href="<?= BASE_URL ?>/admin/Locations_cars"><i class="bi bi-arrow-right-short"></i>Gérer les locations</a>
                     </li>
                   </ul>
+                </li>
+              <?php endif; ?>
+
+              <?php
+                $peutVoirUtilisateurs = $user->userHasPermission('utilisateur_apercu');
+                $peutVoirChauffeurs = $user->userHasPermission('Configuration_gestion_car/chauffeur');
+              ?>
+              <?php if ($peutVoirUtilisateurs || $peutVoirChauffeurs): ?>
+                <li class="menu-label">Personnel</li>
+                <li>
+                  <a href="<?= BASE_URL ?>/admin/Employes">
+                    <div class="parent-icon"><i class="bx bx-id-card"></i>
+                    </div>
+                    <div class="menu-title">Employés</div>
+                  </a>
                 </li>
               <?php endif; ?>
 
