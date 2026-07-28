@@ -477,8 +477,8 @@
         return false;
       }
 
-      if (in_array($billet->status_billets ?? null, ['annule', 'annulation_demandee'], true)) {
-        $this->set_flash("Ce billet est déjà annulé ou une demande d'annulation est déjà en cours.", "warning");
+      if (!in_array($billet->status_billets ?? null, [null, ''], true)) {
+        $this->set_flash("Ce billet est déjà annulé ou une demande (annulation/report) est déjà en cours.", "warning");
         return false;
       }
 
@@ -856,8 +856,12 @@
       if (($billet->statut_embarquement ?? null) === 'embarque') {
         return ['ok' => true, 'deja' => true, 'message' => 'Déjà embarqué.'];
       }
-      if (in_array($billet->status_billets ?? null, ['annule', 'annulation_demandee', 'report_demande'], true)) {
-        return ['ok' => false, 'deja' => false, 'message' => "Annulé ou en attente de traitement : impossible de l'embarquer."];
+      // Meme garde que le filtre de getBilletsPourEmbarquement() (status_billets IS NULL/vide) :
+      // un billet annule ou en cours de report (quelle que soit l'etape — demande, transmis,
+      // en_validation — ou d'annulation) n'a pas a etre embarque, meme si la requete arrive
+      // directement (rejeu, ancien onglet ouvert) sans passer par la liste affichee a l'ecran.
+      if (!in_array($billet->status_billets ?? null, [null, ''], true)) {
+        return ['ok' => false, 'deja' => false, 'message' => "Annulé ou en attente de traitement (report/annulation) : impossible de l'embarquer."];
       }
 
       $ok = $this->insertion_update_simples(
@@ -1013,7 +1017,7 @@
         $this->set_flash("Ce client est déjà embarqué : aucune raison de le reporter.", "warning");
         return false;
       }
-      if (in_array($billet->status_billets ?? null, ['annule', 'annulation_demandee', 'report_demande', 'report_transmis'], true)) {
+      if (!in_array($billet->status_billets ?? null, [null, ''], true)) {
         $this->set_flash("Ce billet est déjà annulé ou une demande est déjà en cours.", "warning");
         return false;
       }
