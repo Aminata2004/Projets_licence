@@ -23,7 +23,10 @@
                 if ($heure && $destination) {
                     $model = new Liste_du_jour();
 
-                    $where = 'billets.id_compagnie = :id_compagnie AND billets.destinationId = :destination AND billets.Heur_departs = :heure AND billets.jourVoyage = :jour';
+                    // Une fois l'heure de depart passee, le billet n'a plus rien a faire dans
+                    // la liste "a voir" du jour (meme regle que liste_du_jours.view.php).
+                    $where = 'billets.id_compagnie = :id_compagnie AND billets.destinationId = :destination AND billets.Heur_departs = :heure AND billets.jourVoyage = :jour
+                              AND TIMESTAMP(billets.jourVoyage, billets.Heur_departs) >= NOW()';
                     $params = [
                         'id_compagnie' => $id_compagnie,
                         'destination' => $destination,

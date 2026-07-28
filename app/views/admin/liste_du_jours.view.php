@@ -155,7 +155,11 @@
                                 foreach ($liste_du_jour as $item): ?>
                                     <?php
                                      date_default_timezone_set('Africa/Bamako');
-                                    if ($item->jourVoyage == date("Y-m-d")): ?>
+                                    // Une fois l'heure de depart passee, le billet n'a plus rien a faire dans
+                                    // la liste "a voir" du jour (meme logique que l'ecran Embarquement pour
+                                    // les billets deja embarques) : seuls les departs encore a venir s'affichent.
+                                    $departDejaPasse = strtotime($item->jourVoyage . ' ' . $item->Heur_departs) < time();
+                                    if ($item->jourVoyage == date("Y-m-d") && !$departDejaPasse): ?>
                                         <tr class="text-center">
                                             <td data-label="Client"><?= $item->Client ?></td>
                                             <td data-label="Destination"><?= $item->destinationId ?></td>
