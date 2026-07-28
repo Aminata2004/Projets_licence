@@ -471,4 +471,144 @@ class Liste_du_jours extends  Controller
     header("Location: " . BASE_URL . "/admin/Liste_du_jours/demandesAnnulation");
     exit;
   }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // EMBARQUEMENT
+  // ─────────────────────────────────────────────────────────────────────────
+
+  public function embarquement()
+  {
+    $this->requirePermission('Billets_embarquement');
+    date_default_timezone_set('Africa/Bamako');
+    $id_compagnie = $_SESSION['id_compagnie'];
+    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
+    $idDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
+    $numeroGare = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
+    $model = new Liste_du_jour();
+
+    $jour = $_GET['date'] ?? date('Y-m-d');
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $jour)) {
+      $jour = date('Y-m-d');
+    }
+    $destination = trim($_GET['destination'] ?? '');
+    $heure = trim($_GET['heure'] ?? '');
+
+    $liste = $model->getBilletsPourEmbarquement($idDepart, $numeroGare, $jour, $destination, $heure);
+
+    $liste_horaires = $model->FetchSelectWheres('*', 'horaire', 'id_compagnie = :id_compagnie', ['id_compagnie' => $id_compagnie]);
+    $destinations = $model->getDestinations($idDepart, $id_compagnie, $numeroGare);
+
+    $this->view('admin/embarquement', [
+      'liste' => $liste,
+      'liste_horaires' => $liste_horaires,
+      'destinations' => $destinations,
+      'date' => $jour,
+    ]);
+  }
+
+  public function marquerEmbarque()
+  {
+    $this->requirePermission('Billets_embarquement');
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      (new Liste_du_jour())->marquerEmbarque($_POST['idBillets'] ?? null);
+    }
+    header("Location: " . BASE_URL . "/admin/Liste_du_jours/embarquement");
+    exit;
+  }
+
+  public function annulerEmbarquement()
+  {
+    $this->requirePermission('Billets_embarquement');
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      (new Liste_du_jour())->annulerEmbarquementBillet($_POST['idBillets'] ?? null);
+    }
+    header("Location: " . BASE_URL . "/admin/Liste_du_jours/embarquement");
+    exit;
+  }
+
+  // Client non embarqué : l'agent propose une nouvelle date/heure, soumise à validation Admin.
+  public function demanderReport()
+  {
+    $this->requirePermission('Billets_embarquement');
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      (new Liste_du_jour())->demanderReportBillet(
+        $_POST['idBillets'] ?? null,
+        $_POST['nouvelle_date'] ?? '',
+        $_POST['nouvelle_heure'] ?? ''
+      );
+    }
+    header("Location: " . BASE_URL . "/admin/Liste_du_jours/embarquement");
+    exit;
+  }
+
+  // Ecran unique, contenu différent selon le rôle : le chef d'escale voit les demandes de
+  // sa propre gare en attente de SON examen (étape 1) ; l'Admin/super_admin voit celles
+  // déjà transmises par un chef d'escale, en attente de validation finale (étape 2).
+  public function demandesReport()
+  {
+    $this->requirePermission('Billets_annulation');
+    $billets = new Liste_du_jour();
+    $droit = $_SESSION['droit'] ?? null;
+
+    if (in_array($droit, ['Admin', 'super_admin', 'PDG'], true)) {
+      $this->view('admin/demandes_report_billet', [
+        'listeDemandes' => $billets->getDemandesReportEnAttente($_SESSION['id_compagnie']),
+        'estAdmin' => true,
+      ]);
+      return;
+    }
+
+    if ($droit === 'chef_d_escale') {
+      $this->view('admin/demandes_report_billet', [
+        'listeDemandes' => $billets->getDemandesReportEnAttenteChef(
+          $_SESSION['id_compagnie'],
+          $_SESSION['ville'] ?? null,
+          $_SESSION['numero_gare'] ?? null
+        ),
+        'estAdmin' => false,
+      ]);
+      return;
+    }
+
+    $billets->set_flash("Accès refusé.", "danger");
+    header("Location: " . BASE_URL . "/admin/Homes/home");
+    exit;
+  }
+
+  // Etape 1 -> 2 (chef d'escale uniquement) : transmet une demande de sa gare à l'Admin.
+  public function transmettreReport($idBillets)
+  {
+    $this->requirePermission('Billets_annulation');
+    $billets = new Liste_du_jour();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_SESSION['droit'] ?? null) === 'chef_d_escale') {
+      $billets->transmettreReportBillet($idBillets);
+    }
+    header("Location: " . BASE_URL . "/admin/Liste_du_jours/demandesReport");
+    exit;
+  }
+
+  // Validation finale (Admin/super_admin uniquement) : applique réellement le report.
+  public function confirmerReport($idBillets)
+  {
+    $this->requirePermission('Billets_annulation');
+    $billets = new Liste_du_jour();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+      $billets->confirmerReportBillet($idBillets);
+    }
+    header("Location: " . BASE_URL . "/admin/Liste_du_jours/demandesReport");
+    exit;
+  }
+
+  // Rejet, possible par le chef d'escale (sa gare, étape 1) ou l'Admin (étapes 1 et 2) —
+  // le modèle vérifie lui-même la portée exacte autorisée pour chaque rôle.
+  public function rejeterReport($idBillets)
+  {
+    $this->requirePermission('Billets_annulation');
+    $billets = new Liste_du_jour();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin', 'chef_d_escale'], true)) {
+      $billets->rejeterReportBillet($idBillets);
+    }
+    header("Location: " . BASE_URL . "/admin/Liste_du_jours/demandesReport");
+    exit;
+  }
 }

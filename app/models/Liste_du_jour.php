@@ -221,7 +221,7 @@
         if (!$billet) {
           $pdo->rollBack();
           $this->set_flash("Aucune modification effectuée : billet introuvable.", "warning");
-          return;
+          return false;
         }
 
         date_default_timezone_set('Africa/Bamako');
@@ -290,7 +290,7 @@
           if (!$rowProg) {
             $pdo->rollBack();
             $this->set_flash("Aucun car programmé pour cette heure et ce trajet à la nouvelle date.", "danger");
-            return;
+            return false;
           }
           $stmt = $pdo->prepare("SELECT nbr_place, nbr_place_reserve FROM car WHERE id_car = :id FOR UPDATE");
           $stmt->execute([':id' => $rowProg['id_car_programmer']]);
@@ -298,13 +298,13 @@
           if (!$car) {
             $pdo->rollBack();
             $this->set_flash("Car introuvable pour la nouvelle date.", "danger");
-            return;
+            return false;
           }
           $placesDispo = $car['nbr_place'] - $car['nbr_place_reserve'];
           if ($nombrePassages > $placesDispo) {
             $pdo->rollBack();
             $this->set_flash("Places insuffisantes sur le nouveau créneau : $placesDispo restantes.", "danger");
-            return;
+            return false;
           }
           $pdo->prepare("UPDATE car SET nbr_place_reserve = nbr_place_reserve + :n WHERE id_car = :id")
             ->execute([':n' => $nombrePassages, ':id' => $rowProg['id_car_programmer']]);
@@ -331,7 +331,7 @@
             if ($nombrePassages > $placesDispo) {
               $pdo->rollBack();
               $this->set_flash("Places insuffisantes pour demain sur le nouveau créneau : $placesDispo restantes.", "danger");
-              return;
+              return false;
             }
             $pdo->prepare("UPDATE suivis SET place_reserve = place_reserve + :n WHERE idSuivis = :id")
               ->execute([':n' => $nombrePassages, ':id' => $suivi['idSuivis']]);
@@ -339,12 +339,12 @@
             if ($placeTotale <= 0) {
               $pdo->rollBack();
               $this->set_flash("Erreur : nombre de places minimales non défini.", "danger");
-              return;
+              return false;
             }
             if ($nombrePassages > $placeTotale) {
               $pdo->rollBack();
               $this->set_flash("Places insuffisantes pour demain sur le nouveau créneau : $placeTotale restantes.", "danger");
-              return;
+              return false;
             }
             $pdo->prepare(
               "INSERT INTO suivis (place_reserve, place_totals, depart, destination, heur_depart, date_reservation, id_compagnie)
@@ -396,14 +396,16 @@
         if ($stmtUpd->rowCount() === 0) {
           $pdo->rollBack();
           $this->set_flash("Aucune modification effectuée : billet introuvable.", "warning");
-          return;
+          return false;
         }
 
         $pdo->commit();
         $this->set_flash("Voyage reporté avec succès, places mises à jour.", "primary");
+        return true;
       } catch (Throwable $e) {
         $pdo->rollBack();
         $this->set_flash("Erreur lors du report : " . $e->getMessage(), "danger");
+        return false;
       }
     }
 
@@ -706,5 +708,344 @@
         $this->set_flash("Erreur lors de l'annulation : " . $e->getMessage(), "danger");
         return false;
       }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // EMBARQUEMENT (remplace la case a cocher papier de la liste d'embarquement)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Billets d'un trajet/date donnes, pour l'ecran Embarquement. Les billets annules ou en
+    // attente de traitement (annulation/report) sont exclus : rien a embarquer pour eux.
+    public function getBilletsPourEmbarquement($idDepart, $numeroGare, $jourVoyage, $destination = '', $heure = '')
+    {
+      $where = 'b.id_compagnie = :id_compagnie AND b.jourVoyage = :jour
+                 AND (b.status_billets IS NULL OR b.status_billets = \'\')';
+      $params = [':id_compagnie' => $_SESSION['id_compagnie'] ?? null, ':jour' => $jourVoyage];
+
+      if ($idDepart !== null) {
+        $where .= ' AND b.departId = :depart';
+        $params[':depart'] = $idDepart;
+      }
+      if ($numeroGare !== null) {
+        $where .= ' AND b.num_gare = :numeroGare';
+        $params[':numeroGare'] = $numeroGare;
+      }
+      if ($destination !== '') {
+        $where .= ' AND b.destinationId = :destination';
+        $params[':destination'] = $destination;
+      }
+      if ($heure !== '') {
+        $where .= ' AND b.Heur_departs = :heure';
+        $params[':heure'] = $heure;
+      }
+
+      return $this->fetchAll(
+        "SELECT b.idBillets, b.numeroBillets, b.destinationId, b.Heur_departs, b.numeroPlace,
+                b.statut_embarquement, b.embarque_le, c.Client,
+                ue.utilisateurs AS embarque_par_nom
+         FROM billets b
+         INNER JOIN client c ON b.id_client = c.idClient
+         LEFT JOIN utilisateur ue ON ue.idUser = b.embarque_par
+         WHERE $where
+         ORDER BY b.Heur_departs, c.Client",
+        $params
+      );
+    }
+
+    public function marquerEmbarque($idBillets)
+    {
+      if (!csrf_verify()) {
+        $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+        return false;
+      }
+
+      $billet = $this->getBilletById($idBillets);
+      if (!$billet) {
+        $this->set_flash("Billet introuvable.", "danger");
+        return false;
+      }
+      if (($billet->statut_embarquement ?? null) === 'embarque') {
+        $this->set_flash("Ce client est déjà marqué comme embarqué.", "warning");
+        return false;
+      }
+      if (in_array($billet->status_billets ?? null, ['annule', 'annulation_demandee', 'report_demande'], true)) {
+        $this->set_flash("Ce billet est annulé ou en attente de traitement : impossible de l'embarquer.", "danger");
+        return false;
+      }
+
+      $ok = $this->insertion_update_simples(
+        "UPDATE billets SET statut_embarquement = 'embarque', embarque_le = NOW(), embarque_par = :par
+         WHERE idBillets = :id AND id_compagnie = :id_compagnie",
+        [':par' => $_SESSION['id_utilisateur'] ?? null, ':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie]
+      );
+
+      if ($ok) {
+        $this->set_flash("Client embarqué.", "success");
+        return true;
+      }
+      $this->set_flash("Erreur lors de l'enregistrement de l'embarquement.", "danger");
+      return false;
+    }
+
+    // Annule un embarquement marqué par erreur (clic accidentel) : reste possible tant que
+    // le départ n'a pas ete cloture cote interface (la cloture n'est qu'un etat d'affichage,
+    // pas une contrainte en base, pour rester simple).
+    public function annulerEmbarquementBillet($idBillets)
+    {
+      if (!csrf_verify()) {
+        $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+        return false;
+      }
+
+      $billet = $this->getBilletById($idBillets);
+      if (!$billet || ($billet->statut_embarquement ?? null) !== 'embarque') {
+        $this->set_flash("Ce client n'est pas marqué comme embarqué.", "warning");
+        return false;
+      }
+
+      $ok = $this->insertion_update_simples(
+        "UPDATE billets SET statut_embarquement = NULL, embarque_le = NULL, embarque_par = NULL
+         WHERE idBillets = :id AND id_compagnie = :id_compagnie",
+        [':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie]
+      );
+
+      if ($ok) {
+        $this->set_flash("Embarquement annulé.", "info");
+        return true;
+      }
+      $this->set_flash("Erreur lors de l'annulation de l'embarquement.", "danger");
+      return false;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // REPORT POUR NON-EMBARQUEMENT (soumis a validation Admin, meme principe que
+    // demanderAnnulationBillet() / confirmerAnnulationBillet() ci-dessus)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Etape 1 : soumet une demande de report (aucune place touchee avant validation). Un
+    // client deja embarque n'a pas de raison d'etre reporte.
+    //
+    // Flux a deux etapes, intelligent selon qui demande : un simple Utilisateur passe
+    // d'abord par le chef d'escale de sa gare (statut 'report_demande') ; un chef d'escale
+    // (ou l'Admin) a deja l'autorite de transmission, sa propre demande part directement
+    // vers l'Admin (statut 'report_transmis'), sans étape intermediaire inutile.
+    public function demanderReportBillet($idBillets, $nouvelleDate, $nouvelleHeure)
+    {
+      if (!csrf_verify()) {
+        $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+        return false;
+      }
+
+      $billet = $this->getBilletById($idBillets);
+      if (!$billet) {
+        $this->set_flash("Billet introuvable.", "danger");
+        return false;
+      }
+      if (($billet->statut_embarquement ?? null) === 'embarque') {
+        $this->set_flash("Ce client est déjà embarqué : aucune raison de le reporter.", "warning");
+        return false;
+      }
+      if (in_array($billet->status_billets ?? null, ['annule', 'annulation_demandee', 'report_demande', 'report_transmis'], true)) {
+        $this->set_flash("Ce billet est déjà annulé ou une demande est déjà en cours.", "warning");
+        return false;
+      }
+      if (empty($nouvelleDate) || empty($nouvelleHeure)) {
+        $this->set_flash("Veuillez choisir une nouvelle date et une heure de départ valides.", "danger");
+        return false;
+      }
+
+      date_default_timezone_set('Africa/Bamako');
+      $nouveauJour = date('Y-m-d', strtotime($nouvelleDate));
+      $aujourdhui  = date('Y-m-d');
+      $demain      = date('Y-m-d', strtotime('+1 day'));
+      if (!in_array($nouveauJour, [$aujourdhui, $demain], true)) {
+        $this->set_flash("Le report n'est possible que vers aujourd'hui ou demain.", "danger");
+        return false;
+      }
+
+      $droit = $_SESSION['droit'] ?? null;
+      $idUtilisateur = $_SESSION['id_utilisateur'] ?? null;
+      $sauteEtapeChef = in_array($droit, ['chef_d_escale', 'Admin', 'super_admin', 'PDG'], true);
+      $statut = $sauteEtapeChef ? 'report_transmis' : 'report_demande';
+
+      $sql = "UPDATE billets SET status_billets = :statut, nouvelle_date_demandee = :nd,
+                  nouvelle_heure_demandee = :nh, demande_report_par = :par, demande_report_le = NOW()";
+      $params = [
+        ':statut' => $statut,
+        ':nd' => $nouveauJour,
+        ':nh' => $nouvelleHeure,
+        ':par' => $idUtilisateur,
+        ':id' => $idBillets,
+        ':id_compagnie' => $billet->id_compagnie,
+      ];
+      if ($sauteEtapeChef) {
+        $sql .= ", report_transmis_par = :tp, report_transmis_le = NOW()";
+        $params[':tp'] = $idUtilisateur;
+      }
+      $sql .= " WHERE idBillets = :id AND id_compagnie = :id_compagnie";
+
+      $ok = $this->insertion_update_simples($sql, $params);
+
+      if ($ok) {
+        $message = $sauteEtapeChef
+          ? "Demande de report envoyée : un Admin doit la valider."
+          : "Demande de report envoyée à votre chef d'escale.";
+        $this->set_flash($message, "success");
+        return true;
+      }
+      $this->set_flash("Erreur lors de l'envoi de la demande de report.", "danger");
+      return false;
+    }
+
+    // Etape 1 (chef d'escale) : demandes de sa propre gare en attente de son examen.
+    public function getDemandesReportEnAttenteChef($id_compagnie, $ville, $numeroGare)
+    {
+      return $this->fetchAll(
+        "SELECT b.idBillets, b.numeroBillets, b.jourVoyage, b.Heur_departs, b.departId, b.destinationId,
+                b.nouvelle_date_demandee, b.nouvelle_heure_demandee, b.demande_report_le,
+                c.Client, u.utilisateurs AS demandeur
+         FROM billets b
+         INNER JOIN client c ON b.id_client = c.idClient
+         LEFT JOIN utilisateur u ON u.idUser = b.demande_report_par
+         WHERE b.id_compagnie = :id_compagnie AND b.status_billets = 'report_demande'
+           AND b.departId = :ville AND b.num_gare = :numeroGare
+         ORDER BY b.demande_report_le ASC",
+        [':id_compagnie' => $id_compagnie, ':ville' => $ville, ':numeroGare' => $numeroGare]
+      );
+    }
+
+    // Etape 2 (Admin) : demandes deja transmises par un chef d'escale (ou soumises
+    // directement par un chef d'escale/Admin), en attente de validation finale.
+    public function getDemandesReportEnAttente($id_compagnie)
+    {
+      return $this->fetchAll(
+        "SELECT b.idBillets, b.numeroBillets, b.jourVoyage, b.Heur_departs, b.departId, b.destinationId,
+                b.nouvelle_date_demandee, b.nouvelle_heure_demandee, b.demande_report_le,
+                c.Client, u.utilisateurs AS demandeur, ut.utilisateurs AS transmis_par_nom
+         FROM billets b
+         INNER JOIN client c ON b.id_client = c.idClient
+         LEFT JOIN utilisateur u ON u.idUser = b.demande_report_par
+         LEFT JOIN utilisateur ut ON ut.idUser = b.report_transmis_par
+         WHERE b.id_compagnie = :id_compagnie AND b.status_billets = 'report_transmis'
+         ORDER BY b.report_transmis_le ASC",
+        [':id_compagnie' => $id_compagnie]
+      );
+    }
+
+    // Etape 1 -> 2 (chef d'escale uniquement) : transmet une demande de sa gare à l'Admin.
+    public function transmettreReportBillet($idBillets)
+    {
+      if (!csrf_verify()) {
+        $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+        return false;
+      }
+
+      $billet = $this->getBilletById($idBillets);
+      if (!$billet || ($billet->status_billets ?? null) !== 'report_demande') {
+        $this->set_flash("Aucune demande de report en attente pour ce billet.", "warning");
+        return false;
+      }
+
+      // IDOR : un chef d'escale ne peut transmettre qu'une demande de sa propre gare.
+      if (($_SESSION['droit'] ?? null) === 'chef_d_escale') {
+        if ($billet->departId !== ($_SESSION['ville'] ?? null) || $billet->num_gare !== ($_SESSION['numero_gare'] ?? null)) {
+          $this->set_flash("Cette demande ne concerne pas votre gare.", "danger");
+          return false;
+        }
+      }
+
+      $ok = $this->insertion_update_simples(
+        "UPDATE billets SET status_billets = 'report_transmis', report_transmis_par = :par, report_transmis_le = NOW()
+         WHERE idBillets = :id AND id_compagnie = :id_compagnie",
+        [':par' => $_SESSION['id_utilisateur'] ?? null, ':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie]
+      );
+
+      if ($ok) {
+        $this->set_flash("Demande transmise à l'Admin pour validation.", "success");
+        return true;
+      }
+      $this->set_flash("Erreur lors de la transmission de la demande.", "danger");
+      return false;
+    }
+
+    // Rejet, possible aux deux etapes : par le chef d'escale (sa gare, etape 1 uniquement)
+    // ou par l'Admin (n'importe quelle gare, aux deux etapes). Le billet redevient actif
+    // sur son depart initial.
+    public function rejeterReportBillet($idBillets)
+    {
+      if (!csrf_verify()) {
+        $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+        return false;
+      }
+
+      $billet = $this->getBilletById($idBillets);
+      if (!$billet || !in_array($billet->status_billets ?? null, ['report_demande', 'report_transmis'], true)) {
+        $this->set_flash("Aucune demande de report en attente pour ce billet.", "warning");
+        return false;
+      }
+
+      if (($_SESSION['droit'] ?? null) === 'chef_d_escale') {
+        $estSaGare = $billet->departId === ($_SESSION['ville'] ?? null) && $billet->num_gare === ($_SESSION['numero_gare'] ?? null);
+        if ($billet->status_billets !== 'report_demande' || !$estSaGare) {
+          $this->set_flash("Vous ne pouvez pas rejeter cette demande.", "danger");
+          return false;
+        }
+      }
+
+      $ok = $this->insertion_update_simples(
+        "UPDATE billets SET status_billets = NULL, nouvelle_date_demandee = NULL,
+            nouvelle_heure_demandee = NULL, demande_report_par = NULL, demande_report_le = NULL,
+            report_transmis_par = NULL, report_transmis_le = NULL
+         WHERE idBillets = :id AND id_compagnie = :id_compagnie",
+        [':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie]
+      );
+
+      if ($ok) {
+        $this->set_flash("Demande de report rejetée : le billet reste sur son départ initial.", "info");
+        return true;
+      }
+      $this->set_flash("Erreur lors du rejet de la demande.", "danger");
+      return false;
+    }
+
+    // Etape finale (Admin) : valide la demande deja transmise, applique reellement le
+    // report (reutilise reporte_voyage(), qui gere places/car/suivis), puis nettoie les
+    // traces de la demande.
+    public function confirmerReportBillet($idBillets)
+    {
+      if (!csrf_verify()) {
+        $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+        return false;
+      }
+
+      $billet = $this->getBilletById($idBillets);
+      if (!$billet || ($billet->status_billets ?? null) !== 'report_transmis') {
+        $this->set_flash("Aucune demande de report transmise en attente pour ce billet.", "warning");
+        return false;
+      }
+
+      $ok = $this->reporte_voyage([
+        'idBillets' => $idBillets,
+        'jourVoyage' => $billet->nouvelle_date_demandee,
+        'Heur_departs' => $billet->nouvelle_heure_demandee,
+      ]);
+
+      if (!$ok) {
+        // reporte_voyage() a deja pose son propre message d'erreur (places insuffisantes,
+        // car introuvable...) : la demande reste en attente, l'Admin peut reessayer plus tard.
+        return false;
+      }
+
+      $this->insertion_update_simples(
+        "UPDATE billets SET status_billets = NULL, nouvelle_date_demandee = NULL,
+            nouvelle_heure_demandee = NULL, demande_report_par = NULL, demande_report_le = NULL,
+            report_transmis_par = NULL, report_transmis_le = NULL,
+            statut_embarquement = NULL, embarque_le = NULL, embarque_par = NULL
+         WHERE idBillets = :id AND id_compagnie = :id_compagnie",
+        [':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie]
+      );
+
+      $this->set_flash("Report validé : le billet est désormais programmé à la nouvelle date.", "success");
+      return true;
     }
   }

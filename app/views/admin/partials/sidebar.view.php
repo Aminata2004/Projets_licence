@@ -45,6 +45,11 @@
             </li>
           <?php }
           ?>
+          <?php if ($user->userHasPermission('Billets_embarquement')) { ?>
+            <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours/embarquement"><i class="bi bi-arrow-right-short"></i>Embarquement</a>
+            </li>
+          <?php }
+          ?>
           <?php if ($user->userHasPermission('Billets_validation')) { ?>
             <li> <a href="<?= BASE_URL ?>/admin/Liste_ententes"><i class="bi bi-arrow-right-short"></i>Ticket en entente</a>
             </li>
@@ -52,6 +57,10 @@
           ?>
           <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin', 'PDG'], true)): ?>
             <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours/demandesAnnulation"><i class="bi bi-arrow-right-short"></i>Demandes d'annulation</a>
+            </li>
+          <?php endif; ?>
+          <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin', 'PDG', 'chef_d_escale'], true) && $user->userHasPermission('Billets_annulation')): ?>
+            <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours/demandesReport"><i class="bi bi-arrow-right-short"></i>Demandes de report</a>
             </li>
           <?php endif; ?>
         </ul>
