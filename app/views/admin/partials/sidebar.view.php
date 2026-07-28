@@ -12,6 +12,25 @@
         $_SESSION['id_compagnie'] ?? null
       );
     }
+
+    // Meme principe pour les demandes de report en attente : le chef d'escale doit voir
+    // instantanement qu'une demande de sa gare attend son examen (etape 1), et l'Admin
+    // qu'une demande lui a ete transmise (etape 2) — sans avoir a penser a aller consulter
+    // "Demandes de report" au hasard.
+    $demandesReportSidebar = [];
+    if ($user->userHasPermission('Billets_annulation')) {
+      $droitSidebar = $_SESSION['droit'] ?? null;
+      $modelReport = new Liste_du_jour();
+      if (in_array($droitSidebar, ['Admin', 'super_admin', 'PDG'], true)) {
+        $demandesReportSidebar = $modelReport->getDemandesReportEnAttente($_SESSION['id_compagnie'] ?? null);
+      } elseif ($droitSidebar === 'chef_d_escale') {
+        $demandesReportSidebar = $modelReport->getDemandesReportEnAttenteChef(
+          $_SESSION['id_compagnie'] ?? null,
+          $_SESSION['ville'] ?? null,
+          $_SESSION['numero_gare'] ?? null
+        );
+      }
+    }
   ?>
   <aside class="sidebar-wrapper" data-simplebar="true">
     <div class="sidebar-header">
@@ -78,7 +97,11 @@
             </li>
           <?php endif; ?>
           <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin', 'PDG', 'chef_d_escale'], true) && $user->userHasPermission('Billets_annulation')): ?>
-            <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours/demandesReport"><i class="bi bi-arrow-right-short"></i>Demandes de report</a>
+            <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours/demandesReport"><i class="bi bi-arrow-right-short"></i>Demandes de report
+                <?php if (!empty($demandesReportSidebar)): ?>
+                    <span class="badge bg-warning text-dark rounded-pill float-end" title="Demande(s) de report en attente"><?= count($demandesReportSidebar) ?></span>
+                <?php endif; ?>
+              </a>
             </li>
           <?php endif; ?>
         </ul>
