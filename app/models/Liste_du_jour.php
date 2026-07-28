@@ -587,6 +587,26 @@
       try {
         $pdo->beginTransaction();
 
+        // Verrou anti double-traitement : si deux personnes confirment (ou une confirme et
+        // une autre rejette) la meme annulation au meme moment, seule la premiere doit passer.
+        // Comparaison "compare-and-swap" sur le statut lu plus haut (<=> gere le cas NULL) :
+        // si une autre requete a deja modifie status_billets entre-temps, rowCount() = 0 et on
+        // s'arrete avant de toucher aux places/a la caisse (double remboursement sinon).
+        $stmtClaim = $pdo->prepare(
+          "UPDATE billets SET status_billets = 'annulation_en_cours'
+           WHERE idBillets = :id AND id_compagnie = :id_compagnie AND status_billets <=> :ancien"
+        );
+        $stmtClaim->execute([
+          ':id' => $idBillets,
+          ':id_compagnie' => $billet->id_compagnie,
+          ':ancien' => $billet->status_billets ?? null,
+        ]);
+        if ($stmtClaim->rowCount() === 0) {
+          $pdo->rollBack();
+          $this->set_flash("Ce billet a déjà été traité entre-temps par quelqu'un d'autre.", "warning");
+          return false;
+        }
+
         $mainDest = $this->resolveDestinationPrincipale(
           $billet->departId,
           $billet->Heur_departs,
@@ -1037,17 +1057,25 @@
         }
       }
 
-      $ok = $this->insertion_update_simples(
+      // Compare-and-swap sur le statut deja lu ci-dessus : si quelqu'un d'autre (l'Admin en
+      // rejet direct, un double-clic...) a deja fait bouger ce billet entre-temps, rowCount()
+      // vaut 0 et on l'affiche comme "deja traite" plutot que de l'ecraser silencieusement.
+      $stmt = $this->insertion_update_simples(
         "UPDATE billets SET status_billets = 'report_transmis', report_transmis_par = :par, report_transmis_le = NOW()
-         WHERE idBillets = :id AND id_compagnie = :id_compagnie",
-        [':par' => $_SESSION['id_utilisateur'] ?? null, ':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie]
+         WHERE idBillets = :id AND id_compagnie = :id_compagnie AND status_billets <=> :ancien",
+        [
+          ':par' => $_SESSION['id_utilisateur'] ?? null,
+          ':id' => $idBillets,
+          ':id_compagnie' => $billet->id_compagnie,
+          ':ancien' => $billet->status_billets,
+        ]
       );
 
-      if ($ok) {
+      if ($stmt->rowCount() > 0) {
         $this->set_flash("Demande transmise à l'Admin pour validation.", "success");
         return true;
       }
-      $this->set_flash("Erreur lors de la transmission de la demande.", "danger");
+      $this->set_flash("Cette demande a déjà été traitée entre-temps par quelqu'un d'autre.", "warning");
       return false;
     }
 
@@ -1075,19 +1103,19 @@
         }
       }
 
-      $ok = $this->insertion_update_simples(
+      $stmt = $this->insertion_update_simples(
         "UPDATE billets SET status_billets = NULL, nouvelle_date_demandee = NULL,
             nouvelle_heure_demandee = NULL, demande_report_par = NULL, demande_report_le = NULL,
             report_transmis_par = NULL, report_transmis_le = NULL
-         WHERE idBillets = :id AND id_compagnie = :id_compagnie",
-        [':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie]
+         WHERE idBillets = :id AND id_compagnie = :id_compagnie AND status_billets <=> :ancien",
+        [':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie, ':ancien' => $billet->status_billets]
       );
 
-      if ($ok) {
+      if ($stmt->rowCount() > 0) {
         $this->set_flash("Demande de report rejetée : le billet reste sur son départ initial.", "info");
         return true;
       }
-      $this->set_flash("Erreur lors du rejet de la demande.", "danger");
+      $this->set_flash("Cette demande a déjà été traitée entre-temps par quelqu'un d'autre.", "warning");
       return false;
     }
 
@@ -1107,6 +1135,21 @@
         return false;
       }
 
+      // Reserve la demande de facon atomique avant de toucher aux places : sans ca, deux
+      // confirmations (ou une confirmation + un rejet) lancees en meme temps passeraient
+      // toutes les deux le test ci-dessus et reporte_voyage() serait appele deux fois pour
+      // le meme billet (double liberation/reservation de place). rowCount() = 0 signifie
+      // qu'une autre requete a deja pris la main entre-temps.
+      $stmtClaim = $this->insertion_update_simples(
+        "UPDATE billets SET status_billets = 'report_en_validation'
+         WHERE idBillets = :id AND id_compagnie = :id_compagnie AND status_billets <=> 'report_transmis'",
+        [':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie]
+      );
+      if ($stmtClaim->rowCount() === 0) {
+        $this->set_flash("Cette demande a déjà été traitée entre-temps par quelqu'un d'autre.", "warning");
+        return false;
+      }
+
       $ok = $this->reporte_voyage([
         'idBillets' => $idBillets,
         'jourVoyage' => $billet->nouvelle_date_demandee,
@@ -1115,7 +1158,12 @@
 
       if (!$ok) {
         // reporte_voyage() a deja pose son propre message d'erreur (places insuffisantes,
-        // car introuvable...) : la demande reste en attente, l'Admin peut reessayer plus tard.
+        // car introuvable...) : on remet la demande en attente pour que l'Admin puisse
+        // reessayer, plutot que de la laisser bloquee sur le marqueur transitoire.
+        $this->insertion_update_simples(
+          "UPDATE billets SET status_billets = 'report_transmis' WHERE idBillets = :id AND id_compagnie = :id_compagnie",
+          [':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie]
+        );
         return false;
       }
 

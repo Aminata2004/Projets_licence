@@ -303,7 +303,11 @@
             attacherBoutonsLigne(tr);
         }
 
-        function marquerEmbarqueAjax(id, tr) {
+        // btn est desactive le temps de la requete : sans ca, un double-clic (ou un doigt
+        // qui glisse sur mobile) peut partir deux fois avant que la 1ere reponse ne revienne
+        // et redessine la ligne, ce qui envoie deux requetes concurrentes pour le meme billet.
+        function marquerEmbarqueAjax(id, tr, btn) {
+            if (btn) btn.disabled = true;
             fetch(baseUrl + '/admin/Liste_du_jours/marquerEmbarque', {
                     method: 'POST',
                     headers: {
@@ -317,13 +321,19 @@
                     if (data.ok) {
                         appliquerLigneEmbarquee(tr);
                         majCompteurs();
+                    } else if (btn) {
+                        btn.disabled = false;
                     }
                     toast(data.ok ? 'success' : 'warning', data.message || (data.ok ? 'Client embarqué.' : 'Action impossible.'));
                 })
-                .catch(() => toast('error', "Erreur réseau, veuillez réessayer."));
+                .catch(() => {
+                    if (btn) btn.disabled = false;
+                    toast('error', "Erreur réseau, veuillez réessayer.");
+                });
         }
 
-        function annulerEmbarqueAjax(id, tr) {
+        function annulerEmbarqueAjax(id, tr, btn) {
+            if (btn) btn.disabled = true;
             fetch(baseUrl + '/admin/Liste_du_jours/annulerEmbarquement', {
                     method: 'POST',
                     headers: {
@@ -337,23 +347,28 @@
                     if (data.ok) {
                         appliquerLigneNonEmbarquee(tr);
                         majCompteurs();
+                    } else if (btn) {
+                        btn.disabled = false;
                     }
                     toast(data.ok ? 'info' : 'warning', data.message || (data.ok ? 'Embarquement annulé.' : 'Action impossible.'));
                 })
-                .catch(() => toast('error', "Erreur réseau, veuillez réessayer."));
+                .catch(() => {
+                    if (btn) btn.disabled = false;
+                    toast('error', "Erreur réseau, veuillez réessayer.");
+                });
         }
 
         function attacherBoutonsLigne(tr) {
             const btnEmbarquer = tr.querySelector('.btn-marquer-embarque');
             if (btnEmbarquer) {
                 btnEmbarquer.addEventListener('click', function() {
-                    marquerEmbarqueAjax(this.dataset.id, tr);
+                    marquerEmbarqueAjax(this.dataset.id, tr, this);
                 });
             }
             const btnAnnuler = tr.querySelector('.btn-annuler-embarquement');
             if (btnAnnuler) {
                 btnAnnuler.addEventListener('click', function() {
-                    annulerEmbarqueAjax(this.dataset.id, tr);
+                    annulerEmbarqueAjax(this.dataset.id, tr, this);
                 });
             }
             const btnReport = tr.querySelector('.btn-demander-report');
