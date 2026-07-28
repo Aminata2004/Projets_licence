@@ -942,10 +942,15 @@
     // Cars "complets" (places reservees >= capacite) ayant encore au moins un passager non
     // embarque ce jour-la : permet d'alerter proactivement (badge menu + banniere embarquement)
     // au lieu d'attendre que quelqu'un pense a verifier manuellement. L'alerte disparait d'elle
-    // meme une fois tout le monde embarque (voir la sous-requete EXISTS sur billets).
+    // meme une fois tout le monde embarque (voir la sous-requete EXISTS sur billets), ou une
+    // fois l'heure de depart passee (meme instant que la disparition des lignes "embarque" de
+    // la liste principale) : passe ce cap, l'alerte n'a plus lieu d'etre, embarquement fait ou pas.
     public function getCarsComplets($idDepart, $numeroGare, $id_compagnie, $jour = null)
     {
       $jour = $jour ?? date('Y-m-d');
+
+      date_default_timezone_set('Africa/Bamako');
+      $maintenant = date('Y-m-d H:i:s');
 
       $idAgence = null;
       if ($idDepart !== null && $numeroGare !== null) {
@@ -957,8 +962,9 @@
       }
 
       $where = "pv.date_enregistre = :jour AND pv.id_compagnie = :id_compagnie AND pv.statut = 'active'
-                 AND c.nbr_place > 0 AND c.nbr_place_reserve >= c.nbr_place";
-      $params = [':jour' => $jour, ':id_compagnie' => $id_compagnie];
+                 AND c.nbr_place > 0 AND c.nbr_place_reserve >= c.nbr_place
+                 AND TIMESTAMP(pv.date_enregistre, pv.id_horaire) >= :maintenant";
+      $params = [':jour' => $jour, ':id_compagnie' => $id_compagnie, ':maintenant' => $maintenant];
 
       if ($idAgence !== null) {
         $where .= ' AND pv.id_agence = :agence';
