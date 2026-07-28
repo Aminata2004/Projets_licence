@@ -101,10 +101,13 @@
             }
         }
 
-        public function editPlace($data)
+        // $idCompagnieRestrict : quand fourni (Admin non super_admin), l'UPDATE n'affecte que
+        // la ligne appartenant à cette compagnie, même si un id_place_minumale d'une autre
+        // compagnie est posté (protection IDOR).
+        public function editPlace($data, $idCompagnieRestrict = null)
         {
-            $req = "UPDATE place_minumale 
-            SET place_minumale = :place_minumale 
+            $req = "UPDATE place_minumale
+            SET place_minumale = :place_minumale
             WHERE id_place_minumale = :id_place_minumale";
 
             $params = [
@@ -112,10 +115,17 @@
                 ":id_place_minumale" => $data['id_place_minumale']
             ];
 
+            if ($idCompagnieRestrict !== null) {
+                $req .= " AND id_compagnie = :id_compagnie";
+                $params[":id_compagnie"] = $idCompagnieRestrict;
+            }
+
             $modification = $this->insertion_update_simples($req, $params);
 
-            if ($modification) {
+            if ($modification && $modification->rowCount() > 0) {
                 $this->set_flash("Modification faite avec succès", "info");
+            } elseif ($idCompagnieRestrict !== null) {
+                $this->set_flash("Modification refusée.", "danger");
             }
         }
 

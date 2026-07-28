@@ -20,6 +20,18 @@ class Compagnies extends  Controller
     }
   }
 
+  // place_limite()/edit1() gèrent la limite de places de demain d'UNE compagnie : contrairement
+  // au reste du contrôleur, l'Admin de sa propre compagnie doit pouvoir y accéder (le lien est
+  // d'ailleurs déjà présent dans la sidebar admin normale) — seul super_admin doit voir/éditer
+  // les autres compagnies.
+  private function requireAdminOrSuperAdmin()
+  {
+    if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+      header("Location: " . BASE_URL . "/admin/Homes/home");
+      exit;
+    }
+  }
+
   public function index()
   {
     $this->requireSuperAdmin();
@@ -118,21 +130,33 @@ class Compagnies extends  Controller
   // limitation de place 
   public function place_limite()
   {
-    $this->requireSuperAdmin();
+    $this->requireAdminOrSuperAdmin();
 
     // Instanciation du modèle
     $compagnie = new Compagnie();
-    $liste_place = $compagnie->SelectAllData(
-      'place_minumale.*, compagnie.nom_compagnie',
-      'place_minumale INNER JOIN compagnie ON place_minumale.id_compagnie = compagnie.id_compagnie'
-    );
+
+    // super_admin voit/gère la limite de toutes les compagnies ; un Admin ne voit et
+    // ne modifie que la limite de SA propre compagnie (évite qu'il voie/édite les
+    // réglages des autres compagnies du SaaS).
+    if (($_SESSION['droit'] ?? null) === 'super_admin') {
+      $liste_place = $compagnie->SelectAllData(
+        'place_minumale.*, compagnie.nom_compagnie',
+        'place_minumale INNER JOIN compagnie ON place_minumale.id_compagnie = compagnie.id_compagnie'
+      );
+    } else {
+      $liste_place = $compagnie->SelectAllDatas(
+        'place_minumale.*, compagnie.nom_compagnie',
+        'place_minumale INNER JOIN compagnie ON place_minumale.id_compagnie = compagnie.id_compagnie WHERE compagnie.id_compagnie = :ic',
+        [':ic' => $_SESSION['id_compagnie'] ?? null]
+      );
+    }
 
     $this->view('admin/place_limite', ['liste_place' => $liste_place]);
   }
 
   public function edit1()
   {
-    $this->requireSuperAdmin();
+    $this->requireAdminOrSuperAdmin();
 
     $compagnie = new Compagnie();
 
@@ -140,10 +164,16 @@ class Compagnies extends  Controller
       $place_minumale = $_POST["place_minumale"];
       $id = $_POST["id_place_minumale"]; // Récupération de l’ID depuis le formulaire
 
+      // IDOR : un Admin ne doit pouvoir modifier que la ligne de SA propre compagnie,
+      // même s'il poste un id_place_minumale appartenant à une autre compagnie.
+      $idCompagnieRestrict = (($_SESSION['droit'] ?? null) === 'super_admin')
+        ? null
+        : ($_SESSION['id_compagnie'] ?? null);
+
       $compagnie->editPlace([
         'id_place_minumale' => $id,
         'place_minumale' => $place_minumale
-      ]);
+      ], $idCompagnieRestrict);
 
       header("Location: " . BASE_URL . "/admin/Compagnies/place_limite");
       exit;
