@@ -494,6 +494,7 @@ class Liste_du_jours extends  Controller
     $heure = trim($_GET['heure'] ?? '');
 
     $liste = $model->getBilletsPourEmbarquement($idDepart, $numeroGare, $jour, $destination, $heure);
+    $carsComplets = $model->getCarsComplets($idDepart, $numeroGare, $id_compagnie, $jour);
 
     $liste_horaires = $model->FetchSelectWheres('*', 'horaire', 'id_compagnie = :id_compagnie', ['id_compagnie' => $id_compagnie]);
     $destinations = $model->getDestinations($idDepart, $id_compagnie, $numeroGare);
@@ -503,14 +504,29 @@ class Liste_du_jours extends  Controller
       'liste_horaires' => $liste_horaires,
       'destinations' => $destinations,
       'date' => $jour,
+      'carsComplets' => $carsComplets,
     ]);
+  }
+
+  // Repond en JSON si la requete vient du fetch() de embarquement.view.php (AJAX), sinon
+  // conserve l'ancien comportement (redirection + flash) pour rester utilisable sans JS.
+  private function estAjax()
+  {
+    return ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
   }
 
   public function marquerEmbarque()
   {
     $this->requirePermission('Billets_embarquement');
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-      (new Liste_du_jour())->marquerEmbarque($_POST['idBillets'] ?? null);
+      $ok = (new Liste_du_jour())->marquerEmbarque($_POST['idBillets'] ?? null);
+      if ($this->estAjax()) {
+        $message = $_SESSION['notification']['message'] ?? ($ok ? 'Client embarqué.' : 'Erreur.');
+        unset($_SESSION['notification']);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => (bool)$ok, 'message' => $message]);
+        exit;
+      }
     }
     header("Location: " . BASE_URL . "/admin/Liste_du_jours/embarquement");
     exit;
@@ -520,9 +536,39 @@ class Liste_du_jours extends  Controller
   {
     $this->requirePermission('Billets_embarquement');
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-      (new Liste_du_jour())->annulerEmbarquementBillet($_POST['idBillets'] ?? null);
+      $ok = (new Liste_du_jour())->annulerEmbarquementBillet($_POST['idBillets'] ?? null);
+      if ($this->estAjax()) {
+        $message = $_SESSION['notification']['message'] ?? ($ok ? 'Embarquement annulé.' : 'Erreur.');
+        unset($_SESSION['notification']);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => (bool)$ok, 'message' => $message]);
+        exit;
+      }
     }
     header("Location: " . BASE_URL . "/admin/Liste_du_jours/embarquement");
+    exit;
+  }
+
+  // Embarquement en masse : case a cocher + bouton "Embarquer la selection" (AJAX uniquement).
+  public function marquerEmbarqueLot()
+  {
+    $this->requirePermission('Billets_embarquement');
+    header('Content-Type: application/json; charset=utf-8');
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_verify()) {
+      echo json_encode(['ok' => false, 'message' => 'Session expirée, veuillez réessayer.']);
+      exit;
+    }
+
+    $ids = $_POST['idsBillets'] ?? [];
+    if (!is_array($ids) || empty($ids)) {
+      echo json_encode(['ok' => false, 'message' => 'Aucun billet sélectionné.']);
+      exit;
+    }
+
+    $resultat = (new Liste_du_jour())->marquerEmbarqueLot($ids);
+    unset($_SESSION['notification']);
+    echo json_encode(array_merge(['ok' => true], $resultat));
     exit;
   }
 

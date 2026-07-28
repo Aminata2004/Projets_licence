@@ -1,4 +1,18 @@
   <?php $user = new Configuration($_SESSION['id_utilisateur']) ?>
+  <?php
+    // Alerte proactive : bus deja plein mais dont des passagers ne sont pas encore
+    // embarques. Calcule ici (et non dans chaque controleur) pour rester visible sur
+    // toutes les pages, sans attendre que quelqu'un pense a ouvrir Embarquement.
+    $carsCompletsSidebar = [];
+    if ($user->userHasPermission('Billets_embarquement')) {
+      $isAdminSidebar = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
+      $carsCompletsSidebar = (new Liste_du_jour())->getCarsComplets(
+        $isAdminSidebar ? null : ($_SESSION['ville'] ?? null),
+        $isAdminSidebar ? null : ($_SESSION['numero_gare'] ?? null),
+        $_SESSION['id_compagnie'] ?? null
+      );
+    }
+  ?>
   <aside class="sidebar-wrapper" data-simplebar="true">
     <div class="sidebar-header">
       <div>
@@ -46,7 +60,11 @@
           <?php }
           ?>
           <?php if ($user->userHasPermission('Billets_embarquement')) { ?>
-            <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours/embarquement"><i class="bi bi-arrow-right-short"></i>Embarquement</a>
+            <li> <a href="<?= BASE_URL ?>/admin/Liste_du_jours/embarquement"><i class="bi bi-arrow-right-short"></i>Embarquement
+                <?php if (!empty($carsCompletsSidebar)): ?>
+                    <span class="badge bg-danger rounded-pill float-end" title="Bus complet(s), embarquement requis"><?= count($carsCompletsSidebar) ?></span>
+                <?php endif; ?>
+              </a>
             </li>
           <?php }
           ?>

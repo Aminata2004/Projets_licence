@@ -98,7 +98,15 @@
     {
       // Filtré par compagnie de session : empêche un utilisateur de consulter/modifier
       // un billet d'une autre compagnie en changeant simplement l'ID dans l'URL/le formulaire.
-      $sql = "SELECT * FROM billets inner join client on billets.id_client = client.idClient
+      //
+      // billets, client ET utilisateur ont chacune une colonne id_compagnie : un "SELECT *"
+      // les fait entrer en collision et PDO ne garde que celle de la DERNIERE table jointe
+      // (utilisateur.id_compagnie, souvent NULL) — tous les appelants qui filtrent ensuite
+      // une UPDATE/DELETE sur $billet->id_compagnie echouaient alors silencieusement (0 ligne
+      // affectee, aucune erreur). On ne selectionne donc que billets.* + les quelques colonnes
+      // non ambigues realmenet utilisees ailleurs (nom client, montant paye, nom du vendeur).
+      $sql = "SELECT billets.*, client.Client, client.montant_payer, utilisateur.utilisateurs
+        FROM billets inner join client on billets.id_client = client.idClient
         inner join utilisateur on utilisateur.idUser = billets.idUser
         WHERE idBillets = :id AND billets.id_compagnie = :id_compagnie";
       $stmt = $this->connect()->prepare($sql);
@@ -752,25 +760,19 @@
       );
     }
 
-    public function marquerEmbarque($idBillets)
+    // Logique commune d'embarquement, sans gestion de flash (reutilisee par marquerEmbarque()
+    // en solo, marquerEmbarqueLot() en masse, et les endpoints AJAX du controleur).
+    private function embarquerBilletInterne($idBillets): array
     {
-      if (!csrf_verify()) {
-        $this->set_flash("Session expirée, veuillez réessayer.", "danger");
-        return false;
-      }
-
       $billet = $this->getBilletById($idBillets);
       if (!$billet) {
-        $this->set_flash("Billet introuvable.", "danger");
-        return false;
+        return ['ok' => false, 'deja' => false, 'message' => 'Billet introuvable.'];
       }
       if (($billet->statut_embarquement ?? null) === 'embarque') {
-        $this->set_flash("Ce client est déjà marqué comme embarqué.", "warning");
-        return false;
+        return ['ok' => true, 'deja' => true, 'message' => 'Déjà embarqué.'];
       }
       if (in_array($billet->status_billets ?? null, ['annule', 'annulation_demandee', 'report_demande'], true)) {
-        $this->set_flash("Ce billet est annulé ou en attente de traitement : impossible de l'embarquer.", "danger");
-        return false;
+        return ['ok' => false, 'deja' => false, 'message' => "Annulé ou en attente de traitement : impossible de l'embarquer."];
       }
 
       $ok = $this->insertion_update_simples(
@@ -779,12 +781,43 @@
         [':par' => $_SESSION['id_utilisateur'] ?? null, ':id' => $idBillets, ':id_compagnie' => $billet->id_compagnie]
       );
 
-      if ($ok) {
-        $this->set_flash("Client embarqué.", "success");
-        return true;
+      return $ok
+        ? ['ok' => true, 'deja' => false, 'message' => 'Client embarqué.', 'client' => $billet->Client ?? '']
+        : ['ok' => false, 'deja' => false, 'message' => "Erreur lors de l'enregistrement de l'embarquement."];
+    }
+
+    public function marquerEmbarque($idBillets)
+    {
+      if (!csrf_verify()) {
+        $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+        return false;
       }
-      $this->set_flash("Erreur lors de l'enregistrement de l'embarquement.", "danger");
-      return false;
+
+      $res = $this->embarquerBilletInterne($idBillets);
+      $this->set_flash($res['message'], $res['deja'] ? 'warning' : ($res['ok'] ? 'success' : 'danger'));
+      return $res['ok'] && !$res['deja'];
+    }
+
+    // Embarquement en masse (case a cocher + "Embarquer la selection") : boucle sur la meme
+    // logique que marquerEmbarque(), sans flash par billet — un seul resume est renvoye.
+    public function marquerEmbarqueLot(array $idsBillets): array
+    {
+      $succes = 0;
+      $deja = 0;
+      $echecs = 0;
+      $details = [];
+      foreach ($idsBillets as $idBillets) {
+        $res = $this->embarquerBilletInterne($idBillets);
+        if ($res['deja']) {
+          $deja++;
+        } elseif ($res['ok']) {
+          $succes++;
+        } else {
+          $echecs++;
+        }
+        $details[] = ['id' => $idBillets, 'ok' => $res['ok'], 'deja' => $res['deja']];
+      }
+      return ['succes' => $succes, 'deja' => $deja, 'echecs' => $echecs, 'details' => $details];
     }
 
     // Annule un embarquement marqué par erreur (clic accidentel) : reste possible tant que
@@ -815,6 +848,56 @@
       }
       $this->set_flash("Erreur lors de l'annulation de l'embarquement.", "danger");
       return false;
+    }
+
+    // Cars "complets" (places reservees >= capacite) ayant encore au moins un passager non
+    // embarque ce jour-la : permet d'alerter proactivement (badge menu + banniere embarquement)
+    // au lieu d'attendre que quelqu'un pense a verifier manuellement. L'alerte disparait d'elle
+    // meme une fois tout le monde embarque (voir la sous-requete EXISTS sur billets).
+    public function getCarsComplets($idDepart, $numeroGare, $id_compagnie, $jour = null)
+    {
+      $jour = $jour ?? date('Y-m-d');
+
+      $idAgence = null;
+      if ($idDepart !== null && $numeroGare !== null) {
+        $agence = $this->fetchOne(
+          "SELECT idAgence FROM agence WHERE localite = :l AND numeroGare = :ng AND id_compagnie = :c LIMIT 1",
+          [':l' => $idDepart, ':ng' => $numeroGare, ':c' => $id_compagnie]
+        );
+        $idAgence = $agence['idAgence'] ?? null;
+      }
+
+      $where = "pv.date_enregistre = :jour AND pv.id_compagnie = :id_compagnie AND pv.statut = 'active'
+                 AND c.nbr_place > 0 AND c.nbr_place_reserve >= c.nbr_place";
+      $params = [':jour' => $jour, ':id_compagnie' => $id_compagnie];
+
+      if ($idAgence !== null) {
+        $where .= ' AND pv.id_agence = :agence';
+        $params[':agence'] = $idAgence;
+      } elseif ($idDepart !== null) {
+        $where .= ' AND pv.localite_user = :depart';
+        $params[':depart'] = $idDepart;
+      }
+
+      return $this->fetchAll(
+        "SELECT pv.id_trajet AS destination, pv.id_horaire AS heure, pv.localite_user AS depart,
+                c.numero_car, c.matriculle, c.nbr_place, c.nbr_place_reserve
+         FROM programmation_voyage pv
+         INNER JOIN car c ON c.id_car = pv.id_car_programmer
+         WHERE $where
+           AND EXISTS (
+             SELECT 1 FROM billets b
+             WHERE b.jourVoyage = pv.date_enregistre
+               AND b.Heur_departs = pv.id_horaire
+               AND b.destinationId = pv.id_trajet
+               AND b.departId = pv.localite_user
+               AND b.id_compagnie = pv.id_compagnie
+               AND (b.status_billets IS NULL OR b.status_billets = '')
+               AND (b.statut_embarquement IS NULL OR b.statut_embarquement != 'embarque')
+           )
+         ORDER BY pv.id_horaire",
+        $params
+      );
     }
 
     // ─────────────────────────────────────────────────────────────────────────

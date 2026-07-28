@@ -75,6 +75,24 @@
             </div>
 
             <?php $this->view("admin/set_flash") ?>
+            <input type="hidden" id="csrfToken" value="<?= htmlspecialchars(csrf_token()) ?>">
+
+            <?php if (!empty($carsComplets)): ?>
+                <div class="alert alert-danger d-flex align-items-start gap-2" style="border-left: 4px solid #dc3545;">
+                    <i class="bx bx-error-circle" style="font-size:1.4rem;"></i>
+                    <div>
+                        <strong>Bus complet<?= count($carsComplets) > 1 ? 's' : '' ?> : embarquement requis</strong>
+                        <ul class="mb-0 mt-1">
+                            <?php foreach ($carsComplets as $c): ?>
+                                <li>
+                                    Car N°<?= htmlspecialchars($c['numero_car']) ?> vers <strong><?= htmlspecialchars($c['destination']) ?></strong>
+                                    à <?= htmlspecialchars($c['heure']) ?> — <?= (int)$c['nbr_place_reserve'] ?>/<?= (int)$c['nbr_place'] ?> places vendues.
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <?php
                 $total = count($liste);
@@ -83,14 +101,17 @@
             <div class="card shadow-sm border-0 rounded-3 mb-3">
                 <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div>
-                        <span class="fs-4 fw-bold text-success"><?= $embarques ?></span>
-                        <span class="text-muted"> / <?= $total ?> embarqués</span>
+                        <span class="fs-4 fw-bold text-success" id="compteurEmbarques"><?= $embarques ?></span>
+                        <span class="text-muted"> / <span id="compteurTotal"><?= $total ?></span> embarqués</span>
                     </div>
                     <?php if ($total > 0): ?>
                         <div class="progress flex-grow-1 mx-3" style="height: 10px; max-width: 300px;">
-                            <div class="progress-bar bg-success" style="width: <?= $total ? round($embarques / $total * 100) : 0 ?>%"></div>
+                            <div class="progress-bar bg-success" id="progressEmbarquement" style="width: <?= $total ? round($embarques / $total * 100) : 0 ?>%"></div>
                         </div>
                     <?php endif; ?>
+                    <button type="button" class="btn btn-success" id="btnEmbarquerSelection" disabled>
+                        <i class="bx bx-check-double"></i> Embarquer la sélection (<span id="nbSelection">0</span>)
+                    </button>
                 </div>
             </div>
 
@@ -100,6 +121,7 @@
                         <table class="table table-striped table-bordered mobile-card-table" style="width:100%">
                             <thead>
                                 <tr class="text-center">
+                                    <th><input type="checkbox" id="checkAll"></th>
                                     <th>Client</th>
                                     <th>Destination</th>
                                     <th>N° de place</th>
@@ -108,15 +130,19 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="tbodyEmbarquement">
                                 <?php foreach ($liste as $b): ?>
-                                    <tr class="text-center">
+                                    <?php $estEmbarque = ($b['statut_embarquement'] ?? null) === 'embarque'; ?>
+                                    <tr class="text-center" data-id="<?= $b['idBillets'] ?>">
+                                        <td>
+                                            <input type="checkbox" class="chk-billet" value="<?= $b['idBillets'] ?>" <?= $estEmbarque ? 'disabled' : '' ?>>
+                                        </td>
                                         <td data-label="Client"><?= htmlspecialchars($b['Client'] ?? '-') ?></td>
                                         <td data-label="Destination"><?= htmlspecialchars($b['destinationId'] ?? '-') ?></td>
                                         <td data-label="N° de place">Chaisse N°<?= htmlspecialchars($b['numeroPlace'] ?? '-') ?></td>
                                         <td data-label="Heure de départ"><?= htmlspecialchars($b['Heur_departs'] ?? '-') ?></td>
-                                        <td data-label="Statut">
-                                            <?php if (($b['statut_embarquement'] ?? null) === 'embarque'): ?>
+                                        <td data-label="Statut" class="cell-statut">
+                                            <?php if ($estEmbarque): ?>
                                                 <span class="badge bg-success">
                                                     Embarqué <?= !empty($b['embarque_le']) ? '(' . date('H:i', strtotime($b['embarque_le'])) . ')' : '' ?>
                                                 </span>
@@ -127,23 +153,15 @@
                                                 <span class="badge bg-warning text-dark">En attente</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td data-label="Action">
-                                            <?php if (($b['statut_embarquement'] ?? null) === 'embarque'): ?>
-                                                <form action="<?= BASE_URL ?>/admin/Liste_du_jours/annulerEmbarquement" method="post" class="d-inline">
-                                                    <?= csrf_field() ?>
-                                                    <input type="hidden" name="idBillets" value="<?= $b['idBillets'] ?>">
-                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                                        <i class="bx bx-undo"></i> Annuler
-                                                    </button>
-                                                </form>
+                                        <td data-label="Action" class="cell-action">
+                                            <?php if ($estEmbarque): ?>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary btn-annuler-embarquement" data-id="<?= $b['idBillets'] ?>">
+                                                    <i class="bx bx-undo"></i> Annuler
+                                                </button>
                                             <?php else: ?>
-                                                <form action="<?= BASE_URL ?>/admin/Liste_du_jours/marquerEmbarque" method="post" class="d-inline">
-                                                    <?= csrf_field() ?>
-                                                    <input type="hidden" name="idBillets" value="<?= $b['idBillets'] ?>">
-                                                    <button type="submit" class="btn btn-sm btn-success">
-                                                        <i class="bx bx-check"></i> Embarquer
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="btn btn-sm btn-success btn-marquer-embarque" data-id="<?= $b['idBillets'] ?>">
+                                                    <i class="bx bx-check"></i> Embarquer
+                                                </button>
                                                 <button type="button" class="btn btn-sm btn-outline-danger btn-demander-report"
                                                     data-id="<?= $b['idBillets'] ?>" data-client="<?= htmlspecialchars($b['Client'] ?? '-') ?>"
                                                     data-bs-toggle="modal" data-bs-target="#modalDemanderReport">
@@ -155,7 +173,7 @@
                                 <?php endforeach ?>
                                 <?php if (empty($liste)): ?>
                                     <tr>
-                                        <td colspan="6" class="text-center text-muted py-4">Aucun billet pour ce filtre.</td>
+                                        <td colspan="7" class="text-center text-muted py-4">Aucun billet pour ce filtre.</td>
                                     </tr>
                                 <?php endif ?>
                             </tbody>
@@ -215,11 +233,184 @@
     <?php $this->view('admin/partials/foot') ?>
 
     <script>
-        document.querySelectorAll('.btn-demander-report').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                document.getElementById('reportIdBillets').value = this.dataset.id;
-                document.getElementById('reportClientNom').textContent = this.dataset.client;
+        const csrfToken = document.getElementById('csrfToken').value;
+        const baseUrl = '<?= BASE_URL ?>';
+        const tbody = document.getElementById('tbodyEmbarquement');
+
+        function toast(icon, message) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: icon,
+                title: message,
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true
             });
+        }
+
+        function majCompteurs() {
+            const badgesEmbarques = tbody.querySelectorAll('.cell-statut .badge.bg-success').length;
+            const totalLignes = tbody.querySelectorAll('tr[data-id]').length;
+            document.getElementById('compteurEmbarques').textContent = badgesEmbarques;
+            document.getElementById('compteurTotal').textContent = totalLignes;
+            const progress = document.getElementById('progressEmbarquement');
+            if (progress) {
+                progress.style.width = (totalLignes ? Math.round(badgesEmbarques / totalLignes * 100) : 0) + '%';
+            }
+        }
+
+        function majSelectionUi() {
+            const n = tbody.querySelectorAll('.chk-billet:checked').length;
+            document.getElementById('nbSelection').textContent = n;
+            document.getElementById('btnEmbarquerSelection').disabled = (n === 0);
+        }
+
+        function appliquerLigneEmbarquee(tr) {
+            const id = tr.dataset.id;
+            tr.querySelector('.cell-statut').innerHTML =
+                '<span class="badge bg-success">Embarqué (à l\'instant)</span>';
+            tr.querySelector('.cell-action').innerHTML =
+                '<button type="button" class="btn btn-sm btn-outline-secondary btn-annuler-embarquement" data-id="' + id + '">' +
+                '<i class="bx bx-undo"></i> Annuler</button>';
+            const chk = tr.querySelector('.chk-billet');
+            chk.checked = false;
+            chk.disabled = true;
+            attacherBoutonsLigne(tr);
+        }
+
+        function appliquerLigneNonEmbarquee(tr) {
+            const id = tr.dataset.id;
+            const client = tr.querySelector('[data-label="Client"]').textContent.trim();
+            tr.querySelector('.cell-statut').innerHTML =
+                '<span class="badge bg-warning text-dark">En attente</span>';
+            tr.querySelector('.cell-action').innerHTML =
+                '<button type="button" class="btn btn-sm btn-success btn-marquer-embarque" data-id="' + id + '">' +
+                '<i class="bx bx-check"></i> Embarquer</button> ' +
+                '<button type="button" class="btn btn-sm btn-outline-danger btn-demander-report" data-id="' + id + '" ' +
+                'data-client="' + client + '" data-bs-toggle="modal" data-bs-target="#modalDemanderReport">' +
+                '<i class="bx bx-calendar-x"></i> Demander le report</button>';
+            tr.querySelector('.chk-billet').disabled = false;
+            attacherBoutonsLigne(tr);
+        }
+
+        function marquerEmbarqueAjax(id, tr) {
+            fetch(baseUrl + '/admin/Liste_du_jours/marquerEmbarque', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: 'idBillets=' + encodeURIComponent(id) + '&csrf_token=' + encodeURIComponent(csrfToken)
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.ok) {
+                        appliquerLigneEmbarquee(tr);
+                        majCompteurs();
+                    }
+                    toast(data.ok ? 'success' : 'warning', data.message || (data.ok ? 'Client embarqué.' : 'Action impossible.'));
+                })
+                .catch(() => toast('error', "Erreur réseau, veuillez réessayer."));
+        }
+
+        function annulerEmbarqueAjax(id, tr) {
+            fetch(baseUrl + '/admin/Liste_du_jours/annulerEmbarquement', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: 'idBillets=' + encodeURIComponent(id) + '&csrf_token=' + encodeURIComponent(csrfToken)
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.ok) {
+                        appliquerLigneNonEmbarquee(tr);
+                        majCompteurs();
+                    }
+                    toast(data.ok ? 'info' : 'warning', data.message || (data.ok ? 'Embarquement annulé.' : 'Action impossible.'));
+                })
+                .catch(() => toast('error', "Erreur réseau, veuillez réessayer."));
+        }
+
+        function attacherBoutonsLigne(tr) {
+            const btnEmbarquer = tr.querySelector('.btn-marquer-embarque');
+            if (btnEmbarquer) {
+                btnEmbarquer.addEventListener('click', function() {
+                    marquerEmbarqueAjax(this.dataset.id, tr);
+                });
+            }
+            const btnAnnuler = tr.querySelector('.btn-annuler-embarquement');
+            if (btnAnnuler) {
+                btnAnnuler.addEventListener('click', function() {
+                    annulerEmbarqueAjax(this.dataset.id, tr);
+                });
+            }
+            const btnReport = tr.querySelector('.btn-demander-report');
+            if (btnReport) {
+                btnReport.addEventListener('click', function() {
+                    document.getElementById('reportIdBillets').value = this.dataset.id;
+                    document.getElementById('reportClientNom').textContent = this.dataset.client;
+                });
+            }
+        }
+
+        tbody.querySelectorAll('tr[data-id]').forEach(attacherBoutonsLigne);
+
+        tbody.addEventListener('change', function(e) {
+            if (e.target.classList.contains('chk-billet')) {
+                majSelectionUi();
+            }
+        });
+
+        document.getElementById('checkAll').addEventListener('change', function() {
+            tbody.querySelectorAll('.chk-billet:not(:disabled)').forEach(chk => {
+                chk.checked = this.checked;
+            });
+            majSelectionUi();
+        });
+
+        document.getElementById('btnEmbarquerSelection').addEventListener('click', function() {
+            const cases = Array.from(tbody.querySelectorAll('.chk-billet:checked'));
+            const ids = cases.map(c => c.value);
+            if (ids.length === 0) return;
+
+            this.disabled = true;
+            const body = new URLSearchParams();
+            ids.forEach(id => body.append('idsBillets[]', id));
+            body.append('csrf_token', csrfToken);
+
+            fetch(baseUrl + '/admin/Liste_du_jours/marquerEmbarqueLot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: body.toString()
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.ok && Array.isArray(data.details)) {
+                        data.details.forEach(function(d) {
+                            if (d.ok) {
+                                const tr = tbody.querySelector('tr[data-id="' + d.id + '"]');
+                                if (tr) appliquerLigneEmbarquee(tr);
+                            }
+                        });
+                        majCompteurs();
+                        document.getElementById('checkAll').checked = false;
+                        majSelectionUi();
+                        let resume = data.succes + ' embarqué(s)';
+                        if (data.deja > 0) resume += ', ' + data.deja + ' déjà embarqué(s)';
+                        if (data.echecs > 0) resume += ', ' + data.echecs + ' échec(s)';
+                        toast(data.echecs > 0 ? 'warning' : 'success', resume);
+                    } else {
+                        toast('error', data.message || "Erreur lors de l'embarquement en masse.");
+                    }
+                })
+                .catch(() => toast('error', "Erreur réseau, veuillez réessayer."))
+                .finally(() => majSelectionUi());
         });
     </script>
 
