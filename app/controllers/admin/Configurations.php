@@ -158,10 +158,12 @@ class Configurations extends Controller
             $idUser = (int)$_POST['idUser'];
             $utilisateurs = $_POST['utilisateurs'];
             $emailUser = $_POST['emailUser'];
+            $telephone = trim($_POST['telephone'] ?? '');
             $droit = $_POST['droit'];
 
             if (($role === 'Admin' && !$this->utilisateurAppartientCompagnie($configuration, $idUser, $id_compagnie))
                 || !in_array($droit, $droitsAutorises, true)
+                || ($telephone !== '' && !preg_match('/^[0-9+\s.\-]{6,20}$/', $telephone))
             ) {
                 $configuration->set_flash("Action non autorisée.", "danger");
                 header("Location: " . $_SERVER['REQUEST_URI']);
@@ -170,10 +172,11 @@ class Configurations extends Controller
 
             $profile = ($droit === 'Utilisateur') ? ($_POST['profile'] ?? null) : null;
 
-            $updateFields = "utilisateurs = :utilisateurs, emailUser = :emailUser, droit = :droit, profile = :profile";
+            $updateFields = "utilisateurs = :utilisateurs, emailUser = :emailUser, telephone = :telephone, droit = :droit, profile = :profile";
             $params = [
                 ":utilisateurs" => $utilisateurs,
                 ":emailUser" => $emailUser,
+                ":telephone" => $telephone !== '' ? $telephone : null,
                 ":droit" => $droit,
                 ":profile" => $profile,
                 ":id" => $idUser
@@ -198,7 +201,7 @@ class Configurations extends Controller
             exit;
         }
 
-        $userColumns = 'utilisateur.idUser, utilisateur.utilisateurs, utilisateur.emailUser, utilisateur.motPasse,
+        $userColumns = 'utilisateur.idUser, utilisateur.utilisateurs, utilisateur.emailUser, utilisateur.telephone, utilisateur.motPasse,
             utilisateur.droit, utilisateur.profile, utilisateur.status, agence.numeroGare';
 
         // Les comptes super_admin n'apparaissent jamais dans cette liste, y compris pour

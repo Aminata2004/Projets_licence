@@ -57,6 +57,7 @@
                       <th class="fw-semibold">Nom &amp; prénom</th>
                       <th class="fw-semibold">Fonction</th>
                       <th class="fw-semibold">Contact</th>
+                      <th class="fw-semibold">Téléphone</th>
                       <th class="fw-semibold">Affectation</th>
                       <th class="fw-semibold">Type</th>
                       <th class="fw-semibold">Statut</th>
@@ -65,7 +66,7 @@
                   <tbody class="text-center">
                     <?php if (empty($employes)): ?>
                       <tr>
-                        <td colspan="6" class="text-muted py-4">Aucun employé trouvé pour cette compagnie.</td>
+                        <td colspan="7" class="text-muted py-4">Aucun employé trouvé pour cette compagnie.</td>
                       </tr>
                     <?php endif; ?>
                     <?php foreach ($employes as $employe): ?>
@@ -73,6 +74,7 @@
                         <td data-label="Nom & prénom"><?= htmlspecialchars($employe['nom']) ?></td>
                         <td data-label="Fonction"><?= htmlspecialchars($employe['fonction']) ?></td>
                         <td data-label="Contact"><?= htmlspecialchars($employe['contact']) ?></td>
+                        <td data-label="Téléphone"><?= htmlspecialchars($employe['telephone']) ?></td>
                         <td data-label="Affectation"><?= htmlspecialchars($employe['affectation']) ?></td>
                         <td data-label="Type">
                           <span class="badge <?= $employe['type'] === 'Chauffeur' ? 'bg-warning text-dark' : 'bg-primary' ?>">

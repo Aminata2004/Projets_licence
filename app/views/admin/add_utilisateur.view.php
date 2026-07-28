@@ -157,6 +157,11 @@
                                         <input type="email" class="form-control" id="validationCustom02" placeholder="Email" name="emailUser" required>
                                     </div>
 
+                                    <div class="col-md-6">
+                                        <label for="validationCustomTelephone" class="form-label fw-semibold">Téléphone</label>
+                                        <input type="tel" class="form-control" id="validationCustomTelephone" placeholder="Téléphone" name="telephone" pattern="[0-9+\s.\-]{6,20}">
+                                    </div>
+
                                     <!-- <div class="col-md-6">
                                         <label for="validationCustomUsername" class="form-label fw-semibold">Mot de passe</label>
                                         <div class="input-group has-validation">

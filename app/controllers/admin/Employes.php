@@ -38,7 +38,7 @@ class Employes extends Controller
         $employes = [];
 
         if ($peutVoirUtilisateurs) {
-            $userColumns = 'utilisateur.idUser, utilisateur.utilisateurs, utilisateur.emailUser,
+            $userColumns = 'utilisateur.idUser, utilisateur.utilisateurs, utilisateur.emailUser, utilisateur.telephone,
                 utilisateur.droit, utilisateur.profile, utilisateur.status, agence.numeroGare';
 
             if ($role === 'super_admin') {
@@ -70,6 +70,7 @@ class Employes extends Controller
                     'nom'         => $u->utilisateurs,
                     'fonction'    => $fonction,
                     'contact'     => $u->emailUser,
+                    'telephone'   => $u->telephone ?: '—',
                     'affectation' => $u->numeroGare ?? '—',
                     'statut'      => ((int)$u->status === 1) ? 'Actif' : 'Inactif',
                 ];
@@ -98,7 +99,8 @@ class Employes extends Controller
                     'type'        => 'Chauffeur',
                     'nom'         => $c->nom_prenom,
                     'fonction'    => 'Chauffeur',
-                    'contact'     => $c->numero,
+                    'contact'     => '—',
+                    'telephone'   => $c->numero,
                     'affectation' => 'Car : ' . $c->numero_car,
                     'statut'      => 'Actif',
                 ];

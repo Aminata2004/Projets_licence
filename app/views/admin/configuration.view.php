@@ -153,6 +153,7 @@
                     <tr>
                       <th class="fw-semibold">Utilisateur</th>
                       <th class="fw-semibold">Email</th>
+                      <th class="fw-semibold">Téléphone</th>
                       <th class="fw-semibold">Gare</th>
                       <th class="fw-semibold">Droit</th>
                       <th class="fw-semibold">Service</th>
@@ -164,6 +165,7 @@
                       <tr class="align-middle text-center">
                         <td data-label="Utilisateur"><?= htmlspecialchars($listes->utilisateurs) ?></td>
                         <td data-label="Email"><?= htmlspecialchars($listes->emailUser) ?></td>
+                        <td data-label="Téléphone"><?= htmlspecialchars($listes->telephone ?? '') ?></td>
                         <td data-label="Gare"><?= htmlspecialchars($listes->numeroGare ?? '') ?></td>
                         <td data-label="Droit"><?= htmlspecialchars($listes->droit) ?></td>
                         <td data-label="Service">
@@ -204,6 +206,7 @@
                             data-id="<?= $listes->idUser ?>"
                             data-utilisateurs="<?= $listes->utilisateurs ?>"
                             data-email="<?= $listes->emailUser ?>"
+                            data-telephone="<?= htmlspecialchars($listes->telephone ?? '') ?>"
                             data-motpasse="<?= $listes->motPasse ?>"
                             data-droit="<?= $listes->droit ?>"
                             data-profile="<?= htmlspecialchars($listes->profile ?? '') ?>">
@@ -358,7 +361,12 @@
               <label for="edit_emailUser" class="form-label fw-semibold">Email</label>
               <input type="email" class="form-control" id="edit_emailUser" name="emailUser" required>
             </div>
-            
+
+            <div class="mb-3">
+              <label for="edit_telephone" class="form-label fw-semibold">Téléphone</label>
+              <input type="tel" class="form-control" id="edit_telephone" name="telephone" pattern="[0-9+\s.\-]{6,20}">
+            </div>
+
             <div class="mb-3">
               <label for="edit_droit" class="form-label fw-semibold">Droit</label>
               <select class="form-select" id="edit_droit" name="droit" required>
@@ -417,6 +425,7 @@
           document.getElementById('edit_idUser').value = this.dataset.id;
           document.getElementById('edit_utilisateurs').value = this.dataset.utilisateurs;
           document.getElementById('edit_emailUser').value = this.dataset.email;
+          document.getElementById('edit_telephone').value = this.dataset.telephone || '';
           editDroit.value = this.dataset.droit;
           document.getElementById('edit_motPasse').value = '';
           toggleServiceField();

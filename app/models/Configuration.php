@@ -50,6 +50,11 @@
                 $errors[] = "Cet email est déjà utilisé.";
             }
 
+            $telephone = trim($_POST['telephone'] ?? '');
+            if ($telephone !== '' && !preg_match('/^[0-9+\s.\-]{6,20}$/', $telephone)) {
+                $errors[] = "Le numéro de téléphone n'est pas valide.";
+            }
+
             if (count($errors) === 0) {
                 // Mot de passe par défaut identique pour tous les nouveaux comptes,
                 // à communiquer à l'utilisateur (pas d'envoi d'email) : il le change
@@ -71,11 +76,12 @@
                     // lieu du compte réellement créé — chaque nouvel utilisateur se retrouvait
                     // sans aucune permission malgré le message de succès.
                     $result = $this->insertion_update_simples_insert_id(
-                        "INSERT INTO utilisateur (utilisateurs, emailUser, motPasse, status, id_agence, id_compagnie, droit, profile)
-                        VALUES (:utilisateurs, :emailUser, :motPasse, :status, :id_agence, :id_compagnie, :droit, :profile)",
+                        "INSERT INTO utilisateur (utilisateurs, emailUser, telephone, motPasse, status, id_agence, id_compagnie, droit, profile)
+                        VALUES (:utilisateurs, :emailUser, :telephone, :motPasse, :status, :id_agence, :id_compagnie, :droit, :profile)",
                         [
                             ":utilisateurs"  => $utilisateurs,
                             ":emailUser"     => $emailUser,
+                            ":telephone"     => $telephone !== '' ? $telephone : null,
                             ":motPasse"      => $motPasseHash,
                             ":status"        => $status,
                             ":id_agence"     => $id_agence,
