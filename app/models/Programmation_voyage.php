@@ -461,6 +461,78 @@ $fromAndWhere = "liaison_car_trajet
         return $this->SelectAllDatas($select, $fromAndWhere, $params);
     }
 
+    // Marque le depart reel d'un voyage programme : appele depuis l'ecran Embarquement une
+    // fois tous les passagers traites (embarques ou annules — cf. Liste_du_jour::busDejaDecolle(),
+    // qui s'appuie sur ce champ pour bloquer ensuite tout embarquement/annulation sur ce trajet).
+    //
+    // Ne touche pas a car.status_car ('En_transit_...', deja positionne des la programmation
+    // du voyage) : c'est un suivi distinct, propre a ce trajet precis (un meme car peut faire
+    // plusieurs voyages dans la journee), qui ne remplace pas la mecanique existante utilisee
+    // par validerArrivee()/getCarsInTransit() et par le blocage des transferts entre gares.
+    public function decollerCar($id_programmation, $id_compagnie)
+    {
+      if (!csrf_verify()) {
+        $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+        return false;
+      }
+
+      $prog = $this->fetchOne(
+        "SELECT * FROM programmation_voyage WHERE id_programmation = :id AND id_compagnie = :id_compagnie",
+        [':id' => $id_programmation, ':id_compagnie' => $id_compagnie]
+      );
+      if (!$prog) {
+        $this->set_flash("Programmation introuvable.", "danger");
+        return false;
+      }
+      if (!empty($prog['decolle_le'])) {
+        $this->set_flash("Ce bus a déjà décollé.", "warning");
+        return false;
+      }
+
+      // IDOR/portee : un chef d'escale ne peut decoller qu'un car partant de sa propre gare.
+      if (($_SESSION['droit'] ?? null) === 'chef_d_escale' && $prog['localite_user'] !== ($_SESSION['ville'] ?? null)) {
+        $this->set_flash("Ce car ne part pas de votre gare.", "danger");
+        return false;
+      }
+
+      $restants = $this->fetchOne(
+        "SELECT COUNT(*) AS n FROM billets
+         WHERE jourVoyage = :jour AND Heur_departs = :heure AND destinationId = :dest
+           AND departId = :depart AND id_compagnie = :id_compagnie
+           AND (statut_embarquement IS NULL OR statut_embarquement != 'embarque')
+           AND (status_billets IS NULL OR status_billets != 'annule')",
+        [
+          ':jour' => $prog['date_enregistre'], ':heure' => $prog['id_horaire'],
+          ':dest' => $prog['id_trajet'], ':depart' => $prog['localite_user'],
+          ':id_compagnie' => $id_compagnie,
+        ]
+      );
+      $nbRestants = (int)($restants['n'] ?? 0);
+      if ($nbRestants > 0) {
+        $this->set_flash("$nbRestants passager(s) non traité(s) (ni embarqué, ni annulé) : impossible de faire décoller le bus.", "warning");
+        return false;
+      }
+
+      date_default_timezone_set('Africa/Bamako');
+      $stmt = $this->insertion_update_simples(
+        "UPDATE programmation_voyage SET decolle_le = :maintenant, decolle_par = :par
+         WHERE id_programmation = :id AND id_compagnie = :id_compagnie AND decolle_le IS NULL",
+        [
+          ':maintenant' => date('Y-m-d H:i:s'),
+          ':par' => $_SESSION['id_utilisateur'] ?? null,
+          ':id' => $id_programmation,
+          ':id_compagnie' => $id_compagnie,
+        ]
+      );
+
+      if ($stmt->rowCount() > 0) {
+        $this->set_flash("Bus décollé avec ses passagers.", "success");
+        return true;
+      }
+      $this->set_flash("Ce bus a déjà été traité entre-temps par quelqu'un d'autre.", "warning");
+      return false;
+    }
+
     public function validerArrivee($id_car)
     {
         $car = $this->FetchSelectWheres("status_car", "car", "id_car = :id_car", [":id_car" => $id_car]);

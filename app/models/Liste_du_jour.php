@@ -798,10 +798,14 @@
       return $this->fetchAll(
         "SELECT b.idBillets, b.numeroBillets, b.destinationId, b.Heur_departs, b.numeroPlace,
                 b.statut_embarquement, b.embarque_le, c.Client,
-                ue.utilisateurs AS embarque_par_nom
+                ue.utilisateurs AS embarque_par_nom, pv.decolle_le AS bus_decolle_le
          FROM billets b
          INNER JOIN client c ON b.id_client = c.idClient
          LEFT JOIN utilisateur ue ON ue.idUser = b.embarque_par
+         LEFT JOIN programmation_voyage pv ON pv.date_enregistre = b.jourVoyage
+                AND pv.id_horaire = b.Heur_departs AND pv.id_trajet = b.destinationId
+                AND pv.localite_user = b.departId AND pv.id_compagnie = b.id_compagnie
+                AND pv.statut = 'active'
          WHERE $where
          ORDER BY b.Heur_departs, c.Client",
         $params
@@ -845,6 +849,26 @@
       );
     }
 
+    // Le bus associe a ce billet (meme jour/heure/destination/depart) a-t-il deja
+    // "decolle" (cf. Programmation_voyage::decollerCar()) ? Le bus programme peut avoir
+    // change de creneau (report/modification) : on prend la programmation active la plus
+    // recente correspondant exactement au trajet du billet.
+    private function busDejaDecolle($billet): bool
+    {
+      $prog = $this->fetchOne(
+        "SELECT decolle_le FROM programmation_voyage
+         WHERE date_enregistre = :jour AND id_horaire = :heure AND id_trajet = :dest
+           AND localite_user = :depart AND id_compagnie = :id_compagnie AND statut = 'active'
+         ORDER BY id_programmation DESC LIMIT 1",
+        [
+          ':jour' => $billet->jourVoyage, ':heure' => $billet->Heur_departs,
+          ':dest' => $billet->destinationId, ':depart' => $billet->departId,
+          ':id_compagnie' => $billet->id_compagnie,
+        ]
+      );
+      return !empty($prog['decolle_le']);
+    }
+
     // Logique commune d'embarquement, sans gestion de flash (reutilisee par marquerEmbarque()
     // en solo, marquerEmbarqueLot() en masse, et les endpoints AJAX du controleur).
     private function embarquerBilletInterne($idBillets): array
@@ -862,6 +886,9 @@
       // directement (rejeu, ancien onglet ouvert) sans passer par la liste affichee a l'ecran.
       if (!in_array($billet->status_billets ?? null, [null, ''], true)) {
         return ['ok' => false, 'deja' => false, 'message' => "Annulé ou en attente de traitement (report/annulation) : impossible de l'embarquer."];
+      }
+      if ($this->busDejaDecolle($billet)) {
+        return ['ok' => false, 'deja' => false, 'message' => "Le bus a déjà décollé : impossible d'embarquer."];
       }
 
       $ok = $this->insertion_update_simples(
@@ -910,8 +937,8 @@
     }
 
     // Annule un embarquement marqué par erreur (clic accidentel) : reste possible tant que
-    // le départ n'a pas ete cloture cote interface (la cloture n'est qu'un etat d'affichage,
-    // pas une contrainte en base, pour rester simple).
+    // le bus n'a pas reellement decolle (decollerCar()) — une fois le bus parti, revenir en
+    // arriere sur l'embarquement d'un passager qui est physiquement dans le bus n'a plus de sens.
     public function annulerEmbarquementBillet($idBillets)
     {
       if (!csrf_verify()) {
@@ -922,6 +949,10 @@
       $billet = $this->getBilletById($idBillets);
       if (!$billet || ($billet->statut_embarquement ?? null) !== 'embarque') {
         $this->set_flash("Ce client n'est pas marqué comme embarqué.", "warning");
+        return false;
+      }
+      if ($this->busDejaDecolle($billet)) {
+        $this->set_flash("Le bus a déjà décollé : impossible d'annuler cet embarquement.", "warning");
         return false;
       }
 
@@ -990,6 +1021,56 @@
                AND (b.status_billets IS NULL OR b.status_billets = '')
                AND (b.statut_embarquement IS NULL OR b.statut_embarquement != 'embarque')
            )
+         ORDER BY pv.id_horaire",
+        $params
+      );
+    }
+
+    // Cars programmes aujourd'hui pour cette gare, quel que soit leur taux de remplissage :
+    // affiche sur l'ecran Embarquement avec un bouton "Faire decoller" par car/trajet (une
+    // fois tous les passagers traites — cf. Programmation_voyage::decollerCar()), ou un badge
+    // "Decolle" si deja fait. nb_restants sert a desactiver le bouton cote vue tant qu'il
+    // reste du monde a traiter (embarquer, reporter ou annuler).
+    public function getCarsDuJourPourEmbarquement($idDepart, $numeroGare, $id_compagnie, $jour = null)
+    {
+      $jour = $jour ?? date('Y-m-d');
+
+      $idAgence = null;
+      if ($idDepart !== null && $numeroGare !== null) {
+        $agence = $this->fetchOne(
+          "SELECT idAgence FROM agence WHERE localite = :l AND numeroGare = :ng AND id_compagnie = :c LIMIT 1",
+          [':l' => $idDepart, ':ng' => $numeroGare, ':c' => $id_compagnie]
+        );
+        $idAgence = $agence['idAgence'] ?? null;
+      }
+
+      $where = "pv.date_enregistre = :jour AND pv.id_compagnie = :id_compagnie AND pv.statut = 'active'";
+      $params = [':jour' => $jour, ':id_compagnie' => $id_compagnie];
+
+      if ($idAgence !== null) {
+        $where .= ' AND pv.id_agence = :agence';
+        $params[':agence'] = $idAgence;
+      } elseif ($idDepart !== null) {
+        $where .= ' AND pv.localite_user = :depart';
+        $params[':depart'] = $idDepart;
+      }
+
+      return $this->fetchAll(
+        "SELECT pv.id_programmation, pv.id_trajet AS destination, pv.id_horaire AS heure,
+                pv.localite_user AS depart, pv.decolle_le, pv.decolle_par,
+                ud.utilisateurs AS decolle_par_nom,
+                c.numero_car, c.matriculle, c.nbr_place, c.nbr_place_reserve,
+                (SELECT COUNT(*) FROM billets b
+                  WHERE b.jourVoyage = pv.date_enregistre AND b.Heur_departs = pv.id_horaire
+                    AND b.destinationId = pv.id_trajet AND b.departId = pv.localite_user
+                    AND b.id_compagnie = pv.id_compagnie
+                    AND (b.statut_embarquement IS NULL OR b.statut_embarquement != 'embarque')
+                    AND (b.status_billets IS NULL OR b.status_billets != 'annule')
+                ) AS nb_restants
+         FROM programmation_voyage pv
+         INNER JOIN car c ON c.id_car = pv.id_car_programmer
+         LEFT JOIN utilisateur ud ON ud.idUser = pv.decolle_par
+         WHERE $where
          ORDER BY pv.id_horaire",
         $params
       );

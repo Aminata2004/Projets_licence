@@ -495,6 +495,7 @@ class Liste_du_jours extends  Controller
 
     $liste = $model->getBilletsPourEmbarquement($idDepart, $numeroGare, $jour, $destination, $heure);
     $carsComplets = $model->getCarsComplets($idDepart, $numeroGare, $id_compagnie, $jour);
+    $carsDuJour = $model->getCarsDuJourPourEmbarquement($idDepart, $numeroGare, $id_compagnie, $jour);
 
     $liste_horaires = $model->FetchSelectWheres('*', 'horaire', 'id_compagnie = :id_compagnie', ['id_compagnie' => $id_compagnie]);
     $destinations = $model->getDestinations($idDepart, $id_compagnie, $numeroGare);
@@ -505,7 +506,28 @@ class Liste_du_jours extends  Controller
       'destinations' => $destinations,
       'date' => $jour,
       'carsComplets' => $carsComplets,
+      'carsDuJour' => $carsDuJour,
     ]);
+  }
+
+  // Marque le depart reel d'un car (AJAX depuis l'ecran Embarquement) : voir
+  // Programmation_voyage::decollerCar() pour les regles (bloque tant que des passagers
+  // ne sont pas traites, desactive ensuite Embarquer/Annuler pour ce trajet).
+  public function decollerCar()
+  {
+    $this->requirePermission('Billets_embarquement');
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      $ok = (new Programmation_voyage())->decollerCar($_POST['idProgrammation'] ?? null, $_SESSION['id_compagnie']);
+      if ($this->estAjax()) {
+        $message = $_SESSION['notification']['message'] ?? ($ok ? 'Bus décollé.' : 'Erreur.');
+        unset($_SESSION['notification']);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => (bool)$ok, 'message' => $message]);
+        exit;
+      }
+    }
+    header("Location: " . BASE_URL . "/admin/Liste_du_jours/embarquement");
+    exit;
   }
 
   // Repond en JSON si la requete vient du fetch() de embarquement.view.php (AJAX), sinon

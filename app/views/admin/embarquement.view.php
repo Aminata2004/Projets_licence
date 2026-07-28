@@ -94,6 +94,64 @@
                 </div>
             <?php endif; ?>
 
+            <?php if (!empty($carsDuJour)): ?>
+                <div class="card shadow-sm border-0 rounded-3 mb-3">
+                    <div class="bg-light border-bottom rounded-top px-3 py-2 d-flex align-items-center mb-0" style="gap:8px;">
+                        <i class="bx bx-bus text-primary" style="font-size:1.3rem;"></i>
+                        <h6 class="mb-0 fw-bold text-primary" style="letter-spacing:1px;">Cars du jour</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped mb-0 text-center align-middle" id="tableCarsDuJour">
+                                <thead>
+                                    <tr>
+                                        <th>Car</th>
+                                        <th>Destination</th>
+                                        <th>Heure</th>
+                                        <th>Places</th>
+                                        <th>Restants</th>
+                                        <th>Décollage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($carsDuJour as $car): ?>
+                                        <tr data-id-programmation="<?= $car['id_programmation'] ?>"
+                                            data-destination="<?= htmlspecialchars($car['destination']) ?>"
+                                            data-heure="<?= htmlspecialchars($car['heure']) ?>">
+                                            <td>N°<?= htmlspecialchars($car['numero_car']) ?><br><small class="text-muted"><?= htmlspecialchars($car['matriculle']) ?></small></td>
+                                            <td><?= htmlspecialchars($car['destination']) ?></td>
+                                            <td><?= htmlspecialchars($car['heure']) ?></td>
+                                            <td><?= (int)$car['nbr_place_reserve'] ?>/<?= (int)$car['nbr_place'] ?></td>
+                                            <td class="cell-restants">
+                                                <?php if ((int)$car['nb_restants'] > 0): ?>
+                                                    <span class="badge bg-warning text-dark"><?= (int)$car['nb_restants'] ?> non traité(s)</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-success">0</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="cell-decollage">
+                                                <?php if (!empty($car['decolle_le'])): ?>
+                                                    <span class="badge bg-dark"><i class="bx bx-check-circle"></i> Décollé à <?= date('H:i', strtotime($car['decolle_le'])) ?></span>
+                                                    <?php if (!empty($car['decolle_par_nom'])): ?>
+                                                        <br><small class="text-muted">par <?= htmlspecialchars($car['decolle_par_nom']) ?></small>
+                                                    <?php endif; ?>
+                                                <?php else: ?>
+                                                    <button type="button" class="btn btn-sm btn-primary btn-decoller"
+                                                        data-id="<?= $car['id_programmation'] ?>"
+                                                        <?= (int)$car['nb_restants'] > 0 ? 'disabled title="Traitez d\'abord tous les passagers (embarquer, reporter ou annuler)"' : '' ?>>
+                                                        <i class="bx bx-rocket"></i> Faire décoller
+                                                    </button>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <?php
                 $total = count($liste);
                 $embarques = count(array_filter($liste, fn($b) => ($b['statut_embarquement'] ?? null) === 'embarque'));
@@ -136,10 +194,13 @@
                             </thead>
                             <tbody id="tbodyEmbarquement">
                                 <?php foreach ($liste as $b): ?>
-                                    <?php $estEmbarque = ($b['statut_embarquement'] ?? null) === 'embarque'; ?>
+                                    <?php
+                                        $estEmbarque = ($b['statut_embarquement'] ?? null) === 'embarque';
+                                        $busDecolle = !empty($b['bus_decolle_le']);
+                                    ?>
                                     <tr class="text-center" data-id="<?= $b['idBillets'] ?>">
                                         <td data-label="Sélection">
-                                            <input type="checkbox" class="chk-billet" value="<?= $b['idBillets'] ?>" <?= $estEmbarque ? 'disabled' : '' ?>>
+                                            <input type="checkbox" class="chk-billet" value="<?= $b['idBillets'] ?>" <?= ($estEmbarque || $busDecolle) ? 'disabled' : '' ?>>
                                         </td>
                                         <td data-label="Client"><?= htmlspecialchars($b['Client'] ?? '-') ?></td>
                                         <td data-label="Destination"><?= htmlspecialchars($b['destinationId'] ?? '-') ?></td>
@@ -158,7 +219,9 @@
                                             <?php endif; ?>
                                         </td>
                                         <td data-label="Action" class="cell-action">
-                                            <?php if ($estEmbarque): ?>
+                                            <?php if ($busDecolle): ?>
+                                                <span class="badge bg-dark">Bus parti</span>
+                                            <?php elseif ($estEmbarque): ?>
                                                 <button type="button" class="btn btn-sm btn-outline-secondary btn-annuler-embarquement" data-id="<?= $b['idBillets'] ?>">
                                                     <i class="bx bx-undo"></i> Annuler
                                                 </button>
@@ -471,6 +534,60 @@
                 })
                 .catch(() => toast('error', "Erreur réseau, veuillez réessayer."))
                 .finally(() => majSelectionUi());
+        });
+
+        // Fait "decoller" un car : desactive ensuite Embarquer/Annuler pour tous les billets
+        // de ce trajet precis (destination + heure), le bus etant desormais physiquement parti.
+        document.querySelectorAll('.btn-decoller').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const btnEl = this;
+                const tr = btnEl.closest('tr');
+                btnEl.disabled = true;
+
+                fetch(baseUrl + '/admin/Liste_du_jours/decollerCar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: 'idProgrammation=' + encodeURIComponent(id) + '&csrf_token=' + encodeURIComponent(csrfToken)
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.ok) {
+                            const heureAffichee = new Date().toLocaleTimeString('fr-FR', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            tr.querySelector('.cell-decollage').innerHTML =
+                                '<span class="badge bg-dark"><i class="bx bx-check-circle"></i> Décollé à ' + heureAffichee + '</span>';
+
+                            const destination = tr.dataset.destination;
+                            const heureDepart = tr.dataset.heure;
+                            tbody.querySelectorAll('tr[data-id]').forEach(function(billetTr) {
+                                const dest = billetTr.querySelector('[data-label="Destination"]').textContent.trim();
+                                const hd = billetTr.querySelector('[data-label="Heure de départ"]').textContent.trim();
+                                if (dest === destination && hd === heureDepart) {
+                                    billetTr.querySelector('.cell-action').innerHTML = '<span class="badge bg-dark">Bus parti</span>';
+                                    const chk = billetTr.querySelector('.chk-billet');
+                                    if (chk) {
+                                        chk.checked = false;
+                                        chk.disabled = true;
+                                    }
+                                }
+                            });
+                            majSelectionUi();
+                        } else {
+                            btnEl.disabled = false;
+                        }
+                        toast(data.ok ? 'success' : 'warning', data.message || (data.ok ? 'Bus décollé.' : 'Action impossible.'));
+                    })
+                    .catch(() => {
+                        btnEl.disabled = false;
+                        toast('error', "Erreur réseau, veuillez réessayer.");
+                    });
+            });
         });
     </script>
 
