@@ -127,7 +127,12 @@ class Transfert_gare extends Model
                 return false;
             }
 
-            if ($source['status_car'] !== null && strpos($source['status_car'], 'En_transit_') === 0) {
+            // Anciennement basé sur car.status_car ('En_transit_...'), qui est positionné dès
+            // la programmation du voyage — bien avant le départ réel — et bloquait donc des
+            // transferts sur des cars qui n'avaient meme pas commence l'embarquement. On se
+            // base desormais sur decolle_le (pv.*, deja recupere ci-dessus), positionne
+            // uniquement par Programmation_voyage::decollerCar() une fois le bus reellement parti.
+            if (!empty($source['decolle_le'])) {
                 $pdo->rollBack();
                 $this->set_flash("Ce car est déjà parti : impossible de transférer ses passagers.", "danger");
                 return false;

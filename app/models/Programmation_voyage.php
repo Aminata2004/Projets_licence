@@ -443,7 +443,18 @@ $fromAndWhere = "liaison_car_trajet
     {
         $select = "car.*";
         $fromAndWhere = "car";
-        $where = " WHERE status_car LIKE 'En_transit_%'";
+        // "En transit" affiche ici seulement si le bus a REELLEMENT decolle (decolle_le rempli
+        // sur sa derniere programmation active vers cette destination — cf. decollerCar()),
+        // et non des la simple programmation du voyage : sinon "Valider" l'arrivee devenait
+        // possible bien avant que l'embarquement n'ait meme commence.
+        $decolleReel = "(
+            SELECT pv.decolle_le FROM programmation_voyage pv
+            WHERE pv.id_car_programmer = car.id_car
+              AND pv.id_trajet = SUBSTRING(car.status_car, 12)
+              AND pv.statut = 'active'
+            ORDER BY pv.id_programmation DESC LIMIT 1
+        ) IS NOT NULL";
+        $where = " WHERE status_car LIKE 'En_transit_%' AND $decolleReel";
         $params = [];
 
         if (isset($_SESSION['droit'], $_SESSION['id_compagnie'])) {
@@ -451,7 +462,7 @@ $fromAndWhere = "liaison_car_trajet
                 $where .= " AND id_compagnie = :compagnie";
                 $params[':compagnie'] = $_SESSION['id_compagnie'];
             } elseif ($_SESSION['droit'] === 'chef_d_escale' && isset($_SESSION['ville'])) {
-                $where = " WHERE status_car = :ville AND id_compagnie = :compagnie";
+                $where = " WHERE status_car = :ville AND id_compagnie = :compagnie AND $decolleReel";
                 $params[':ville'] = 'En_transit_' . $_SESSION['ville'];
                 $params[':compagnie'] = $_SESSION['id_compagnie'];
             }
@@ -465,10 +476,12 @@ $fromAndWhere = "liaison_car_trajet
     // fois tous les passagers traites (embarques ou annules — cf. Liste_du_jour::busDejaDecolle(),
     // qui s'appuie sur ce champ pour bloquer ensuite tout embarquement/annulation sur ce trajet).
     //
-    // Ne touche pas a car.status_car ('En_transit_...', deja positionne des la programmation
-    // du voyage) : c'est un suivi distinct, propre a ce trajet precis (un meme car peut faire
-    // plusieurs voyages dans la journee), qui ne remplace pas la mecanique existante utilisee
-    // par validerArrivee()/getCarsInTransit() et par le blocage des transferts entre gares.
+    // Ne touche pas a car.status_car ('En_transit_...', deja positionne des la programmation du
+    // voyage pour empecher qu'un meme car soit programme deux fois) : ce champ reste le suivi de
+    // "reservation" du car. decolle_le est le suivi, precis a CE trajet, du depart physique reel —
+    // c'est lui qui conditionne desormais getCarsInTransit()/validerArrivee() (l'arrivee ne peut
+    // etre validee qu'apres un vrai decollage) et le blocage des transferts entre gares
+    // (Transfert_gare.php, qui autorise a nouveau un transfert tant que le bus n'a pas decolle).
     public function decollerCar($id_programmation, $id_compagnie)
     {
       if (!csrf_verify()) {
@@ -540,6 +553,15 @@ $fromAndWhere = "liaison_car_trajet
             $status = $car[0]->status_car;
             if (strpos($status, 'En_transit_') === 0) {
                 $ville = substr($status, 11);
+                // Garde-fou (defense en profondeur) : meme si getCarsInTransit() ne liste plus
+                // ce car normalement, on revalide ici que le bus a reellement decolle avant de
+                // le "faire arriver" — sans ca, un POST direct pourrait valider l'arrivee d'un
+                // bus qui n'a jamais quitte sa gare.
+                $prog = $this->getProgrammationActivePourCar($id_car, $ville);
+                if (empty($prog->decolle_le)) {
+                    $this->set_flash("Ce bus n'a pas encore décollé : impossible de valider son arrivée.", "warning");
+                    return false;
+                }
                 $update = "UPDATE car SET status_car = :ville WHERE id_car = :id_car";
                 return $this->insertion_update_simples($update, [':ville' => $ville, ':id_car' => $id_car]);
             }
@@ -547,14 +569,16 @@ $fromAndWhere = "liaison_car_trajet
         return false;
     }
 
-    // Dernière programmation enregistrée pour ce car vers cette destination : sert à retrouver
-    // le numéro de gare de destination à afficher dans la liste des cars en transit.
+    // Dernière programmation ACTIVE enregistrée pour ce car vers cette destination : sert à
+    // retrouver le numéro de gare de destination à afficher dans la liste des cars en transit,
+    // et à vérifier si le bus a réellement décollé (decolle_le) avant de valider son arrivée.
     public function getProgrammationActivePourCar($id_car, $destination)
     {
-        $sql = "SELECT pv.id_programmation, pv.date_enregistre, pv.id_horaire, a.numeroGare AS numeroGareDestination
+        $sql = "SELECT pv.id_programmation, pv.date_enregistre, pv.id_horaire, pv.decolle_le,
+                       a.numeroGare AS numeroGareDestination
                 FROM programmation_voyage pv
                 LEFT JOIN agence a ON a.idAgence = pv.id_agence_destination
-                WHERE pv.id_car_programmer = :id_car AND pv.id_trajet = :destination
+                WHERE pv.id_car_programmer = :id_car AND pv.id_trajet = :destination AND pv.statut = 'active'
                 ORDER BY pv.date_enregistre DESC, pv.id_programmation DESC
                 LIMIT 1";
         $stmt = $this->connect()->prepare($sql);

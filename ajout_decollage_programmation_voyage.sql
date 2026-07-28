@@ -6,10 +6,9 @@
 -- au lieu de se fier uniquement à l'heure de départ prévue (un bus peut partir en
 -- avance ou en retard).
 --
--- N'affecte pas le mécanisme existant car.status_car ('En_transit_...') utilisé par
--- Programmation_voyage::validerArrivee()/getCarsInTransit() et par le blocage des
--- transferts entre gares (Transfert_gare.php) : ce sont deux suivis distincts pour
--- l'instant.
+-- Programmation_voyage::validerArrivee()/getCarsInTransit() et le blocage des transferts
+-- entre gares (Transfert_gare.php) dépendent maintenant de ce champ (et non plus de
+-- car.status_car, positionné dès la programmation du voyage — bien avant le départ réel).
 --
 -- À exécuter une seule fois.
 
