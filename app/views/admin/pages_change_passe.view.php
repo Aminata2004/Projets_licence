@@ -108,30 +108,30 @@
                                 <div class="row">
                                     <div class="mb-3 col-md-6 form-password-toggle">
                                         <label class="form-label" for="currentPassword">Ancien mot de pass</label>
-                                        <div class="input-group" id="show_hide_password">
+                                        <div class="input-group password-toggle-group">
                                             <input type="password" class="form-control border-end-0"
                                                 id="ancien_password" name="ancien_password"> <a href="javascript:;"
-                                                class="input-group-text bg-transparent"><i class='bx bx-hide'></i></a>
+                                                class="input-group-text bg-transparent toggle-password"><i class='bx bx-hide'></i></a>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="mb-3 col-md-6 form-password-toggle">
                                         <label class="form-label" for="newPassword">Nouveau mot de pass</label>
-                                        <div class="input-group" id="show_hide_password">
+                                        <div class="input-group password-toggle-group">
                                             <input type="password" class="form-control border-end-0"
                                                 id="new_password" name="new_password"> <a href="javascript:;"
-                                                class="input-group-text bg-transparent"><i class='bx bx-hide'></i></a>
+                                                class="input-group-text bg-transparent toggle-password"><i class='bx bx-hide'></i></a>
                                         </div>
                                     </div>
 
                                     <div class="mb-3 col-md-6 form-password-toggle">
                                         <label class="form-label" for="confirmPassword">Confirmer nouveau mot
                                             pass</label>
-                                        <div class="input-group" id="show_hide_password">
+                                        <div class="input-group password-toggle-group">
                                             <input type="password" class="form-control border-end-0"
                                                 id="confirme_new_passe" name="confirme_new_passe"> <a href="javascript:;"
-                                                class="input-group-text bg-transparent"><i class='bx bx-hide'></i></a>
+                                                class="input-group-text bg-transparent toggle-password"><i class='bx bx-hide'></i></a>
                                         </div>
                                     </div>
 
@@ -164,7 +164,23 @@
 
     <?php $this->view('admin/partials/foot') ?>
 
-
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(function (toggle) {
+            toggle.addEventListener('click', function () {
+                var input = this.closest('.input-group').querySelector('input');
+                var icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('bx-hide');
+                    icon.classList.add('bx-show');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('bx-show');
+                    icon.classList.add('bx-hide');
+                }
+            });
+        });
+    </script>
 
 </body>
 
