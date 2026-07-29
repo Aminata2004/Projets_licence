@@ -65,6 +65,19 @@
                 $id_compagnie = in_array($droit, ['Admin', 'PDG'], true) ? ($_POST['id_compagnie'] ?? null) : $id_compagnie_session;
                 $profile = ($droit === 'Utilisateur') ? ($_POST['profile'] ?? null) : null;
 
+                $photoPath = null;
+                if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = 'public/uploads/profiles/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+                    $fileName = time() . '_' . basename($_FILES['photo']['name']);
+                    $targetFile = $uploadDir . $fileName;
+                    if (move_uploaded_file($_FILES['photo']['tmp_name'], $targetFile)) {
+                        $photoPath = $fileName;
+                    }
+                }
+
                 try {
                     // insertion_update_simples_insert_id() ouvre sa PROPRE connexion PDO et
                     // renvoie lastInsertId() de CETTE connexion. Avant ce correctif, le code
@@ -76,8 +89,8 @@
                     // lieu du compte réellement créé — chaque nouvel utilisateur se retrouvait
                     // sans aucune permission malgré le message de succès.
                     $result = $this->insertion_update_simples_insert_id(
-                        "INSERT INTO utilisateur (utilisateurs, emailUser, telephone, motPasse, status, id_agence, id_compagnie, droit, profile)
-                        VALUES (:utilisateurs, :emailUser, :telephone, :motPasse, :status, :id_agence, :id_compagnie, :droit, :profile)",
+                        "INSERT INTO utilisateur (utilisateurs, emailUser, telephone, motPasse, status, id_agence, id_compagnie, droit, profile, photo)
+                        VALUES (:utilisateurs, :emailUser, :telephone, :motPasse, :status, :id_agence, :id_compagnie, :droit, :profile, :photo)",
                         [
                             ":utilisateurs"  => $utilisateurs,
                             ":emailUser"     => $emailUser,
@@ -87,7 +100,8 @@
                             ":id_agence"     => $id_agence,
                             ":id_compagnie"  => $id_compagnie,
                             ":droit"         => $droit,
-                            ":profile"       => $profile
+                            ":profile"       => $profile,
+                            ":photo"         => $photoPath
                         ]
                     );
 

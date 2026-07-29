@@ -145,7 +145,7 @@
                         </div>
                         <div class="card-body p-4">
                             <div class="p-4 border rounded-3">
-                                <form class="row g-3" method="post">
+                                <form class="row g-3" method="post" enctype="multipart/form-data">
 
                                     <div class="col-md-6">
                                         <label for="validationCustom01" class="form-label fw-semibold">Nom & prénom</label>
@@ -160,6 +160,11 @@
                                     <div class="col-md-6">
                                         <label for="validationCustomTelephone" class="form-label fw-semibold">Téléphone</label>
                                         <input type="tel" class="form-control" id="validationCustomTelephone" placeholder="Téléphone" name="telephone" pattern="[0-9+\s.\-]{6,20}">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="photo" class="form-label fw-semibold">Photo de profil</label>
+                                        <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
                                     </div>
 
                                     <!-- <div class="col-md-6">

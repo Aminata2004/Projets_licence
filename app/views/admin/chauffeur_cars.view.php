@@ -45,7 +45,7 @@
                                     </div>
 
                                     <div class="modal-body text-dark">
-                                        <form action="" method="post">
+                                        <form action="" method="post" enctype="multipart/form-data">
                                             <div class="row g-3">
                                                 <div class="col-md-6">
                                                     <label for="nomPrenom" class="form-label">Nom & Prénom</label>
@@ -58,14 +58,20 @@
                                                 </div>
                                             </div>
 
-                                            <div class="mt-3">
-                                                <label for="selectCar" class="form-label">Car</label>
-                                                <select class="form-select" name="id_car" id="selectCar" required>
-                                                    <option></option>
-                                                    <?php foreach ($listeCar as $listeCars): ?>
-                                                        <option value="<?= $listeCars->id_car ?>">Car : <?= $listeCars->numero_car ?></option>
-                                                    <?php endforeach ?>
-                                                </select>
+                                            <div class="row g-3 mt-1">
+                                                <div class="col-md-6">
+                                                    <label for="selectCar" class="form-label">Car</label>
+                                                    <select class="form-select" name="id_car" id="selectCar" required>
+                                                        <option></option>
+                                                        <?php foreach ($listeCar as $listeCars): ?>
+                                                            <option value="<?= $listeCars->id_car ?>">Car : <?= $listeCars->numero_car ?></option>
+                                                        <?php endforeach ?>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="photo" class="form-label">Photo de profil</label>
+                                                    <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+                                                </div>
                                             </div>
                                     </div>
 
@@ -215,6 +221,7 @@
                                         <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center mobile-card-table" style="width:100%">
                                             <thead class="table-light text-center">
                                                 <tr>
+                                                    <th class="fw-semibold">Photo</th>
                                                     <th class="fw-semibold">Nom & prénom</th>
                                                     <th class="fw-semibold">Numéro</th>
                                                     <th class="fw-semibold">Numéro du car</th>
@@ -225,6 +232,15 @@
 
                                                 <?php foreach ($listeChaufeur as $listeChaufeurs) : ?>
                                                     <tr>
+                                                        <td data-label="Photo">
+                                                            <?php if (!empty($listeChaufeurs->photo)): ?>
+                                                                <img src="<?= BASE_URL ?>/uploads/profiles/<?= htmlspecialchars($listeChaufeurs->photo) ?>" alt="Photo" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                                                            <?php else: ?>
+                                                                <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                                    <i class="bx bx-user fs-5"></i>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        </td>
                                                         <td data-label="Nom & prénom"><?= $listeChaufeurs->nom_prenom ?></td>
                                                         <td data-label="Numéro"><?= $listeChaufeurs->numero ?></td>
                                                         <td data-label="Numéro du car"><?= $listeChaufeurs->numero_car ?></td>

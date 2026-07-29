@@ -39,7 +39,7 @@ class Employes extends Controller
 
         if ($peutVoirUtilisateurs) {
             $userColumns = 'utilisateur.idUser, utilisateur.utilisateurs, utilisateur.emailUser, utilisateur.telephone,
-                utilisateur.droit, utilisateur.profile, utilisateur.status, agence.numeroGare';
+                utilisateur.droit, utilisateur.profile, utilisateur.status, utilisateur.photo, agence.numeroGare';
 
             if ($role === 'super_admin') {
                 $utilisateurs = $configuration->FetchSelectWheres(
@@ -66,6 +66,7 @@ class Employes extends Controller
                 }
 
                 $employes[] = [
+                    'id'          => $u->idUser,
                     'type'        => 'Utilisateur',
                     'nom'         => $u->utilisateurs,
                     'fonction'    => $fonction,
@@ -73,6 +74,7 @@ class Employes extends Controller
                     'telephone'   => $u->telephone ?: '—',
                     'affectation' => $u->numeroGare ?? '—',
                     'statut'      => ((int)$u->status === 1) ? 'Actif' : 'Inactif',
+                    'photo'       => $u->photo ?? null,
                 ];
             }
         }
@@ -96,6 +98,7 @@ class Employes extends Controller
 
             foreach ($chauffeurs as $c) {
                 $employes[] = [
+                    'id'          => $c->id_chauffeur,
                     'type'        => 'Chauffeur',
                     'nom'         => $c->nom_prenom,
                     'fonction'    => 'Chauffeur',
@@ -103,6 +106,7 @@ class Employes extends Controller
                     'telephone'   => $c->numero,
                     'affectation' => 'Car : ' . $c->numero_car,
                     'statut'      => 'Actif',
+                    'photo'       => $c->photo ?? null,
                 ];
             }
         }
@@ -111,6 +115,79 @@ class Employes extends Controller
             'employes'             => $employes,
             'peutVoirUtilisateurs' => $peutVoirUtilisateurs,
             'peutVoirChauffeurs'   => $peutVoirChauffeurs,
+        ]);
+    }
+
+    public function printCard($type, $id, $format = 1)
+    {
+        $this->requireLogin();
+        $configuration = new Configuration($_SESSION['id_utilisateur']);
+        $id_compagnie = $_SESSION['id_compagnie'] ?? null;
+        
+        $employe = null;
+        if ($type === 'Utilisateur') {
+            $u = $configuration->getUserById($id);
+            if ($u) {
+                $employe = [
+                    'type' => 'Utilisateur',
+                    'nom' => $u['utilisateurs'],
+                    'fonction' => $u['droit'],
+                    'contact' => $u['emailUser'],
+                    'telephone' => $u['telephone'],
+                    'affectation' => '',
+                    'localite' => '',
+                    'photo' => $u['photo'] ?? null,
+                ];
+                if (!empty($u['id_agence'])) {
+                    $agence = $configuration->SelectAllData('*', 'agence WHERE idAgence = ' . (int)$u['id_agence']);
+                    if (!empty($agence)) {
+                        $employe['affectation'] = $agence[0]->numeroGare;
+                        $employe['localite'] = $agence[0]->localite;
+                    }
+                }
+            }
+        } elseif ($type === 'Chauffeur') {
+            $chauffeursModel = new Chauffeurs_car();
+            $c = $chauffeursModel->SelectAllData('*', 'chauffeur WHERE id_chauffeur = ' . (int)$id);
+            if (!empty($c)) {
+                $c = $c[0];
+                $employe = [
+                    'type' => 'Chauffeur',
+                    'nom' => $c->nom_prenom,
+                    'fonction' => 'Chauffeur',
+                    'contact' => '—',
+                    'telephone' => $c->numero,
+                    'photo' => $c->photo ?? null,
+                    'affectation' => '',
+                    'localite' => ''
+                ];
+                if (!empty($c->id_car)) {
+                    $car = $chauffeursModel->SelectAllData('*', 'car WHERE id_car = ' . (int)$c->id_car);
+                    if (!empty($car)) {
+                        $employe['affectation'] = 'Car : ' . $car[0]->numero_car;
+                    }
+                }
+            }
+        }
+
+        if (!$employe) {
+            $configuration->set_flash("Employé introuvable.", "danger");
+            $this->redirect("admin/Employes/index");
+            return;
+        }
+
+        $compagnie = null;
+        if ($id_compagnie) {
+            $comp = $configuration->SelectAllData('*', 'compagnie WHERE id_compagnie = ' . (int)$id_compagnie);
+            if (!empty($comp)) {
+                $compagnie = $comp[0];
+            }
+        }
+
+        $this->view('admin/print_card', [
+            'employe' => $employe,
+            'format' => (int)$format,
+            'compagnie' => $compagnie
         ]);
     }
 }

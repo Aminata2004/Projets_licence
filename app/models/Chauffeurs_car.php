@@ -31,14 +31,28 @@
 
             // Si aucune erreur, on procède à l'insertion
             if (count($errors) === 0) {
+                $photoPath = null;
+                if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = 'public/uploads/profiles/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+                    $fileName = time() . '_' . basename($_FILES['photo']['name']);
+                    $targetFile = $uploadDir . $fileName;
+                    if (move_uploaded_file($_FILES['photo']['tmp_name'], $targetFile)) {
+                        $photoPath = $fileName;
+                    }
+                }
+
                 $insertion = $this->insertion_update_simples(
-                    "INSERT INTO chauffeur (nom_prenom, numero, id_car,id_compagnie) 
-        VALUES (:nom_prenom, :numero, :id_car,:id_compagnie)",
+                    "INSERT INTO chauffeur (nom_prenom, numero, id_car, id_compagnie, photo) 
+        VALUES (:nom_prenom, :numero, :id_car, :id_compagnie, :photo)",
                     [
                         ":nom_prenom" => $nom_prenom,
                         ":numero" => $numero,
                         ":id_car"  => $id_car,
-                        ":id_compagnie" => $id_compagnie
+                        ":id_compagnie" => $id_compagnie,
+                        ":photo" => $photoPath
                     ]
                 );
 

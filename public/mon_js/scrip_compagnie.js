@@ -22,7 +22,8 @@ $('.edit-btn').click(function (e) {
     let nom      = $(this).data('nom_compagnie');
     let libele   = $(this).data('libele');
     let slogant  = $(this).data('slogant');
-    let logo     = $(this).data('logo'); // ex: /images/logos/logo1.png
+    let logo     = $(this).data('logo'); // full URL for preview
+    let logoFilename = $(this).data('logofilename'); // just the filename
 
     $('#inputidCompagnie').val(id);
     $('#inputnomCompagnie').val(nom);
@@ -31,7 +32,7 @@ $('.edit-btn').click(function (e) {
 
     if (logo) {
         $('#logoPreview').attr('src', logo).show();
-        $('#ancienLogo').val(logo.replace('/images/logos/', ''));
+        $('#ancienLogo').val(logoFilename);
     } else {
         $('#logoPreview').hide();
         $('#ancienLogo').val('');

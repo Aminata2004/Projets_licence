@@ -54,6 +54,7 @@
                 <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center mobile-card-table" style="width:100%">
                   <thead class="table-light text-center">
                     <tr>
+                      <th class="fw-semibold">Photo</th>
                       <th class="fw-semibold">Nom &amp; prénom</th>
                       <th class="fw-semibold">Fonction</th>
                       <th class="fw-semibold">Contact</th>
@@ -61,6 +62,7 @@
                       <th class="fw-semibold">Affectation</th>
                       <th class="fw-semibold">Type</th>
                       <th class="fw-semibold">Statut</th>
+                      <th class="fw-semibold">Action</th>
                     </tr>
                   </thead>
                   <tbody class="text-center">
@@ -71,6 +73,15 @@
                     <?php endif; ?>
                     <?php foreach ($employes as $employe): ?>
                       <tr class="align-middle text-center">
+                        <td data-label="Photo">
+                            <?php if (!empty($employe['photo'])): ?>
+                                <img src="<?= BASE_URL ?>/uploads/profiles/<?= htmlspecialchars($employe['photo']) ?>" alt="Photo" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <?php else: ?>
+                                <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="bx bx-user fs-5"></i>
+                                </div>
+                            <?php endif; ?>
+                        </td>
                         <td data-label="Nom & prénom"><?= htmlspecialchars($employe['nom']) ?></td>
                         <td data-label="Fonction"><?= htmlspecialchars($employe['fonction']) ?></td>
                         <td data-label="Contact"><?= htmlspecialchars($employe['contact']) ?></td>
@@ -85,6 +96,18 @@
                           <span class="badge <?= $employe['statut'] === 'Actif' ? 'bg-success' : 'bg-secondary' ?>">
                             <?= htmlspecialchars($employe['statut']) ?>
                           </span>
+                        </td>
+                        <td data-label="Action">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bx bx-printer"></i> Imprimer
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Employes/printCard/<?= $employe['type'] ?>/<?= $employe['id'] ?>/1" target="_blank">Format 1 (Moderne Vertical)</a></li>
+                                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Employes/printCard/<?= $employe['type'] ?>/<?= $employe['id'] ?>/2" target="_blank">Format 2 (Corporate Horizontal)</a></li>
+                                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Employes/printCard/<?= $employe['type'] ?>/<?= $employe['id'] ?>/3" target="_blank">Format 3 (Badge Minimaliste)</a></li>
+                                </ul>
+                            </div>
                         </td>
                       </tr>
                     <?php endforeach ?>

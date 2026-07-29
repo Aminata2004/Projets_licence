@@ -28,7 +28,9 @@
 
                 if (!$errors) {
                     $ext = ($mime === 'image/png') ? '.png' : (($mime === 'image/webp') ? '.webp' : '.jpg');
-                    $uploadDir = ROOT . '/public/images/logos';
+                    // ROOT n'est pas défini — on construit le chemin absolu depuis ce fichier
+                    // __DIR__ = /app/models  →  ../../public/images/logos
+                    $uploadDir = dirname(__DIR__, 2) . '/public/images/logos';
 
                     if (!is_dir($uploadDir)) mkdir($uploadDir, 0775, true);
 

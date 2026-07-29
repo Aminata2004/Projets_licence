@@ -151,6 +151,7 @@
                 <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center mobile-card-table" style="width:100%">
                   <thead class="table-light text-center">
                     <tr>
+                      <th class="fw-semibold">Photo</th>
                       <th class="fw-semibold">Utilisateur</th>
                       <th class="fw-semibold">Email</th>
                       <th class="fw-semibold">Téléphone</th>
@@ -163,6 +164,15 @@
                   <tbody class="text-center">
                     <?php foreach ($liste as $listes): ?>
                       <tr class="align-middle text-center">
+                        <td data-label="Photo">
+                            <?php if (!empty($listes->photo)): ?>
+                                <img src="<?= BASE_URL ?>/uploads/profiles/<?= htmlspecialchars($listes->photo) ?>" alt="Photo" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            <?php else: ?>
+                                <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="bx bx-user fs-5"></i>
+                                </div>
+                            <?php endif; ?>
+                        </td>
                         <td data-label="Utilisateur"><?= htmlspecialchars($listes->utilisateurs) ?></td>
                         <td data-label="Email"><?= htmlspecialchars($listes->emailUser) ?></td>
                         <td data-label="Téléphone"><?= htmlspecialchars($listes->telephone ?? '') ?></td>

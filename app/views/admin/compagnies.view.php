@@ -245,6 +245,7 @@
                                                                     data-libele="<?= htmlspecialchars($listes->libele, ENT_QUOTES) ?>"
                                                                     data-slogant="<?= htmlspecialchars($listes->slogant, ENT_QUOTES) ?>"
                                                                     data-logo="<?= !empty($listes->logo) ? BASE_URL . '/images/logos/' . htmlspecialchars($listes->logo, ENT_QUOTES) : '' ?>"
+                                                                    data-logofilename="<?= htmlspecialchars($listes->logo, ENT_QUOTES) ?>"
                                                                     href="#">
                                                                     ✏️ Modifier
                                                                 </a>

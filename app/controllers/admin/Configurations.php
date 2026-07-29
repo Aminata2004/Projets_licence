@@ -202,7 +202,7 @@ class Configurations extends Controller
         }
 
         $userColumns = 'utilisateur.idUser, utilisateur.utilisateurs, utilisateur.emailUser, utilisateur.telephone, utilisateur.motPasse,
-            utilisateur.droit, utilisateur.profile, utilisateur.status, agence.numeroGare';
+            utilisateur.droit, utilisateur.profile, utilisateur.status, utilisateur.photo, agence.numeroGare';
 
         // Les comptes super_admin n'apparaissent jamais dans cette liste, y compris pour
         // un autre super_admin : ce rôle n'est ni visible ni gérable depuis cette interface.

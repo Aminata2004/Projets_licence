@@ -73,7 +73,7 @@ class Compagnies extends  Controller
     // Vérifier si un nouveau logo est envoyé
     if (!empty($_FILES['logo']['name'])) {
 
-        $dossier = "public/images/logos/";
+        $dossier = dirname(__DIR__, 2) . '/public/images/logos/';
         $nom_fichier = time() . "_" . basename($_FILES['logo']['name']);
         $chemin = $dossier . $nom_fichier;
 
