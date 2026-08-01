@@ -26,6 +26,9 @@
         </div>
         <div class="ms-auto">
           <div class="d-flex gap-2">
+            <button type="button" id="btnSelectionMultiple" class="btn btn-outline-secondary d-flex align-items-center gap-2 shadow-sm">
+              <i class="bx bx-list-check fs-5"></i> Sélection multiple
+            </button>
             <?php if ($peutVoirUtilisateurs): ?>
               <a href="<?= BASE_URL ?>/admin/Configurations" class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm">
                 <i class="bx bx-user fs-5"></i> Gérer les utilisateurs
@@ -50,10 +53,23 @@
               <h5 class="mb-0 fw-bold"><i class="bx bx-id-card me-2"></i>Liste des employés</h5>
             </div>
             <div class="card-body p-4">
+              <form id="formImpressionGroupee" method="post" action="<?= BASE_URL ?>/admin/Employes/printSelection" target="_blank">
+                <?= csrf_field() ?>
+                <div id="batchToolbar" class="d-none align-items-center flex-wrap gap-3 mb-3 p-3 bg-light rounded border">
+                  <span id="selectionCount" class="fw-semibold">0 sélectionné(s)</span>
+                  <select name="format" class="form-select form-select-sm" style="width:auto">
+                    <option value="1" selected>Format 1 (Corporate Horizontal)</option>
+                  </select>
+                  <button type="submit" id="btnImprimerSelection" class="btn btn-primary btn-sm d-flex align-items-center gap-2" disabled>
+                    <i class="bx bx-printer"></i> Imprimer la sélection (max 4 par feuille A4)
+                  </button>
+                </div>
+
               <div class="table-responsive">
                 <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center mobile-card-table" style="width:100%">
                   <thead class="table-light text-center">
                     <tr>
+                      <th class="fw-semibold selection-col d-none"><input type="checkbox" id="checkAll" class="form-check-input"></th>
                       <th class="fw-semibold">Photo</th>
                       <th class="fw-semibold">Nom &amp; prénom</th>
                       <th class="fw-semibold">Fonction</th>
@@ -68,11 +84,14 @@
                   <tbody class="text-center">
                     <?php if (empty($employes)): ?>
                       <tr>
-                        <td colspan="7" class="text-muted py-4">Aucun employé trouvé pour cette compagnie.</td>
+                        <td colspan="10" class="text-muted py-4">Aucun employé trouvé pour cette compagnie.</td>
                       </tr>
                     <?php endif; ?>
                     <?php foreach ($employes as $employe): ?>
                       <tr class="align-middle text-center">
+                        <td class="selection-col d-none">
+                          <input type="checkbox" class="form-check-input row-check" name="selection[]" value="<?= htmlspecialchars($employe['type']) ?>:<?= (int)$employe['id'] ?>">
+                        </td>
                         <td data-label="Photo">
                             <?php if (!empty($employe['photo'])): ?>
                                 <img src="<?= BASE_URL ?>/uploads/profiles/<?= htmlspecialchars($employe['photo']) ?>" alt="Photo" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
@@ -103,9 +122,7 @@
                                     <i class="bx bx-printer"></i> Imprimer
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Employes/printCard/<?= $employe['type'] ?>/<?= $employe['id'] ?>/1" target="_blank">Format 1 (Moderne Vertical)</a></li>
-                                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Employes/printCard/<?= $employe['type'] ?>/<?= $employe['id'] ?>/2" target="_blank">Format 2 (Corporate Horizontal)</a></li>
-                                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Employes/printCard/<?= $employe['type'] ?>/<?= $employe['id'] ?>/3" target="_blank">Format 3 (Badge Minimaliste)</a></li>
+                                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Employes/printCard/<?= $employe['type'] ?>/<?= $employe['id'] ?>/1" target="_blank">Format 1 (Corporate Horizontal)</a></li>
                                 </ul>
                             </div>
                         </td>
@@ -114,6 +131,7 @@
                   </tbody>
                 </table>
               </div>
+              </form>
             </div>
           </div>
         </div>
@@ -130,5 +148,53 @@
   </div>
   <!--end wrapper-->
   <?php $this->view('admin/partials/foot') ?>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var btnToggle = document.getElementById('btnSelectionMultiple');
+      var toolbar = document.getElementById('batchToolbar');
+      var table = document.getElementById('example');
+      var checkAll = document.getElementById('checkAll');
+      var btnSubmit = document.getElementById('btnImprimerSelection');
+      var countLabel = document.getElementById('selectionCount');
+      if (!btnToggle || !toolbar || !table) return;
+
+      function updateCount() {
+        var checked = table.querySelectorAll('.row-check:checked').length;
+        countLabel.textContent = checked + ' sélectionné(s)';
+        btnSubmit.disabled = checked === 0;
+      }
+
+      btnToggle.addEventListener('click', function () {
+        var enabling = toolbar.classList.contains('d-none');
+        toolbar.classList.toggle('d-none', !enabling);
+        toolbar.classList.toggle('d-flex', enabling);
+        document.querySelectorAll('.selection-col').forEach(function (el) {
+          el.classList.toggle('d-none', !enabling);
+        });
+        btnToggle.classList.toggle('active', enabling);
+        btnToggle.classList.toggle('btn-outline-secondary', !enabling);
+        btnToggle.classList.toggle('btn-secondary', enabling);
+
+        if (!enabling) {
+          table.querySelectorAll('.row-check').forEach(function (cb) { cb.checked = false; });
+          if (checkAll) checkAll.checked = false;
+        }
+        updateCount();
+      });
+
+      table.addEventListener('change', function (e) {
+        if (e.target.classList.contains('row-check')) {
+          updateCount();
+        }
+      });
+
+      if (checkAll) {
+        checkAll.addEventListener('change', function () {
+          table.querySelectorAll('.row-check').forEach(function (cb) { cb.checked = checkAll.checked; });
+          updateCount();
+        });
+      }
+    });
+  </script>
 </body>
 </html>
