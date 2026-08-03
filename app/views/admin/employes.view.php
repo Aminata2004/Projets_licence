@@ -29,6 +29,9 @@
             <button type="button" id="btnSelectionMultiple" class="btn btn-outline-secondary d-flex align-items-center gap-2 shadow-sm">
               <i class="bx bx-list-check fs-5"></i> Sélection multiple
             </button>
+            <a href="<?= BASE_URL ?>/admin/Employes/printListPdf" class="btn btn-outline-danger d-flex align-items-center gap-2 shadow-sm" target="_blank">
+              <i class="bx bxs-file-pdf fs-5"></i> Télécharger en PDF
+            </a>
             <?php if ($peutVoirUtilisateurs): ?>
               <a href="<?= BASE_URL ?>/admin/Configurations" class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm">
                 <i class="bx bx-user fs-5"></i> Gérer les utilisateurs

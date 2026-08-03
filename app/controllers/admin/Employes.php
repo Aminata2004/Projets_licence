@@ -27,6 +27,23 @@ class Employes extends Controller
         $role = $_SESSION['droit'] ?? null;
         $id_compagnie = $_SESSION['id_compagnie'] ?? null;
 
+        $employes = $this->buildEmployesListe($configuration, $peutVoirUtilisateurs, $peutVoirChauffeurs);
+
+        $this->view('admin/employes', [
+            'employes'             => $employes,
+            'peutVoirUtilisateurs' => $peutVoirUtilisateurs,
+            'peutVoirChauffeurs'   => $peutVoirChauffeurs,
+        ]);
+    }
+
+    // Construit la liste unifiee des employes (utilisateurs + chauffeurs) de la compagnie
+    // courante. Partagee entre l'affichage de la page (index()) et l'export PDF
+    // (printListPdf()) pour ne pas dupliquer les requetes de recuperation.
+    private function buildEmployesListe(Configuration $configuration, $peutVoirUtilisateurs, $peutVoirChauffeurs)
+    {
+        $role = $_SESSION['droit'] ?? null;
+        $id_compagnie = $_SESSION['id_compagnie'] ?? null;
+
         $droitLabels = [
             'super_admin'   => 'Super administrateur',
             'Admin'         => 'Administrateur',
@@ -111,11 +128,43 @@ class Employes extends Controller
             }
         }
 
-        $this->view('admin/employes', [
-            'employes'             => $employes,
-            'peutVoirUtilisateurs' => $peutVoirUtilisateurs,
-            'peutVoirChauffeurs'   => $peutVoirChauffeurs,
-        ]);
+        return $employes;
+    }
+
+    // Export PDF de la liste complete des employes affiches sur la page (memes
+    // permissions et memes donnees que index()), telechargeable en un clic.
+    public function printListPdf()
+    {
+        $this->requireLogin();
+        $configuration = new Configuration($_SESSION['id_utilisateur']);
+
+        $peutVoirUtilisateurs = $configuration->userHasPermission('utilisateur_apercu');
+        $peutVoirChauffeurs = $configuration->userHasPermission('Configuration_gestion_car/chauffeur');
+
+        if (!$peutVoirUtilisateurs && !$peutVoirChauffeurs) {
+            $configuration->set_flash("Accès refusé : vous n'avez pas la permission nécessaire.", "danger");
+            $this->redirect("admin/Homes/home");
+            return;
+        }
+
+        $employes = $this->buildEmployesListe($configuration, $peutVoirUtilisateurs, $peutVoirChauffeurs);
+        $compagnie = $this->getCompagnieCourante($configuration);
+
+        ob_start();
+        include ROOT . '/app/views/admin/pdf/employes_liste.php';
+        $html = ob_get_clean();
+
+        $opt = new \Dompdf\Options();
+        $opt->setChroot(ROOT);
+        $opt->setIsRemoteEnabled(true);
+
+        $dompdf = new \Dompdf\Dompdf($opt);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+
+        $dompdf->stream('liste_employes_' . date('Ymd_His') . '.pdf', ['Attachment' => true]);
+        exit;
     }
 
     // Resout un employe (Utilisateur ou Chauffeur) vers le tableau attendu par la vue

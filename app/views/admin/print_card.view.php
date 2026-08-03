@@ -104,6 +104,8 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
     <title>Carte Pro – <?= htmlspecialchars($employes[0]['nom'] ?? '') ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@500;600;700&family=Montserrat:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
     <style>
         :root{
@@ -153,6 +155,16 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
             box-shadow: 0 14px 32px rgba(13,33,73,.55), 0 0 0 1px rgba(216,166,58,.65) inset;
         }
         .print-btn:active { transform: translateY(0); }
+        .print-btn:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+        .print-btn.pdf-btn {
+            background: linear-gradient(120deg, var(--red) 0%, var(--red-2) 100%);
+            box-shadow: 0 10px 26px rgba(168,14,20,.45), 0 0 0 1px rgba(216,166,58,.45) inset;
+        }
+        .print-btn.pdf-btn .print-btn-ic {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+            box-shadow: 0 4px 12px rgba(13,33,73,.55);
+        }
+        .btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
         .no-print .hint { font-size: 12.5px; color: #eef1f6; opacity: .85; letter-spacing: .2px; }
 
         @page { size: A4; margin: 0; }
@@ -187,8 +199,10 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
             outline: 0.4pt dashed #c7cedb; outline-offset: -2mm;
             pointer-events: none;
         }
-        .batch-page .slot:nth-child(4n) { break-after: page; }
-        @media print { .batch-page { box-shadow: none; } }
+        @media print {
+            .batch-page { box-shadow: none; break-after: page; }
+            .batch-page:last-of-type { break-after: auto; }
+        }
         @media screen {
             .batch-page { box-shadow: 0 2px 10px rgba(0,0,0,.15), 0 20px 55px rgba(0,0,0,.30); margin-bottom: 10mm; }
         }
@@ -276,10 +290,16 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
 <body>
 
 <div class="no-print">
-    <button class="print-btn" onclick="window.print()">
-        <span class="print-btn-ic"><i class="bi bi-printer-fill"></i></span>
-        <span class="print-btn-tx"><?= count($employes) > 1 ? 'Imprimer la planche (' . count($employes) . ' badges)' : 'Imprimer le badge' ?></span>
-    </button>
+    <div class="btn-row">
+        <button class="print-btn" onclick="window.print()">
+            <span class="print-btn-ic"><i class="bi bi-printer-fill"></i></span>
+            <span class="print-btn-tx"><?= count($employes) > 1 ? 'Imprimer la planche (' . count($employes) . ' badges)' : 'Imprimer le badge' ?></span>
+        </button>
+        <button type="button" class="print-btn pdf-btn" id="btnTelechargerPdf">
+            <span class="print-btn-ic"><i class="bi bi-file-earmark-pdf-fill"></i></span>
+            <span class="print-btn-tx">Télécharger en PDF</span>
+        </button>
+    </div>
     <?php if (count($employes) > 1): ?>
         <div class="hint">Format A4 · 2 badges par ligne · 4 par page · découpez selon les pointillés</div>
     <?php endif; ?>
@@ -293,17 +313,64 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
 
 <?php else: ?>
 
-    <div class="batch-page">
-        <?php foreach ($employes as $e): ?>
-            <div class="slot"><?= ann_render_badge($format, $e, $compNom, $logoSrc) ?></div>
-        <?php endforeach; ?>
-    </div>
+    <?php foreach (array_chunk($employes, 4) as $groupe): ?>
+        <div class="batch-page">
+            <?php foreach ($groupe as $e): ?>
+                <div class="slot"><?= ann_render_badge($format, $e, $compNom, $logoSrc) ?></div>
+            <?php endforeach; ?>
+        </div>
+    <?php endforeach; ?>
 
 <?php endif; ?>
 
 <script>
-    window.addEventListener('load', function () {
-        setTimeout(function () { window.print(); }, 900);
+    document.addEventListener('DOMContentLoaded', function () {
+        var btnPdf = document.getElementById('btnTelechargerPdf');
+        if (!btnPdf) return;
+
+        var estPlanche = <?= count($employes) > 1 ? 'true' : 'false' ?>;
+        var nomFichier = <?= json_encode($employes[0]['nom'] ?? 'employe') ?>;
+
+        function slugify(txt) {
+            var sansAccents = txt.normalize('NFD').replace(/[̀-ͯ]/g, '');
+            return sansAccents.replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase();
+        }
+
+        btnPdf.addEventListener('click', async function () {
+            var libelle = btnPdf.querySelector('.print-btn-tx');
+            var texteOriginal = libelle.textContent;
+            btnPdf.disabled = true;
+            libelle.textContent = 'Génération en cours...';
+
+            try {
+                var jsPDF = window.jspdf.jsPDF;
+
+                if (!estPlanche) {
+                    var carte = document.querySelector('.badge-h');
+                    var canvas = await html2canvas(carte, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+                    var pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [92, 56] });
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 92, 56);
+                    pdf.save('carte_' + slugify(nomFichier) + '.pdf');
+                } else {
+                    var pages = document.querySelectorAll('.batch-page');
+                    var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                    for (var i = 0; i < pages.length; i++) {
+                        var canvasPage = await html2canvas(pages[i], { scale: 2.5, useCORS: true, backgroundColor: '#ffffff' });
+                        var largeurImg = 210;
+                        var hauteurImg = canvasPage.height * (largeurImg / canvasPage.width);
+                        if (i > 0) pdf.addPage();
+                        pdf.addImage(canvasPage.toDataURL('image/jpeg', 0.95), 'JPEG', 0, (297 - hauteurImg) / 2, largeurImg, hauteurImg);
+                    }
+                    pdf.save('cartes_employes.pdf');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Une erreur est survenue lors de la génération du PDF.');
+            } finally {
+                btnPdf.disabled = false;
+                libelle.textContent = texteOriginal;
+            }
+        });
     });
 </script>
 </body>
