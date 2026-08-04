@@ -67,18 +67,6 @@
       text-align: center;
     }
 
-    .col-photo {
-      width: 34px;
-      text-align: center;
-    }
-
-    .col-photo img {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
     .col-type,
     .col-statut {
       width: 70px;
@@ -115,7 +103,7 @@
           <?php
             $logoPath = (!empty($compagnie->logo)) ? ROOT . '/public/images/logos/' . $compagnie->logo : null;
           ?>
-          <?php if ($logoPath && file_exists($logoPath)): ?>
+          <?php if ($logoPath && file_exists($logoPath) && extension_loaded('gd')): ?>
             <img src="file://<?= realpath($logoPath) ?>" alt="Logo">
           <?php endif; ?>
         </td>
@@ -132,7 +120,6 @@
     <thead>
       <tr>
         <th class="col-num">#</th>
-        <th class="col-photo">Photo</th>
         <th>Nom &amp; prénom</th>
         <th>Fonction</th>
         <th>Contact</th>
@@ -145,16 +132,8 @@
     <tbody>
       <?php $i = 1; ?>
       <?php foreach ($employes as $employe): ?>
-        <?php
-          $photoPath = !empty($employe['photo']) ? ROOT . '/public/uploads/profiles/' . $employe['photo'] : null;
-        ?>
         <tr>
           <td class="col-num"><?= $i++ ?></td>
-          <td class="col-photo">
-            <?php if ($photoPath && file_exists($photoPath)): ?>
-              <img src="file://<?= realpath($photoPath) ?>" alt="">
-            <?php endif; ?>
-          </td>
           <td><?= htmlspecialchars($employe['nom']) ?></td>
           <td><?= htmlspecialchars($employe['fonction']) ?></td>
           <td><?= htmlspecialchars($employe['contact']) ?></td>
@@ -174,7 +153,7 @@
       <?php endforeach; ?>
       <?php if (empty($employes)): ?>
         <tr>
-          <td colspan="9" style="text-align:center;">Aucun employé trouvé pour cette compagnie.</td>
+          <td colspan="8" style="text-align:center;">Aucun employé trouvé pour cette compagnie.</td>
         </tr>
       <?php endif; ?>
     </tbody>
