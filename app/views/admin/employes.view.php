@@ -79,7 +79,6 @@
                       <th class="fw-semibold">Contact</th>
                       <th class="fw-semibold">Téléphone</th>
                       <th class="fw-semibold">Affectation</th>
-                      <th class="fw-semibold">Type</th>
                       <th class="fw-semibold">Statut</th>
                       <th class="fw-semibold">Action</th>
                     </tr>
@@ -87,7 +86,7 @@
                   <tbody class="text-center">
                     <?php if (empty($employes)): ?>
                       <tr>
-                        <td colspan="10" class="text-muted py-4">Aucun employé trouvé pour cette compagnie.</td>
+                        <td colspan="9" class="text-muted py-4">Aucun employé trouvé pour cette compagnie.</td>
                       </tr>
                     <?php endif; ?>
                     <?php foreach ($employes as $employe): ?>
@@ -105,29 +104,26 @@
                             <?php endif; ?>
                         </td>
                         <td data-label="Nom & prénom"><?= htmlspecialchars($employe['nom']) ?></td>
-                        <td data-label="Fonction"><?= htmlspecialchars($employe['fonction']) ?></td>
+                        <td data-label="Fonction">
+                          <span class="badge <?= $employe['type'] === 'Chauffeur' ? 'bg-warning text-dark' : 'bg-primary' ?>">
+                            <?= htmlspecialchars($employe['fonction']) ?>
+                          </span>
+                        </td>
                         <td data-label="Contact"><?= htmlspecialchars($employe['contact']) ?></td>
                         <td data-label="Téléphone"><?= htmlspecialchars($employe['telephone']) ?></td>
                         <td data-label="Affectation"><?= htmlspecialchars($employe['affectation']) ?></td>
-                        <td data-label="Type">
-                          <span class="badge <?= $employe['type'] === 'Chauffeur' ? 'bg-warning text-dark' : 'bg-primary' ?>">
-                            <?= htmlspecialchars($employe['type']) ?>
-                          </span>
-                        </td>
                         <td data-label="Statut">
                           <span class="badge <?= $employe['statut'] === 'Actif' ? 'bg-success' : 'bg-secondary' ?>">
                             <?= htmlspecialchars($employe['statut']) ?>
                           </span>
                         </td>
                         <td data-label="Action">
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bx bx-printer"></i> Imprimer
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/admin/Employes/printCard/<?= $employe['type'] ?>/<?= $employe['id'] ?>/1" target="_blank">Format 1 (Corporate Horizontal)</a></li>
-                                </ul>
-                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2"
+                                    data-bs-toggle="modal" data-bs-target="#modalImprimerBadge"
+                                    data-type="<?= htmlspecialchars($employe['type']) ?>" data-id="<?= (int)$employe['id'] ?>"
+                                    data-nom="<?= htmlspecialchars($employe['nom']) ?>">
+                                <i class="bx bx-printer"></i> Imprimer
+                            </button>
                         </td>
                       </tr>
                     <?php endforeach ?>
@@ -135,6 +131,32 @@
                 </table>
               </div>
               </form>
+
+              <!-- Modal : choix du format d'impression du badge -->
+              <div class="modal fade" id="modalImprimerBadge" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title d-flex align-items-center gap-2">
+                        <i class="bx bx-printer text-primary fs-4"></i>
+                        Imprimer le badge <span id="modalImprimerNom" class="text-primary"></span>
+                      </h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                      <p class="text-muted mb-3">Choisissez le format de la carte à imprimer.</p>
+                      <a href="#" id="modalImprimerLienFormat1" target="_blank"
+                         class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-between px-3 py-3">
+                        <span class="d-flex align-items-center gap-2">
+                          <i class="bx bxs-id-card fs-4"></i>
+                          Format 1 — Corporate Horizontal
+                        </span>
+                        <i class="bx bx-chevron-right fs-4"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -195,6 +217,27 @@
         checkAll.addEventListener('change', function () {
           table.querySelectorAll('.row-check').forEach(function (cb) { cb.checked = checkAll.checked; });
           updateCount();
+        });
+      }
+
+      var modalImprimer = document.getElementById('modalImprimerBadge');
+      var lienFormat1 = document.getElementById('modalImprimerLienFormat1');
+      if (modalImprimer) {
+        modalImprimer.addEventListener('show.bs.modal', function (event) {
+          var btn = event.relatedTarget;
+          if (!btn) return;
+          var type = btn.getAttribute('data-type');
+          var id = btn.getAttribute('data-id');
+          var nom = btn.getAttribute('data-nom') || '';
+          document.getElementById('modalImprimerNom').textContent = nom;
+          lienFormat1.href =
+            '<?= BASE_URL ?>/admin/Employes/printCard/' + encodeURIComponent(type) + '/' + encodeURIComponent(id) + '/1';
+        });
+      }
+      if (lienFormat1) {
+        lienFormat1.addEventListener('click', function () {
+          var modalInstance = bootstrap.Modal.getInstance(modalImprimer);
+          if (modalInstance) modalInstance.hide();
         });
       }
     });

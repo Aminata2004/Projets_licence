@@ -65,11 +65,17 @@ class Employes extends Controller
                     "utilisateur.droit != 'super_admin'"
                 );
             } else {
+                // LEFT JOIN (et non INNER JOIN) car les comptes Admin/PDG n'ont pas
+                // forcement d'agence assignee : ils sont rattaches directement a la
+                // compagnie via utilisateur.id_compagnie (cf. Configuration::saveUtilisateur()).
                 $utilisateurs = $configuration->FetchSelectWheres(
                     $userColumns,
-                    'utilisateur INNER JOIN agence ON agence.idAgence = utilisateur.id_agence',
-                    "agence.id_compagnie = :id_compagnie AND utilisateur.droit != 'super_admin'",
-                    ['id_compagnie' => $id_compagnie]
+                    'utilisateur LEFT JOIN agence ON agence.idAgence = utilisateur.id_agence',
+                    "utilisateur.droit != 'super_admin' AND (
+                        (utilisateur.droit IN ('Admin', 'PDG') AND utilisateur.id_compagnie = :id_compagnie_droit)
+                        OR (utilisateur.droit NOT IN ('Admin', 'PDG') AND agence.id_compagnie = :id_compagnie_agence)
+                    )",
+                    ['id_compagnie_droit' => $id_compagnie, 'id_compagnie_agence' => $id_compagnie]
                 );
             }
 
@@ -191,16 +197,22 @@ class Employes extends Controller
                     'localite' => '',
                     'photo' => $u['photo'] ?? null,
                 ];
-                $agenceCompagnie = null;
-                if (!empty($u['id_agence'])) {
-                    $agence = $configuration->SelectAllData('*', 'agence WHERE idAgence = ' . (int)$u['id_agence']);
-                    if (!empty($agence)) {
-                        $employe['affectation'] = $agence[0]->numeroGare;
-                        $employe['localite'] = $agence[0]->localite;
-                        $agenceCompagnie = $agence[0]->id_compagnie ?? null;
+                // Admin/PDG sont rattaches directement a la compagnie via
+                // utilisateur.id_compagnie (pas d'agence assignee), cf. buildEmployesListe().
+                if (in_array($u['droit'], ['Admin', 'PDG'], true)) {
+                    $employeCompagnie = $u['id_compagnie'] ?? null;
+                } else {
+                    $employeCompagnie = null;
+                    if (!empty($u['id_agence'])) {
+                        $agence = $configuration->SelectAllData('*', 'agence WHERE idAgence = ' . (int)$u['id_agence']);
+                        if (!empty($agence)) {
+                            $employe['affectation'] = $agence[0]->numeroGare;
+                            $employe['localite'] = $agence[0]->localite;
+                            $employeCompagnie = $agence[0]->id_compagnie ?? null;
+                        }
                     }
                 }
-                if ($role !== 'super_admin' && (int)$agenceCompagnie !== (int)$id_compagnie) {
+                if ($role !== 'super_admin' && (int)$employeCompagnie !== (int)$id_compagnie) {
                     return null;
                 }
             }

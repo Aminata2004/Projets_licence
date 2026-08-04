@@ -33,9 +33,16 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
         $location = htmlspecialchars($employe['localite']);
     }
 
+    $fonctionRaw = $employe['fonction'] ?? $employe['type'] ?? '';
+    if ($fonctionRaw === 'Utilisateur') {
+        $fonctionRaw = 'Agent_Billeterie';
+    } elseif ($fonctionRaw === 'chef_d_escale') {
+        $fonctionRaw = "Chef d'escale";
+    }
+
     $nomDisplay  = htmlspecialchars($employe['nom']);
-    $roleDisplay = htmlspecialchars($employe['fonction'] ?? $employe['type'] ?? '');
-    $typeDisplay = htmlspecialchars($employe['type'] ?? '—');
+    $roleDisplay = htmlspecialchars($fonctionRaw);
+    $fonctionDisplay = htmlspecialchars($fonctionRaw !== '' ? $fonctionRaw : '—');
     $telDisplay  = htmlspecialchars($employe['telephone'] ?? '—');
     $mailDisplay = (!empty($employe['contact']) && $employe['contact'] !== '—')
         ? htmlspecialchars($employe['contact']) : '';
@@ -67,7 +74,7 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
             <div class="bh-grid">
                 <div class="bh-item">
                     <div class="bh-ic"><i class="bi bi-person-badge"></i></div>
-                    <div class="bh-dt"><span class="bh-lbl">Type</span><span class="bh-val"><?= $typeDisplay ?></span></div>
+                    <div class="bh-dt"><span class="bh-lbl">Fonction</span><span class="bh-val"><?= $fonctionDisplay ?></span></div>
                 </div>
                 <div class="bh-item">
                     <div class="bh-ic"><i class="bi bi-telephone-fill"></i></div>
@@ -167,7 +174,7 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
         .btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
         .no-print .hint { font-size: 12.5px; color: #eef1f6; opacity: .85; letter-spacing: .2px; }
 
-        @page { size: A4; margin: 0; }
+        @page { size: A4 landscape; margin: 0; }
         @media print {
             html, body { background: #fff; padding: 0; }
             .no-print { display: none !important; }
@@ -181,17 +188,17 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
             display: flex; align-items: center; justify-content: center;
         }
         .batch-page {
-            width: 210mm;
-            padding: 8mm;
+            width: 297mm;
+            padding: 10mm;
             display: grid;
-            grid-template-columns: repeat(2, 92mm);
+            grid-template-columns: repeat(2, 114mm);
             justify-content: center;
-            gap: 8mm 6mm;
+            gap: 8mm 12mm;
             background: #fff;
         }
         .batch-page .slot {
             display: flex; align-items: center; justify-content: center;
-            position: relative; padding: 3mm;
+            position: relative; padding: 2mm;
         }
         .batch-page .slot::before {
             content: '';
@@ -208,10 +215,10 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
         }
 
         /* ══════════════════════════════════════════════
-           FORMAT 1 — CORPORATE HORIZONTAL  (92 × 56 mm)
+           FORMAT 1 — CORPORATE HORIZONTAL  (110 × 56 mm)
         ══════════════════════════════════════════════ */
         .badge-h {
-            width: 92mm; height: 56mm;
+            width: 110mm; height: 56mm; flex-shrink: 0;
             border-radius: 3.2mm; overflow: hidden; position: relative;
             display: flex; background: #fff;
             box-shadow: 0 1mm 3mm rgba(0,0,0,.10), 0 3mm 8mm rgba(13,33,73,.16);
@@ -269,20 +276,23 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
             align-self: flex-start; background: var(--red); color: #fff;
             font-size: 6.1pt; font-weight: 800; letter-spacing: .8px; text-transform: uppercase;
             padding: 1mm 3mm; border-radius: 3mm;
-            max-width: 78%; white-space: normal; line-height: 1.3; text-align: center;
+            max-width: 100%; white-space: nowrap; line-height: 1.3; text-align: center;
         }
         .bh-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 1.8mm 2.5mm;
+            display: grid; grid-template-columns: 1.6fr 1fr; gap: 1.8mm 2.5mm;
             border-top: 0.2mm solid var(--hair); padding-top: 2mm;
         }
-        .bh-item { display: flex; align-items: flex-start; gap: 1.6mm; }
+        .bh-item { display: flex; align-items: flex-start; gap: 1.6mm; min-width: 0; }
         .bh-ic {
             width: 4.4mm; height: 4.4mm; border-radius: 50%; background: var(--red); color: #fff; font-size: 5.6pt;
             display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.2mm;
         }
         .bh-dt { display: flex; flex-direction: column; min-width: 0; }
         .bh-lbl { font-size: 4.8pt; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; font-weight: 700; }
-        .bh-val { font-size: 6.9pt; font-weight: 800; color: var(--navy); line-height: 1.15; word-break: break-word; }
+        .bh-val {
+            font-size: 6.9pt; font-weight: 800; color: var(--navy); line-height: 1.15;
+            white-space: nowrap;
+        }
         .bh-foot { position: absolute; bottom: 0; right: 0; left: 36%; height: 1mm; background: linear-gradient(90deg, var(--gold), var(--gold-2), var(--gold)); z-index: 5; }
 
     </style>
@@ -348,18 +358,18 @@ function ann_render_badge($format, array $employe, $compNom, $logoSrc)
                 if (!estPlanche) {
                     var carte = document.querySelector('.badge-h');
                     var canvas = await html2canvas(carte, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
-                    var pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [92, 56] });
-                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 92, 56);
+                    var pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [110, 56] });
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 110, 56);
                     pdf.save('carte_' + slugify(nomFichier) + '.pdf');
                 } else {
                     var pages = document.querySelectorAll('.batch-page');
-                    var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                    var pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                     for (var i = 0; i < pages.length; i++) {
                         var canvasPage = await html2canvas(pages[i], { scale: 2.5, useCORS: true, backgroundColor: '#ffffff' });
-                        var largeurImg = 210;
+                        var largeurImg = 297;
                         var hauteurImg = canvasPage.height * (largeurImg / canvasPage.width);
                         if (i > 0) pdf.addPage();
-                        pdf.addImage(canvasPage.toDataURL('image/jpeg', 0.95), 'JPEG', 0, (297 - hauteurImg) / 2, largeurImg, hauteurImg);
+                        pdf.addImage(canvasPage.toDataURL('image/jpeg', 0.95), 'JPEG', 0, (210 - hauteurImg) / 2, largeurImg, hauteurImg);
                     }
                     pdf.save('cartes_employes.pdf');
                 }
