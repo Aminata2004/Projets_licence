@@ -69,6 +69,7 @@ class Compagnies extends  Controller
     $ancien_logo   = $_POST["ancien_logo"];
 
     $logo = $ancien_logo; // par défaut on garde l’ancien
+    $erreurLogo = null; // message d'échec d'upload, affiché APRES editCompagnie() ci-dessous
 
     // Vérifier si un nouveau logo est envoyé
     if (!empty($_FILES['logo']['name'])) {
@@ -86,10 +87,7 @@ class Compagnies extends  Controller
                 UPLOAD_ERR_CANT_WRITE => "Échec d'écriture du fichier temporaire côté serveur.",
                 UPLOAD_ERR_EXTENSION  => "Upload bloqué par une extension PHP du serveur.",
             ];
-            $compagnie->set_flash(
-                "Logo non enregistré : " . ($messagesErreur[$erreurUpload] ?? "erreur d'upload inconnue (code $erreurUpload)."),
-                'danger'
-            );
+            $erreurLogo = "Logo non enregistré : " . ($messagesErreur[$erreurUpload] ?? "erreur d'upload inconnue (code $erreurUpload).");
         } else {
 
             $dossier = dirname(__DIR__, 2) . '/public/images/logos/';
@@ -100,11 +98,11 @@ class Compagnies extends  Controller
             $extensions_autorisees = ['jpg', 'jpeg', 'png', 'webp'];
 
             if (!in_array($extension, $extensions_autorisees)) {
-                $compagnie->set_flash("Logo non enregistré : format .$extension non autorisé (jpg, jpeg, png, webp uniquement).", 'danger');
+                $erreurLogo = "Logo non enregistré : format .$extension non autorisé (jpg, jpeg, png, webp uniquement).";
             } elseif (!is_dir($dossier) || !is_writable($dossier)) {
-                $compagnie->set_flash("Logo non enregistré : le dossier de destination n'est pas accessible en écriture sur le serveur.", 'danger');
+                $erreurLogo = "Logo non enregistré : le dossier de destination n'est pas accessible en écriture sur le serveur.";
             } elseif (!move_uploaded_file($_FILES['logo']['tmp_name'], $chemin)) {
-                $compagnie->set_flash("Logo non enregistré : échec de l'écriture du fichier sur le serveur.", 'danger');
+                $erreurLogo = "Logo non enregistré : échec de l'écriture du fichier sur le serveur.";
             } else {
                 // Le umask du process PHP peut produire un fichier non lisible par
                 // le serveur web (403) selon l'hébergeur ; on force donc 0644.
@@ -128,6 +126,13 @@ class Compagnies extends  Controller
         'slogant'       => $slogant,
         'logo'          => $logo
     ]);
+
+    // editCompagnie() écrase toujours le flash avec un message de succès dès que
+    // l'UPDATE SQL passe (même si $logo est resté l'ancien) : on le remplace ici,
+    // en dernier, si l'upload a échoué, sinon l'échec restait invisible pour l'admin.
+    if ($erreurLogo !== null) {
+        $compagnie->set_flash($erreurLogo, 'danger');
+    }
 
     header("Location: " . BASE_URL . "/admin/Compagnies/index");
     exit;
