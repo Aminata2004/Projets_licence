@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Tous les voyages - TransGest</title>
-    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/aos.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/aos.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -892,7 +892,7 @@ $nbAgences = count(array_unique(array_merge($villesDepart, $villesDestination)))
     </div>
 </footer>
 
-<script src="<?= BASE_URL ?>/assets_site/js/aos.js"></script>
+<script src="<?= ASSET_URL ?>/assets_site/js/aos.js"></script>
 <script>
     AOS.init({ duration: 650, once: true, offset: 60, easing: 'ease-out-cubic' });
 

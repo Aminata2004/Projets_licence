@@ -12,26 +12,26 @@
     <!-- ======== Page title ============ -->
     <title>Shared on THEMELOCK.COM - Travo - Tour Booking Html Template</title>
     <!--<< Favcion >>-->
-    <link rel="icon" href="<?=BASE_URL?>/assets/images/favicon-32x32.png" type="image/png" sizes="32x32">
-    <link rel="icon" href="<?=BASE_URL?>/assets/images/favicon-16x16.png" type="image/png" sizes="16x16">
+    <link rel="icon" href="<?=ASSET_URL?>/assets/images/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="<?=ASSET_URL?>/assets/images/favicon-16x16.png" type="image/png" sizes="16x16">
     <!--<< Bootstrap min.css >>-->
-    <link rel="stylesheet" href="<?=BASE_URL?>/assets_site/css/bootstrap.min1.css">
+    <link rel="stylesheet" href="<?=ASSET_URL?>/assets_site/css/bootstrap.min1.css">
     <!--<< All Min Css >>-->
-    <link rel="stylesheet" href="<?=BASE_URL?>/assets_site/css/all.min.css">
+    <link rel="stylesheet" href="<?=ASSET_URL?>/assets_site/css/all.min.css">
     <!--<< Animate.css >>-->
-    <link rel="stylesheet" href="<?=BASE_URL?>/assets_site/css/animate.css">
+    <link rel="stylesheet" href="<?=ASSET_URL?>/assets_site/css/animate.css">
     <!--<< Magnific Popup.css >>-->
-    <link rel="stylesheet" href="<?=BASE_URL?>/assets_site/css/magnific-popup.css">
+    <link rel="stylesheet" href="<?=ASSET_URL?>/assets_site/css/magnific-popup.css">
     <!--<< MeanMenu.css >>-->
-    <link rel="stylesheet" href="<?=BASE_URL?>/assets_site/css/meanmenu.css">
+    <link rel="stylesheet" href="<?=ASSET_URL?>/assets_site/css/meanmenu.css">
     <!--<< Swiper Bundle.css >>-->
-    <link rel="stylesheet" href="<?=BASE_URL?>/assets_site/css/swiper-bundle.min.css">
+    <link rel="stylesheet" href="<?=ASSET_URL?>/assets_site/css/swiper-bundle.min.css">
     <!--<< Nice Select.css >>-->
-    <link rel="stylesheet" href="<?=BASE_URL?>/assets_site/css/nice-select.css">
+    <link rel="stylesheet" href="<?=ASSET_URL?>/assets_site/css/nice-select.css">
     <!--<< Color.css >>-->
-    <link rel="stylesheet" href="<?=BASE_URL?>/assets_site/css/color.css">
+    <link rel="stylesheet" href="<?=ASSET_URL?>/assets_site/css/color.css">
     <!--<< flacticon.css >>-->
-    <link rel="stylesheet" href="<?=BASE_URL?>/assets_site/css/flacticon.css">
+    <link rel="stylesheet" href="<?=ASSET_URL?>/assets_site/css/flacticon.css">
     <!--<< Main.css >>-->
-    <link rel="stylesheet" href="<?=BASE_URL?>/assets_site/css/main1.css">
+    <link rel="stylesheet" href="<?=ASSET_URL?>/assets_site/css/main1.css">
 </head>

@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Résultats de recherche - TransGest</title>
-    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets_site/css/all.min.css">
-    <link href="<?= BASE_URL ?>/assets_site/css/aos.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= ASSET_URL ?>/assets_site/css/all.min.css">
+    <link href="<?= ASSET_URL ?>/assets_site/css/aos.css" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -211,7 +211,7 @@
                         <div class="result-card-top">
                             <span class="result-compagnie">
                                 <?php if (!empty($r->logo)): ?>
-                                    <img src="<?= BASE_URL ?>/images/logos/<?= htmlspecialchars($r->logo) ?>" alt="">
+                                    <img src="<?= ASSET_URL ?>/images/logos/<?= htmlspecialchars($r->logo) ?>" alt="">
                                 <?php endif; ?>
                                 <?= htmlspecialchars($r->nom_compagnie) ?>
                             </span>
@@ -262,7 +262,7 @@
     </div>
 </footer>
 
-<script src="<?= BASE_URL ?>/assets_site/js/aos.js"></script>
+<script src="<?= ASSET_URL ?>/assets_site/js/aos.js"></script>
 <script>AOS.init({ duration: 600, once: true, offset: 50 });</script>
 </body>
 </html>

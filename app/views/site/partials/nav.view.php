@@ -16,7 +16,7 @@ $navActive = function (...$controllers) use ($currentController) {
 <header class="header" style="position:sticky;top:0;z-index:1000;background:white;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
     <div class="container" style="max-width:1280px;margin:0 auto;padding:0 24px;">
         <div class="header-inner" style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;">
-            <a href="<?= BASE_URL ?>/site/Accueil" class="logo" style="display:flex;align-items:center;text-decoration:none;"><img src="<?= BASE_URL ?>/images/logos/transgest_logo.png" alt="TransGest" style="height:70px;width:auto;object-fit:contain;"></a>
+            <a href="<?= BASE_URL ?>/site/Accueil" class="logo" style="display:flex;align-items:center;text-decoration:none;"><img src="<?= ASSET_URL ?>/images/logos/transgest_logo.png" alt="TransGest" style="height:70px;width:auto;object-fit:contain;"></a>
 
             <!-- Desktop Navigation -->
             <div class="nav" style="display:flex;gap:32px;align-items:center;">

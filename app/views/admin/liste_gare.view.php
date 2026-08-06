@@ -353,8 +353,8 @@
     <!-- fin du modal d'ajout -->
 
     <?php $this->view('admin/partials/foot') ?>
-    <script src="<?= BASE_URL ?>/mon_js/scrip_agence.js"></script>
-    <script src="<?= BASE_URL ?>/mon_js/alert_delete.js"></script>
+    <script src="<?= ASSET_URL ?>/mon_js/scrip_agence.js"></script>
+    <script src="<?= ASSET_URL ?>/mon_js/alert_delete.js"></script>
     <script>
         // "Add to row" pour la modal d'ajout de gares : voir add_gare.view.php (ancienne
         // page, conservée telle quelle pour référence) pour le détail des choix (novalidate

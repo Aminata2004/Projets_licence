@@ -218,7 +218,7 @@
     <!--end wrapper-->
 
     <?php $this->view('admin/partials/foot') ?>
-    <script src="<?= BASE_URL ?>/mon_js/thermal-print.js"></script>
+    <script src="<?= ASSET_URL ?>/mon_js/thermal-print.js"></script>
     <script>
         // Le ticket est la preuve de paiement remise au client : imprimé automatiquement
         // dès l'arrivée sur cette page après enregistrement d'un billet (cf.

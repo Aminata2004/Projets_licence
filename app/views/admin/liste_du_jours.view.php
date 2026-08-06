@@ -329,7 +329,7 @@
     <!-- JQuery et SweetAlert2 déjà inclus -->
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
-    <script src="<?= BASE_URL ?>/mon_js/thermal-print.js"></script>
+    <script src="<?= ASSET_URL ?>/mon_js/thermal-print.js"></script>
     <script>
         $(document).ready(function() {
             $('#selectheure, #id_destination').change(function() {

@@ -408,7 +408,7 @@
                         <!-- Logo Wrapper -->
                         <div class="logo-wrapper shadow-lg">
                             <?php if($c->logo): ?>
-                                <img src="<?= BASE_URL ?>/images/logos/<?= htmlspecialchars($c->logo) ?>" alt="<?= htmlspecialchars($c->nom_compagnie) ?>" class="company-logo-img">
+                                <img src="<?= ASSET_URL ?>/images/logos/<?= htmlspecialchars($c->logo) ?>" alt="<?= htmlspecialchars($c->nom_compagnie) ?>" class="company-logo-img">
                             <?php else: ?>
                                 <div class="default-logo">
                                     <i class="fas fa-bus text-white fa-2x"></i>

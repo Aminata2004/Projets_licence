@@ -306,7 +306,7 @@
 
 
     <?php $this->view('admin/partials/foot') ?>
-    <script src="<?= BASE_URL ?>/mon_js/thermal-print.js"></script>
+    <script src="<?= ASSET_URL ?>/mon_js/thermal-print.js"></script>
     <script>
         $(document).ready(function() {
             $('#selectheure, #id_destination').change(function() {

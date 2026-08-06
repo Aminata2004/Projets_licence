@@ -234,7 +234,7 @@
                                                     <tr>
                                                         <td data-label="Photo">
                                                             <?php if (!empty($listeChaufeurs->photo)): ?>
-                                                                <img src="<?= BASE_URL ?>/uploads/profiles/<?= htmlspecialchars($listeChaufeurs->photo) ?>" alt="Photo" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                                                                <img src="<?= ASSET_URL ?>/uploads/profiles/<?= htmlspecialchars($listeChaufeurs->photo) ?>" alt="Photo" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
                                                             <?php else: ?>
                                                                 <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                                                                     <i class="bx bx-user fs-5"></i>

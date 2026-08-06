@@ -192,7 +192,7 @@
             <li class="nav-item dropdown dropdown-large">
               <a class="nav-link " href="#" data-bs-toggle="dropdown">
                 <div class="user-setting d-flex align-items-center gap-1">
-                  <img src="<?= BASE_URL ?>/assets_site/img/reservation.png" class="user-img" alt="">
+                  <img src="<?= ASSET_URL ?>/assets_site/img/reservation.png" class="user-img" alt="">
                   <div class="user-name"><?= htmlspecialchars($_SESSION['nom'] ?? '') ?> <small style="font-size: 0.75rem; color: #f59e0b; display: block; line-height: 1;"><?= htmlspecialchars($identiteAffichee) ?></small></div>
                 </div>
               </a>

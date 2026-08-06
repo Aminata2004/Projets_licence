@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>À propos & Contact - TransGest</title>
-    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/aos.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/aos.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -483,7 +483,7 @@
                 </div>
             </div>
             <div class="about-image" data-aos="fade-left">
-                <img src="<?= BASE_URL ?>/assets_site/img/about_unsplash.jpg" alt="Équipe TransGest">
+                <img src="<?= ASSET_URL ?>/assets_site/img/about_unsplash.jpg" alt="Équipe TransGest">
             </div>
         </div>
     </div>
@@ -609,7 +609,7 @@
     </div>
 </footer>
 
-<script src="<?= BASE_URL ?>/assets_site/js/aos.js"></script>
+<script src="<?= ASSET_URL ?>/assets_site/js/aos.js"></script>
 <script>
     AOS.init({ duration: 600, once: true, offset: 50 });
 </script>

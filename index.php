@@ -29,7 +29,7 @@ ob_start(function ($html) {
         return $html;
     }
     $tag = '<script>window.PWA_BASE_URL = ' . json_encode(BASE_URL) . ';</script>' . "\n"
-        . '<script src="' . BASE_URL . '/mon_js/pwa-install.js" defer></script>' . "\n</body>";
+        . '<script src="' . ASSET_URL . '/mon_js/pwa-install.js" defer></script>' . "\n</body>";
     return preg_replace('/<\/body>/i', $tag, $html, 1);
 });
 

@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Suivi de colis - TransGest</title>
-    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/aos.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/aos.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -565,7 +565,7 @@
 
 <!-- PAGE HEADER -->
 <section class="page-header">
-    <img src="<?= BASE_URL ?>/assets_site/img/Suividecolis.png" alt="Suivi de colis" class="page-header-bg">
+    <img src="<?= ASSET_URL ?>/assets_site/img/Suividecolis.png" alt="Suivi de colis" class="page-header-bg">
     <div class="page-header-overlay"></div>
     <div class="container">
         <h1 data-aos="fade-up">Suivi de colis</h1>
@@ -600,7 +600,7 @@
                                     <div class="company-pick-cover"></div>
                                     <div class="company-pick-logo">
                                         <?php if (!empty($compagnie->logo)): ?>
-                                            <img src="<?= BASE_URL ?>/images/logos/<?= htmlspecialchars($compagnie->logo) ?>" alt="<?= htmlspecialchars($compagnie->nom_compagnie) ?>">
+                                            <img src="<?= ASSET_URL ?>/images/logos/<?= htmlspecialchars($compagnie->logo) ?>" alt="<?= htmlspecialchars($compagnie->nom_compagnie) ?>">
                                         <?php else: ?>
                                             <i class="fas fa-bus"></i>
                                         <?php endif; ?>
@@ -780,7 +780,7 @@
     </div>
 </footer>
 
-<script src="<?= BASE_URL ?>/assets_site/js/aos.js"></script>
+<script src="<?= ASSET_URL ?>/assets_site/js/aos.js"></script>
 <script>
     AOS.init({ duration: 600, once: true, offset: 50 });
 

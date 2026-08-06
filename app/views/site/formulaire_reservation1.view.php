@@ -58,7 +58,7 @@
                     <div class="offcanvas__top mb-5 d-flex justify-content-between align-items-center">
                         <div class="offcanvas__logo">
                             <a href="index.html">
-                                <img src="<?= BASE_URL ?>/<?= BASE_URL ?>/assets_site_site/img/logo/black-logo.svg" alt="logo-img">
+                                <img src="<?= ASSET_URL ?>/assets_site/img/logo/black-logo.svg" alt="logo-img">
                             </a>
                         </div>
                         <div class="offcanvas__close">
@@ -142,7 +142,7 @@
     <?php $this->view('site/partials/nav') ?>
     <!-- Breadcrumb-Section Start -->
     <section class="breadcrumb-wrapper fix bg-cover"
-        style="background-image: url(<?= BASE_URL ?>/assets_site/img/breadcrumb/breadcrumb.jpg);">
+        style="background-image: url(<?= ASSET_URL ?>/assets_site/img/breadcrumb/breadcrumb.jpg);">
         <div class="container">
             <div class="row">
                 <div class="page-heading">

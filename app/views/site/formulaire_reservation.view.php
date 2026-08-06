@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Réservation - TransGest</title>
-    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/aos.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/aos.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -437,7 +437,7 @@
 
 <!-- PAGE HEADER avec NOUVELLE IMAGE DE FOND (route et montagnes) -->
 <section class="page-header">
-    <img src="<?= BASE_URL ?>/assets_site/img/reservation-bg.jpg" alt="Route de montagne" class="page-header-bg">
+    <img src="<?= ASSET_URL ?>/assets_site/img/reservation-bg.jpg" alt="Route de montagne" class="page-header-bg">
     <div class="page-header-overlay"></div>
     <div class="container">
         <h1 data-aos="fade-up">Réservez votre voyage</h1>
@@ -455,7 +455,7 @@ $this->view("admin/helpers");
         <div class="booking-card" data-aos="fade-up">
             <!-- Partie Image - Bus avec des passagers (NOUVELLE IMAGE) -->
             <div class="booking-image">
-                <img src="<?= BASE_URL ?>/assets_site/img/reservation-bus.jpg" alt="Passagers dans un bus">
+                <img src="<?= ASSET_URL ?>/assets_site/img/reservation-bus.jpg" alt="Passagers dans un bus">
                 <div class="booking-image-overlay">
                     <p><i class="fas fa-users"></i> Voyagez avec vos proches</p>
                 </div>
@@ -643,7 +643,7 @@ $this->view("admin/helpers");
     </div>
 </footer>
 
-<script src="<?= BASE_URL ?>/assets_site/js/aos.js"></script>
+<script src="<?= ASSET_URL ?>/assets_site/js/aos.js"></script>
 <script>
     AOS.init({ duration: 600, once: true, offset: 50 });
 

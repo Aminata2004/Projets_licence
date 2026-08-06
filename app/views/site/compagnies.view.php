@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Nos Compagnies - TransGest</title>
-    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/aos.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/aos.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -499,7 +499,7 @@
                 <div class="company-cover" style="background: linear-gradient(135deg, #0f3b5e, #1a5276);"></div>
                 <div class="company-logo">
                     <?php if(!empty($c->logo)): ?>
-                        <img src="<?= BASE_URL ?>/images/logos/<?= htmlspecialchars($c->logo) ?>" alt="<?= htmlspecialchars($c->nom_compagnie) ?>" style="width: 100%; height: 100%; object-fit: contain; border-radius: 20px;">
+                        <img src="<?= ASSET_URL ?>/images/logos/<?= htmlspecialchars($c->logo) ?>" alt="<?= htmlspecialchars($c->nom_compagnie) ?>" style="width: 100%; height: 100%; object-fit: contain; border-radius: 20px;">
                     <?php else: ?>
                         <i class="fas fa-bus"></i>
                     <?php endif; ?>
@@ -571,7 +571,7 @@
     </div>
 </footer>
 
-<script src="<?= BASE_URL ?>/assets_site/js/aos.js"></script>
+<script src="<?= ASSET_URL ?>/assets_site/js/aos.js"></script>
 <script>
     AOS.init({ duration: 600, once: true, offset: 50 });
     

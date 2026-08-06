@@ -36,7 +36,7 @@
     <div class="sidebar-header">
       <div>
         <a href="<?= BASE_URL ?>/admin/Homes/home" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">
-          <img src="<?= BASE_URL ?>/images/logos/transgest_logo.png" alt="TransGest" style="height:60px; width:auto; object-fit:contain;">
+          <img src="<?= ASSET_URL ?>/images/logos/transgest_logo.png" alt="TransGest" style="height:60px; width:auto; object-fit:contain;">
         </a>
       </div>
       <div class="toggle-icon ms-auto"><i class="bi bi-chevron-double-left"></i>

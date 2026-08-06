@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Client - TransGest</title>
-    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -153,7 +153,7 @@
     <header class="header">
         <div class="header-inner">
             <a href="<?= BASE_URL ?>/site/Accueil" class="logo">
-                <img src="<?= BASE_URL ?>/images/logos/transgest_logo.png" alt="TransGest">
+                <img src="<?= ASSET_URL ?>/images/logos/transgest_logo.png" alt="TransGest">
             </a>
             <a href="<?= BASE_URL ?>/site/Accueil" class="back-link">
                 <i class="fas fa-arrow-left"></i> Retour à l'accueil

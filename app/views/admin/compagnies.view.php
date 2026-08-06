@@ -220,7 +220,7 @@
                                             <tr class="hover-shadow">
                                                 <td class="text-center" data-label="Logo">
                                                     <?php if (!empty($listes->logo)): ?>
-                                                        <img src="<?= BASE_URL ?>/images/logos/<?= htmlspecialchars($listes->logo) ?>" alt="Logo" style="width: 45px; height: 45px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: #fff; padding: 2px;">
+                                                        <img src="<?= ASSET_URL ?>/images/logos/<?= htmlspecialchars($listes->logo) ?>" alt="Logo" style="width: 45px; height: 45px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: #fff; padding: 2px;">
                                                     <?php else: ?>
                                                         <div style="width: 45px; height: 45px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #ea580c; margin: 0 auto;">
                                                             <i class="bx bx-bus fs-4"></i>
@@ -244,7 +244,7 @@
                                                                     data-nom_compagnie="<?= htmlspecialchars($listes->nom_compagnie, ENT_QUOTES) ?>"
                                                                     data-libele="<?= htmlspecialchars($listes->libele, ENT_QUOTES) ?>"
                                                                     data-slogant="<?= htmlspecialchars($listes->slogant, ENT_QUOTES) ?>"
-                                                                    data-logo="<?= !empty($listes->logo) ? BASE_URL . '/images/logos/' . htmlspecialchars($listes->logo, ENT_QUOTES) : '' ?>"
+                                                                    data-logo="<?= !empty($listes->logo) ? ASSET_URL . '/images/logos/' . htmlspecialchars($listes->logo, ENT_QUOTES) : '' ?>"
                                                                     data-logofilename="<?= htmlspecialchars($listes->logo, ENT_QUOTES) ?>"
                                                                     href="#">
                                                                     ✏️ Modifier
@@ -383,8 +383,8 @@
     </div>
 
     <?php $this->view('admin/partials/foot') ?>
-    <script src="<?= BASE_URL ?>/mon_js/scrip_compagnie.js"></script>
-    <script src="<?= BASE_URL ?>/mon_js/alert_delete.js"></script>
+    <script src="<?= ASSET_URL ?>/mon_js/scrip_compagnie.js"></script>
+    <script src="<?= ASSET_URL ?>/mon_js/alert_delete.js"></script>
 </body>
 
 </html>

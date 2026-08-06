@@ -63,7 +63,7 @@ class Accueil extends Controller {
         $heroSlides = glob(ROOT . '/public/assets_site/img/hero-slides/*.{jpg,jpeg,png,webp}', GLOB_BRACE);
         sort($heroSlides);
         $heroSlides = array_map(function ($path) {
-            return BASE_URL . '/assets_site/img/hero-slides/' . basename($path);
+            return ASSET_URL . '/assets_site/img/hero-slides/' . basename($path);
         }, $heroSlides);
 
         $this->view('site/acceuil', [

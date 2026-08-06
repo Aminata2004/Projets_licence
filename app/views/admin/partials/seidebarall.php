@@ -2,7 +2,7 @@
   <aside class="sidebar-wrapper" data-simplebar="true">
     <div class="sidebar-header">
       <div>
-        <a href="<?= BASE_URL ?>/admin/Homes/home"><img src="<?= BASE_URL ?>/assets/images/logo.png" class="logo-icon" alt="logo icon"></a>
+        <a href="<?= BASE_URL ?>/admin/Homes/home"><img src="<?= ASSET_URL ?>/assets/images/logo.png" class="logo-icon" alt="logo icon"></a>
 
       </div>
       <div>

@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Connexion · TransGest</title>
-    <link rel="icon" href="<?= BASE_URL ?>/assets/images/favicon-32x32.png" type="image/png" sizes="32x32" />
-    <link rel="icon" href="<?= BASE_URL ?>/assets/images/favicon-16x16.png" type="image/png" sizes="16x16" />
+    <link rel="icon" href="<?= ASSET_URL ?>/assets/images/favicon-32x32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="<?= ASSET_URL ?>/assets/images/favicon-16x16.png" type="image/png" sizes="16x16" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -393,7 +393,7 @@
 
         <!-- Logo + texte -->
         <div class="left-content">
-            <img src="<?= BASE_URL ?>/images/logos/transgest_logo.png" alt="TransGest" class="left-logo">
+            <img src="<?= ASSET_URL ?>/images/logos/transgest_logo.png" alt="TransGest" class="left-logo">
             <h2>Gérez vos <em>voyages</em><br>en toute simplicité</h2>
             <p>Accédez à votre espace d'administration pour piloter compagnies, trajets, billets et colis en temps réel.</p>
             <div class="left-stats">
@@ -437,7 +437,7 @@
             <div class="glass-card">
 
                 <div class="card-header-block">
-                    <img src="<?= BASE_URL ?>/images/logos/transgest_logo.png" alt="TransGest" class="card-logo">
+                    <img src="<?= ASSET_URL ?>/images/logos/transgest_logo.png" alt="TransGest" class="card-logo">
                     <div class="card-sub">Connectez-vous à votre espace</div>
                 </div>
 

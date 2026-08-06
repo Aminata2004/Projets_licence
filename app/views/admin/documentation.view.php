@@ -8,7 +8,7 @@
 function docShot($file, $w, $h, $alt, $marks = [])
 {
     $uid = md5($file);
-    echo '<div class="doc-shot-img"><img src="' . BASE_URL . '/images/documentation/' . $file . '" alt="' . htmlspecialchars($alt) . '" loading="lazy">';
+    echo '<div class="doc-shot-img"><img src="' . ASSET_URL . '/images/documentation/' . $file . '" alt="' . htmlspecialchars($alt) . '" loading="lazy">';
     echo '<svg class="doc-mark-svg" viewBox="0 0 ' . $w . ' ' . $h . '" preserveAspectRatio="none">';
     echo '<defs><marker id="arrow-' . $uid . '" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#ff6a00"/></marker></defs>';
     foreach ($marks as $m) {

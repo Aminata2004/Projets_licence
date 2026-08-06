@@ -268,7 +268,7 @@
 
 
     <?php $this->view('admin/partials/foot') ?>
-    <script src="<?= BASE_URL ?>/mon_js/alert_delete.js"></script>
+    <script src="<?= ASSET_URL ?>/mon_js/alert_delete.js"></script>
     <script>
         // "Add to row" : permet de saisir plusieurs horaires d'un coup avant d'enregistrer.
         document.addEventListener("DOMContentLoaded", function() {

@@ -10,6 +10,16 @@ $base_dir = rtrim($script_dir, '/');
 $dynamic_url = $protocol . $host . $base_dir . '/public';
 
 define("BASE_URL", getenv('BASE_URL') ?: $dynamic_url);
+
+// URL de base des fichiers statiques (public/assets, public/images, public/mon_js, etc.).
+// Distincte de BASE_URL car les deux ne pointent pas forcément vers le même dossier :
+// - Si le DocumentRoot du serveur est le dossier "public/" lui-même, BASE_URL et ASSET_URL
+//   sont identiques (comportement historique, ex: ancien hébergement cPanel).
+// - Si le DocumentRoot est la racine du projet (index.php à côté de "public/", ex: certains
+//   hébergements comme LWS), les fichiers statiques ne sont accessibles qu'en préfixant
+//   "/public" — sans quoi ils retournent une erreur 403/404. Dans ce cas, définir dans .env :
+//   ASSET_URL=<BASE_URL>/public
+define("ASSET_URL", getenv('ASSET_URL') ?: BASE_URL);
 // define('ROOT', dirname(__DIR__));  // ou un chemin absolu local
 define("DBNAME", getenv('DB_NAME') ?: "db_compagnies_mvc");
 define("DBHOST", getenv('DB_HOST') ?: "localhost");

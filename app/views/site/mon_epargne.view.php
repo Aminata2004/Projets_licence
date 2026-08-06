@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Épargne - TransGest</title>
-    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
-    <link href="<?= BASE_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/all.min.css" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f5f7fb; color: #1a1f2e; }
@@ -176,7 +176,7 @@
     <header class="header">
         <div class="header-inner">
             <a href="<?= BASE_URL ?>/site/Accueil">
-                <img src="<?= BASE_URL ?>/images/logos/transgest_logo.png" alt="TransGest" style="height:55px;">
+                <img src="<?= ASSET_URL ?>/images/logos/transgest_logo.png" alt="TransGest" style="height:55px;">
             </a>
             <div style="display:flex;align-items:center;gap:12px;">
                 <span style="font-size:0.9rem;color:#555;">Bonjour, <strong style="color:var(--primary);"><?= htmlspecialchars($_SESSION['client_nom']) ?></strong></span>

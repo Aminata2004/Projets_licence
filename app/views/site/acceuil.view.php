@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>TransGest - Réservation & Suivi de colis</title>
-    <link href="<?= BASE_URL ?>/assets_site/css/inter.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets_site/css/all.min.css">
-    <link href="<?= BASE_URL ?>/assets_site/css/aos.css" rel="stylesheet">
+    <link href="<?= ASSET_URL ?>/assets_site/css/inter.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= ASSET_URL ?>/assets_site/css/all.min.css">
+    <link href="<?= ASSET_URL ?>/assets_site/css/aos.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -907,7 +907,7 @@
             <div class="company-card" data-aos="fade-up" data-aos-delay="<?= ($i + 1) * 100 ?>">
                 <div class="company-icon" style="overflow: hidden;">
                     <?php if(!empty($c->logo)): ?>
-                        <img src="<?= BASE_URL ?>/images/logos/<?= htmlspecialchars($c->logo) ?>" alt="<?= htmlspecialchars($c->nom_compagnie) ?>" style="width: 100%; height: 100%; object-fit: contain;">
+                        <img src="<?= ASSET_URL ?>/images/logos/<?= htmlspecialchars($c->logo) ?>" alt="<?= htmlspecialchars($c->nom_compagnie) ?>" style="width: 100%; height: 100%; object-fit: contain;">
                     <?php else: ?>
                         <i class="fas fa-bus"></i>
                     <?php endif; ?>
@@ -946,7 +946,7 @@
                         <li>
                             <button type="button" class="dest-tab-btn<?= $first ? ' active' : '' ?>" data-tab-target="dest-tab-<?= $id_compagnie ?>">
                                 <?php if (!empty($compagnie->logo)): ?>
-                                    <img src="<?= BASE_URL ?>/images/logos/<?= htmlspecialchars($compagnie->logo) ?>" alt="">
+                                    <img src="<?= ASSET_URL ?>/images/logos/<?= htmlspecialchars($compagnie->logo) ?>" alt="">
                                 <?php endif; ?>
                                 <?= htmlspecialchars($compagnie->nom_compagnie ?? 'Compagnie') ?>
                             </button>
@@ -1080,7 +1080,7 @@
     </div>
 </footer>
 
-<script src="<?= BASE_URL ?>/assets_site/js/aos.js"></script>
+<script src="<?= ASSET_URL ?>/assets_site/js/aos.js"></script>
 <script>
     AOS.init({ duration: 600, once: true, offset: 50 });
     

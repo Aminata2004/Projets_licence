@@ -260,7 +260,7 @@
         }
     </style>
     <!-- Scripts de validation -->
-    <script src="<?= BASE_URL ?>/assets/js/scrip_validations.js?v=<?= @filemtime(ROOT . '/public/assets/js/scrip_validations.js') ?: time() ?>"></script>
+    <script src="<?= ASSET_URL ?>/assets/js/scrip_validations.js?v=<?= @filemtime(ROOT . '/public/assets/js/scrip_validations.js') ?: time() ?>"></script>
     <script>
 
     </script>

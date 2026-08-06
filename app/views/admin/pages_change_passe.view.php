@@ -45,7 +45,7 @@
                         <div class="col-12">
                             <div class="card mb-4">
                                 <div class="user-profile-header-banner">
-                                    <img src="<?= BASE_URL ?>/assets_site/img/acc.png"
+                                    <img src="<?= ASSET_URL ?>/assets_site/img/acc.png"
                                         alt="Banner image"
                                         class="rounded-top"
                                         style="width: 100%; height: 400px; object-fit: cover;" />
@@ -54,7 +54,7 @@
                                 <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center mb-4">
                                     <!-- Image de profil -->
                                     <div class="flex-shrink-0 mt-n5 mx-sm-4 mx-auto">
-                                        <img src="<?= BASE_URL ?>/assets_site/img/reservation.png"
+                                        <img src="<?= ASSET_URL ?>/assets_site/img/reservation.png"
                                             alt="user image"
                                             class="rounded-circle user-profile-img"
                                             style="width:130px; height:130px; object-fit:cover; border:3px solid #fff;" />

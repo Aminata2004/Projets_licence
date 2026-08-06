@@ -11,7 +11,7 @@ $format   = (int)($format ?? 1);
 
 $compNom = $compagnie ? htmlspecialchars($compagnie->nom_compagnie) : 'Ann Express';
 $logoSrc = ($compagnie && !empty($compagnie->logo))
-    ? BASE_URL . '/images/logos/' . htmlspecialchars($compagnie->logo)
+    ? ASSET_URL . '/images/logos/' . htmlspecialchars($compagnie->logo)
     : '';
 
 // Construit le HTML d'un seul badge pour le format demandé. Fonction partagée entre
@@ -20,7 +20,7 @@ $logoSrc = ($compagnie && !empty($compagnie->logo))
 function ann_render_badge($format, array $employe, $compNom, $logoSrc)
 {
     $photoSrc = !empty($employe['photo'])
-        ? BASE_URL . '/uploads/profiles/' . htmlspecialchars($employe['photo'])
+        ? ASSET_URL . '/uploads/profiles/' . htmlspecialchars($employe['photo'])
         : '';
 
     $location = '';
