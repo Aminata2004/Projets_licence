@@ -99,10 +99,15 @@ class Compagnies extends  Controller
 
             if (!in_array($extension, $extensions_autorisees)) {
                 $erreurLogo = "Logo non enregistré : format .$extension non autorisé (jpg, jpeg, png, webp uniquement).";
-            } elseif (!is_dir($dossier) || !is_writable($dossier)) {
-                $erreurLogo = "Logo non enregistré : le dossier de destination n'est pas accessible en écriture sur le serveur.";
+            } elseif (!is_dir($dossier)) {
+                $erreurLogo = "Logo non enregistré : dossier introuvable côté serveur ($dossier).";
+            } elseif (!is_writable($dossier)) {
+                $proprietaire = function_exists('posix_getpwuid') ? (posix_getpwuid(fileowner($dossier))['name'] ?? fileowner($dossier)) : fileowner($dossier);
+                $processus = function_exists('posix_getpwuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? posix_geteuid()) : (function_exists('get_current_user') ? get_current_user() : '?');
+                $erreurLogo = "Logo non enregistré : dossier non inscriptible ($dossier), propriétaire=$proprietaire, PHP tourne en tant que=$processus.";
             } elseif (!move_uploaded_file($_FILES['logo']['tmp_name'], $chemin)) {
-                $erreurLogo = "Logo non enregistré : échec de l'écriture du fichier sur le serveur.";
+                $err = error_get_last();
+                $erreurLogo = "Logo non enregistré : échec de l'écriture du fichier ($chemin)" . (!empty($err['message']) ? " — " . $err['message'] : '') . ".";
             } else {
                 // Le umask du process PHP peut produire un fichier non lisible par
                 // le serveur web (403) selon l'hébergeur ; on force donc 0644.
