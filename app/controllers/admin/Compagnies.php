@@ -84,6 +84,10 @@ class Compagnies extends  Controller
 
             if (move_uploaded_file($_FILES['logo']['tmp_name'], $chemin)) {
 
+                // Le umask du process PHP peut produire un fichier non lisible par
+                // le serveur web (403) selon l'hébergeur ; on force donc 0644.
+                chmod($chemin, 0644);
+
                 // Supprimer l'ancien logo si existant
                 if (!empty($ancien_logo) && file_exists($dossier . $ancien_logo)) {
                     unlink($dossier . $ancien_logo);

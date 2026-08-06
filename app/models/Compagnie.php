@@ -38,6 +38,10 @@
                     $destPath = $uploadDir . '/' . $logoNameInDb;
                     if (!move_uploaded_file($file['tmp_name'], $destPath)) {
                         $errors[] = "Échec de l'enregistrement du logo.";
+                    } else {
+                        // Le umask du process PHP peut produire un fichier non lisible par
+                        // le serveur web (403) selon l'hébergeur ; on force donc 0644.
+                        chmod($destPath, 0644);
                     }
                 }
             } else {

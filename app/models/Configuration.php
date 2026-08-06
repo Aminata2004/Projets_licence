@@ -74,6 +74,9 @@
                     $fileName = time() . '_' . basename($_FILES['photo']['name']);
                     $targetFile = $uploadDir . $fileName;
                     if (move_uploaded_file($_FILES['photo']['tmp_name'], $targetFile)) {
+                        // Le umask du process PHP peut produire un fichier non lisible par
+                        // le serveur web (403) selon l'hébergeur ; on force donc 0644.
+                        chmod($targetFile, 0644);
                         $photoPath = $fileName;
                     }
                 }
