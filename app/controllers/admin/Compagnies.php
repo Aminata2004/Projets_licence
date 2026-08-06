@@ -90,7 +90,10 @@ class Compagnies extends  Controller
             $erreurLogo = "Logo non enregistré : " . ($messagesErreur[$erreurUpload] ?? "erreur d'upload inconnue (code $erreurUpload).");
         } else {
 
-            $dossier = dirname(__DIR__, 2) . '/public/images/logos/';
+            // app/controllers/admin/ est a 3 niveaux sous la racine du projet (contrairement
+            // a app/models/, a 2 niveaux) : dirname(__DIR__, 2) pointait par erreur vers
+            // app/public/... au lieu de public/...
+            $dossier = dirname(__DIR__, 3) . '/public/images/logos/';
             $nom_fichier = time() . "_" . basename($_FILES['logo']['name']);
             $chemin = $dossier . $nom_fichier;
 
