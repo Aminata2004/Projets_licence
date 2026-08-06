@@ -73,17 +73,39 @@ class Compagnies extends  Controller
     // Vérifier si un nouveau logo est envoyé
     if (!empty($_FILES['logo']['name'])) {
 
-        $dossier = dirname(__DIR__, 2) . '/public/images/logos/';
-        $nom_fichier = time() . "_" . basename($_FILES['logo']['name']);
-        $chemin = $dossier . $nom_fichier;
+        $erreurUpload = $_FILES['logo']['error'] ?? UPLOAD_ERR_NO_FILE;
 
-        $extension = strtolower(pathinfo($nom_fichier, PATHINFO_EXTENSION));
-        $extensions_autorisees = ['jpg', 'jpeg', 'png', 'webp'];
+        if ($erreurUpload !== UPLOAD_ERR_OK) {
+            // Cause la plus fréquente d'échec silencieux constatée en prod : le code
+            // ignorait ce code d'erreur et gardait l'ancien logo sans jamais le signaler.
+            $messagesErreur = [
+                UPLOAD_ERR_INI_SIZE   => "Logo trop volumineux (limite serveur upload_max_filesize dépassée).",
+                UPLOAD_ERR_FORM_SIZE  => "Logo trop volumineux (limite du formulaire dépassée).",
+                UPLOAD_ERR_PARTIAL    => "Le fichier n'a été que partiellement envoyé.",
+                UPLOAD_ERR_NO_TMP_DIR => "Dossier temporaire d'upload manquant côté serveur.",
+                UPLOAD_ERR_CANT_WRITE => "Échec d'écriture du fichier temporaire côté serveur.",
+                UPLOAD_ERR_EXTENSION  => "Upload bloqué par une extension PHP du serveur.",
+            ];
+            $compagnie->set_flash(
+                "Logo non enregistré : " . ($messagesErreur[$erreurUpload] ?? "erreur d'upload inconnue (code $erreurUpload)."),
+                'danger'
+            );
+        } else {
 
-        if (in_array($extension, $extensions_autorisees)) {
+            $dossier = dirname(__DIR__, 2) . '/public/images/logos/';
+            $nom_fichier = time() . "_" . basename($_FILES['logo']['name']);
+            $chemin = $dossier . $nom_fichier;
 
-            if (move_uploaded_file($_FILES['logo']['tmp_name'], $chemin)) {
+            $extension = strtolower(pathinfo($nom_fichier, PATHINFO_EXTENSION));
+            $extensions_autorisees = ['jpg', 'jpeg', 'png', 'webp'];
 
+            if (!in_array($extension, $extensions_autorisees)) {
+                $compagnie->set_flash("Logo non enregistré : format .$extension non autorisé (jpg, jpeg, png, webp uniquement).", 'danger');
+            } elseif (!is_dir($dossier) || !is_writable($dossier)) {
+                $compagnie->set_flash("Logo non enregistré : le dossier de destination n'est pas accessible en écriture sur le serveur.", 'danger');
+            } elseif (!move_uploaded_file($_FILES['logo']['tmp_name'], $chemin)) {
+                $compagnie->set_flash("Logo non enregistré : échec de l'écriture du fichier sur le serveur.", 'danger');
+            } else {
                 // Le umask du process PHP peut produire un fichier non lisible par
                 // le serveur web (403) selon l'hébergeur ; on force donc 0644.
                 chmod($chemin, 0644);
