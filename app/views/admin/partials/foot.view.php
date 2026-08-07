@@ -45,20 +45,23 @@ $(document).ready(function() {
 </script>
 
 <script>
-  // Un menu "..." (dropdown-menu) ouvert dans un tableau .table-responsive était rogné
-  // par le défilement horizontal du tableau (overflow-x: auto rend aussi overflow-y
-  // effectif, donc tout ce qui dépasse verticalement est masqué). On désactive le
-  // défilement le temps que le menu est ouvert, pour qu'il s'affiche en entier.
-  document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.table-responsive').forEach(function (wrapper) {
-      wrapper.addEventListener('show.bs.dropdown', function () {
-        wrapper.style.overflow = 'visible';
-      });
-      wrapper.addEventListener('hide.bs.dropdown', function () {
-        wrapper.style.overflow = '';
-      });
-    });
-  });
+  // Un menu "..." (dropdown-menu) ouvert dans un tableau .table-responsive était rogné :
+  // overflow-x:auto rend aussi overflow-y effectif (règle CSS), donc tout ce qui dépasse
+  // verticalement est masqué -- plus une ligne est haute (texte long dans Libellé/Slogan
+  // par ex.), plus c'est visible. La tentative précédente (basculer overflow:visible sur
+  // show.bs.dropdown/hide.bs.dropdown) ne suffisait pas de façon fiable. On utilise à la
+  // place le mécanisme officiel de Bootstrap pour ce cas ("dropdown dans un conteneur à
+  // défilement") : positionner le menu en "fixed" plutôt qu'"absolute", ce qui le fait
+  // échapper complètement au découpage du conteneur, quel que soit le timing.
+  // Fait au clic, en phase de capture, avant que Bootstrap ne crée l'instance Dropdown
+  // (qui lit data-bs-strategy à ce moment-là) -- couvre aussi les lignes ajoutées
+  // dynamiquement (DataTables, pagination...) sans avoir à les réinitialiser.
+  document.addEventListener('click', function (event) {
+    var toggle = event.target.closest('.table-responsive [data-bs-toggle="dropdown"]');
+    if (toggle) {
+      toggle.setAttribute('data-bs-strategy', 'fixed');
+    }
+  }, true);
 </script>
 
 <style>
