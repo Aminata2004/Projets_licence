@@ -285,7 +285,8 @@
                 $peutVoirGProgramme = $user->userHasPermission('Programme_Creation')
                     || $user->userHasPermission('Programme_programmer_car')
                     || $user->userHasPermission('Programme_programmation_voyage')
-                    || $user->userHasPermission('Programme_hors_programme');
+                    || $user->userHasPermission('Programme_hors_programme')
+                    || in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin', 'PDG'], true);
               ?>
               <?php if ($peutVoirGProgramme): ?>
                 <li class="menu-label">Gestion des programmations</li>
@@ -316,6 +317,10 @@
                     <li> <a href="#"><i class="bi bi-arrow-right-short"></i>Hors programmer</a>
                     </li>
                   <?php } ?>
+                  <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin', 'PDG'], true)): ?>
+                    <li> <a href="<?= BASE_URL ?>/admin/Flotte"><i class="bi bi-arrow-right-short"></i>État de la flotte</a>
+                    </li>
+                  <?php endif; ?>
                 </ul>
                 </li>
               <?php endif; ?>

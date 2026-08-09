@@ -586,6 +586,36 @@ $fromAndWhere = "liaison_car_trajet
         return $stmt->fetch(PDO::FETCH_OBJ) ?: null;
     }
 
+    // Etat courant de TOUS les cars de la compagnie (disponible a une gare, en transit avec
+    // ou sans decollage reel enregistre, ou anomalie sans programmation active correspondante)
+    // — vue d'ensemble pour l'ecran "Etat de la flotte". Contrairement a getCarsInTransit()/
+    // getCarsBloques(), qui ne montrent chacun qu'un sous-ensemble filtre, celle-ci renvoie
+    // une ligne par car (LEFT JOIN) pour que meme les cars sans transit en cours apparaissent.
+    // Reserve a Admin/super_admin/PDG (PDG en lecture seule) : vue de supervision globale.
+    public function getEtatFlotte()
+    {
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin', 'PDG'], true)) {
+            return [];
+        }
+
+        $select = "c.id_car, c.numero_car, c.matriculle, c.nbr_place, c.status_car,
+                   pv.id_programmation, pv.decolle_le, pv.date_enregistre, pv.id_horaire,
+                   pv.localite_user AS origine, pv.id_trajet AS destination,
+                   aOrig.numeroGare AS numeroGareDepart,
+                   aDest.numeroGare AS numeroGareDestination";
+        $fromAndWhere = "car c
+            LEFT JOIN programmation_voyage pv
+                ON pv.id_car_programmer = c.id_car
+               AND pv.statut = 'active'
+               AND c.status_car = CONCAT('En_transit_', pv.id_trajet)
+            LEFT JOIN agence aOrig ON aOrig.idAgence = pv.id_agence
+            LEFT JOIN agence aDest ON aDest.idAgence = pv.id_agence_destination
+            WHERE c.id_compagnie = :id_compagnie
+            ORDER BY c.numero_car";
+
+        return $this->SelectAllDatas($select, $fromAndWhere, [':id_compagnie' => $_SESSION['id_compagnie'] ?? null]);
+    }
+
     // Cars "fantomes" : status_car indique un transit ('En_transit_XXX') mais aucun
     // decollage n'a jamais ete enregistre sur leur programmation active correspondante
     // (typiquement des voyages crees avant l'ajout de decolle_le, ou une anomalie
