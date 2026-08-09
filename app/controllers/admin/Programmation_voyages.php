@@ -140,8 +140,23 @@ class Programmation_voyages extends Controller
             exit;
         }
 
+        // Déblocage d'un car "fantôme" (En_transit_ sans decolle_le, cf. getCarsBloques()).
+        if (isset($_POST['debloquer_arrive']) && !empty($_POST['id_programmation_bloque'])) {
+            $programmation_voyage->debloquerCarArrive($_POST['id_programmation_bloque'], $_SESSION['id_compagnie']);
+            header("Location: " . BASE_URL . "/admin/Programmation_voyages/index");
+            exit;
+        }
+        if (isset($_POST['debloquer_jamais_parti']) && !empty($_POST['id_programmation_bloque'])) {
+            $programmation_voyage->debloquerCarJamaisParti($_POST['id_programmation_bloque'], $_SESSION['id_compagnie']);
+            header("Location: " . BASE_URL . "/admin/Programmation_voyages/index");
+            exit;
+        }
+
         // Récupération des cars en transit
         $cars_en_transit = $programmation_voyage->getCarsInTransit();
+
+        // Cars bloqués (anomalie) : visible seulement pour Admin/super_admin.
+        $cars_bloques = $programmation_voyage->getCarsBloques();
 
         // Pour chaque car en approche : numéro de gare de destination à afficher.
         foreach ($cars_en_transit as $car) {
@@ -174,6 +189,7 @@ class Programmation_voyages extends Controller
             'listehoraire' => $listehoraire,
             'cars_destinations' => $cars_destinations,
             'cars_en_transit' => $cars_en_transit,
+            'cars_bloques' => $cars_bloques,
             'programmation_veille' => $programmation_veille,
             'derniere_date' => $derniere_date,
             'tousLesTrajets' => $tousLesTrajets

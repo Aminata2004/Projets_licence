@@ -197,16 +197,73 @@
                                         </td>
                                         <td>
                                             <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
-                                            <form action="" method="post" class="d-inline form-valider-arrivee"
-                                                data-depart-datetime="<?= htmlspecialchars($car->depart_datetime ?? '') ?>"
-                                                data-id-programmation="<?= htmlspecialchars($car->id_programmation ?? '') ?>">
+                                            <form action="" method="post" class="d-inline">
                                                 <input type="hidden" name="id_car_arrivee" value="<?= $car->id_car ?>">
-                                                <input type="hidden" name="force_arrivee" value="0" class="champ-force-arrivee">
                                                 <button type="submit" name="valider_arrivee" class="btn btn-sm btn-success shadow-sm rounded-pill px-3">
                                                     <i class="bx bx-check-double me-1"></i> Valider l'arrivée
                                                 </button>
                                             </form>
                                             <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Cars bloqués : "En transit" en base mais sans decollage jamais enregistré
+                 (voyage antérieur à l'ajout de decolle_le, ou anomalie) — invisibles à la
+                 fois de "disponibles" et "en approche" tant que personne ne les débloque. -->
+            <?php if (!empty($cars_bloques)): ?>
+            <div class="card shadow-lg border-0 rounded-3 mt-4">
+                <div class="card-header bg-warning text-dark fw-bold">
+                    <i class="bx bx-error me-1"></i> Cars bloqués (anomalie à résoudre)
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        Ces cars sont marqués « en transit » en base, mais leur décollage n'a jamais été
+                        enregistré (voyage créé avant l'ajout du suivi de décollage, ou anomalie).
+                        Ils n'apparaissent ni comme disponibles, ni comme « en approche ». Indiquez
+                        leur état réel pour les débloquer.
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle shadow-sm rounded">
+                            <thead class="table-warning text-center">
+                                <tr>
+                                    <th>Numéro Car</th>
+                                    <th>Départ prévu</th>
+                                    <th>Destination prévue</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <?php foreach ($cars_bloques as $car): ?>
+                                    <tr>
+                                        <td class="fw-bold"><?= htmlspecialchars($car['numero_car']) ?></td>
+                                        <td><?= htmlspecialchars($car['origine']) ?></td>
+                                        <td><?= htmlspecialchars($car['destination']) ?></td>
+                                        <td><?= htmlspecialchars(date('d/m/Y', strtotime($car['date_enregistre']))) ?></td>
+                                        <td>
+                                            <form action="" method="post" class="d-inline"
+                                                onsubmit="return confirm('Confirmer : ce car est bien arrivé à <?= htmlspecialchars(addslashes($car['destination'])) ?> ?');">
+                                                <?= csrf_field() ?>
+                                                <input type="hidden" name="id_programmation_bloque" value="<?= $car['id_programmation'] ?>">
+                                                <button type="submit" name="debloquer_arrive" class="btn btn-sm btn-success shadow-sm rounded-pill px-2 mb-1">
+                                                    <i class="bx bx-check-double me-1"></i> Arrivé à destination
+                                                </button>
+                                            </form>
+                                            <form action="" method="post" class="d-inline"
+                                                onsubmit="return confirm('Confirmer : ce car n\'a jamais quitté <?= htmlspecialchars(addslashes($car['origine'])) ?> ?');">
+                                                <?= csrf_field() ?>
+                                                <input type="hidden" name="id_programmation_bloque" value="<?= $car['id_programmation'] ?>">
+                                                <button type="submit" name="debloquer_jamais_parti" class="btn btn-sm btn-outline-secondary shadow-sm rounded-pill px-2 mb-1">
+                                                    <i class="bx bx-undo me-1"></i> Jamais parti
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

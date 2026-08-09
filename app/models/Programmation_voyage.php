@@ -586,6 +586,156 @@ $fromAndWhere = "liaison_car_trajet
         return $stmt->fetch(PDO::FETCH_OBJ) ?: null;
     }
 
+    // Cars "fantomes" : status_car indique un transit ('En_transit_XXX') mais aucun
+    // decollage n'a jamais ete enregistre sur leur programmation active correspondante
+    // (typiquement des voyages crees avant l'ajout de decolle_le, ou une anomalie
+    // operationnelle). Ni disponibles (getProgrammationCars() les exclut), ni visibles
+    // comme "en approche" (getCarsInTransit() exige decolle_le) : invisibles partout tant
+    // que personne ne les debloque manuellement. Reserve a Admin/super_admin — c'est une
+    // correction d'etat incoherent, pas un flux operationnel courant.
+    public function getCarsBloques()
+    {
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+            return [];
+        }
+
+        return $this->fetchAll(
+            "SELECT c.id_car, c.numero_car, c.status_car,
+                    pv.id_programmation, pv.date_enregistre, pv.id_horaire,
+                    pv.id_trajet AS destination, pv.localite_user AS origine
+             FROM car c
+             JOIN programmation_voyage pv
+               ON pv.id_car_programmer = c.id_car
+              AND pv.id_trajet = SUBSTRING(c.status_car, 12)
+              AND pv.statut = 'active'
+             WHERE c.status_car LIKE 'En\\_transit\\_%'
+               AND pv.decolle_le IS NULL
+               AND c.id_compagnie = :id_compagnie
+             ORDER BY c.numero_car",
+            [':id_compagnie' => $_SESSION['id_compagnie'] ?? null]
+        );
+    }
+
+    // Debloque un car fantome dont le voyage est en realite deja arrive a destination
+    // (juste jamais enregistre comme tel) : enregistre coup sur coup le decollage (a
+    // l'instant de la correction, faute de connaitre l'heure reelle) et l'arrivee, comme
+    // l'aurait fait le flux normal decollerCar() + validerArrivee().
+    public function debloquerCarArrive($id_programmation, $id_compagnie)
+    {
+        if (!csrf_verify()) {
+            $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+            return false;
+        }
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+            $this->set_flash("Accès refusé.", "danger");
+            return false;
+        }
+
+        $prog = $this->fetchOne(
+            "SELECT * FROM programmation_voyage WHERE id_programmation = :id AND id_compagnie = :ic AND statut = 'active'",
+            [':id' => $id_programmation, ':ic' => $id_compagnie]
+        );
+        if (!$prog) {
+            $this->set_flash("Programmation introuvable.", "danger");
+            return false;
+        }
+
+        $car = $this->fetchOne(
+            "SELECT id_car, status_car FROM car WHERE id_car = :id AND id_compagnie = :ic",
+            [':id' => $prog['id_car_programmer'], ':ic' => $id_compagnie]
+        );
+        if (!$car || $car['status_car'] !== 'En_transit_' . $prog['id_trajet']) {
+            $this->set_flash("Ce car n'est plus dans l'état bloqué attendu.", "warning");
+            return false;
+        }
+
+        date_default_timezone_set('Africa/Bamako');
+        $pdo = $this->connect();
+        $pdo->beginTransaction();
+        try {
+            $pdo->prepare(
+                "UPDATE programmation_voyage SET decolle_le = :maintenant, decolle_par = :par
+                 WHERE id_programmation = :id AND id_compagnie = :ic AND decolle_le IS NULL"
+            )->execute([
+                ':maintenant' => date('Y-m-d H:i:s'),
+                ':par' => $_SESSION['id_utilisateur'] ?? null,
+                ':id' => $id_programmation,
+                ':ic' => $id_compagnie,
+            ]);
+
+            $pdo->prepare("UPDATE car SET status_car = :dest WHERE id_car = :id_car")
+                ->execute([':dest' => $prog['id_trajet'], ':id_car' => $prog['id_car_programmer']]);
+
+            $pdo->commit();
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            $this->set_flash("Erreur lors du déblocage.", "danger");
+            return false;
+        }
+
+        $this->set_flash("Car débloqué : marqué arrivé à destination.", "success");
+        return true;
+    }
+
+    // Debloque un car fantome dont le voyage n'a en realite jamais eu lieu (le car n'a
+    // jamais quitte sa gare). Le voyage est annule (meme semantique que le statut pose par
+    // Transfert_gare pour un voyage sans depart reel) et le car redevient disponible a son
+    // origine, compteur de places reserve remis a zero (mirroir de Transfert_gare::
+    // transfererPassagers(), etape 8, pour un voyage qui ne part finalement pas).
+    public function debloquerCarJamaisParti($id_programmation, $id_compagnie)
+    {
+        if (!csrf_verify()) {
+            $this->set_flash("Session expirée, veuillez réessayer.", "danger");
+            return false;
+        }
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'super_admin'], true)) {
+            $this->set_flash("Accès refusé.", "danger");
+            return false;
+        }
+
+        $prog = $this->fetchOne(
+            "SELECT * FROM programmation_voyage WHERE id_programmation = :id AND id_compagnie = :ic AND statut = 'active'",
+            [':id' => $id_programmation, ':ic' => $id_compagnie]
+        );
+        if (!$prog) {
+            $this->set_flash("Programmation introuvable.", "danger");
+            return false;
+        }
+        if (!empty($prog['decolle_le'])) {
+            $this->set_flash("Ce bus a déjà décollé : impossible de le remettre à sa gare de départ.", "warning");
+            return false;
+        }
+
+        $car = $this->fetchOne(
+            "SELECT id_car, status_car FROM car WHERE id_car = :id AND id_compagnie = :ic",
+            [':id' => $prog['id_car_programmer'], ':ic' => $id_compagnie]
+        );
+        if (!$car || $car['status_car'] !== 'En_transit_' . $prog['id_trajet']) {
+            $this->set_flash("Ce car n'est plus dans l'état bloqué attendu.", "warning");
+            return false;
+        }
+
+        $pdo = $this->connect();
+        $pdo->beginTransaction();
+        try {
+            $pdo->prepare(
+                "UPDATE programmation_voyage SET statut = 'annulee' WHERE id_programmation = :id AND id_compagnie = :ic"
+            )->execute([':id' => $id_programmation, ':ic' => $id_compagnie]);
+
+            $pdo->prepare("UPDATE car SET status_car = :origine, nbr_place_reserve = 0 WHERE id_car = :id_car")
+                ->execute([':origine' => $prog['localite_user'], ':id_car' => $prog['id_car_programmer']]);
+
+            $pdo->commit();
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            $this->set_flash("Erreur lors du déblocage.", "danger");
+            return false;
+        }
+
+        $this->set_flash("Car débloqué : remis disponible à sa gare de départ.", "success");
+        return true;
+    }
+
     public function getProgrammationById($id)
     {
         return $this->FetchSelectWhereS(
