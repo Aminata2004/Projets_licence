@@ -78,6 +78,7 @@ class Programmation_voyages extends Controller
             $date_enregistre = date('Y-m-d');
 
             $errors = [];  // tableau pour collecter les erreurs
+            $programmations_reussies = 0;
 
             foreach ($_POST['select_car'] as $val) {
                 $index = $val;
@@ -95,7 +96,16 @@ class Programmation_voyages extends Controller
                 // deux gares de la même ville de destination seraient indiscernables.
                 $id_agence_destination = $_POST['id_destination_agence'][$index] ?? null;
 
-                if (!$id_care || !$id_horaire || !$id_destination || !$id_agence_destination) {
+                // Une ligne cochée mais jamais renseignée (aucune destination choisie) n'est
+                // pas une erreur de saisie : elle correspond à un car resté sélectionné sans
+                // intention réelle (case "tout sélectionner", reste d'un "Reproduire hier"
+                // partiel...). On l'ignore silencieusement plutôt que de bloquer les lignes
+                // réellement remplies avec un message d'erreur trompeur.
+                if (empty($id_destination)) {
+                    continue;
+                }
+
+                if (!$id_care || !$id_horaire || !$id_agence_destination) {
                     $errors[] = "Veuillez remplir tous les champs pour la ligne choisie.";
                     continue; // passe à la ligne suivante sans insérer
                 }
@@ -110,6 +120,8 @@ class Programmation_voyages extends Controller
                     $update_result = $model->updateCareStatus($id_care, $id_destination);
                     if (!$update_result) {
                         $errors[] = "Erreur lors de la mise à jour du statut du car $id_care.";
+                    } else {
+                        $programmations_reussies++;
                     }
                 } else {
                     $errors[] = "Erreur lors de l'insertion de la programmation pour le car $id_care.";
@@ -120,10 +132,12 @@ class Programmation_voyages extends Controller
                 foreach ($errors as $error) {
                     $model->set_flash($error, "danger");
                 }
-            } else {
+            } elseif ($programmations_reussies > 0) {
                 $model->set_flash("Programmation générée avec succès !", "info");
                 header("Location: " . BASE_URL . "/admin/Programmation_voyages/index");
                 exit;
+            } else {
+                $model->set_flash("Veuillez cocher au moins un car et choisir sa destination.", "danger");
             }
         }
 

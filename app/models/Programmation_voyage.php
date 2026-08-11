@@ -67,11 +67,13 @@ $fromAndWhere = "liaison_car_trajet
 
         if (isset($_SESSION['droit'], $_SESSION['id_compagnie'])) {
             if ($_SESSION['droit'] === 'Admin') {
-                // Admin : voit tous les cars disponibles de sa compagnie, quelle que soit la ville
-                // où ils se trouvent actuellement — seuls les cars EN TRANSIT sont exclus.
-                // (status_car vaut soit NULL/vide, soit le nom d'une ville où le car est à l'arrêt,
-                // soit "En_transit_XXX" pendant un trajet ; un car "à Bamako" doit rester proposable.)
-                $where = " WHERE (car.status_car IS NULL OR car.status_car NOT LIKE 'En\\_transit\\_%') AND car.id_compagnie = :compagnie";
+                // Admin : ne voit que les cars JAMAIS ENCORE programmés (status_car NULL, cars
+                // tout juste ajoutés à la flotte — voir Cars_chauffeur::insertCar(), qui ne
+                // renseigne pas status_car à la création). C'est l'Admin qui fait la toute
+                // première affectation (ville de départ) d'un car ; une fois cette première
+                // programmation faite, status_car devient une vraie ville et c'est ensuite au
+                // chef d'escale de cette ville de reprogrammer le car (cf. branche ci-dessous).
+                $where = " WHERE car.status_car IS NULL AND car.id_compagnie = :compagnie";
                 $params[':compagnie'] = $_SESSION['id_compagnie'];
             } elseif ($_SESSION['droit'] === 'chef_d_escale' && isset($_SESSION['ville'])) {
                 // Chef d'escale : status_car = ville, id_compagnie = leur compagnie,

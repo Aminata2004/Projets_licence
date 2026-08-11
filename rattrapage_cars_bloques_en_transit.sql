@@ -42,3 +42,4 @@ WHERE c.status_car LIKE 'En\_transit\_%'
 UPDATE car
 SET status_car = SUBSTRING(status_car, 12)
 WHERE status_car LIKE 'En\_transit\_%';
+

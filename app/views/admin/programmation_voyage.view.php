@@ -90,7 +90,11 @@
                                                     <!-- Rempli en JS depuis le trajet choisi (jamais une saisie libre) : évite de
                                                          programmer un car à une heure qui n'existe pas pour ce trajet. -->
                                                     <select class="form-select shadow-sm" name="id_horaire[]">
-                                                        <option value="" disabled selected>Choisir d'abord une destination</option>
+                                                        <!-- Pas de "disabled" ici : une option disabled-selected est exclue de la
+                                                             soumission du formulaire (spec HTML), ce qui décale les index de ce
+                                                             tableau par rapport à id_care[]/select_car[] pour toute ligne non
+                                                             touchée. On garde juste "selected" pour l'affichage du placeholder. -->
+                                                        <option value="" selected>Choisir d'abord une destination</option>
                                                     </select>
                                                 </td>
                                                 <?php if ($_SESSION['droit'] === 'Admin'): ?>
@@ -100,8 +104,9 @@
                                                     </td>
                                                 <?php endif; ?>
                                                 <td>
-                                                    <select class="form-select shadow-sm" name="id_destination[]" required>
-                                                        <option selected disabled value="">Choisir une destination</option>
+                                                    <select class="form-select shadow-sm" name="id_destination[]">
+                                                        <!-- Pas de "disabled" ici, pour la même raison que id_horaire[] ci-dessus. -->
+                                                        <option selected value="">Choisir une destination</option>
                                                         <?php foreach ($tousLesTrajets as $d): ?>
                                                             <?php
                                                             // Tous les trajets de la compagnie sont proposes ici (pas seulement ceux
@@ -303,10 +308,30 @@
         })();
 
 
+        // La destination n'est obligatoire que pour les lignes cochées : sinon le navigateur
+        // bloque la soumission en demandant de remplir des cars qu'on ne veut pas programmer.
+        function syncDestinationRequired(tr) {
+            const checkbox = tr.querySelector('.checkbox-car');
+            const selectDestination = tr.querySelector('select[name="id_destination[]"]');
+            if (checkbox && selectDestination) {
+                selectDestination.required = checkbox.checked;
+            }
+        }
+
+        document.querySelectorAll('tbody tr[data-id-car]').forEach(function(tr) {
+            const checkbox = tr.querySelector('.checkbox-car');
+            if (checkbox) {
+                checkbox.addEventListener('change', function() {
+                    syncDestinationRequired(tr);
+                });
+            }
+        });
+
         document.getElementById('selectAll').addEventListener('change', function() {
             const isChecked = this.checked;
             document.querySelectorAll('.checkbox-car').forEach(function(checkbox) {
                 checkbox.checked = isChecked;
+                syncDestinationRequired(checkbox.closest('tr'));
             });
         });
 
@@ -339,7 +364,7 @@
                     const heure = selectedOption?.getAttribute('data-heure') || '';
                     selectHoraire.innerHTML = heure
                         ? `<option value="${heure}" selected>${heure.slice(0, 5)}</option>`
-                        : '<option value="" disabled selected>Choisir d\'abord une destination</option>';
+                        : '<option value="" selected>Choisir d\'abord une destination</option>';
                 }
             });
         });
@@ -383,6 +408,7 @@
                     }
 
                     if (checkbox) checkbox.checked = true;
+                    syncDestinationRequired(tr);
                     appliques++;
                 });
 
