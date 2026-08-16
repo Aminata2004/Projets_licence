@@ -291,6 +291,62 @@
         </div>
       <?php endif; ?>
 
+      <!-- CARS VERS MA GARE (chef d'escale uniquement) : en transit + programmés non partis -->
+      <?php if ($_SESSION['droit'] === 'chef_d_escale' && (!empty($carsEnTransit) || !empty($carsProgrammes))): ?>
+        <div class="tg-section-label"><i class="bi bi-bus-front me-1"></i>Cars vers votre gare</div>
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="tg-panel">
+              <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                  <span class="tg-panel__icon" style="background: rgba(59,130,246,0.12); color: var(--accent);"><i class="bi bi-bus-front"></i></span>
+                  <div>
+                    <h5 class="tg-panel__title">Cars en approche</h5>
+                    <p class="tg-panel__subtitle">En transit ou programmés vers <?= htmlspecialchars($_SESSION['ville']) ?></p>
+                  </div>
+                </div>
+                <a href="<?= BASE_URL ?>/admin/Programmation_voyages/index" class="btn btn-sm btn-outline-primary">
+                  Gérer <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Numéro Car</th>
+                      <th>Places</th>
+                      <th>Provenance</th>
+                      <th>Heure prévue</th>
+                      <th>Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($carsEnTransit as $car): ?>
+                      <tr>
+                        <td class="fw-semibold"><?= htmlspecialchars($car->numero_car) ?></td>
+                        <td><?= htmlspecialchars($car->nbr_place) ?></td>
+                        <td><?= htmlspecialchars($car->provenance ?? '—') ?></td>
+                        <td><?= htmlspecialchars($car->id_horaire ?? '—') ?></td>
+                        <td><span class="badge bg-success">En transit</span></td>
+                      </tr>
+                    <?php endforeach; ?>
+                    <?php foreach ($carsProgrammes as $car): ?>
+                      <tr>
+                        <td class="fw-semibold"><?= htmlspecialchars($car->numero_car) ?></td>
+                        <td><?= htmlspecialchars($car->nbr_place) ?></td>
+                        <td><?= htmlspecialchars($car->localite_user) ?></td>
+                        <td><?= htmlspecialchars($car->id_horaire) ?></td>
+                        <td><span class="badge bg-warning text-dark">Programmé</span></td>
+                      </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
+
       <!-- FINANCES : aperçu bénéfice (Admin/PDG) / état de la caisse (chef d'escale) -->
       <?php if ((in_array($_SESSION['droit'], ['Admin', 'PDG'], true) && !empty($beneficeJour)) || ($_SESSION['droit'] === 'chef_d_escale')): ?>
         <div class="tg-section-label"><i class="bi bi-cash-coin me-1"></i>Finances</div>

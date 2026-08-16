@@ -103,6 +103,20 @@ class Homes extends Controller
             $data['caisseGare'] = $this->homeModel->getCaisseGare();
         }
 
+        // Cars destinés à la gare du chef d'escale : déjà en transit, ou programmés mais
+        // pas encore décollés — visibilité directe sur la page d'accueil.
+        if ($droit === 'chef_d_escale') {
+            $programmationVoyage = new Programmation_voyage();
+            $carsEnTransit = $programmationVoyage->getCarsInTransit();
+            foreach ($carsEnTransit as $car) {
+                $prog = $programmationVoyage->getProgrammationActivePourCar($car->id_car, $_SESSION['ville']);
+                $car->provenance = $prog->localite_user ?? null;
+                $car->id_horaire = $prog->id_horaire ?? null;
+            }
+            $data['carsEnTransit']  = $carsEnTransit;
+            $data['carsProgrammes'] = $programmationVoyage->getCarsProgrammesVersMaGare();
+        }
+
         $data['activiteRecente'] = $this->homeModel->getActiviteRecente($gareLabel);
 
         // ── Données analytiques avancées (graphiques) ──────────────────

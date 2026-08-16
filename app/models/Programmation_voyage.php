@@ -474,6 +474,35 @@ $fromAndWhere = "liaison_car_trajet
         return $this->SelectAllDatas($select, $fromAndWhere, $params);
     }
 
+    // Cars programmes aujourd'hui vers la gare du chef d'escale mais pas encore reellement
+    // decolles (decolle_le IS NULL) : complement de getCarsInTransit() pour que la page
+    // d'accueil montre, en un coup d'oeil, tout ce qui est en approche vers sa gare — deja
+    // en route (getCarsInTransit) ou juste programme (ici).
+    public function getCarsProgrammesVersMaGare()
+    {
+        if (($_SESSION['droit'] ?? null) !== 'chef_d_escale' || empty($_SESSION['ville'])) {
+            return [];
+        }
+
+        $sql = "SELECT car.id_car, car.numero_car, car.nbr_place, pv.id_horaire, pv.localite_user
+                FROM programmation_voyage pv
+                JOIN car ON car.id_car = pv.id_car_programmer
+                WHERE pv.id_trajet = :ville
+                  AND pv.id_compagnie = :compagnie
+                  AND pv.statut = 'active'
+                  AND pv.decolle_le IS NULL
+                  AND pv.date_enregistre = :today
+                ORDER BY pv.id_horaire ASC";
+
+        $stmt = $this->connect()->prepare($sql);
+        $stmt->execute([
+            ':ville'     => $_SESSION['ville'],
+            ':compagnie' => $_SESSION['id_compagnie'],
+            ':today'     => date('Y-m-d'),
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
     // Marque le depart reel d'un voyage programme : appele depuis l'ecran Embarquement une
     // fois tous les passagers traites (embarques ou annules — cf. Liste_du_jour::busDejaDecolle(),
     // qui s'appuie sur ce champ pour bloquer ensuite tout embarquement/annulation sur ce trajet).
@@ -576,7 +605,7 @@ $fromAndWhere = "liaison_car_trajet
     // et à vérifier si le bus a réellement décollé (decolle_le) avant de valider son arrivée.
     public function getProgrammationActivePourCar($id_car, $destination)
     {
-        $sql = "SELECT pv.id_programmation, pv.date_enregistre, pv.id_horaire, pv.decolle_le,
+        $sql = "SELECT pv.id_programmation, pv.date_enregistre, pv.id_horaire, pv.decolle_le, pv.localite_user,
                        a.numeroGare AS numeroGareDestination
                 FROM programmation_voyage pv
                 LEFT JOIN agence a ON a.idAgence = pv.id_agence_destination
