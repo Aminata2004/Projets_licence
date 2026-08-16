@@ -292,7 +292,7 @@
       <?php endif; ?>
 
       <!-- CARS VERS MA GARE (chef d'escale uniquement) : en transit + programmés non partis -->
-      <?php if ($_SESSION['droit'] === 'chef_d_escale' && (!empty($carsEnTransit) || !empty($carsProgrammes))): ?>
+      <?php if ($_SESSION['droit'] === 'chef_d_escale'): ?>
         <div class="tg-section-label"><i class="bi bi-bus-front me-1"></i>Cars vers votre gare</div>
         <div class="row mb-4">
           <div class="col-12">
@@ -309,39 +309,46 @@
                   Gérer <i class="bi bi-arrow-right"></i>
                 </a>
               </div>
-              <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                  <thead>
-                    <tr>
-                      <th>Numéro Car</th>
-                      <th>Places</th>
-                      <th>Provenance</th>
-                      <th>Heure prévue</th>
-                      <th>Statut</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php foreach ($carsEnTransit as $car): ?>
+              <?php if (empty($carsEnTransit) && empty($carsProgrammes)): ?>
+                <div class="tg-empty">
+                  <i class="bi bi-bus-front"></i>
+                  Aucun car en approche pour le moment.
+                </div>
+              <?php else: ?>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead>
                       <tr>
-                        <td class="fw-semibold"><?= htmlspecialchars($car->numero_car) ?></td>
-                        <td><?= htmlspecialchars($car->nbr_place) ?></td>
-                        <td><?= htmlspecialchars($car->provenance ?? '—') ?></td>
-                        <td><?= htmlspecialchars($car->id_horaire ?? '—') ?></td>
-                        <td><span class="badge bg-success">En transit</span></td>
+                        <th>Numéro Car</th>
+                        <th>Places</th>
+                        <th>Provenance</th>
+                        <th>Heure prévue</th>
+                        <th>Statut</th>
                       </tr>
-                    <?php endforeach; ?>
-                    <?php foreach ($carsProgrammes as $car): ?>
-                      <tr>
-                        <td class="fw-semibold"><?= htmlspecialchars($car->numero_car) ?></td>
-                        <td><?= htmlspecialchars($car->nbr_place) ?></td>
-                        <td><?= htmlspecialchars($car->localite_user) ?></td>
-                        <td><?= htmlspecialchars($car->id_horaire) ?></td>
-                        <td><span class="badge bg-warning text-dark">Programmé</span></td>
-                      </tr>
-                    <?php endforeach; ?>
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      <?php foreach ($carsEnTransit as $car): ?>
+                        <tr>
+                          <td class="fw-semibold"><?= htmlspecialchars($car->numero_car) ?></td>
+                          <td><?= htmlspecialchars($car->nbr_place) ?></td>
+                          <td><?= htmlspecialchars($car->provenance ?? '—') ?></td>
+                          <td><?= htmlspecialchars($car->id_horaire ?? '—') ?></td>
+                          <td><span class="badge bg-success">En transit</span></td>
+                        </tr>
+                      <?php endforeach; ?>
+                      <?php foreach ($carsProgrammes as $car): ?>
+                        <tr>
+                          <td class="fw-semibold"><?= htmlspecialchars($car->numero_car) ?></td>
+                          <td><?= htmlspecialchars($car->nbr_place) ?></td>
+                          <td><?= htmlspecialchars($car->localite_user) ?></td>
+                          <td><?= htmlspecialchars($car->id_horaire) ?></td>
+                          <td><span class="badge bg-warning text-dark">Programmé</span></td>
+                        </tr>
+                      <?php endforeach; ?>
+                    </tbody>
+                  </table>
+                </div>
+              <?php endif; ?>
             </div>
           </div>
         </div>
