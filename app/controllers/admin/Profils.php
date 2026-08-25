@@ -64,11 +64,12 @@ class Profils extends Controller
                 }
 
                 if ($userModel->updateInfoUtilisateur($idUser, $utilisateurs, $emailUser, $telephone !== '' ? $telephone : null, $photo)) {
-                    // La vue affiche $_SESSION['nom']/['emailUser'], pas une valeur rechargée
-                    // depuis la base : sans ca, le changement ne serait visible qu'a la
-                    // prochaine connexion.
+                    // La vue (et la navbar) affichent $_SESSION['nom']/['emailUser']/['photo'],
+                    // pas une valeur rechargée depuis la base : sans ca, le changement ne serait
+                    // visible qu'a la prochaine connexion.
                     $_SESSION['nom'] = $utilisateurs;
                     $_SESSION['emailUser'] = $emailUser;
+                    $_SESSION['photo'] = $photo;
                     $userModel->set_flash('Informations mises à jour avec succès.', 'success');
                 } else {
                     $userModel->set_flash('Erreur lors de la mise à jour des informations.', 'danger');

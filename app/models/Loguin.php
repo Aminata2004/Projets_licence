@@ -117,6 +117,7 @@ class Loguin extends Model
             $_SESSION['droit'] = $utilisateur->droit;
             $_SESSION['status'] = $utilisateur->status;
             $_SESSION['profile'] = $utilisateur->profile ?? null;
+            $_SESSION['photo'] = $utilisateur->photo ?? null;
 
             // Vérifie si l'utilisateur a une agence
             $_SESSION['ville'] = $utilisateur->localite ?? null;
