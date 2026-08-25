@@ -219,12 +219,18 @@ class Configurations extends Controller
                 ['self_id' => $idUserConnecte]
             );
         } else {
+            // LEFT JOIN (pas INNER) : un Admin ou un utilisateur sans agence assignee
+            // (id_agence NULL -- cas normal pour un Admin qui gere toute la compagnie,
+            // pas une gare precise) disparaissait entierement de la liste, lui y compris,
+            // des qu'un INNER JOIN agence echouait a trouver une correspondance. Le filtre
+            // par compagnie utilise utilisateur.id_compagnie directement (colonne existant
+            // deja sur la table, cf. utilisateurAppartientCompagnie() plus bas) plutot que
+            // de dependre de cette jointure.
             $listes = $configuration->FetchSelectWheres(
                 $userColumns,
                 'utilisateur
-            INNER JOIN agence ON agence.idAgence = utilisateur.id_agence
-            INNER JOIN compagnie ON compagnie.id_compagnie = agence.id_compagnie',
-                "agence.id_compagnie = :id_compagnie AND (utilisateur.droit != 'super_admin' OR utilisateur.idUser = :self_id)",
+            LEFT JOIN agence ON agence.idAgence = utilisateur.id_agence',
+                "utilisateur.id_compagnie = :id_compagnie AND (utilisateur.droit != 'super_admin' OR utilisateur.idUser = :self_id)",
                 ['id_compagnie' => $id_compagnie, 'self_id' => $idUserConnecte]
             );
         }
