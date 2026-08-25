@@ -250,86 +250,6 @@
                           <?php endif; ?>
                         </td>
                       </tr>
-
-                      <?php if (($_SESSION['droit'] ?? null) === 'super_admin'): ?>
-                      <!-- Modal Suppression définitive -->
-                      <div class="modal fade" id="deleteModal<?= $listes->idUser ?>" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                          <div class="modal-content">
-                            <form action="<?= BASE_URL ?>/admin/Configurations" method="post">
-                              <div class="modal-header bg-danger">
-                                <h5 class="modal-title text-white">Supprimer définitivement ce compte</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
-                              </div>
-                              <div class="modal-body">
-                                <p>
-                                  Cette action est <strong class="text-danger">irréversible</strong>. Le compte
-                                  <strong><?= htmlspecialchars($listes->utilisateurs) ?></strong> sera supprimé
-                                  ainsi que ses données propres (permissions, historique de connexion).
-                                  Ses billets/colis/dépenses déjà enregistrés sont conservés mais détachés de son compte.
-                                </p>
-                                <p class="mb-1">Pour confirmer, saisissez l'email exact de ce compte :</p>
-                                <p class="fw-bold mb-2"><?= htmlspecialchars($listes->emailUser) ?></p>
-                                <input type="text"
-                                  class="form-control confirm-delete-input"
-                                  name="confirmation"
-                                  data-expected="<?= htmlspecialchars($listes->emailUser) ?>"
-                                  autocomplete="off"
-                                  placeholder="Saisir l'email pour confirmer">
-                                <input type="hidden" name="idUser" value="<?= $listes->idUser ?>">
-                                <?= csrf_field() ?>
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                                <button type="submit" name="deleteUtilisateur" class="btn btn-danger delete-submit-btn" disabled>
-                                  Supprimer définitivement
-                                </button>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                      <?php endif; ?>
-                      <!-- Modal Activation/Désactivation -->
-                      <div class="modal fade animate__animated animate__slideInDown"
-                        id="animationModal<?= $listes->idUser ?>"
-                        tabindex="-1"
-                        role="dialog"
-                        aria-labelledby="exampleModalCenterTitle"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                          <div class="modal-content">
-                            <form action="<?= BASE_URL ?>/admin/Configurations" method="post">
-                              <div class="modal-header">
-                                <h5 class="modal-title fw-bold text-primary" id="exampleModalCenterTitle">
-                                  Confirmation de <?= $listes->status == 1 ? 'désactivation' : 'réactivation' ?>
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                                </button>
-                              </div>
-                              <div class="modal-body text-center">
-                                <i class="nav-icon fa fa-exclamation-triangle text-danger" style="font-size: 60px;"></i>
-                                <p class="mt-3">
-                                  Voulez-vous vraiment
-                                  <strong class="text-danger">
-                                    <?= $listes->status == 1 ? 'désactiver' : 'activer' ?>
-                                  </strong>
-                                  le compte <br><strong><?= $listes->utilisateurs ?></strong> ?
-                                </p>
-
-                                <input type="hidden" name="idUser" value="<?= $listes->idUser ?>">
-                                <input type="hidden" name="newStatut" value="<?= $listes->status == 1 ? 0 : 1 ?>">
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                                <button type="submit" name="valider" class="btn btn-primary">
-                                  Oui <?= $listes->status == 1 ? 'Désactiver' : 'Activer' ?>
-                                </button>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
                     <?php endforeach ?>
                   </tbody>
                 </table>
@@ -349,6 +269,93 @@
     <!--End Back To Top Button-->
   </div>
   <!--end wrapper-->
+
+  <?php /* Modals par utilisateur (suppression, activation/désactivation) : rendues ici, hors
+           du tableau, sinon un modal Bootstrap (position: fixed) imbriqué dans .table-responsive
+           (overflow-x: auto) se retrouve piégé/mal positionné dans la card au lieu de s'afficher
+           par-dessus la page. */ ?>
+  <?php foreach ($liste as $listes): ?>
+    <?php if (($_SESSION['droit'] ?? null) === 'super_admin'): ?>
+    <!-- Modal Suppression définitive -->
+    <div class="modal fade" id="deleteModal<?= $listes->idUser ?>" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <form action="<?= BASE_URL ?>/admin/Configurations" method="post">
+            <div class="modal-header bg-danger">
+              <h5 class="modal-title text-white">Supprimer définitivement ce compte</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+            </div>
+            <div class="modal-body">
+              <p>
+                Cette action est <strong class="text-danger">irréversible</strong>. Le compte
+                <strong><?= htmlspecialchars($listes->utilisateurs) ?></strong> sera supprimé
+                ainsi que ses données propres (permissions, historique de connexion).
+                Ses billets/colis/dépenses déjà enregistrés sont conservés mais détachés de son compte.
+              </p>
+              <p class="mb-1">Pour confirmer, saisissez l'email exact de ce compte :</p>
+              <p class="fw-bold mb-2"><?= htmlspecialchars($listes->emailUser) ?></p>
+              <input type="text"
+                class="form-control confirm-delete-input"
+                name="confirmation"
+                data-expected="<?= htmlspecialchars($listes->emailUser) ?>"
+                autocomplete="off"
+                placeholder="Saisir l'email pour confirmer">
+              <input type="hidden" name="idUser" value="<?= $listes->idUser ?>">
+              <?= csrf_field() ?>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+              <button type="submit" name="deleteUtilisateur" class="btn btn-danger delete-submit-btn" disabled>
+                Supprimer définitivement
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <?php endif; ?>
+    <!-- Modal Activation/Désactivation -->
+    <div class="modal fade animate__animated animate__slideInDown"
+      id="animationModal<?= $listes->idUser ?>"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalCenterTitle"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <form action="<?= BASE_URL ?>/admin/Configurations" method="post">
+            <div class="modal-header">
+              <h5 class="modal-title fw-bold text-primary" id="exampleModalCenterTitle">
+                Confirmation de <?= $listes->status == 1 ? 'désactivation' : 'réactivation' ?>
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+              </button>
+            </div>
+            <div class="modal-body text-center">
+              <i class="nav-icon fa fa-exclamation-triangle text-danger" style="font-size: 60px;"></i>
+              <p class="mt-3">
+                Voulez-vous vraiment
+                <strong class="text-danger">
+                  <?= $listes->status == 1 ? 'désactiver' : 'activer' ?>
+                </strong>
+                le compte <br><strong><?= $listes->utilisateurs ?></strong> ?
+              </p>
+
+              <input type="hidden" name="idUser" value="<?= $listes->idUser ?>">
+              <input type="hidden" name="newStatut" value="<?= $listes->status == 1 ? 0 : 1 ?>">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+              <button type="submit" name="valider" class="btn btn-primary">
+                Oui <?= $listes->status == 1 ? 'Désactiver' : 'Activer' ?>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  <?php endforeach ?>
+
   <!-- Modal Modification Utilisateur -->
   <div class="modal fade" id="modalModification" tabindex="-1" aria-labelledby="modalModificationLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
