@@ -109,6 +109,10 @@ class Permissions extends Controller
             exit;
         }
 
+        // Complète le catalogue avec les permissions par défaut manquantes avant de
+        // construire la liste à cocher, pour que l'écran reflète toujours le catalogue complet.
+        $permissionModel->seedPermissionsParDefautSiVide();
+
         $allPermissions = $permissionModel->getAll(); // À créer si besoin
         $userPermissions = $permissionModel->getUserPermissions($idUtilisateur); // À créer si besoin
 

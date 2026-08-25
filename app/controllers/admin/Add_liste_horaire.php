@@ -75,13 +75,18 @@ class Add_liste_horaire extends  Controller
 
   public function add_permission()
   {
-     // instanciation 
+     // instanciation
     $add_liste_horaire = new Add_liste_horaires();
     // enregistrement des escales
     if (isset($_POST["enregistre"])) {
       // var_dump($_POST);exit;
       $add_liste_horaire->savePermission();
     }
+
+    // Complète le catalogue avec les permissions par défaut manquantes (ex: table
+    // restée incomplète depuis une ancienne version) avant d'afficher la liste : cet
+    // écran est justement celui qui doit refléter le catalogue complet.
+    (new Permission())->seedPermissionsParDefautSiVide();
 
      $liste = $add_liste_horaire->SelectAllData(
         "*","permision" );
