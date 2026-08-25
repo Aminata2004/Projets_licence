@@ -208,7 +208,10 @@
                           </a>
 
 
-                          <!-- Modifier -->
+                          <!-- Modifier : un Admin ne voit ce bouton que sur sa propre ligne (il ne gere
+                               pas les comptes de son equipe depuis cette page) ; le super_admin le
+                               voit sur toutes les lignes affichees. -->
+                          <?php if (($_SESSION['droit'] ?? null) === 'super_admin' || (int)$listes->idUser === (int)$_SESSION['id_utilisateur']): ?>
                           <i class="bx bx-edit text-primary me-2 fs-4 cursor-pointer add-button"
                             title="Modifier"
                             data-bs-toggle="modal"
@@ -221,6 +224,7 @@
                             data-droit="<?= $listes->droit ?>"
                             data-profile="<?= htmlspecialchars($listes->profile ?? '') ?>">
                           </i>
+                          <?php endif; ?>
 
                           <!-- Activation/Désactivation -->
                           <?php if ($listes->status == 1): ?>
