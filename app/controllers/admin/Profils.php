@@ -14,6 +14,45 @@ class Profils extends Controller
         $info_user = $req->fetch();
         $this->view('admin/profile', ['info_user' => $info_user]);
     }
+    // Modification du nom/email par l'utilisateur connecté depuis "Mes informations".
+    // Le formulaire pointait vers un fichier "modifier_utilisateur.php" inexistant : le
+    // routeur, ne trouvant aucun controleur correspondant, redirigeait vers l'accueil du
+    // site public (redirectToHome() dans app/core/app.php) -- d'ou l'impression de tomber
+    // sur "la partie site" en soumettant ce formulaire.
+    public function updateInfo()
+    {
+        $this->requireLogin();
+
+        $userModel = new Configuration();
+
+        if (isset($_POST['modifier'])) {
+            $idUser         = $_SESSION['id_utilisateur'];
+            $utilisateurs   = trim($_POST['utilisateurs'] ?? '');
+            $emailUser      = trim($_POST['emailUser'] ?? '');
+            $ancien_passe   = $_POST['ancien_password'] ?? '';
+
+            $info_user = $userModel->getUserById($idUser);
+
+            if (!$info_user || !password_verify($ancien_passe, $info_user['motPasse'])) {
+                $userModel->set_flash('Mot de passe incorrect.', 'danger');
+            } elseif ($utilisateurs === '' || !filter_var($emailUser, FILTER_VALIDATE_EMAIL)) {
+                $userModel->set_flash('Nom ou email invalide.', 'danger');
+            } elseif ($userModel->updateInfoUtilisateur($idUser, $utilisateurs, $emailUser)) {
+                // La vue affiche $_SESSION['nom']/['emailUser'], pas une valeur rechargée
+                // depuis la base : sans ca, le changement ne serait visible qu'a la
+                // prochaine connexion.
+                $_SESSION['nom'] = $utilisateurs;
+                $_SESSION['emailUser'] = $emailUser;
+                $userModel->set_flash('Informations mises à jour avec succès.', 'success');
+            } else {
+                $userModel->set_flash('Erreur lors de la mise à jour des informations.', 'danger');
+            }
+        }
+
+        header("Location: " . BASE_URL . "/admin/Profils/index");
+        exit;
+    }
+
     public function changePassword()
     {
         $this->requireLogin();

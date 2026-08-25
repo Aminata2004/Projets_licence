@@ -217,6 +217,13 @@
             return $stmt->execute([$newPassword, $idUser]);
         }
 
+        // Mise à jour du nom et de l'email par l'utilisateur lui-même (page "Mes informations").
+        public function updateInfoUtilisateur($idUser, $utilisateurs, $emailUser)
+        {
+            $stmt = $this->connect()->prepare("UPDATE utilisateur SET utilisateurs = ?, emailUser = ? WHERE idUser = ?");
+            return $stmt->execute([$utilisateurs, $emailUser, $idUser]);
+        }
+
 
         public function getByEmail($email)
         {

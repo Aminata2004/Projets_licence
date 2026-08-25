@@ -37,6 +37,7 @@
                 </div>
             </div>
             <!--end breadcrumb-->
+            <?php $this->view("admin/set_flash") ?>
             <div class="row">
                 <div class="container-fluid">
 
@@ -163,7 +164,7 @@
                                 </div>
 
                                 <div class="card-body">
-                                    <form id="formAccountSettings" action="modifier_utilisateur.php" method="post">
+                                    <form id="formAccountSettings" action="<?= BASE_URL ?>/admin/Profils/updateInfo" method="post">
                                         <div class="row">
                                             <div class="mb-3 col-md-6">
                                                 <label for="firstName" class="form-label">Nom & Prenom</label>

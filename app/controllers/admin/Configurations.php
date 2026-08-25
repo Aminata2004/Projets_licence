@@ -204,15 +204,19 @@ class Configurations extends Controller
         $userColumns = 'utilisateur.idUser, utilisateur.utilisateurs, utilisateur.emailUser, utilisateur.telephone, utilisateur.motPasse,
             utilisateur.droit, utilisateur.profile, utilisateur.status, utilisateur.photo, agence.numeroGare';
 
-        // Les comptes super_admin n'apparaissent jamais dans cette liste, y compris pour
-        // un autre super_admin : ce rôle n'est ni visible ni gérable depuis cette interface.
+        // Les comptes super_admin n'apparaissent pas dans cette liste (ce rôle n'est ni
+        // géré ni visible ici pour les autres), SAUF l'utilisateur connecté lui-même :
+        // sans cette exception, un super_admin ne pouvait jamais se voir ni modifier ses
+        // propres infos depuis cette page.
+        $idUserConnecte = $_SESSION['id_utilisateur'];
         if ($role === 'super_admin') {
             $listes = $configuration->FetchSelectWheres(
                 $userColumns,
                 'utilisateur
             LEFT JOIN agence ON agence.idAgence = utilisateur.id_agence
             LEFT JOIN compagnie ON compagnie.id_compagnie = agence.id_compagnie',
-                "utilisateur.droit != 'super_admin'"
+                "(utilisateur.droit != 'super_admin' OR utilisateur.idUser = :self_id)",
+                ['self_id' => $idUserConnecte]
             );
         } else {
             $listes = $configuration->FetchSelectWheres(
@@ -220,8 +224,8 @@ class Configurations extends Controller
                 'utilisateur
             INNER JOIN agence ON agence.idAgence = utilisateur.id_agence
             INNER JOIN compagnie ON compagnie.id_compagnie = agence.id_compagnie',
-                "agence.id_compagnie = :id_compagnie AND utilisateur.droit != 'super_admin'",
-                ['id_compagnie' => $id_compagnie]
+                "agence.id_compagnie = :id_compagnie AND (utilisateur.droit != 'super_admin' OR utilisateur.idUser = :self_id)",
+                ['id_compagnie' => $id_compagnie, 'self_id' => $idUserConnecte]
             );
         }
 
