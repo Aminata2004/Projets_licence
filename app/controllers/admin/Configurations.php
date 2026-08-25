@@ -226,11 +226,14 @@ class Configurations extends Controller
             // par compagnie utilise utilisateur.id_compagnie directement (colonne existant
             // deja sur la table, cf. utilisateurAppartientCompagnie() plus bas) plutot que
             // de dependre de cette jointure.
+            // Un Admin ne gere que ses subalternes depuis cette page (pas lui-meme : l'edition
+            // de ses propres infos se fait via "Mon Profil") : sa propre ligne est exclue,
+            // contrairement au super_admin ci-dessus qui doit se voir.
             $listes = $configuration->FetchSelectWheres(
                 $userColumns,
                 'utilisateur
             LEFT JOIN agence ON agence.idAgence = utilisateur.id_agence',
-                "utilisateur.id_compagnie = :id_compagnie AND (utilisateur.droit != 'super_admin' OR utilisateur.idUser = :self_id)",
+                "utilisateur.id_compagnie = :id_compagnie AND utilisateur.droit != 'super_admin' AND utilisateur.idUser != :self_id",
                 ['id_compagnie' => $id_compagnie, 'self_id' => $idUserConnecte]
             );
         }
