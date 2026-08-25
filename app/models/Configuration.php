@@ -217,11 +217,11 @@
             return $stmt->execute([$newPassword, $idUser]);
         }
 
-        // Mise à jour du nom et de l'email par l'utilisateur lui-même (page "Mes informations").
-        public function updateInfoUtilisateur($idUser, $utilisateurs, $emailUser)
+        // Mise à jour de ses propres infos par l'utilisateur lui-même (page "Mes informations").
+        public function updateInfoUtilisateur($idUser, $utilisateurs, $emailUser, $telephone = null, $photo = null)
         {
-            $stmt = $this->connect()->prepare("UPDATE utilisateur SET utilisateurs = ?, emailUser = ? WHERE idUser = ?");
-            return $stmt->execute([$utilisateurs, $emailUser, $idUser]);
+            $stmt = $this->connect()->prepare("UPDATE utilisateur SET utilisateurs = ?, emailUser = ?, telephone = ?, photo = ? WHERE idUser = ?");
+            return $stmt->execute([$utilisateurs, $emailUser, $telephone, $photo, $idUser]);
         }
 
 

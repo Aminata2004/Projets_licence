@@ -55,7 +55,7 @@
                                 <div class="user-profile-header d-flex flex-column flex-sm-row text-sm-start text-center mb-4">
                                     <!-- Image de profil -->
                                     <div class="flex-shrink-0 mt-n5 mx-sm-4 mx-auto">
-                                        <img src="<?= ASSET_URL ?>/assets_site/img/reservation.png"
+                                        <img src="<?= !empty($info_user['photo']) ? ASSET_URL . '/uploads/profiles/' . htmlspecialchars($info_user['photo']) : ASSET_URL . '/assets_site/img/reservation.png' ?>"
                                             alt="user image"
                                             class="rounded-circle user-profile-img"
                                             style="width:130px; height:130px; object-fit:cover; border:3px solid #fff;" />
@@ -164,7 +164,7 @@
                                 </div>
 
                                 <div class="card-body">
-                                    <form id="formAccountSettings" action="<?= BASE_URL ?>/admin/Profils/updateInfo" method="post">
+                                    <form id="formAccountSettings" action="<?= BASE_URL ?>/admin/Profils/updateInfo" method="post" enctype="multipart/form-data">
                                         <div class="row">
                                             <div class="mb-3 col-md-6">
                                                 <label for="firstName" class="form-label">Nom & Prenom</label>
@@ -175,6 +175,16 @@
                                                 <label for="lastName" class="form-label">Email</label>
                                                 <input class="form-control" type="text" name="emailUser" id="lastName"
                                                     value="<?= $info_user['emailUser'] ?>" />
+                                            </div>
+                                            <div class="mb-3 col-md-6">
+                                                <label for="telephone" class="form-label">Téléphone</label>
+                                                <input class="form-control" type="tel" name="telephone" id="telephone"
+                                                    pattern="[0-9+\s.\-]{6,20}"
+                                                    value="<?= htmlspecialchars($info_user['telephone'] ?? '') ?>" />
+                                            </div>
+                                            <div class="mb-3 col-md-6">
+                                                <label for="photo" class="form-label">Photo de profil</label>
+                                                <input type="file" class="form-control" name="photo" id="photo" accept="image/*" />
                                             </div>
 
                                             <div class="mb-3 col-md-6">

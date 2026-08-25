@@ -29,6 +29,7 @@ class Profils extends Controller
             $idUser         = $_SESSION['id_utilisateur'];
             $utilisateurs   = trim($_POST['utilisateurs'] ?? '');
             $emailUser      = trim($_POST['emailUser'] ?? '');
+            $telephone      = trim($_POST['telephone'] ?? '');
             $ancien_passe   = $_POST['ancien_password'] ?? '';
 
             $info_user = $userModel->getUserById($idUser);
@@ -37,15 +38,41 @@ class Profils extends Controller
                 $userModel->set_flash('Mot de passe incorrect.', 'danger');
             } elseif ($utilisateurs === '' || !filter_var($emailUser, FILTER_VALIDATE_EMAIL)) {
                 $userModel->set_flash('Nom ou email invalide.', 'danger');
-            } elseif ($userModel->updateInfoUtilisateur($idUser, $utilisateurs, $emailUser)) {
-                // La vue affiche $_SESSION['nom']/['emailUser'], pas une valeur rechargée
-                // depuis la base : sans ca, le changement ne serait visible qu'a la
-                // prochaine connexion.
-                $_SESSION['nom'] = $utilisateurs;
-                $_SESSION['emailUser'] = $emailUser;
-                $userModel->set_flash('Informations mises à jour avec succès.', 'success');
+            } elseif ($telephone !== '' && !preg_match('/^[0-9+\s.\-]{6,20}$/', $telephone)) {
+                $userModel->set_flash('Numéro de téléphone invalide.', 'danger');
             } else {
-                $userModel->set_flash('Erreur lors de la mise à jour des informations.', 'danger');
+                $photo = $info_user['photo'] ?? null; // conserve la photo actuelle par defaut
+
+                if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = 'public/uploads/profiles/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0775, true);
+                    }
+                    $fileName = time() . '_' . basename($_FILES['photo']['name']);
+                    $targetFile = $uploadDir . $fileName;
+
+                    if (move_uploaded_file($_FILES['photo']['tmp_name'], $targetFile)) {
+                        // Le umask du process PHP peut produire un fichier non lisible par
+                        // le serveur web (403) selon l'hébergeur ; on force donc 0644.
+                        chmod($targetFile, 0644);
+
+                        if (!empty($photo) && file_exists($uploadDir . $photo)) {
+                            unlink($uploadDir . $photo);
+                        }
+                        $photo = $fileName;
+                    }
+                }
+
+                if ($userModel->updateInfoUtilisateur($idUser, $utilisateurs, $emailUser, $telephone !== '' ? $telephone : null, $photo)) {
+                    // La vue affiche $_SESSION['nom']/['emailUser'], pas une valeur rechargée
+                    // depuis la base : sans ca, le changement ne serait visible qu'a la
+                    // prochaine connexion.
+                    $_SESSION['nom'] = $utilisateurs;
+                    $_SESSION['emailUser'] = $emailUser;
+                    $userModel->set_flash('Informations mises à jour avec succès.', 'success');
+                } else {
+                    $userModel->set_flash('Erreur lors de la mise à jour des informations.', 'danger');
+                }
             }
         }
 
