@@ -161,7 +161,11 @@ class Configurations extends Controller
             $telephone = trim($_POST['telephone'] ?? '');
             $droit = $_POST['droit'];
 
-            if (($role === 'Admin' && !$this->utilisateurAppartientCompagnie($configuration, $idUser, $id_compagnie))
+            // Un Admin ne gere plus les comptes de son equipe depuis cette page (l'icone
+            // Modifier n'est deja affichee que sur sa propre ligne, cf. configuration.view.php) :
+            // sans ce controle cote serveur, rejouer la requete (devtools) sur l'idUser d'un
+            // collegue suffisait a contourner cette restriction purement visuelle.
+            if (($role === 'Admin' && ($idUser !== (int)$_SESSION['id_utilisateur'] || !$this->utilisateurAppartientCompagnie($configuration, $idUser, $id_compagnie)))
                 || !in_array($droit, $droitsAutorises, true)
                 || ($telephone !== '' && !preg_match('/^[0-9+\s.\-]{6,20}$/', $telephone))
             ) {
