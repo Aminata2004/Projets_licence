@@ -516,11 +516,11 @@ $this->view("admin/helpers");
                         <!-- Date -->
                         <div class="form-group">
                             <label><i class="fas fa-calendar-alt"></i> Date du voyage</label>
-                            <?php
-                            $today = date('Y-m-d');
-                            $tomorrow = date('Y-m-d', strtotime('+1 day'));
-                            ?>
-                            <input type="date" name="jourVoyage" class="form-control" min="<?= $today ?>" max="<?= $tomorrow ?>" value="<?= $today ?>">
+                             <?php
+                             $today = date('Y-m-d');
+                             $maxDate = date('Y-m-d', strtotime('+6 days'));
+                             ?>
+                             <input type="date" name="jourVoyage" class="form-control" min="<?= $today ?>" max="<?= $maxDate ?>" value="<?= $today ?>">
                         </div>
 
                         <!-- Heure -->

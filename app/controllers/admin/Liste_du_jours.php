@@ -381,9 +381,9 @@ class Liste_du_jours extends  Controller
       // le contrôle de capacité au jour venu.
       $nouveauJour = date('Y-m-d', strtotime($_POST['nouvelle_date']));
       $aujourdhui  = date('Y-m-d');
-      $demain      = date('Y-m-d', strtotime('+1 day'));
-      if (!in_array($nouveauJour, [$aujourdhui, $demain], true)) {
-        $billets->set_flash("Le report n'est possible que vers aujourd'hui ou demain.", "danger");
+      $maxJour     = date('Y-m-d', strtotime('+6 days'));
+      if ($nouveauJour < $aujourdhui || $nouveauJour > $maxJour) {
+        $billets->set_flash("Le report n'est possible que vers une date entre aujourd'hui et dans 6 jours.", "danger");
         header("Location: " . BASE_URL . "/admin/Liste_du_jours/index");
         exit;
       }

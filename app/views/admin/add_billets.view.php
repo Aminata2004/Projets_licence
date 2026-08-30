@@ -241,11 +241,11 @@
 
         (function initDateLimits() {
             const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
+            const maxDate = new Date(today);
+            maxDate.setDate(today.getDate() + 6);
             const toISO = d => d.toISOString().slice(0, 10);
             dateInput.min = toISO(today);
-            dateInput.max = toISO(tomorrow);
+            dateInput.max = toISO(maxDate);
             dateInput.value = dateInput.min;
         })();
 

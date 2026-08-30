@@ -234,7 +234,7 @@
 
         date_default_timezone_set('Africa/Bamako');
         $aujourdhui  = date('Y-m-d');
-        $demain      = date('Y-m-d', strtotime('+1 day'));
+        $maxJour     = date('Y-m-d', strtotime('+6 days'));
         $ancienJour  = date('Y-m-d', strtotime($billet['jourVoyage']));
         $nouveauJour = date('Y-m-d', strtotime($data['jourVoyage']));
 
@@ -263,7 +263,7 @@
         );
         $idAgenceBillet = $agenceBillet['idAgence'] ?? null;
 
-        // 1) Libère la place sur l'ANCIEN créneau, s'il était suivi (aujourd'hui ou demain).
+        // 1) Libère la place sur l'ANCIEN créneau, s'il était suivi (aujourd'hui ou dans la semaine).
         if ($ancienJour === $aujourdhui) {
           $rowProg = $this->fetchOne(
             "SELECT id_car_programmer FROM programmation_voyage
@@ -281,7 +281,8 @@
                 ->execute([':n' => $nouveauReserve, ':id' => $rowProg['id_car_programmer']]);
             }
           }
-        } elseif ($ancienJour === $demain) {
+        } elseif ($ancienJour > $aujourdhui) {
+          // J+1 à J+6 : la place est comptabilisée dans la table suivis
           $stmt = $pdo->prepare(
             "SELECT idSuivis, place_reserve FROM suivis
              WHERE depart = :dep AND destination = :dest AND heur_depart = :h
@@ -296,7 +297,7 @@
           }
         }
 
-        // 2) Réserve la place sur le NOUVEAU créneau, s'il est suivi (aujourd'hui ou demain).
+        // 2) Réserve la place sur le NOUVEAU créneau, s'il est suivi (aujourd'hui ou dans la semaine).
         //    Recalcule aussi le numéro de place : celui de l'ancien créneau n'a plus de sens ici.
         $numPlace = $billet['numeroPlace'];
 
@@ -332,7 +333,8 @@
           $start = (int)$car['nbr_place_reserve'] + 1;
           $end   = $start + $nombrePassages - 1;
           $numPlace = ($nombrePassages == 1) ? "$start" : "$start-$end";
-        } elseif ($nouveauJour === $demain) {
+        } elseif ($nouveauJour > $aujourdhui) {
+          // J+1 à J+6 : gestion via la table suivis
           $stmt = $pdo->prepare("SELECT place_minumale FROM place_minumale WHERE id_compagnie = :ic LIMIT 1");
           $stmt->execute([':ic' => $id_compagnie]);
           $rowPlace = $stmt->fetch();
@@ -350,7 +352,7 @@
             $placesDispo = $suivi['place_totals'] - $suivi['place_reserve'];
             if ($nombrePassages > $placesDispo) {
               $pdo->rollBack();
-              $this->set_flash("Places insuffisantes pour demain sur le nouveau créneau : $placesDispo restantes.", "danger");
+              $this->set_flash("Places insuffisantes sur le nouveau créneau : $placesDispo restantes.", "danger");
               return false;
             }
             $pdo->prepare("UPDATE suivis SET place_reserve = place_reserve + :n WHERE idSuivis = :id")
@@ -363,7 +365,7 @@
             }
             if ($nombrePassages > $placeTotale) {
               $pdo->rollBack();
-              $this->set_flash("Places insuffisantes pour demain sur le nouveau créneau : $placeTotale restantes.", "danger");
+              $this->set_flash("Places insuffisantes sur le nouveau créneau : $placeTotale restantes.", "danger");
               return false;
             }
             $pdo->prepare(

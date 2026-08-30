@@ -23,7 +23,7 @@
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
                             </li>
-                            <li class="breadcrumb-item active text-primary" aria-current="page">Liste des tickets de demain </li>
+                            <li class="breadcrumb-item active text-primary" aria-current="page">Liste à venir</li>
                         </ol>
                     </nav>
                 </div>
@@ -66,9 +66,9 @@
                             <a class="nav-link active" href="<?= BASE_URL ?>/admin/Liste_de_demains" role="tab" aria-selected="false">
                                 <div class="d-flex align-items-center">
                                     <div class="tab-icon">
-                                        <i class="fadeIn animated bx bx-time-five font-19"></i> <!-- Icône horloge -->
+                                        <i class="fadeIn animated bx bx-calendar-week font-19"></i>
                                     </div>
-                                    <div class="tab-title">Liste de demain</div>
+                                    <div class="tab-title">Liste à venir</div>
                                 </div>
                             </a>
                         </li>
@@ -134,7 +134,7 @@
                                     <th>Client</th>
                                     <th>Destionation</th>
                                     <th>N° de place</th>
-                                    <th>heure de depart</th>
+                                    <th>Heure de départ</th>
                                     <th>Jour de voyage</th>
                                     <th>Date d'expiration</th>
                                     <th>Action</th>
@@ -142,13 +142,21 @@
                             </thead>
                             <tbody id="tableClient">
                                 <?php foreach ($liste_demain as $item): ?>
-                                    <?php if ($item->jourVoyage == date('Y-m-d', strtotime('+1 day'))): ?>
                                         <tr class="text-center">
                                             <td data-label="Client"><?= $item->Client ?></td>
                                             <td data-label="Destination"><?= $item->destinationId ?></td>
                                             <td data-label="N° de place">Chaisse N° <?= $item->numeroPlace ?></td>
                                             <td data-label="Heure de départ"><?= $item->Heur_departs ?></td>
-                                            <td data-label="Jour de voyage"><?= $item->jourVoyage ?></td>
+                                            <td data-label="Jour de voyage">
+                                                <?php
+                                                $jv = date('Y-m-d', strtotime($item->jourVoyage));
+                                                $aj = date('Y-m-d');
+                                                $dm = date('Y-m-d', strtotime('+1 day'));
+                                                if ($jv === $aj)      echo '<span class="badge bg-success">Aujourd\'hui</span>';
+                                                elseif ($jv === $dm)  echo '<span class="badge bg-primary">Demain</span>';
+                                                else                  echo '<span class="badge bg-info text-dark">' . date('d/m/Y', strtotime($item->jourVoyage)) . '</span>';
+                                                ?>
+                                            </td>
                                             <td data-label="Date d'expiration"><?= $item->date_expiration ?></td>
                                             <td data-label="Action">
                                                 <div class="dropup ">
@@ -177,9 +185,6 @@
                                                         </a>
 
                                                         <?php
-                                                        // Un simple Utilisateur ne peut pas annuler. Un chef d'escale ne peut que
-                                                        // demander l'annulation (validée ensuite par un Admin) ; l'Admin annule
-                                                        // directement.
                                                         $droitUser = $_SESSION['droit'] ?? null;
                                                         $statutAnnulation = $item->status_billets ?? null;
                                                         ?>
@@ -200,7 +205,6 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    <?php endif ?>
                                 <?php endforeach ?>
                             </tbody>
                         </table>

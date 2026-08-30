@@ -10,10 +10,10 @@
 
             $jourVoyage = date('Y-m-d', strtotime($jourVoyage));
             $aujourdhui = date('Y-m-d');
-            $demain     = date('Y-m-d', strtotime('+1 day'));
+            $maxJour    = date('Y-m-d', strtotime('+6 days'));
 
-            if (!in_array($jourVoyage, [$aujourdhui, $demain])) {
-                $this->set_flash("Date invalide : choisissez aujourd’hui ou demain.", "danger");
+            if ($jourVoyage < $aujourdhui || $jourVoyage > $maxJour) {
+                $this->set_flash("Date invalide : choisissez une date entre aujourd'hui et dans 6 jours.", "danger");
                 return false;
             }
 
@@ -87,7 +87,7 @@
                 ]);
                 $idClient = $pdo->lastInsertId();
 
-                if ($jourVoyage == $demain) {
+                if ($jourVoyage > $aujourdhui) {
                     // Récupérer la place minimale dynamique
                     $stmt = $pdo->prepare("SELECT place_minumale FROM place_minumale WHERE id_compagnie = :ic LIMIT 1");
                     $stmt->execute([':ic' => $_SESSION['id_compagnie']]);

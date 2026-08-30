@@ -64,9 +64,9 @@
                             <a class="nav-link" href="<?= BASE_URL ?>/admin/Liste_de_demains" role="tab" aria-selected="false">
                                 <div class="d-flex align-items-center">
                                     <div class="tab-icon">
-                                        <i class="fadeIn animated bx bx-time-five font-19"></i> <!-- Icône horloge -->
+                                        <i class="fadeIn animated bx bx-calendar-week font-19"></i>
                                     </div>
-                                    <div class="tab-title">Liste de demain</div>
+                                    <div class="tab-title">Liste à venir</div>
                                 </div>
                             </a>
                         </li>

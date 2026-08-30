@@ -153,11 +153,11 @@ class Reservation_formulaire extends Controller
 
                 date_default_timezone_set('Africa/Bamako');
                 $aujourdhui = date('Y-m-d');
-                $demain     = date('Y-m-d', strtotime('+1 day'));
+                $maxJour    = date('Y-m-d', strtotime('+6 days'));
 
                 // --- Vérification de la date ---
-                if (!in_array($jourVoyage, [$aujourdhui, $demain])) {
-                    throw new Exception("Date invalide : choisissez aujourd’hui ou demain.");
+                if ($jourVoyage < $aujourdhui || $jourVoyage > $maxJour) {
+                    throw new Exception("Date invalide : choisissez une date entre aujourd'hui et dans 6 jours.");
                 }
 
                 // --- Calcul des places pour aujourd'hui ---
@@ -243,10 +243,59 @@ class Reservation_formulaire extends Controller
                     $delait_reservation
                 ]);
 
-                // --- 4️⃣ Mise à jour places si voyage aujourd'hui ---
+                // --- 4️⃣ Mise à jour des places ---
                 if ($jourVoyage == $aujourdhui) {
+                    // Aujourd'hui : on décompte sur le car programmé
                     $stmt = $pdo->prepare("UPDATE car SET nbr_place_reserve = nbr_place_reserve + :n WHERE id_car = :num");
                     $stmt->execute([':n' => $nbPassagers, ':num' => $idCarProgrammer]);
+                } else {
+                    // J+1 à J+6 : on gère via la table suivis (même mécanisme que la réservation présentielle)
+                    $stmtPlace = $pdo->prepare("SELECT place_minumale FROM place_minumale WHERE id_compagnie = :ic LIMIT 1");
+                    $stmtPlace->execute([':ic' => $idCompagnie]);
+                    $rowPlace    = $stmtPlace->fetch(PDO::FETCH_ASSOC);
+                    $placeTotale = $rowPlace ? (int)$rowPlace['place_minumale'] : 0;
+
+                    $stmtSuivi = $pdo->prepare(
+                        "SELECT idSuivis, place_totals, place_reserve FROM suivis
+                         WHERE depart = :dep AND destination = :dest AND heur_depart = :h
+                         AND date_reservation = :jr AND id_compagnie = :ic LIMIT 1 FOR UPDATE"
+                    );
+                    $stmtSuivi->execute([
+                        ':dep'  => $departId,
+                        ':dest' => $destinationAEnregistrer,
+                        ':h'    => $heureDepart,
+                        ':jr'   => $jourVoyage,
+                        ':ic'   => $idCompagnie,
+                    ]);
+                    $suivi = $stmtSuivi->fetch(PDO::FETCH_ASSOC);
+
+                    if ($suivi) {
+                        $placesDispo = $suivi['place_totals'] - $suivi['place_reserve'];
+                        if ($nbPassagers > $placesDispo) {
+                            throw new Exception("Places insuffisantes : $placesDispo restantes.");
+                        }
+                        $pdo->prepare("UPDATE suivis SET place_reserve = place_reserve + :n WHERE idSuivis = :id")
+                           ->execute([':n' => $nbPassagers, ':id' => $suivi['idSuivis']]);
+                    } else {
+                        if ($placeTotale <= 0) {
+                            throw new Exception("Nombre de places minimales non défini pour cette compagnie.");
+                        }
+                        if ($nbPassagers > $placeTotale) {
+                            throw new Exception("Places insuffisantes : $placeTotale restantes.");
+                        }
+                        $pdo->prepare(
+                            "INSERT INTO suivis (place_reserve, place_totals, depart, destination, heur_depart, date_reservation, id_compagnie)
+                             VALUES (:n, :total, :dep, :dest, :h, :jr, :ic)"
+                        )->execute([
+                            ':n'     => $nbPassagers,
+                            ':total' => $placeTotale,
+                            ':dep'   => $departId,
+                            ':dest'  => $destinationAEnregistrer,
+                            ':h'     => $heureDepart,
+                            ':jr'    => $jourVoyage,
+                            ':ic'    => $idCompagnie,
+                        ]);
+                    }
                 }
 
                 $pdo->commit();
