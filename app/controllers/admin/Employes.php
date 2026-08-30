@@ -49,6 +49,7 @@ class Employes extends Controller
             'Admin'         => 'Administrateur',
             'PDG'           => 'PDG (superviseur)',
             'chef_d_escale' => "Chef d'escale",
+            'secretaire'    => 'Secrétaire',
             'Utilisateur'   => 'Utilisateur',
         ];
 
@@ -72,8 +73,8 @@ class Employes extends Controller
                     $userColumns,
                     'utilisateur LEFT JOIN agence ON agence.idAgence = utilisateur.id_agence',
                     "utilisateur.droit != 'super_admin' AND (
-                        (utilisateur.droit IN ('Admin', 'PDG') AND utilisateur.id_compagnie = :id_compagnie_droit)
-                        OR (utilisateur.droit NOT IN ('Admin', 'PDG') AND agence.id_compagnie = :id_compagnie_agence)
+                        (utilisateur.droit IN ('Admin', 'PDG', 'secretaire') AND utilisateur.id_compagnie = :id_compagnie_droit)
+                        OR (utilisateur.droit NOT IN ('Admin', 'PDG', 'secretaire') AND agence.id_compagnie = :id_compagnie_agence)
                     )",
                     ['id_compagnie_droit' => $id_compagnie, 'id_compagnie_agence' => $id_compagnie]
                 );
@@ -199,7 +200,7 @@ class Employes extends Controller
                 ];
                 // Admin/PDG sont rattaches directement a la compagnie via
                 // utilisateur.id_compagnie (pas d'agence assignee), cf. buildEmployesListe().
-                if (in_array($u['droit'], ['Admin', 'PDG'], true)) {
+                if (in_array($u['droit'], ['Admin', 'PDG', 'secretaire'], true)) {
                     $employeCompagnie = $u['id_compagnie'] ?? null;
                 } else {
                     $employeCompagnie = null;

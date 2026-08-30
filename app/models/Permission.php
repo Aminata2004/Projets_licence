@@ -156,6 +156,10 @@ class Permission extends Model
             $noms = self::NOMS_PERMISSIONS_BILLET;
         } elseif ($droit === 'Utilisateur' && $profile === 'colis') {
             $noms = self::NOMS_PERMISSIONS_COLIS;
+        } elseif ($droit === 'secretaire') {
+            // Un secrétaire n'aura aucun droit par défaut à sa création (0 permission).
+            // C'est l'Admin qui choisit manuellement les permissions à attribuer.
+            return;
         } else {
             return;
         }

@@ -185,6 +185,7 @@
                                         <select class="form-select" id="droitSelect" name="droit" required>
                                             <option value="" disabled selected>Le droit</option>
                                             <option value="Utilisateur">Utilisateur</option>
+                                            <option value="secretaire">Secrétaire</option>
                                             <?php if(isset($_SESSION['droit']) && $_SESSION['droit'] !== 'chef_d_escale'): ?>
                                                 <option value="chef_d_escale">Chef d'escale</option>
                                             <?php endif; ?>
@@ -271,26 +272,29 @@
 
             const gareSelect = document.getElementById('gareSelect');
 
-            if (droit === 'Admin' || droit === 'PDG') {
+            if (droit === 'Admin' || droit === 'PDG' || droit === 'secretaire') {
                 compagnieField.style.display = 'block';
                 gareField.style.display = 'none';
                 gareSelect.removeAttribute('required');
                 gareSelect.value = '';
             } else {
                 compagnieField.style.display = 'none';
-                gareField.style.display = 'block';
-                // Chef d'escale / Utilisateur : rattachés à une gare précise, obligatoire
-                // pour que leurs opérations (billets, colis, caisse) soient scopées dessus.
-                gareSelect.setAttribute('required', 'required');
-            }
+                if (droit === 'Utilisateur') {
+                    document.getElementById('serviceField').style.display = 'block';
+                    document.getElementById('serviceSelect').setAttribute('required', 'required');
+                } else {
+                    document.getElementById('serviceField').style.display = 'none';
+                    document.getElementById('serviceSelect').removeAttribute('required');
+                    document.getElementById('serviceSelect').value = '';
+                }
 
-            if (droit === 'Utilisateur') {
-                serviceField.style.display = 'block';
-                serviceSelect.setAttribute('required', 'required');
-            } else {
-                serviceField.style.display = 'none';
-                serviceSelect.removeAttribute('required');
-                serviceSelect.value = '';
+                if (droit === 'Utilisateur' || droit === 'chef_d_escale') {
+                    document.getElementById('gareField').style.display = 'block';
+                    document.getElementById('gareSelect').setAttribute('required', 'required');
+                } else {
+                    document.getElementById('gareField').style.display = 'none';
+                    document.getElementById('gareSelect').removeAttribute('required');
+                }
             }
         });
     </script>

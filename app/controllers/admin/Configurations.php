@@ -258,8 +258,8 @@ class Configurations extends Controller
     private function droitsAutorisesPour($role)
     {
         return $role === 'super_admin'
-            ? ['super_admin', 'Admin', 'PDG', 'Utilisateur', 'chef_d_escale']
-            : ['Utilisateur', 'chef_d_escale'];
+            ? ['super_admin', 'Admin', 'PDG', 'Utilisateur', 'chef_d_escale', 'secretaire']
+            : ['Utilisateur', 'chef_d_escale', 'secretaire'];
     }
 
 

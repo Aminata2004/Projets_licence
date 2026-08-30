@@ -42,7 +42,7 @@
             // leurs opérations (billets, colis, caisse) sont scopées dessus, un compte sans
             // gare ne peut rien faire de cohérent. Seuls un Admin et un PDG (rattachés à une
             // compagnie entière, pas une gare précise) échappent à cette règle.
-            if (!empty($droit) && !in_array($droit, ['Admin', 'PDG'], true) && empty($_POST['id_agence'])) {
+            if (!empty($droit) && !in_array($droit, ['Admin', 'PDG', 'secretaire'], true) && empty($_POST['id_agence'])) {
                 $errors[] = "La gare est obligatoire pour ce type de compte.";
             }
 
@@ -62,7 +62,7 @@
                 $motPasseHash = password_hash(self::MOT_DE_PASSE_PAR_DEFAUT, PASSWORD_DEFAULT);
 
                 $id_agence = $_POST['id_agence'] ?? null;
-                $id_compagnie = in_array($droit, ['Admin', 'PDG'], true) ? ($_POST['id_compagnie'] ?? null) : $id_compagnie_session;
+                $id_compagnie = in_array($droit, ['Admin', 'PDG', 'secretaire'], true) ? ($_POST['id_compagnie'] ?? null) : $id_compagnie_session;
                 $profile = ($droit === 'Utilisateur') ? ($_POST['profile'] ?? null) : null;
 
                 $photoPath = null;
