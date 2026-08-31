@@ -391,6 +391,7 @@
               <label for="edit_droit" class="form-label fw-semibold">Droit</label>
               <select class="form-select" id="edit_droit" name="droit" required>
                   <option value="Utilisateur">Utilisateur</option>
+                  <option value="secretaire">Secrétaire Général</option>
                   <?php if(isset($_SESSION['droit']) && $_SESSION['droit'] !== 'chef_d_escale'): ?>
                       <option value="chef_d_escale">Chef d'escale</option>
                   <?php endif; ?>

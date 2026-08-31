@@ -16,7 +16,7 @@ class Cars_chauffeurs extends  Controller
     } else {
       $errors = [];
     }
-    if (isset($_SESSION['droit']) && in_array($_SESSION['droit'], ['Admin', 'PDG'], true) && isset($_SESSION['id_compagnie'])) {
+    if (isset($_SESSION['droit']) && in_array($_SESSION['droit'], ['Admin', 'PDG', 'secretaire'], true) && isset($_SESSION['id_compagnie'])) {
       $id_compagnie = $_SESSION['id_compagnie'];
 
       // Admin → uniquement les cars liés à sa compagnie

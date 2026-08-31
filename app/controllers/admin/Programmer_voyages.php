@@ -12,7 +12,7 @@ class Programmer_voyages extends  Controller
 
     if (isset($_SESSION['droit'])) {
       $role = $_SESSION['droit'];
-      if (in_array($role, ['Admin', 'PDG'], true) || $role === 'chef_d_escale' && isset($_SESSION['id_compagnie'])) {
+      if (in_array($role, ['Admin', 'PDG', 'secretaire'], true) || $role === 'chef_d_escale' && isset($_SESSION['id_compagnie'])) {
         // Admin : voit seulement ce qui est lié à sa compagnie
         $id_compagnie = $_SESSION['id_compagnie'];
 
@@ -122,7 +122,7 @@ class Programmer_voyages extends  Controller
         $liste_agence = $add_liste_trajet->SelectAllData('*', "agence");
         $liste_agence_depart = $liste_agence;
         $listeEscale = $add_liste_trajet->SelectAllData("*", "escale");
-      } elseif (in_array($role, ['Admin', 'PDG'], true) || $role === 'chef_d_escale' && isset($_SESSION['id_compagnie'])) {
+      } elseif (in_array($role, ['Admin', 'PDG', 'secretaire'], true) || $role === 'chef_d_escale' && isset($_SESSION['id_compagnie'])) {
         // Admin : voit seulement ce qui est lié à sa compagnie
         $id_compagnie = $_SESSION['id_compagnie'];
 
@@ -197,7 +197,7 @@ class Programmer_voyages extends  Controller
 
     // index() et add_programmer() restreignent déjà cette section à Admin/chef_d_escale :
     // edit() (modification du prix d'un trajet programmé) doit avoir le même contrôle.
-    if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)) {
+    if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale', 'secretaire'], true)) {
       $programmer_voyage->set_flash("Accès refusé ou session invalide", "danger");
       header("Location: " . BASE_URL . "/admin/Programmer_voyages/index");
       exit;
@@ -236,7 +236,7 @@ class Programmer_voyages extends  Controller
   {
     $programmer_voyage = new Programmer_voyage();
 
-    if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)) {
+    if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale', 'secretaire'], true)) {
       $programmer_voyage->set_flash("Accès refusé ou session invalide", "danger");
       header("Location: " . BASE_URL . "/admin/Programmer_voyages/index");
       exit;

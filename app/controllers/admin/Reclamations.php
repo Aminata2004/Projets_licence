@@ -94,7 +94,7 @@ class Reclamations extends  Controller
               exit;
           }
 
-          if (!isset($_SESSION['droit']) || !in_array($_SESSION['droit'], ['Admin', 'chef_d_escale'])) {
+          if (!isset($_SESSION['droit']) || !in_array($_SESSION['droit'], ['Admin', 'chef_d_escale', 'secretaire'])) {
               $db->set_flash("Vous n'avez pas l'autorisation d'approuver ou gérer les réclamations.", "danger");
               header("Location: " . BASE_URL . "/admin/Reclamations");
               exit;

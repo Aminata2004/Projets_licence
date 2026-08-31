@@ -14,7 +14,7 @@
                 $id_compagnie = $_SESSION['id_compagnie'];
                 // Admin n'a pas de gare fixe en session : il voit les billets de toute la compagnie.
                 // numeroGare précise la gare exacte (une ville peut avoir plusieurs gares).
-                $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
+                $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG', 'secretaire'], true);
                 $idDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
                 $numeroGare = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
                 date_default_timezone_set('Africa/Bamako');

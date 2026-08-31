@@ -19,7 +19,7 @@ class Add_liste_escales extends  Controller
 
     $liste = [];
 
-    if (isset($_SESSION['droit']) && in_array($_SESSION['droit'], ['Admin', 'PDG'], true) && isset($_SESSION['id_compagnie'])) {
+    if (isset($_SESSION['droit']) && in_array($_SESSION['droit'], ['Admin', 'PDG', 'secretaire'], true) && isset($_SESSION['id_compagnie'])) {
       $id_compagnie = $_SESSION['id_compagnie'];
 
       // On récupère uniquement les escales liées à cette compagnie

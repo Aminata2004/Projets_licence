@@ -22,7 +22,7 @@ class Liste_du_jours extends  Controller
     // Admin n'a pas de gare fixe en session : il voit les billets de toute la compagnie.
     // Pour les autres rôles, numeroGare précise la gare exacte : une ville peut avoir
     // plusieurs gares (ex. "Segou" Gare I et Gare II), le nom de ville seul ne suffit pas.
-    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
+    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG', 'secretaire'], true);
     $idDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
     $numeroGare = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $model = new Liste_du_jour();
@@ -51,7 +51,7 @@ class Liste_du_jours extends  Controller
   {
     date_default_timezone_set('Africa/Bamako');
     $id_compagnie = $_SESSION['id_compagnie'];
-    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
+    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG', 'secretaire'], true);
     $idDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
     $numeroGare = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $model = new Liste_du_jour();
@@ -249,7 +249,7 @@ class Liste_du_jours extends  Controller
     date_default_timezone_set('Africa/Bamako');
     $id_compagnie = $_SESSION['id_compagnie'];
     // Admin n'a pas de gare fixe en session : il voit les billets de toute la compagnie.
-    $isAdmin      = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
+    $isAdmin      = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG', 'secretaire'], true);
     $idDepart     = $isAdmin ? null : ($_SESSION['ville'] ?? null);
     $numeroGare   = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $destination  = trim($_GET['destination'] ?? '');
@@ -324,7 +324,7 @@ class Liste_du_jours extends  Controller
   {
     $destinationId = $_POST['destination_id'];
     // Admin n'a pas de gare fixe en session : il voit les heures de toute la compagnie.
-    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
+    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG', 'secretaire'], true);
     $villeDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
     $numeroGare  = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $billets = new Liste_du_jour();
@@ -481,7 +481,7 @@ class Liste_du_jours extends  Controller
     $this->requirePermission('Billets_embarquement');
     date_default_timezone_set('Africa/Bamako');
     $id_compagnie = $_SESSION['id_compagnie'];
-    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true);
+    $isAdmin = in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG', 'secretaire'], true);
     $idDepart = $isAdmin ? null : ($_SESSION['ville'] ?? null);
     $numeroGare = $isAdmin ? null : ($_SESSION['numero_gare'] ?? null);
     $model = new Liste_du_jour();

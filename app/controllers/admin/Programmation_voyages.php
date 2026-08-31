@@ -253,7 +253,7 @@ class Programmation_voyages extends Controller
 
         // index() restreint déjà cette section à Admin/chef_d_escale : edit() (modification
         // d'une programmation de voyage) doit avoir le même contrôle.
-        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale'], true)) {
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale', 'secretaire'], true)) {
             $programmation_voyage->set_flash("Accès refusé ou session invalide", "danger");
             header("Location: " . BASE_URL . "/admin/Programmation_voyages/index");
             exit;

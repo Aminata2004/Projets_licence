@@ -51,7 +51,7 @@ class Depenses extends Controller
     {
         $model = new Depense();
 
-        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG'], true)) {
+        if (!in_array($_SESSION['droit'] ?? null, ['Admin', 'PDG', 'secretaire'], true)) {
             $model->set_flash("Accès réservé à l'Admin de la compagnie.", "danger");
             header("Location: " . BASE_URL . "/admin/Homes/home");
             exit;

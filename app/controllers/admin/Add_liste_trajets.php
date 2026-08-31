@@ -32,7 +32,7 @@ class Add_liste_trajets extends  Controller
         $liste = $add_liste_trajet->SelectAllData('*', "trajet");
         $liste_agence = $add_liste_trajet->SelectAllData('*', "agence");
         $listeEscale = $add_liste_trajet->SelectAllData("*", "escale");
-      } elseif (in_array($role, ['Admin', 'PDG'], true) && isset($_SESSION['id_compagnie'])) {
+      } elseif (in_array($role, ['Admin', 'PDG', 'secretaire'], true) && isset($_SESSION['id_compagnie'])) {
         // Admin : voit seulement ce qui est lié à sa compagnie
         $id_compagnie = $_SESSION['id_compagnie'];
 

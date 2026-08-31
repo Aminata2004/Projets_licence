@@ -185,7 +185,7 @@
                                         <select class="form-select" id="droitSelect" name="droit" required>
                                             <option value="" disabled selected>Le droit</option>
                                             <option value="Utilisateur">Utilisateur</option>
-                                            <option value="secretaire">Secrétaire</option>
+                                            <option value="secretaire">Secrétaire Général</option>
                                             <?php if(isset($_SESSION['droit']) && $_SESSION['droit'] !== 'chef_d_escale'): ?>
                                                 <option value="chef_d_escale">Chef d'escale</option>
                                             <?php endif; ?>
