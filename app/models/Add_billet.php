@@ -479,11 +479,11 @@
 
             $jourVoyage = date('Y-m-d', strtotime($jourVoyage));
             $aujourdhui = date('Y-m-d');
-            $demain     = date('Y-m-d', strtotime('+1 day'));
+            $maxJour    = date('Y-m-d', strtotime('+6 days'));
 
-            // Vérification date
-            if (!in_array($jourVoyage, [$aujourdhui, $demain])) {
-                $this->set_flash("Date invalide : choisissez aujourd’hui ou demain.", "danger");
+            // Vérification date : autorise aujourd'hui jusqu'à J+6 (une semaine)
+            if ($jourVoyage < $aujourdhui || $jourVoyage > $maxJour) {
+                $this->set_flash("Date invalide : choisissez une date entre aujourd'hui et dans 6 jours.", "danger");
                 return false;
             }
 
@@ -582,7 +582,7 @@
                     $end      = $start + (int)$nombrePassages - 1;
                     $numPlace = ($nombrePassages == 1) ? "$start" : "$start-$end";
                 } else {
-                    // Demain → gestion via suivi et place minimale
+                    // J+1 à J+6 → gestion via suivi et place minimale
                     $stmt = $pdo->prepare("SELECT place_minumale FROM place_minumale WHERE id_compagnie = :ic LIMIT 1");
                     $stmt->execute([':ic' => $_SESSION['id_compagnie']]);
                     $rowPlace = $stmt->fetch();
@@ -614,7 +614,7 @@
                         $placesDispo = $suivi['place_totals'] - $suivi['place_reserve'];
                         if ($nombrePassages > $placesDispo) {
                             $pdo->rollBack();
-                            $this->set_flash("Places insuffisantes pour demain : $placesDispo restantes.", "danger");
+                            $this->set_flash("Places insuffisantes pour ce créneau : $placesDispo restantes.", "danger");
                             return false;
                         }
                         $stmt = $pdo->prepare("UPDATE suivis SET place_reserve = place_reserve + :n WHERE idSuivis = :id");
@@ -625,7 +625,7 @@
                     } else {
                         if ($nombrePassages > $placeTotale) {
                             $pdo->rollBack();
-                            $this->set_flash("Places insuffisantes pour demain : $placeTotale restantes.", "danger");
+                            $this->set_flash("Places insuffisantes pour ce créneau : $placeTotale restantes.", "danger");
                             return false;
                         }
                         $stmt = $pdo->prepare(
