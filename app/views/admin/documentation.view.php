@@ -131,7 +131,7 @@ function docShot($file, $w, $h, $alt, $marks = [])
                     ['type' => 'circle', 'cx' => 1560, 'cy' => 448, 'rx' => 40, 'ry' => 18],
                 ]); ?>
 
-                <h3>Cars & Chauffeurs</h3>
+                <h3>Cars & Camions & Chauffeurs</h3>
                 <p>Le parc de véhicules de la compagnie (numéro de car, matricule, nombre de places) et les chauffeurs qui leur sont associés.</p>
                 <?php docShot('cars-chauffeurs.png', 1920, 1080, "Liste des cars, onglet Chauffeurs", [
                     ['type' => 'circle', 'cx' => 989, 'cy' => 351, 'rx' => 110, 'ry' => 28],

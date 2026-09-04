@@ -23,8 +23,9 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 p-0">
                             <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
+                            <?php $estCamion = $type_vehicule === 'camion'; ?>
                             <li class="breadcrumb-item active " aria-current="page">
-                                Colis envoyés pour le car N° <?= htmlspecialchars($id_car) ?>
+                                Colis envoyés pour le <?= $estCamion ? 'camion' : 'car' ?> N° <?= htmlspecialchars($id_vehicule) ?>
                                 le <?= date('d/m/Y à H:i', strtotime($date_envoi)) ?>
                             </li>
                         </ol>
@@ -66,7 +67,7 @@
                                                 data-bs-toggle="modal" data-bs-target="#modalChangerCar"
                                                 data-id-colis="<?= htmlspecialchars($colis->id_colis) ?>"
                                                 data-nom-colis="<?= htmlspecialchars($colis->nom_colis) ?>">
-                                                <i class="bx bx-transfer-alt me-1"></i> Changer de car
+                                                <i class="bx bx-transfer-alt me-1"></i> Changer de <?= $estCamion ? 'camion' : 'car' ?>
                                             </button>
                                             <?php endif; ?>
                                         </td>
@@ -83,49 +84,78 @@
                 </div>
             </div>
 
-            <!-- Modal changer de car -->
+            <!-- Modal changer de véhicule : le changement reste intra-type (un envoi camion ne
+                 peut être réaffecté qu'à un autre camion, pas basculé vers un car, et
+                 inversement) -- la page entière porte sur un seul type ($type_vehicule),
+                 déterminé une fois pour toutes par le contrôleur. -->
             <div class="modal fade" id="modalChangerCar" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header bg-primary">
-                            <h5 class="modal-title text-white">Changer le car d'envoi</h5>
+                            <h5 class="modal-title text-white">Changer le <?= $estCamion ? 'camion' : 'car' ?> d'envoi</h5>
                             <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form action="<?= BASE_URL ?>/admin/Envoi_colis/changer_car" method="post">
+                        <form action="<?= BASE_URL ?>/admin/Envoi_colis/<?= $estCamion ? 'changer_camion' : 'changer_car' ?>" method="post">
                             <div class="modal-body">
                                 <p>Colis : <strong id="modalNomColis"></strong></p>
                                 <input type="hidden" name="id_colis" id="modalIdColis">
-                                <input type="hidden" name="ancien_id_car" value="<?= htmlspecialchars($id_car) ?>">
+                                <?php if ($estCamion): ?>
+                                    <input type="hidden" name="ancien_id_camion" value="<?= htmlspecialchars($id_vehicule) ?>">
+                                <?php else: ?>
+                                    <input type="hidden" name="ancien_id_car" value="<?= htmlspecialchars($id_vehicule) ?>">
+                                <?php endif; ?>
                                 <input type="hidden" name="ancienne_date" value="<?= htmlspecialchars($date_envoi) ?>">
 
-                                <?php
-                                $autresCars = array_filter($liste_cars, fn($car) => $car['id_car_programmer'] != $id_car);
-                                ?>
+                                <?php if ($estCamion): ?>
+                                    <?php $autresVehicules = array_filter($liste_vehicules, fn($camion) => $camion['id_camion'] != $id_vehicule); ?>
 
-                                <?php if (empty($autresCars)): ?>
-                                    <div class="alert alert-warning mb-0">
-                                        <i class="bx bx-error me-1"></i>
-                                        Aucun autre car programmé aujourd'hui. Activez et programmez un autre car
-                                        (menus <em>Cars &amp; chauffeurs</em> et <em>Programmation des voyages</em>)
-                                        pour pouvoir réaffecter ce colis.
-                                    </div>
+                                    <?php if (empty($autresVehicules)): ?>
+                                        <div class="alert alert-warning mb-0">
+                                            <i class="bx bx-error me-1"></i>
+                                            Aucun autre camion actif. Activez un autre camion
+                                            (menu <em>Cars &amp; Camions &amp; Chauffeurs</em>)
+                                            pour pouvoir réaffecter ce colis.
+                                        </div>
+                                    <?php else: ?>
+                                        <label class="form-label fw-semibold">Nouveau camion</label>
+                                        <select class="form-select" name="nouveau_id_camion" required>
+                                            <option value="" disabled selected>Choisir un camion</option>
+                                            <?php foreach ($autresVehicules as $camion): ?>
+                                                <option value="<?= htmlspecialchars($camion['id_camion']) ?>">
+                                                    Camion N°<?= htmlspecialchars($camion['numero_camion']) ?> —
+                                                    Matricule : <?= htmlspecialchars($camion['matriculle']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    <?php endif; ?>
                                 <?php else: ?>
-                                    <label class="form-label fw-semibold">Nouveau car</label>
-                                    <select class="form-select" name="nouveau_id_car" required>
-                                        <option value="" disabled selected>Choisir un car</option>
-                                        <?php foreach ($autresCars as $car): ?>
-                                            <option value="<?= htmlspecialchars($car['id_car_programmer']) ?>">
-                                                Car N°<?= htmlspecialchars($car['id_car_programmer']) ?> —
-                                                Départ: <?= htmlspecialchars($car['id_horaire']) ?> —
-                                                Destination: <?= htmlspecialchars($car['id_trajet']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
+                                    <?php $autresVehicules = array_filter($liste_vehicules, fn($car) => $car['id_car_programmer'] != $id_vehicule); ?>
+
+                                    <?php if (empty($autresVehicules)): ?>
+                                        <div class="alert alert-warning mb-0">
+                                            <i class="bx bx-error me-1"></i>
+                                            Aucun autre car programmé aujourd'hui. Activez et programmez un autre car
+                                            (menus <em>Cars &amp; chauffeurs</em> et <em>Programmation des voyages</em>)
+                                            pour pouvoir réaffecter ce colis.
+                                        </div>
+                                    <?php else: ?>
+                                        <label class="form-label fw-semibold">Nouveau car</label>
+                                        <select class="form-select" name="nouveau_id_car" required>
+                                            <option value="" disabled selected>Choisir un car</option>
+                                            <?php foreach ($autresVehicules as $car): ?>
+                                                <option value="<?= htmlspecialchars($car['id_car_programmer']) ?>">
+                                                    Car N°<?= htmlspecialchars($car['id_car_programmer']) ?> —
+                                                    Départ: <?= htmlspecialchars($car['id_horaire']) ?> —
+                                                    Destination: <?= htmlspecialchars($car['id_trajet']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                                <button type="submit" class="btn btn-primary" <?= empty($autresCars) ? 'disabled' : '' ?>>Confirmer</button>
+                                <button type="submit" class="btn btn-primary" <?= empty($autresVehicules) ? 'disabled' : '' ?>>Confirmer</button>
                             </div>
                         </form>
                     </div>

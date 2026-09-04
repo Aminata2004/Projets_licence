@@ -59,12 +59,27 @@
                                             </div>
 
                                             <div class="row g-3 mt-1">
-                                                <div class="col-md-6">
+                                                <div class="col-12">
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="estCamionCheck" name="est_camion" value="1">
+                                                        <label class="form-check-label" for="estCamionCheck">Chauffeur de camion (au lieu d'un car)</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6" id="carField">
                                                     <label for="selectCar" class="form-label">Car</label>
                                                     <select class="form-select" name="id_car" id="selectCar" required>
                                                         <option></option>
                                                         <?php foreach ($listeCar as $listeCars): ?>
                                                             <option value="<?= $listeCars->id_car ?>">Car : <?= $listeCars->numero_car ?></option>
+                                                        <?php endforeach ?>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 d-none" id="camionField">
+                                                    <label for="selectCamion" class="form-label">Camion</label>
+                                                    <select class="form-select" name="id_camion" id="selectCamion">
+                                                        <option></option>
+                                                        <?php foreach ($listeCamion as $listeCamions): ?>
+                                                            <option value="<?= $listeCamions->id_camion ?>">Camion : <?= $listeCamions->numero_camion ?></option>
                                                         <?php endforeach ?>
                                                     </select>
                                                 </div>
@@ -159,7 +174,7 @@
                     <a class="nav-link active text-break" role="tab"
                       aria-current="page" href="<?= BASE_URL ?>/admin/Cars_chauffeurs"
                       aria-selected="true">
-                      <i class="bx bx-car me-2 align-middle d-inline-block"></i>Cars & Chauffeurs
+                      <i class="bx bx-car me-2 align-middle d-inline-block"></i>Cars & Camions & Chauffeurs
                     </a>
                   </li>
                 <?php } ?>
@@ -205,6 +220,15 @@
                                     </a>
                                 </li>
                                 <li class="nav-item" role="presentation">
+                                    <a class="nav-link" href="<?= BASE_URL ?>/admin/Camions" role="tab" aria-selected="false">
+                                        <div class="d-flex align-items-center">
+                                            <div class="tab-icon"><i class='bx bx-truck font-18 me-1'></i>
+                                            </div>
+                                            <div class="tab-title">Camions</div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li class="nav-item" role="presentation">
                                     <a class="nav-link active" href="<?= BASE_URL ?>/admin/Chauffeurs_cars" role="tab" aria-selected="false">
                                         <div class="d-flex align-items-center">
                                             <div class="tab-icon"><i class='bx bx-user-pin font-18 me-1'></i>
@@ -224,7 +248,7 @@
                                                     <th class="fw-semibold">Photo</th>
                                                     <th class="fw-semibold">Nom & prénom</th>
                                                     <th class="fw-semibold">Numéro</th>
-                                                    <th class="fw-semibold">Numéro du car</th>
+                                                    <th class="fw-semibold">Véhicule</th>
                                                     <th class="fw-semibold">Action</th>
                                                 </tr>
                                             </thead>
@@ -243,7 +267,13 @@
                                                         </td>
                                                         <td data-label="Nom & prénom"><?= $listeChaufeurs->nom_prenom ?></td>
                                                         <td data-label="Numéro"><?= $listeChaufeurs->numero ?></td>
-                                                        <td data-label="Numéro du car"><?= $listeChaufeurs->numero_car ?></td>
+                                                        <td data-label="Véhicule">
+                                                            <?php if (($listeChaufeurs->type_vehicule ?? 'car') === 'camion'): ?>
+                                                                <span class="badge bg-warning text-dark">Camion n°<?= htmlspecialchars($listeChaufeurs->numero_camion ?? '') ?></span>
+                                                            <?php else: ?>
+                                                                <span class="badge bg-primary">Car n°<?= htmlspecialchars($listeChaufeurs->numero_car ?? '') ?></span>
+                                                            <?php endif; ?>
+                                                        </td>
                                                         <td data-label="Action">
                                                             <div class="dropdown">
                                                                 <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
@@ -258,7 +288,9 @@
                                                                             data-id="<?= $listeChaufeurs->id_chauffeur ?>"
                                                                             data-nom="<?= htmlspecialchars($listeChaufeurs->nom_prenom, ENT_QUOTES) ?>"
                                                                             data-numero="<?= htmlspecialchars($listeChaufeurs->numero, ENT_QUOTES) ?>"
-                                                                            data-idcar="<?= htmlspecialchars($listeChaufeurs->id_car, ENT_QUOTES) ?>"
+                                                                            data-idcar="<?= htmlspecialchars($listeChaufeurs->id_car ?? '', ENT_QUOTES) ?>"
+                                                                            data-idcamion="<?= htmlspecialchars($listeChaufeurs->id_camion ?? '', ENT_QUOTES) ?>"
+                                                                            data-type="<?= htmlspecialchars($listeChaufeurs->type_vehicule ?? 'car', ENT_QUOTES) ?>"
                                                                             href="#">
                                                                             ✏️ Modifier
                                                                         </a>
@@ -325,12 +357,26 @@
                             <input type="text" class="form-control" name="numero" id="edit_numero">
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="editEstCamionCheck" name="est_camion" value="1">
+                            <label class="form-check-label" for="editEstCamionCheck">Chauffeur de camion (au lieu d'un car)</label>
+                        </div>
+
+                        <div class="mb-3" id="editCarField">
                             <label for="edit_car" class="form-label">Car attribué</label>
-                            <select class="form-select" name="id_car" id="edit_car" required>
+                            <select class="form-select" name="id_car" id="edit_car">
                                 <option></option>
                                 <?php foreach ($listeCar as $listeCars): ?>
                                     <option value="<?= $listeCars->id_car ?>">Car : <?= $listeCars->numero_car ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-none" id="editCamionField">
+                            <label for="edit_camion" class="form-label">Camion attribué</label>
+                            <select class="form-select" name="id_camion" id="edit_camion">
+                                <option></option>
+                                <?php foreach ($listeCamion as $listeCamions): ?>
+                                    <option value="<?= $listeCamions->id_camion ?>">Camion : <?= $listeCamions->numero_camion ?></option>
                                 <?php endforeach ?>
                             </select>
                         </div>
@@ -349,7 +395,42 @@
 
     <?php $this->view('admin/partials/foot') ?>
     <script>
+        // Bascule entre le select Car et le select Camion selon la checkbox
+        // "Chauffeur de camion" -- meme principe pour le modal d'ajout et d'edition.
+        function toggleVehiculeFields(checkbox, carField, camionField, carSelect, camionSelect) {
+            const estCamion = checkbox.checked;
+            carField.classList.toggle('d-none', estCamion);
+            camionField.classList.toggle('d-none', !estCamion);
+            carSelect.required = !estCamion;
+            camionSelect.required = estCamion;
+            if (estCamion) {
+                $(carSelect).val('').trigger('change');
+            } else {
+                $(camionSelect).val('').trigger('change');
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
+            const estCamionCheck = document.getElementById('estCamionCheck');
+            const carField = document.getElementById('carField');
+            const camionField = document.getElementById('camionField');
+            const selectCar = document.getElementById('selectCar');
+            const selectCamion = document.getElementById('selectCamion');
+
+            estCamionCheck.addEventListener('change', function() {
+                toggleVehiculeFields(this, carField, camionField, selectCar, selectCamion);
+            });
+
+            const editEstCamionCheck = document.getElementById('editEstCamionCheck');
+            const editCarField = document.getElementById('editCarField');
+            const editCamionField = document.getElementById('editCamionField');
+            const editCar = document.getElementById('edit_car');
+            const editCamion = document.getElementById('edit_camion');
+
+            editEstCamionCheck.addEventListener('change', function() {
+                toggleVehiculeFields(this, editCarField, editCamionField, editCar, editCamion);
+            });
+
             const editButtons = document.querySelectorAll(".edit-btn");
 
             editButtons.forEach(button => {
@@ -357,7 +438,16 @@
                     document.getElementById("edit_chauffeur_id").value = this.dataset.id;
                     document.getElementById("edit_nom").value = this.dataset.nom;
                     document.getElementById("edit_numero").value = this.dataset.numero;
-                    $('#edit_car').val(this.dataset.idcar).trigger('change');
+
+                    const estCamion = this.dataset.type === 'camion';
+                    editEstCamionCheck.checked = estCamion;
+                    toggleVehiculeFields(editEstCamionCheck, editCarField, editCamionField, editCar, editCamion);
+
+                    if (estCamion) {
+                        $(editCamion).val(this.dataset.idcamion).trigger('change');
+                    } else {
+                        $(editCar).val(this.dataset.idcar).trigger('change');
+                    }
                 });
             });
         });
@@ -369,8 +459,20 @@
                 dropdownParent: $('#addChauffeurModal'),
                 width: '100%'
             });
+            $('#selectCamion').select2({
+                placeholder: "Choisissez le camion",
+                allowClear: true,
+                dropdownParent: $('#addChauffeurModal'),
+                width: '100%'
+            });
             $('#edit_car').select2({
                 placeholder: "Choisissez le car",
+                allowClear: true,
+                dropdownParent: $('#editChauffeurModal'),
+                width: '100%'
+            });
+            $('#edit_camion').select2({
+                placeholder: "Choisissez le camion",
                 allowClear: true,
                 dropdownParent: $('#editChauffeurModal'),
                 width: '100%'

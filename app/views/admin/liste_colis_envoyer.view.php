@@ -69,15 +69,22 @@
                             <thead class="table-primary text-center">
                                 <tr>
                                     <th>Date d'envoi</th>
-                                    <th>Numéro du car</th>
+                                    <th>Véhicule</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody class="text-center">
                                 <?php foreach ($liste_colis_envoyer as $colis): ?>
+                                    <?php $estCamion = $colis->type_vehicule === 'camion'; ?>
                                     <tr>
                                         <td><?= htmlspecialchars($colis->dates) ?></td>
-                                        <td>Car n°<?= htmlspecialchars($colis->numero_car) ?></td>
+                                        <td>
+                                            <?php if ($estCamion): ?>
+                                                <span class="badge bg-warning text-dark">Camion n°<?= htmlspecialchars($colis->id_vehicule) ?></span>
+                                            <?php else: ?>
+                                                <span class="badge bg-primary">Car n°<?= htmlspecialchars($colis->id_vehicule) ?></span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td>
                                             <div class="dropdown">
                                                 <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
@@ -86,20 +93,20 @@
                                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                                     <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                     <li>
-                                                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Envoi_colis/envoi_colis?id_car=<?= $colis->numero_car ?>">
+                                                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Envoi_colis/envoi_colis?<?= $estCamion ? 'id_camion' : 'id_car' ?>=<?= $colis->id_vehicule ?>">
                                                             <i class="bx bx-plus me-2"></i> Ajouter
                                                         </a>
                                                     </li>
                                                     <?php endif; ?>
                                                     <li>
-                                                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Envoi_colis/details_colis_envoyer?id_car=<?= $colis->numero_car ?>&date=<?= $colis->dates ?>">
-                                                            <i class="bx bx-info-circle me-2"></i> Détails / Changer de car
+                                                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/Envoi_colis/details_colis_envoyer?type=<?= $colis->type_vehicule ?>&id_vehicule=<?= $colis->id_vehicule ?>&date=<?= $colis->dates ?>">
+                                                            <i class="bx bx-info-circle me-2"></i> Détails / Changer de véhicule
                                                         </a>
                                                     </li>
                                                     <?php if (($_SESSION['droit'] ?? null) !== 'PDG'): ?>
                                                     <li>
                                                         <a class="dropdown-item text-danger annuler-envoi-btn"
-                                                            href="<?= BASE_URL ?>/admin/Envoi_colis/annuler_envoi?id_car=<?= $colis->numero_car ?>&date=<?= $colis->dates ?>">
+                                                            href="<?= BASE_URL ?>/admin/Envoi_colis/annuler_envoi?type=<?= $colis->type_vehicule ?>&id_vehicule=<?= $colis->id_vehicule ?>&date=<?= $colis->dates ?>">
                                                             <i class="bx bx-trash me-2"></i> Annuler l'envoi
                                                         </a>
                                                     </li>

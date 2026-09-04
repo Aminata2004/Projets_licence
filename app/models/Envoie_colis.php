@@ -341,4 +341,193 @@ class Envoie_colis extends Model
 
       return true;
    }
+
+   // --- CAMION : miroir des méthodes CAR ci-dessus, mais sans notion de
+   // programmation du jour -- un camion est sélectionnable dès qu'il est actif
+   // (contrairement à un car, qui doit être programmé sur un trajet passager du
+   // jour via programmation_voyage). Aucune méthode CAR existante n'est modifiée
+   // par cet ajout.
+
+   public function getCamionsActifs()
+   {
+      // FetchSelectWhere1() (pas la FetchSelectWheres() de CETTE classe, qui renvoie
+      // des objets PDO::FETCH_OBJ) : les vues qui consomment cette liste
+      // (ajouter_colis_envoi.view.php, details_colis_envoyer.view.php) utilisent la
+      // syntaxe tableau ($camion['id_camion']), comme pour getCarsDisponiblesAujourdhui()
+      // et getCamionById() ci-dessous -- il faut rester cohérent avec ce format.
+      return $this->FetchSelectWhere1(
+         "*",
+         "camion",
+         "actif = :actif AND id_compagnie = :id_compagnie",
+         [":actif" => "on", ":id_compagnie" => $_SESSION['id_compagnie']]
+      );
+   }
+
+   public function getCamionById($id)
+   {
+      $result = $this->FetchSelectWhere1(
+         "*",
+         "camion",
+         "id_camion = :id AND id_compagnie = :id_compagnie",
+         [":id" => $id, ":id_compagnie" => $_SESSION['id_compagnie'] ?? null]
+      );
+      return !empty($result) ? $result[0] : null;
+   }
+
+   public function traiterEnvoiCamion($colis_ids, $id_camion)
+   {
+      date_default_timezone_set('Africa/Bamako');
+      $id_compagnie = $_SESSION['id_compagnie'];
+
+      $pdo = $this->connect();
+      $pdo->beginTransaction();
+      try {
+         // Verrouille le camion : meme raison que le verrou sur car dans traiterEnvoi1().
+         $pdo->prepare("SELECT id_camion FROM camion WHERE id_camion = :id_camion AND id_compagnie = :ic FOR UPDATE")
+            ->execute([':id_camion' => $id_camion, ':ic' => $id_compagnie]);
+
+         $date_enregistre = $this->getOuCreerLigneEnvoiCamionDuJour($pdo, $id_camion, $id_compagnie);
+
+         $colis_ids = $this->verrouillerColisDisponibles($pdo, $colis_ids, $id_compagnie);
+         if (empty($colis_ids)) {
+            $pdo->rollBack();
+            return;
+         }
+
+         $stmtEnvoi = $pdo->prepare(
+            "INSERT INTO envoi (id_coli, id_camion, date_enregistre, id_compagnie)
+             VALUES (:id_coli, :id_camion, :date_enregistre, :id_compagnie)"
+         );
+         foreach ($colis_ids as $id_colis) {
+            $stmtEnvoi->execute([
+               ':id_coli' => $id_colis,
+               ':id_camion' => $id_camion,
+               ':date_enregistre' => $date_enregistre,
+               ':id_compagnie' => $id_compagnie
+            ]);
+         }
+
+         $placeholders = implode(',', array_fill(0, count($colis_ids), '?'));
+         $sql = "UPDATE colis SET status = 'en_cours' WHERE id_colis IN ($placeholders) AND id_compagnie = ?";
+         $pdo->prepare($sql)->execute([...$colis_ids, $id_compagnie]);
+
+         $pdo->commit();
+      } catch (Throwable $e) {
+         $pdo->rollBack();
+      }
+   }
+
+   // Miroir de getOuCreerLigneEnvoiDuJour() pour un camion (colonne numero_camion,
+   // qui stocke en réalité un id_camion, même convention que numero_car).
+   private function getOuCreerLigneEnvoiCamionDuJour(\PDO $pdo, $id_camion, $id_compagnie)
+   {
+      $date_aujourdhui = date('Y-m-d');
+
+      $stmt = $pdo->prepare("
+        SELECT dates
+        FROM ligne_envoi
+        WHERE numero_camion = :numero_camion
+          AND DATE(dates) = :date_aujourdhui
+          AND id_compagnie = :id_compagnie
+        LIMIT 1
+    ");
+      $stmt->execute([
+         ':numero_camion' => $id_camion,
+         ':date_aujourdhui' => $date_aujourdhui,
+         ':id_compagnie' => $id_compagnie
+      ]);
+      $ligne_existante = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if ($ligne_existante) {
+         return $ligne_existante['dates'];
+      }
+
+      $date_enregistre = date('YmdHis');
+      $pdo->prepare(
+         "INSERT INTO ligne_envoi (numero_camion, dates, id_compagnie)
+          VALUES(:numero_camion, :dates, :id_compagnie)"
+      )->execute([
+         ':numero_camion' => $id_camion,
+         ':dates' => $date_enregistre,
+         ':id_compagnie' => $id_compagnie
+      ]);
+
+      return $date_enregistre;
+   }
+
+   public function getColisParCamionEtDate($id_camion, $date_envoi)
+   {
+      $query = "SELECT envoi.*, colis.*
+              FROM envoi
+              INNER JOIN colis ON envoi.id_coli = colis.id_colis
+              WHERE envoi.id_camion = :id_camion AND envoi.date_enregistre = :date_envoi";
+
+      $stmt = $this->connect()->prepare($query);
+      $stmt->execute([
+         ':id_camion' => $id_camion,
+         ':date_envoi' => $date_envoi
+      ]);
+
+      return $stmt->fetchAll(PDO::FETCH_OBJ);
+   }
+
+   // Déplace un colis déjà envoyé vers un autre camion (miroir de changerCarColis()).
+   public function changerCamionColis($id_colis, $ancien_id_camion, $ancienne_date, $nouveau_id_camion)
+   {
+      $id_compagnie = $_SESSION['id_compagnie'];
+      date_default_timezone_set('Africa/Bamako');
+      $nouvelle_date = $this->getOuCreerLigneEnvoiCamionDuJour($this->connect(), $nouveau_id_camion, $id_compagnie);
+
+      $stmt = $this->insertion_update_simples(
+         "UPDATE envoi
+          SET id_camion = :nouveau_id_camion, date_enregistre = :nouvelle_date
+          WHERE id_coli = :id_colis
+            AND id_camion = :ancien_id_camion
+            AND date_enregistre = :ancienne_date
+            AND id_compagnie = :id_compagnie",
+         [
+            ':nouveau_id_camion' => $nouveau_id_camion,
+            ':nouvelle_date' => $nouvelle_date,
+            ':id_colis' => $id_colis,
+            ':ancien_id_camion' => $ancien_id_camion,
+            ':ancienne_date' => $ancienne_date,
+            ':id_compagnie' => $id_compagnie
+         ]
+      );
+
+      return $stmt && $stmt->rowCount() > 0;
+   }
+
+   // Annule un envoi complet par camion (miroir de annulerEnvoi()).
+   public function annulerEnvoiCamion($id_camion, $date_envoi)
+   {
+      $id_compagnie = $_SESSION['id_compagnie'];
+
+      $stmt = $this->connect()->prepare(
+         "SELECT id_coli FROM envoi WHERE id_camion = :id_camion AND date_enregistre = :date_envoi AND id_compagnie = :id_compagnie"
+      );
+      $stmt->execute([':id_camion' => $id_camion, ':date_envoi' => $date_envoi, ':id_compagnie' => $id_compagnie]);
+      $ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+      if (empty($ids)) {
+         return false;
+      }
+
+      $placeholders = implode(',', array_fill(0, count($ids), '?'));
+      $this->connect()
+         ->prepare("UPDATE colis SET status = 'enregistre' WHERE id_colis IN ($placeholders)")
+         ->execute($ids);
+
+      $this->insertion_update_simples(
+         "DELETE FROM envoi WHERE id_camion = :id_camion AND date_enregistre = :date_envoi AND id_compagnie = :id_compagnie",
+         [':id_camion' => $id_camion, ':date_envoi' => $date_envoi, ':id_compagnie' => $id_compagnie]
+      );
+
+      $this->insertion_update_simples(
+         "DELETE FROM ligne_envoi WHERE numero_camion = :numero_camion AND dates = :date_envoi AND id_compagnie = :id_compagnie",
+         [':numero_camion' => $id_camion, ':date_envoi' => $date_envoi, ':id_compagnie' => $id_compagnie]
+      );
+
+      return true;
+   }
 }

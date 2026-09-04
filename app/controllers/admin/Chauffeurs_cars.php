@@ -16,8 +16,16 @@ class Chauffeurs_cars extends  Controller
     } else {
       $errors = [];
     }
-    // la recuperation 
-    // recuperation des cars
+    // la recuperation
+    // recuperation des cars et camions
+    // LEFT JOIN double (et non INNER JOIN) : un chauffeur affecte a un camion n'a
+    // pas de ligne `car` a joindre (id_car est NULL pour lui), et inversement.
+    // Avec un INNER JOIN, ces chauffeurs disparaitraient silencieusement de la liste.
+    $selectChauffeur = "chauffeur.*, car.numero_car AS numero_car, camion.numero_camion AS numero_camion";
+    $joinChauffeur = "chauffeur
+        LEFT JOIN car ON chauffeur.type_vehicule = 'car' AND chauffeur.id_car = car.id_car
+        LEFT JOIN camion ON chauffeur.type_vehicule = 'camion' AND chauffeur.id_camion = camion.id_camion";
+
     if (isset($_SESSION['droit']) && in_array($_SESSION['droit'], ['Admin', 'PDG', 'secretaire'], true) && isset($_SESSION['id_compagnie'])) {
       $id_compagnie = $_SESSION['id_compagnie'];
 
@@ -29,22 +37,34 @@ class Chauffeurs_cars extends  Controller
         [":id_compagnie" => $id_compagnie]
       );
 
-      // Admin → uniquement les chauffeurs liés aux cars de sa compagnie
-      $listeChaufeur = $chauffeurs_car->FetchSelectWheres(
+      // Admin → uniquement les camions de sa compagnie
+      $listeCamion = $chauffeurs_car->FetchSelectWheres(
         "*",
-        "chauffeur INNER JOIN car ON chauffeur.id_car = car.id_car",
-        "car.id_compagnie = :id_compagnie",
+        "camion",
+        "id_compagnie = :id_compagnie",
+        [":id_compagnie" => $id_compagnie]
+      );
+
+      // Admin → uniquement les chauffeurs de sa compagnie (filtre desormais sur
+      // chauffeur.id_compagnie directement, plus via car.id_compagnie -- un
+      // chauffeur de camion n'a pas de ligne `car` a filtrer)
+      $listeChaufeur = $chauffeurs_car->FetchSelectWheres(
+        $selectChauffeur,
+        $joinChauffeur,
+        "chauffeur.id_compagnie = :id_compagnie",
         [":id_compagnie" => $id_compagnie]
       );
     } else {
       // SuperAdmin ou autres → toutes les données
       $listeCar = $chauffeurs_car->SelectAllData('*', "car");
-      $listeChaufeur = $chauffeurs_car->SelectAllData('*', "chauffeur INNER JOIN car ON chauffeur.id_car = car.id_car");
+      $listeCamion = $chauffeurs_car->SelectAllData('*', "camion");
+      $listeChaufeur = $chauffeurs_car->SelectAllData($selectChauffeur, $joinChauffeur);
     }
 
     $this->view('admin/chauffeur_cars', [
       'errors' => $errors ?? [],
       'listeCar' => $listeCar,
+      'listeCamion' => $listeCamion,
       'listeChaufeur' => $listeChaufeur
     ]);
   }
@@ -64,10 +84,27 @@ class Chauffeurs_cars extends  Controller
           exit;
       }
 
+      $estCamion = isset($_POST['est_camion']) && $_POST['est_camion'] === '1';
+      $id_car = $estCamion ? null : ($_POST['id_car'] ?? null);
+      $id_camion = $estCamion ? ($_POST['id_camion'] ?? null) : null;
+
+      if ($estCamion && empty($id_camion)) {
+        $chauffeurs_car->set_flash('Le camion est obligatoire.', 'danger');
+        header("Location: " . BASE_URL . "/admin/Chauffeurs_cars/index");
+        exit;
+      }
+      if (!$estCamion && empty($id_car)) {
+        $chauffeurs_car->set_flash('Le car est obligatoire.', 'danger');
+        header("Location: " . BASE_URL . "/admin/Chauffeurs_cars/index");
+        exit;
+      }
+
       $data = [
         'nom_prenom' => $_POST['nom_prenom'],
         'numero'     => $_POST['numero'],
-        'id_car'     => $_POST['id_car']
+        'id_car'     => $id_car,
+        'id_camion'  => $id_camion,
+        'type_vehicule' => $estCamion ? 'camion' : 'car'
       ];
 
       $chauffeurs_car = new Chauffeurs_car();

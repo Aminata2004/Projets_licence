@@ -256,6 +256,16 @@
                 </li>
               <?php endif; ?>
 
+              <?php if ($user->userHasPermission('Salaire_apercu')): ?>
+                <li>
+                  <a href="<?= BASE_URL ?>/admin/Salaires">
+                    <div class="parent-icon"><i class="bx bx-money"></i>
+                    </div>
+                    <div class="menu-title">Salaires</div>
+                  </a>
+                </li>
+              <?php endif; ?>
+
               <?php if (in_array($_SESSION['droit'] ?? null, ['Admin', 'chef_d_escale', 'PDG'], true)): ?>
                 <li class="menu-label">Banque</li>
                 <li>

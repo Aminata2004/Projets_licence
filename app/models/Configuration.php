@@ -118,6 +118,11 @@
                         $permissionModel = new Permission();
                         $permissionModel->assignPermissionsParDefautPourRole($idNouvelUtilisateur, $droit, $profile);
 
+                        // Module Salaire : chaque nouveau compte (hors super_admin, deja
+                        // exclu par Employe::creerEmployePourUtilisateur()) recoit directement
+                        // sa fiche employe (salaire a 0, a renseigner par l'Admin ensuite).
+                        (new Employe())->creerEmployePourUtilisateur($idNouvelUtilisateur, $droit, $id_agence, $id_compagnie);
+
                         $this->set_swal(
                             "👤 Utilisateur ajouté !",
                             "L'utilisateur a été ajouté avec succès. Mot de passe par défaut : " . self::MOT_DE_PASSE_PAR_DEFAUT . " (à communiquer à l'utilisateur, qui pourra le modifier après sa première connexion).",

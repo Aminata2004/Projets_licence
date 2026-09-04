@@ -46,6 +46,11 @@ class Permission extends Model
         'Programme_programmer_car',
         'Programme_programmation_voyage',
         'Programme_hors_programme',
+        // Salaire/bulletin de paie : donne acces a SON PROPRE salaire + celui de son
+        // equipe (scope par gare, cf. Employe::getEmployesVisibles()). Volontairement
+        // absente de NOMS_PERMISSIONS_CHEF_ESCALE/BILLET/COLIS : un chef d'escale ou un
+        // simple Utilisateur ne la recoit que si l'Admin la lui attribue explicitement.
+        'Salaire_apercu',
     ];
 
     // Chef d'escale : toutes les permissions par défaut SAUF la programmation fixe

@@ -39,6 +39,7 @@
                 <form action="" method="post">
                     <div class="card-body border-top border-4 border-primary">
 
+                        <div class="row">
                         <!-- Sélection du car -->
                         <div class="mb-4 col-12 col-md-4">
                             <label for="id_car_selectionner" class="form-label fw-bold">Sélectionner un car</label>
@@ -58,6 +59,26 @@
                                     <i class="bx bx-check-circle"></i> Car N°<?= htmlspecialchars($car_selectionne['id_car_programmer']) ?> présélectionné (départ <?= htmlspecialchars($car_selectionne['id_horaire']) ?> vers <?= htmlspecialchars($car_selectionne['id_trajet']) ?>).
                                 </div>
                             <?php endif; ?>
+                        </div>
+
+                        <!-- Sélection du camion (véhicule de fret, pas de trajet programmé requis) -->
+                        <div class="mb-4 col-12 col-md-4">
+                            <label for="id_camion_selectionner" class="form-label fw-bold">— ou sélectionner un camion —</label>
+                            <select id="id_camion_selectionner" name="id_camion_selectionner" class="form-select shadow-sm">
+                                <option value="">-- Choisir un camion --</option>
+                                <?php foreach ($liste_camions as $camion): ?>
+                                    <option value="<?= $camion['id_camion'] ?>"
+                                        <?= (!empty($camion_selectionne) && $camion['id_camion'] == $camion_selectionne['id_camion']) ? 'selected' : '' ?>>
+                                        Camion N°<?= $camion['numero_camion'] ?> — Matricule : <?= htmlspecialchars($camion['matriculle']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <?php if (!empty($camion_selectionne)): ?>
+                                <div class="form-text text-success">
+                                    <i class="bx bx-check-circle"></i> Camion N°<?= htmlspecialchars($camion_selectionne['numero_camion']) ?> présélectionné.
+                                </div>
+                            <?php endif; ?>
+                        </div>
                         </div>
 
                         <!-- Table des colis -->
@@ -119,11 +140,23 @@
     <?php $this->view('admin/partials/foot') ?>
     <!-- ✅ Script JS pour gérer la sélection de tous les checkboxes -->
     <script>
-        document.getElementById('selectAll').addEventListener('change', function() {
-            const isChecked = this.checked;
-            document.querySelectorAll('.checkbox-car').forEach(function(checkbox) {
-                checkbox.checked = isChecked;
+        const selectAllCheckbox = document.getElementById('selectAll');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                const isChecked = this.checked;
+                document.querySelectorAll('.checkbox-car').forEach(function(checkbox) {
+                    checkbox.checked = isChecked;
+                });
             });
+        }
+    </script>
+    <script>
+        // Un colis part soit sur un car, soit sur un camion : choisir l'un désélectionne l'autre.
+        document.addEventListener("DOMContentLoaded", function () {
+            const carSel = document.getElementById('id_car_selectionner');
+            const camionSel = document.getElementById('id_camion_selectionner');
+            carSel.addEventListener('change', function () { if (this.value) camionSel.value = ''; });
+            camionSel.addEventListener('change', function () { if (this.value) carSel.value = ''; });
         });
     </script>
 

@@ -9,6 +9,14 @@
             extract($_POST);
             $errors = [];
             $id_compagnie = $_SESSION["id_compagnie"];
+
+            // Un chauffeur conduit soit un car, soit un camion (jamais les deux) : la
+            // checkbox "est_camion" du formulaire determine lequel des deux champs fait foi.
+            $estCamion = isset($_POST['est_camion']) && $_POST['est_camion'] === '1';
+            $id_car = $estCamion ? null : ($_POST['id_car'] ?? null);
+            $id_camion = $estCamion ? ($_POST['id_camion'] ?? null) : null;
+            $type_vehicule = $estCamion ? 'camion' : 'car';
+
             // Vérification des champs requis
             if (empty($nom_prenom)) {
                 $errors[] = "Le nom du chauffeur est obligatoire.";
@@ -25,8 +33,14 @@
                 }
             }
 
-            if (empty($id_car)) {
-                $errors[] = "Le car qu il conduit est obligatoire.";
+            if ($estCamion) {
+                if (empty($id_camion)) {
+                    $errors[] = "Le camion qu'il conduit est obligatoire.";
+                }
+            } else {
+                if (empty($id_car)) {
+                    $errors[] = "Le car qu il conduit est obligatoire.";
+                }
             }
 
             // Si aucune erreur, on procède à l'insertion
@@ -47,22 +61,31 @@
                     }
                 }
 
-                $insertion = $this->insertion_update_simples(
-                    "INSERT INTO chauffeur (nom_prenom, numero, id_car, id_compagnie, photo) 
-        VALUES (:nom_prenom, :numero, :id_car, :id_compagnie, :photo)",
+                // insertion_update_simples_insert_id() (pas la variante sans "_insert_id") :
+                // necessaire pour recuperer l'id du chauffeur cree sur LA MEME connexion PDO
+                // (cf. le meme correctif deja applique dans Configuration::saveUtilisateur(),
+                // sinon lastInsertId() sur une connexion separee vaudrait toujours 0), afin de
+                // creer sa fiche employe (module Salaire) juste apres.
+                $result = $this->insertion_update_simples_insert_id(
+                    "INSERT INTO chauffeur (nom_prenom, numero, id_car, id_camion, type_vehicule, id_compagnie, photo)
+        VALUES (:nom_prenom, :numero, :id_car, :id_camion, :type_vehicule, :id_compagnie, :photo)",
                     [
                         ":nom_prenom" => $nom_prenom,
                         ":numero" => $numero,
                         ":id_car"  => $id_car,
+                        ":id_camion" => $id_camion,
+                        ":type_vehicule" => $type_vehicule,
                         ":id_compagnie" => $id_compagnie,
                         ":photo" => $photoPath
                     ]
                 );
+                $idNouveauChauffeur = (int) ($result['lastInsertId'] ?? 0);
 
-                if ($insertion) {
-                    $this->set_flash("Car ajouté avec succès", "info");
+                if ($idNouveauChauffeur > 0) {
+                    (new Employe())->creerEmployePourChauffeur($idNouveauChauffeur, $id_compagnie);
+                    $this->set_flash("Chauffeur ajouté avec succès", "info");
                 } else {
-                    $this->set_flash("Erreur : le car n'a pas pu être ajouté");
+                    $this->set_flash("Erreur : le chauffeur n'a pas pu être ajouté");
                 }
             } else {
                 // Affichage des erreurs
@@ -76,7 +99,7 @@
         public function updateChauffeur($id, $data)
         {
             // Un Admin ne peut modifier que les chauffeurs de sa propre compagnie (IDOR sinon)
-            $sql = "UPDATE chauffeur SET nom_prenom = :nom, numero = :numero, id_car = :id_car WHERE id_chauffeur = :id";
+            $sql = "UPDATE chauffeur SET nom_prenom = :nom, numero = :numero, id_car = :id_car, id_camion = :id_camion, type_vehicule = :type_vehicule WHERE id_chauffeur = :id";
             if (($_SESSION['droit'] ?? null) !== 'super_admin') {
                 $sql .= " AND id_compagnie = :id_compagnie";
             }
@@ -84,6 +107,8 @@
             $stmt->bindParam(':nom', $data['nom_prenom']);
             $stmt->bindParam(':numero', $data['numero']);
             $stmt->bindParam(':id_car', $data['id_car']);
+            $stmt->bindParam(':id_camion', $data['id_camion']);
+            $stmt->bindParam(':type_vehicule', $data['type_vehicule']);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             if (($_SESSION['droit'] ?? null) !== 'super_admin') {
                 $stmt->bindValue(':id_compagnie', $_SESSION['id_compagnie'] ?? null);
