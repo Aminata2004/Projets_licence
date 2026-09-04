@@ -49,7 +49,9 @@ Un seul bulletin par `(id_employe, periode)`, vérifié en code (pas de contrain
 
 ## Permission
 
-Nouvelle permission **`Salaire_apercu`**, accordée par défaut à `super_admin`/`Admin`/`PDG`. **Absente** des jeux par défaut de `chef_d_escale`/`secretaire`/`Utilisateur` : pour eux, l'Admin doit l'accorder manuellement via l'écran d'assignation de permissions déjà existant (`/admin/Permissions/assigner/{id}`) — aucune nouvelle interface n'a été nécessaire pour ça.
+Nouvelle permission **`Salaire_apercu`**, accordée par défaut à `super_admin`/`Admin`/`PDG`. **Absente** des jeux par défaut de `chef_d_escale`/`secretaire`/`Utilisateur` : pour eux, l'Admin doit l'accorder manuellement via l'écran d'assignation de permissions déjà existant (`/admin/Permissions/assigner/{id}`) — aucune nouvelle interface n'a été nécessaire pour ça, la permission apparaît automatiquement dans un groupe "Salaire" (le regroupement par module y est dynamique, basé sur le préfixe du nom de la permission).
+
+⚠️ L'attribution "par défaut" ne se déclenche qu'à la **création** d'un compte (`Permission::assignPermissionsParDefautPourRole()`) — les comptes Admin/PDG déjà existants avant ce module ne l'avaient donc pas automatiquement. `ajout_salaires.sql` fait ce backfill rétroactif pour eux ; à ne pas oublier lors du déploiement, sinon un Admin déjà créé se retrouve sans accès à "Salaires" malgré la documentation ci-dessus. De même, un compte déjà connecté au moment où une permission lui est accordée doit se reconnecter pour que ça prenne effet (les permissions sont mises en cache en session).
 
 Cette permission gouverne **toute** la visibilité du module, y compris son propre salaire : sans elle, personne d'autre qu'Admin/PDG/super_admin ne voit rien dans "Salaires" (le lien de menu lui-même est masqué).
 
@@ -67,12 +69,14 @@ Calqué sur le pattern déjà utilisé par `Depense::getDepenses()` :
 
 | Écran | Route | Description |
 |---|---|---|
-| Liste des salaires | `/admin/Salaires` | Personnel visible selon le scoping ci-dessus, avec salaire de base. Ajout d'un employé hors-système et modification réservés Admin/PDG/super_admin. |
-| Génération de bulletin | (modal sur l'écran ci-dessus) | Choix d'une période (mois/année), snapshot du salaire au moment de la génération. |
+| Liste des salaires | `/admin/Salaires` | Personnel visible selon le scoping ci-dessus, avec salaire de base. Ajout d'un employé hors-système et modification réservés Admin/PDG/super_admin. Pour ces derniers, une case à cocher par ligne (+ "tout sélectionner") permet de choisir plusieurs employés ; pour un compte en lecture seule (permission accordée sans droit de gestion), la colonne Action affiche un tiret plutôt qu'un menu vide. |
+| Génération de bulletin | (modal sur l'écran ci-dessus) | Choix d'une période (mois/année), snapshot du salaire au moment de la génération. Deux déclencheurs vers le même contrôleur (`Salaires::generer_bulletin()`) : le bouton "Générer un bulletin" d'une ligne (un seul employé, `id_employe`) ou "Générer pour la sélection" (plusieurs employés cochés, `ids_employes[]`, une seule période pour tout le lot). |
 | Liste des bulletins | `/admin/Salaires/liste_bulletins` | Historique des bulletins déjà générés (même scoping), avec téléchargement. |
 | Téléchargement PDF | `/admin/Salaires/telecharger_bulletin/{id}` | Génère le PDF à la volée (Dompdf, A4 portrait, même convention que les autres PDF du projet), re-vérifie l'appartenance compagnie/gare avant de servir le fichier. |
 
 Lien de menu "Salaires" ajouté dans la sidebar sous le label "Personnel" (déjà utilisé par le lien "Employés" existant), gated par `userHasPermission('Salaire_apercu')`.
+
+⚠️ **Piège rencontré pendant le développement, à garder en tête pour toute évolution de ce module** : les méthodes de récupération de ce framework ne renvoient pas toutes le même type — `FetchSelectWheres()`/`SelectAllData()` (base `Model`) renvoient des **objets** (`PDO::FETCH_OBJ`), `FetchSelectWhere1()` renvoie des **tableaux** (`PDO::FETCH_ASSOC`). `Employe::getEmployesVisibles()`/`BulletinPaie::getBulletinsVisibles()` (listes) renvoient donc des objets (`$employe->poste`), tandis que `Employe::getEmployeVisibleById()`/`BulletinPaie::getBulletinVisibleById()` (une seule fiche) renvoient des tableaux (`$employe['poste']`) — une confusion entre les deux a d'abord causé une page blanche à la génération d'un bulletin et un nom de fichier PDF cassé au téléchargement, avant correction.
 
 ## Limites connues / choix assumés
 

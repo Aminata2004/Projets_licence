@@ -72,6 +72,8 @@ Dans le formulaire d'enregistrement des chauffeurs (modals d'ajout et d'édition
 
 **Point technique important** : la liste des chauffeurs (`Chauffeurs_cars::index()`) utilisait un `INNER JOIN car` — avec `id_car` désormais nullable, ce join aurait silencieusement exclu tout chauffeur affecté à un camion de la liste. Corrigé en un double `LEFT JOIN` (vers `car` et vers `camion`, chacun conditionné par `type_vehicule`).
 
+**Effet de bord du module Salaire** (ajouté après cette fonctionnalité, voir [`GESTION_SALAIRES.md`](GESTION_SALAIRES.md)) : `Chauffeurs_car::saveChauffeur()` crée désormais aussi, automatiquement, une fiche de paie (`employe`) pour tout nouveau chauffeur, qu'il conduise un car ou un camion — sans salaire de base renseigné (0 par défaut, à compléter par l'Admin depuis l'écran "Salaires"). Ça a nécessité de faire passer l'insertion du chauffeur de `insertion_update_simples()` à `insertion_update_simples_insert_id()` pour récupérer son id et créer la fiche liée.
+
 ## Écran "Envoi des colis"
 
 URL : `/admin/Envoi_colis/envoi_colis`.
