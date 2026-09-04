@@ -88,6 +88,9 @@ class Salaires extends Controller
         }
     }
 
+    // Génère un bulletin pour un employé (bouton par ligne, id_employe seul) OU pour
+    // plusieurs d'un coup (cases à cocher + "Générer pour la sélection",
+    // ids_employes[]) -- même endpoint, une seule période pour tout le lot.
     public function generer_bulletin()
     {
         $this->requireGestionnaire();
@@ -95,23 +98,45 @@ class Salaires extends Controller
         $model = new Employe();
         $bulletinModel = new BulletinPaie();
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_employe'], $_POST['periode'])) {
-            $employe = $model->getEmployeVisibleById($_POST['id_employe']);
-            if (!$employe) {
-                $bulletinModel->set_flash("Employé introuvable.", "danger");
-                header("Location: " . BASE_URL . "/admin/Salaires");
-                exit;
-            }
-
-            $bulletinModel->genererBulletin(
-                $employe->id_employe,
-                $_POST['periode'],
-                $employe->salaire_base,
-                $_SESSION['id_utilisateur'] ?? null
-            );
-            $bulletinModel->set_flash("Bulletin généré avec succès.", "success");
-        } else {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_POST['periode'])) {
             $bulletinModel->set_flash("Données invalides pour la génération du bulletin.", "danger");
+            header("Location: " . BASE_URL . "/admin/Salaires");
+            exit;
+        }
+
+        $ids = !empty($_POST['ids_employes']) && is_array($_POST['ids_employes'])
+            ? $_POST['ids_employes']
+            : (!empty($_POST['id_employe']) ? [$_POST['id_employe']] : []);
+
+        if (empty($ids)) {
+            $bulletinModel->set_flash("Veuillez sélectionner au moins un employé.", "danger");
+            header("Location: " . BASE_URL . "/admin/Salaires");
+            exit;
+        }
+
+        $nbGeneres = 0;
+        foreach ($ids as $id_employe) {
+            // getEmployeVisibleById() re-vérifie l'IDOR (compagnie/gare) pour CHAQUE id :
+            // un id trafiqué dans la requête (hors scope de l'appelant) est simplement ignoré.
+            $employe = $model->getEmployeVisibleById($id_employe);
+            if ($employe) {
+                $bulletinModel->genererBulletin(
+                    $employe['id_employe'],
+                    $_POST['periode'],
+                    $employe['salaire_base'],
+                    $_SESSION['id_utilisateur'] ?? null
+                );
+                $nbGeneres++;
+            }
+        }
+
+        if ($nbGeneres > 0) {
+            $bulletinModel->set_flash(
+                $nbGeneres > 1 ? "$nbGeneres bulletins générés avec succès." : "Bulletin généré avec succès.",
+                "success"
+            );
+        } else {
+            $bulletinModel->set_flash("Aucun employé valide trouvé pour la génération.", "danger");
         }
 
         header("Location: " . BASE_URL . "/admin/Salaires/liste_bulletins");
@@ -150,7 +175,7 @@ class Salaires extends Controller
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        $dompdf->stream('bulletin_paie_' . $bulletin->periode . '.pdf', ['Attachment' => true]);
+        $dompdf->stream('bulletin_paie_' . $bulletin['periode'] . '.pdf', ['Attachment' => true]);
         exit;
     }
 }

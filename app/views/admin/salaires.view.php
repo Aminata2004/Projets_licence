@@ -31,6 +31,10 @@
                             <i class="bx bx-receipt fs-5"></i> Bulletins générés
                         </a>
                         <?php if ($peutGerer): ?>
+                        <button type="button" id="genererSelectionBtn" class="btn btn-primary d-flex align-items-center gap-2 shadow-sm" disabled
+                            data-bs-toggle="modal" data-bs-target="#genererBulletinsMultiModal">
+                            <i class="bx bx-receipt fs-5"></i> Générer pour la sélection
+                        </button>
                         <button type="button" class="btn btn-success d-flex align-items-center gap-2 shadow-sm"
                             data-bs-toggle="modal" data-bs-target="#addEmployeModal">
                             <i class="bx bx-plus-circle fs-5"></i> Ajouter (hors-système)
@@ -56,6 +60,9 @@
                         <table id="example" class="table table-striped table-bordered table-hover-effect table-custom-header text-center mobile-card-table" style="width:100%">
                             <thead class="table-light text-center">
                                 <tr>
+                                    <?php if ($peutGerer): ?>
+                                    <th class="fw-semibold"><input type="checkbox" id="selectAllEmployes"></th>
+                                    <?php endif; ?>
                                     <th class="fw-semibold">Nom &amp; prénom</th>
                                     <th class="fw-semibold">Poste</th>
                                     <th class="fw-semibold">Gare</th>
@@ -68,6 +75,9 @@
                                 <?php foreach ($listeEmployes as $employe): ?>
                                     <?php $horsSysteme = empty($employe->id_utilisateur) && empty($employe->id_chauffeur); ?>
                                     <tr>
+                                        <?php if ($peutGerer): ?>
+                                        <td data-label=""><input type="checkbox" class="employe-checkbox" value="<?= $employe->id_employe ?>"></td>
+                                        <?php endif; ?>
                                         <td data-label="Nom & prénom"><?= htmlspecialchars($employe->nom_affiche ?? '') ?></td>
                                         <td data-label="Poste"><?= htmlspecialchars($employe->poste) ?></td>
                                         <td data-label="Gare"><?= htmlspecialchars($employe->localite ?? 'Compagnie entière') ?></td>
@@ -80,12 +90,12 @@
                                             <?php endif; ?>
                                         </td>
                                         <td data-label="Action">
+                                            <?php if ($peutGerer): ?>
                                             <div class="dropdown">
                                                 <a href="#" class="text-dark fs-5" data-bs-toggle="dropdown" aria-expanded="false">
                                                     &#8943;
                                                 </a>
                                                 <ul class="dropdown-menu shadow-sm">
-                                                    <?php if ($peutGerer): ?>
                                                     <li>
                                                         <a class="dropdown-item edit-btn"
                                                             data-bs-toggle="modal"
@@ -111,9 +121,11 @@
                                                             🧾 Générer un bulletin
                                                         </a>
                                                     </li>
-                                                    <?php endif; ?>
                                                 </ul>
                                             </div>
+                                            <?php else: ?>
+                                                <span class="text-muted">—</span>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach ?>
@@ -246,6 +258,32 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal génération groupée : les cases cochées sont injectées en champs cachés
+             (ids_employes[]) par JS juste avant l'ouverture, cf. script plus bas. -->
+        <div class="modal fade" id="genererBulletinsMultiModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form action="<?= BASE_URL ?>/admin/Salaires/generer_bulletin" method="post" id="formGenererMulti">
+                        <div class="modal-header bg-primary">
+                            <h5 class="modal-title text-white">Générer les bulletins sélectionnés</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong id="generer_multi_count">0</strong> employé(s) sélectionné(s).</p>
+                            <div class="mb-3">
+                                <label class="form-label">Période</label>
+                                <input type="month" class="form-control" name="periode" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Générer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <?php endif; ?>
 
         <!--start overlay-->
@@ -294,6 +332,45 @@
                     document.getElementById("generer_id").value = this.dataset.id;
                     document.getElementById("generer_nom").textContent = this.dataset.nom;
                 });
+            });
+
+            // Sélection multiple (cases à cocher) pour générer plusieurs bulletins d'un
+            // coup, meme période pour tout le lot.
+            const selectAll = document.getElementById("selectAllEmployes");
+            const genererSelectionBtn = document.getElementById("genererSelectionBtn");
+            const employeCheckboxes = () => document.querySelectorAll(".employe-checkbox");
+
+            function majBoutonSelection() {
+                const nbCoches = document.querySelectorAll(".employe-checkbox:checked").length;
+                genererSelectionBtn.disabled = nbCoches === 0;
+            }
+
+            if (selectAll) {
+                selectAll.addEventListener("change", function() {
+                    employeCheckboxes().forEach(function(cb) { cb.checked = selectAll.checked; });
+                    majBoutonSelection();
+                });
+            }
+            employeCheckboxes().forEach(function(cb) {
+                cb.addEventListener("change", majBoutonSelection);
+            });
+
+            // Juste avant l'ouverture du modal de génération groupée : injecte un champ
+            // caché ids_employes[] par case cochée (le formulaire n'a lui-même aucune
+            // case, seulement le tableau principal).
+            const modalMulti = document.getElementById("genererBulletinsMultiModal");
+            const formMulti = document.getElementById("formGenererMulti");
+            modalMulti.addEventListener("show.bs.modal", function() {
+                formMulti.querySelectorAll("input[name='ids_employes[]']").forEach(function(el) { el.remove(); });
+                const coches = document.querySelectorAll(".employe-checkbox:checked");
+                coches.forEach(function(cb) {
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "ids_employes[]";
+                    input.value = cb.value;
+                    formMulti.appendChild(input);
+                });
+                document.getElementById("generer_multi_count").textContent = coches.length;
             });
         });
     </script>

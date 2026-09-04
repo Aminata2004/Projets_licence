@@ -101,33 +101,33 @@
       <tr>
         <td width="60">
           <?php
-            $logoPath = (!empty($bulletin->logo)) ? ROOT . '/public/images/logos/' . $bulletin->logo : null;
+            $logoPath = (!empty($bulletin['logo'])) ? ROOT . '/public/images/logos/' . $bulletin['logo'] : null;
           ?>
           <?php if ($logoPath && file_exists($logoPath) && extension_loaded('gd')): ?>
             <img src="file://<?= realpath($logoPath) ?>" alt="Logo">
           <?php endif; ?>
         </td>
         <td>
-          <h2><?= htmlspecialchars($bulletin->nom_compagnie ?? 'Compagnie') ?></h2>
+          <h2><?= htmlspecialchars($bulletin['nom_compagnie'] ?? 'Compagnie') ?></h2>
         </td>
       </tr>
     </table>
   </header>
 
-  <h3>Bulletin de paie — <?= htmlspecialchars($bulletin->periode) ?></h3>
+  <h3>Bulletin de paie — <?= htmlspecialchars($bulletin['periode']) ?></h3>
 
   <table class="infos">
     <tr>
       <td class="label">Employé</td>
-      <td><?= htmlspecialchars($bulletin->nom_affiche ?? 'N/A') ?></td>
+      <td><?= htmlspecialchars($bulletin['nom_affiche'] ?? 'N/A') ?></td>
       <td class="label">Poste</td>
-      <td><?= htmlspecialchars($bulletin->poste ?? '') ?></td>
+      <td><?= htmlspecialchars($bulletin['poste'] ?? '') ?></td>
     </tr>
     <tr>
       <td class="label">Gare de rattachement</td>
-      <td><?= htmlspecialchars($bulletin->localite ?? 'Compagnie entière') ?></td>
+      <td><?= htmlspecialchars($bulletin['localite'] ?? 'Compagnie entière') ?></td>
       <td class="label">Date de génération</td>
-      <td><?= date('d/m/Y à H:i', strtotime($bulletin->date_generation)) ?></td>
+      <td><?= date('d/m/Y à H:i', strtotime($bulletin['date_generation'])) ?></td>
     </tr>
   </table>
 
@@ -140,18 +140,18 @@
     </thead>
     <tbody>
       <tr>
-        <td>Salaire de base — <?= htmlspecialchars($bulletin->periode) ?></td>
-        <td style="text-align:right;"><?= number_format((float) $bulletin->salaire_verse, 0, ',', ' ') ?> FCFA</td>
+        <td>Salaire de base — <?= htmlspecialchars($bulletin['periode']) ?></td>
+        <td style="text-align:right;"><?= number_format((float) $bulletin['salaire_verse'], 0, ',', ' ') ?> FCFA</td>
       </tr>
       <tr class="montant-total">
         <td>Net à payer</td>
-        <td style="text-align:right;"><?= number_format((float) $bulletin->salaire_verse, 0, ',', ' ') ?> FCFA</td>
+        <td style="text-align:right;"><?= number_format((float) $bulletin['salaire_verse'], 0, ',', ' ') ?> FCFA</td>
       </tr>
     </tbody>
   </table>
 
   <footer>
-    Document généré le <?= date('d/m/Y à H:i') ?> — Bulletin n°<?= htmlspecialchars($bulletin->id_bulletin) ?>.
+    Document généré le <?= date('d/m/Y à H:i') ?> — Bulletin n°<?= htmlspecialchars($bulletin['id_bulletin']) ?>.
   </footer>
 
 </body>

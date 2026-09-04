@@ -14,7 +14,7 @@ class BulletinPaie extends Model
             [":id_employe" => $id_employe, ":periode" => $periode]
         );
         if (!empty($existant)) {
-            return $existant[0]->id_bulletin ?? null;
+            return $existant[0]['id_bulletin'] ?? null;
         }
 
         $result = $this->insertion_update_simples_insert_id(
